@@ -3,6 +3,7 @@ from __future__ import division
 from datetime import datetime, timedelta, date
 import logging
 from dateutil.relativedelta import relativedelta
+import numpy
 from openerp import tools
 from openerp.osv import osv, fields
 from openerp.osv.orm import AbstractModel, Model, browse_null
@@ -2268,8 +2269,7 @@ class KpiExpertAssessments(Model):
             if u'самоотвод' in args:
                 return False
             else:
-                calc_sum = sum(float(x) for x in args)
-                return round(calc_sum / len(args), 2)
+                return round(numpy.mean([map(float, args)]), 2)
 
         data = self.browse(cr, uid, ids, context)
         for row in data:
@@ -2301,7 +2301,7 @@ class KpiExpertAssessments(Model):
         ids = self.search(cr, 1, [('kpi_id', '=', kpi_id), ('state', '=', 'work')])
         result = 0.0
         if ids:
-            result = round(sum(r['mean'] for r in self.read(cr, 1, ids, ['mean'])) / len(ids), 2) or 0.0
+            result = round(numpy.mean([r['mean'] for r in self.read(cr, 1, ids, ['mean'])]), 2) or 0.0
 
         mbo_ids = self.pool.get('kpi.mbo').search(cr, 1, [('name', '=', 5), ('kpi_id', '=', kpi_id)])
         if mbo_ids:
