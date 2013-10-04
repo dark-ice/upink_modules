@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+		
+        <record model="ir.ui.view" id="view_send_code_popup_form">
+            <field name="name">view.send.code.popup.form</field>
+            <field name="model">send.code</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Send Verify Code">
+					<label string="Please specify the valid email address on which you can get varification code." colspan="4"/>
+					<label string="After you get the varification code in your email address, you can varify this server by copy and paste this code in 'Varify Code' pop up." colspan="4"/>
+					<field name="emailto" colspan="4"/>	
+					<newline />
+                    <group colspan="4">
+                        <button name="send_code" string="_Send Code" type="object" icon="gtk-yes"/>
+                        <button special="cancel" string="_Cancel" icon="gtk-cancel" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+       <act_window name="Send Verification Code"
+            res_model="send.code"
+            src_model="email.smtpclient"
+            view_mode="form"
+            target="new"
+            key2="client_action_multi"
+            id="action_view_send_code_popup"/>
+		
+	</data>
+</openerp>

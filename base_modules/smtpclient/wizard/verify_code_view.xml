@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+		
+        <record model="ir.ui.view" id="view_verify_code_popup_form">
+            <field name="name">view.verify.code.popup.form</field>
+            <field name="model">verify.code</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Verify Code">
+					<label string="Please add the varification code, which you have receive in your email address." colspan="4"/>
+					<label string="After successful varification, you will able to send email from this SMTP server." colspan="4"/>
+					<field name="code" colspan="4"/>	
+					<newline />
+                    <group colspan="4">
+                        <button name="verify_code" string="_Verify Code" type="object" icon="gtk-yes"/>
+                        <button special="cancel" string="_Cancel" icon="gtk-cancel" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+       <act_window name="Verify Code"
+            res_model="verify.code"
+            src_model="email.smtpclient"
+            view_mode="form"
+            target="new"
+            key2="client_action_multi"
+            id="action_view_verify_code_popup"/>
+		
+	</data>
+</openerp>

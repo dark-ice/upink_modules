@@ -1,0 +1,2 @@
+este modulo arregla el módulo python-test-before-send para poder utilizar la variable "uid" a la hora de hacer restricciones en el envío
+tambien se le hicieron arreglosen los grupos de usuarios para la version de open 6.1

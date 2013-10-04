@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+	
+		<record model="ir.ui.view" id="view_send_test_email_form">
+            <field name="name">view.send.test.email.form</field>
+            <field name="model">send.test.email</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Send Test Email">
+					<field name="emailto" colspan="2"/>	
+					<newline />
+                    <group colspan="4">
+                        <button name="send_test_email" string="_Send Email" type="object" icon="gtk-yes" />
+                        <button special="cancel" string="_Cancel" icon="gtk-cancel"  />
+                    </group>
+                </form>
+            </field>
+        </record>
+	
+        <act_window name="Send Test Email"
+            res_model="send.test.email"
+            src_model="email.smtpclient"
+            view_mode="form"
+            target="new"
+            key2="client_action_multi"
+            id="action_view_send_test_email"
+		   />
+		
+    </data>
+</openerp>
