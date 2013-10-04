@@ -806,7 +806,7 @@ class res_partner(Model):
         res = self.name_get(cr, user, ids, context)
         return res
 
-    def _get_service_status(self, cr, uid, ids, name, arg, context=None):
+    def _get_partner_status(self, cr, uid, ids, name, arg, context=None):
         res = {}
         for record in self.read(cr, uid, ids, ['added_services_ids'], context):
             val = 'Новая'
