@@ -1,0 +1,244 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="allocation_leave_new_inherit">
+            <field name="name">Allocation Request inherit</field>
+            <field name="model">hr.holidays</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="hr_holidays.edit_holiday_new"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="before">
+                    <field name="check_a"/>
+                    <field name="check_m"/>
+                    <field name="check_h"/>
+                    <field name="timedelt" />
+                </xpath>
+
+                <xpath expr="//field[@name='name']" position="replace">
+                    <field name="name"
+                           invisible="1"
+                            />
+                </xpath>
+                <xpath expr="//field[@name='employee_id']" position="after">
+                    <field name="cr_date" readonly="1" />
+                    <newline />
+                    <field name="job_id" readonly="1"/>
+                    <newline />
+                    <field name="head_id" readonly="1" />
+                </xpath>
+
+                <xpath expr="//field[@name='date_from']" position="replace">
+                    <field name="date_from" on_change="onchange_date_from(date_to, date_from, cr_date)" required="1" attrs="{'readonly':[('state','not in',('draft', 'revision'))]}"/>
+                </xpath>
+
+                <xpath expr="//field[@name='date_to']" position="replace">
+                    <field name="date_to" on_change="onchange_date_from(date_to, date_from, cr_date)" required="1" attrs="{'readonly':[('state','not in',('draft', 'revision'))]}"/>
+                </xpath>
+
+                <xpath expr="//field[@name='employee_id']" position="replace">
+                    <field name="employee_id" readonly="1" attrs="{'required':[('holiday_type','=','employee')]}"/>
+                </xpath>
+
+                <xpath expr="//field[@name='holiday_type']" position="replace" >
+                    <field name="holiday_type" on_change="onchange_type(holiday_type)" attrs="{'readonly':[('state','not in',('draft', 'revision'))]}" width="130" string="Mode" groups="base.group_hr_manager" invisible="1"/>
+                </xpath>
+
+                <xpath expr="//separator[@string='Reasons']" position="before">
+                    <separator string="Комментарий" colspan="4" />
+                    <field name="comment" nolabel="1" colspan="4" attrs="{'readonly': [('state', 'not in',('draft', 'revision'))]}" />
+                    <separator string="Причина подачи заявки не в срок" colspan="4" />
+                    <field name="note_reason" nolabel="1" colspan="4" attrs="{'required': [('timedelt', '&lt;', 15), ('state', 'in',('draft', 'revision'))], 'readonly': [('state', 'not in',('draft', 'revision'))]}" />
+                </xpath>
+
+                <xpath expr="//field[@name='notes']" position="replace">
+                    <field name="notes" colspan="4" nolabel="1" attrs="{'readonly': [('state', '=', 'draft')]}"/>
+                </xpath>
+
+                <xpath expr="//separator[@string='Reasons']" position="replace">
+                    <separator string="Комментарий на доработку" colspan="4" />
+                </xpath>
+
+                <xpath expr="//field[@name='holiday_status_id']" position="replace">
+                    <field name="holiday_status_id"
+                           on_change="onchange_sec_id(holiday_status_id, employee_id)"
+                           widget="selection"
+                           attrs="{'readonly':[('state','not in',('draft', 'revision'))]}"
+                            />
+                    <field name="get_days" />
+                    <newline />
+                </xpath>
+
+                <xpath expr="//field[@name='manager_id']" position="replace" />
+                <xpath expr="//field[@name='manager_id2']" position="replace" />
+                <xpath expr="//field[@name='department_id']" position="replace" />
+
+                <xpath expr="//button[@name='confirm']" position="replace" />
+                <xpath expr="//button[@name='validate']" position="replace" />
+                <xpath expr="//button[@name='second_validate']" position="replace" />
+                <xpath expr="//button[@name='set_to_draft']" position="replace" />
+                <xpath expr="//button[@name='refuse']" position="replace" />
+                
+
+                <xpath expr="//field[@name='state']" position="replace">
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="draft,validate,validate1,confirm"
+                           statusbar_colors='{"confirm":"orange","revision":"brown","cancel":"red"}'
+                           colspan="2"
+                            />
+                    <group colspan="2" col="8">
+                        <button string="Отменить"
+                            name="cancel"
+                            type="workflow"
+                            icon="gtk-no"
+                            attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_a', '=', False)]}"
+                            />
+                        <button string="На утверждение Руководителю"
+                            name="validate1"
+                            type="workflow"
+                            icon="gtk-go-forward"
+                            attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_a', '=', False)]}"
+                            />
+                        <button string="Вернуть в черновик"
+                            name="draft"
+                            type="workflow"
+                            icon="gtk-undo"
+                            attrs="{'invisible': ['|', ('state', '!=', 'validate1'), ('check_a', '=', False)]}"
+                            />
+                        <button string="На доработку"
+                            name="revision"
+                            type="workflow"
+                            icon="gtk-go-back"
+                            attrs="{'invisible': ['|', ('state', '!=', 'validate1'), ('check_m', '=', False)]}"
+                            />
+                        <button string="На утверждение Руководителю"
+                            name="revalidate"
+                            type="workflow"
+                            icon="gtk-go-forward"
+                            attrs="{'invisible': ['|', ('state', '!=', 'revision'), ('check_a', '=', False)]}"
+                            />
+                        <button string="На визирование HR"
+                            name="sight"
+                            type="workflow"
+                            icon="gtk-go-forward"
+                            attrs="{'invisible': ['|', ('state', '!=', 'validate1'), ('check_m', '=', False)]}"
+                            />
+                        <button string="Вернуть на утверждение Руководителю"
+                            name="resight"
+                            states="validate"
+                            type="workflow"
+                            icon="gtk-go-back"
+                            groups="base.group_hr_manager"
+                            />
+                        <button string="Утвердить"
+                            name="confirm"
+                            states="validate"
+                            type="workflow"
+                            icon="gtk-yes"
+                            groups="base.group_hr_manager"
+                            />
+                        <button string="В черновик" name="set_to_draft" type="object" icon="gtk-convert" groups="base.group_hr_user"/>
+                    </group>
+                    <group col="4" colspan="6">
+                        <separator string="История переходов" colspan="4"/>
+                        <field name="history_ids" nolabel="1" colspan="4" readonly="1">
+                            <tree>
+                                <field name="state"/>
+                                <field name="usr_id" />
+                                <field name="create_date" />
+                            </tree>
+                        </field>
+                    </group>
+                </xpath>
+
+                
+
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_holiday_inherit">
+            <field name="name">hr.holidays.tree.inherit</field>
+            <field name="model">hr.holidays</field>
+            <field name="type">tree</field>
+            <field name="inherit_id" ref="hr_holidays.view_holiday"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='holiday_type']" position="replace" />
+                <xpath expr="//field[@name='category_id']" position="replace" />
+                <xpath expr="//field[@name='manager_id']" position="replace" />
+                <xpath expr="//field[@name='name']" position="replace" />
+                <xpath expr="//button[@name='validate']" position="replace" />
+                <xpath expr="//button[@name='second_validate']" position="replace" />
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="edit_holiday_status_form_inherit">
+            <field name="name">hr.holidays.status.form.inherit</field>
+            <field name="model">hr.holidays.status</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="hr_holidays.edit_holiday_status_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='categ_id']" position="replace"/>
+                <xpath expr="//field[@name='double_validation']" position="replace">
+                    <field name="constant" />
+                    <field name="year_refresh" />
+                </xpath>
+                <xpath expr="//group[@name='second']" position="after">
+                    <group colspan="4" col="4">
+                        <separator string="Количество выделяемых дней (может быть формулой)" colspan="4"/>
+                        <field name="days" colspan="4" nolabel="1"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="allocation_leave_search_inherit">
+            <field name="name">Search Holidays</field>
+            <field name="model">hr.holidays</field>
+            <field name="type">search</field>
+            <field name="inherit_id" ref="hr_holidays.view_hr_holidays_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@string='To Confirm']" position="before">
+                    <filter icon="terp-personal+" domain="[('employee_id.active','=', True)]"
+                            name="active" string="Активные" />
+                    <separator/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_employee_form_leave_inherit1" model="ir.ui.view">
+            <field name="name">hr.employee.leave.form.inherit1</field>
+            <field name="model">hr.employee</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='parent_id']" position="after">
+                    <field name="start_date"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="hr_holidays.action_open_ask_holidays_calendar">
+            <field name="sequence" eval="5"/>
+            <field name="view_mode">calendar</field>
+            <field name="view_id" ref="hr_holidays.view_holiday_new_calendar"/>
+            <field name="act_window_id" ref="hr_holidays.open_ask_holidays"/>
+        </record>
+
+        <record id="view_employee_form_inherit1" model="ir.ui.view">
+            <field name="name">hr.employee.form.inherit1</field>
+            <field name="model">hr.employee</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="hr_holidays.view_employee_form_leave_inherit"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='remaining_leaves']" position="replace" />
+                <xpath expr="//field[@name='current_leave_id']" position="replace" />
+                <xpath expr="//field[@name='current_leave_state']" position="replace" />
+            </field>
+        </record>
+
+        <menuitem name="Leave Requests to Approve" parent="hr_holidays.menu_open_ask_holidays" id="hr_holidays.menu_request_approve_holidays" action="hr_holidays.request_approve_holidays" groups="base.group_extended"/>
+        <menuitem name="Allocation Requests" parent="hr_holidays.menu_open_ask_holidays" id="hr_holidays.menu_open_allocation_holidays" action="hr_holidays.open_allocation_holidays" groups="base.group_extended"/>
+        <menuitem name="Leaves Summary" parent="hr_holidays.menu_open_ask_holidays" id="hr_holidays.menu_open_company_allocation" action="hr_holidays.open_company_allocation" sequence="40" groups="base.group_extended"/>
+
+    </data>
+</openerp>

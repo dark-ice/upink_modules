@@ -1,0 +1,365 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="workflow" id="wkf_smm_strategy">
+            <field name="name">smm.strategy.start_workflow</field>
+            <field name="osv">smm.strategy</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- draft -->
+        <record model="workflow.activity" id="act_draft">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="flow_start">True</field>
+            <field name="name">черновик</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='draft')</field>
+        </record>
+
+        <!-- agreement_application -->
+        <record model="workflow.activity" id="act_agreement_application">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">согласование заявки</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='agreement_application')</field>
+        </record>
+
+        <!-- appointment_smm_spec -->
+        <record model="workflow.activity" id="act_appointment_smm_spec">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">назначение СММ специалиста</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='appointment_smm_spec')</field>
+        </record>
+
+        <!-- preparation_strategy -->
+        <record model="workflow.activity" id="act_preparation_strategy">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">составление стратегии</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='preparation_strategy')</field>
+        </record>
+
+        <!-- approval_strategy -->
+        <record model="workflow.activity" id="act_approval_strategy">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">утверждение стратегии</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='approval_strategy')</field>
+        </record>
+
+        <!-- completion_strategy -->
+        <record model="workflow.activity" id="act_completion_strategy">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">доработка стратегии</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='completion_strategy')</field>
+        </record>
+
+        <!-- introduce_strategy -->
+        <record model="workflow.activity" id="act_introduce_strategy">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">ознакомление со стратегией</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='introduce_strategy')</field>
+        </record>
+
+        <!-- start_strategy -->
+        <record model="workflow.activity" id="act_start_strategy">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">запуск стратегии/создание персонажей и сообществ</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='start_strategy')</field>
+        </record>
+
+        <!-- creat_charact_commun -->
+        <record model="workflow.activity" id="act_creat_charact_commun">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">запуск стратегии/создание персонажей и сообществ</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='creat_charact_commun')</field>
+        </record>
+
+        <!-- primary_filling_content -->
+        <record model="workflow.activity" id="act_primary_filling_content">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">первичное наполнение контентом</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='primary_filling_content')</field>
+        </record>
+
+        <!-- development_design -->
+        <record model="workflow.activity" id="act_development_design">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">разработка дизайна</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='development_design')</field>
+        </record>
+
+        <!-- approval_design -->
+        <record model="workflow.activity" id="act_approval_design">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">утверждение дизайна</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='approval_design')</field>
+        </record>
+
+        <!-- completion_design -->
+        <record model="workflow.activity" id="act_completion_design">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">доработка дизайна</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='completion_design')</field>
+        </record>
+
+        <!-- install_design -->
+        <record model="workflow.activity" id="act_install_design">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">установка дизайна</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='install_design')</field>
+        </record>
+
+        <!-- create_script_contest -->
+        <record model="workflow.activity" id="act_create_script_contest">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">создание сценария конкурса</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='create_script_contest')</field>
+        </record>
+
+        <!-- agreement_contest -->
+        <record model="workflow.activity" id="act_agreement_contest">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">согласование сценария</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='agreement_contest')</field>
+        </record>
+
+        <!-- start_targeting_reclam -->
+        <record model="workflow.activity" id="act_start_targeting_reclam">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">запуск таргетированной рекламы</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='start_targeting_reclam')</field>
+        </record>
+
+        <!-- start_contest -->
+        <record model="workflow.activity" id="act_start_contest">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">запуск конкурса</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='start_contest')</field>
+        </record>
+
+        <!-- work_on_promotion -->
+        <record model="workflow.activity" id="act_work_on_promotion">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">работа по продвижению</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='work_on_promotion')</field>
+        </record>
+
+        <!-- sending_additional_sentence -->
+        <record model="workflow.activity" id="act_sending_additional_sentence">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">отправка дополнительного предложения</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='sending_additional_sentence')</field>
+        </record>
+
+        <!-- closed -->
+        <record model="workflow.activity" id="act_closed">
+            <field name="wkf_id" ref="wkf_smm_strategy" />
+            <field name="name">работы закончены</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='closed')</field>
+            <field name="flow_stop">True</field>
+        </record>
+
+
+        <!-- draft -> agreement_application -->
+        <record model="workflow.transition" id="d_aa">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_agreement_application"/>
+            <field name="signal">action_d_aa</field>
+        </record>
+
+        <!-- agreement_application -> appointment_smm_spec -->
+        <record model="workflow.transition" id="aa_ass">
+            <field name="act_from" ref="act_agreement_application" />
+            <field name="act_to" ref="act_appointment_smm_spec" />
+            <field name="signal">action_aa_ass</field>
+        </record>
+
+        <!-- appointment_smm_spec -> preparation_strategy -->
+        <record model="workflow.transition" id="ass_ps">
+            <field name="act_from" ref="act_appointment_smm_spec" />
+            <field name="act_to" ref="act_preparation_strategy" />
+            <field name="signal">action_ass_ps</field>
+        </record>
+
+        <!-- preparation_strategy -> approval_strategy -->
+        <record model="workflow.transition" id="ps_as">
+            <field name="act_from" ref="act_preparation_strategy" />
+            <field name="act_to" ref="act_approval_strategy" />
+            <field name="signal">action_ps_as</field>
+        </record>
+
+        <!-- approval_strategy -> completion_strategy -->
+        <record model="workflow.transition" id="as_cs">
+            <field name="act_from" ref="act_approval_strategy" />
+            <field name="act_to" ref="act_completion_strategy" />
+            <field name="signal">action_as_cs</field>
+        </record>
+
+        <!-- completion_strategy -> approval_strategy -->
+        <record model="workflow.transition" id="cs_as">
+            <field name="act_from" ref="act_completion_strategy" />
+            <field name="act_to" ref="act_approval_strategy" />
+            <field name="signal">action_cs_as</field>
+        </record>
+
+        <!-- approval_strategy -> introduce_strategy -->
+        <record model="workflow.transition" id="as_is">
+            <field name="act_from" ref="act_approval_strategy" />
+            <field name="act_to" ref="act_introduce_strategy" />
+            <field name="signal">action_as_is</field>
+        </record>
+
+        <!-- introduce_strategy -> start_strategy -->
+        <record model="workflow.transition" id="is_ss">
+            <field name="act_from" ref="act_introduce_strategy" />
+            <field name="act_to" ref="act_start_strategy" />
+            <field name="signal">action_is_ss</field>
+        </record>
+
+        <!-- introduce_strategy -> creat_charact_commun -->
+        <record model="workflow.transition" id="is_ccc">
+            <field name="act_from" ref="act_introduce_strategy" />
+            <field name="act_to" ref="act_creat_charact_commun" />
+            <field name="signal">action_is_ccc</field>
+        </record>
+
+        <!-- start_strategy -> primary_filling_content -->
+        <record model="workflow.transition" id="ss_pfc">
+            <field name="act_from" ref="act_start_strategy" />
+            <field name="act_to" ref="act_primary_filling_content" />
+            <field name="signal">action_ss_pfc</field>
+        </record>
+
+        <!-- creat_charact_commun -> primary_filling_content -->
+        <record model="workflow.transition" id="ccc_pfc">
+            <field name="act_from" ref="act_creat_charact_commun" />
+            <field name="act_to" ref="act_primary_filling_content" />
+            <field name="signal">action_ccc_pfc</field>
+        </record>
+
+        <!-- primary_filling_content -> development_design -->
+        <record model="workflow.transition" id="pfc_dd">
+            <field name="act_from" ref="act_primary_filling_content" />
+            <field name="act_to" ref="act_development_design" />
+            <field name="signal">action_pfc_dd</field>
+        </record>
+
+        <!-- development_design -> approval_design -->
+        <record model="workflow.transition" id="dd_ad">
+            <field name="act_from" ref="act_development_design" />
+            <field name="act_to" ref="act_approval_design" />
+            <field name="signal">action_dd_ad</field>
+        </record>
+
+        <!-- approval_design -> completion_design -->
+        <record model="workflow.transition" id="ad_cd">
+            <field name="act_from" ref="act_approval_design" />
+            <field name="act_to" ref="act_completion_design" />
+            <field name="signal">action_ad_cd</field>
+        </record>
+
+        <!-- completion_design -> approval_design -->
+        <record model="workflow.transition" id="cd_ad">
+            <field name="act_from" ref="act_completion_design" />
+            <field name="act_to" ref="act_approval_design" />
+            <field name="signal">action_cd_ad</field>
+        </record>
+
+        <!-- approval_design -> install_design -->
+        <record model="workflow.transition" id="ad_id">
+            <field name="act_from" ref="act_approval_design" />
+            <field name="act_to" ref="act_install_design" />
+            <field name="signal">action_ad_id</field>
+        </record>
+
+        <!-- install_design -> create_script_contest -->
+        <record model="workflow.transition" id="id_csc">
+            <field name="act_from" ref="act_install_design" />
+            <field name="act_to" ref="act_create_script_contest" />
+            <field name="signal">action_id_csc</field>
+        </record>
+
+        <!-- create_script_contest -> agreement_contest -->
+        <record model="workflow.transition" id="csc_ac">
+            <field name="act_from" ref="act_create_script_contest" />
+            <field name="act_to" ref="act_agreement_contest" />
+            <field name="signal">action_csc_ac</field>
+        </record>
+
+        <!-- agreement_contest -> start_contest -->
+        <record model="workflow.transition" id="ac_cs">
+            <field name="act_from" ref="act_agreement_contest" />
+            <field name="act_to" ref="act_start_contest" />
+            <field name="signal">action_ac_cs</field>
+        </record>
+
+        <!-- agreement_contest -> start_targeting_reclam -->
+        <record model="workflow.transition" id="ac_str">
+            <field name="act_from" ref="act_agreement_contest" />
+            <field name="act_to" ref="act_start_targeting_reclam" />
+            <field name="signal">action_ac_str</field>
+        </record>
+
+        <!-- start_contest -> work_on_promotion -->
+        <record model="workflow.transition" id="sc_wop">
+            <field name="act_from" ref="act_start_contest" />
+            <field name="act_to" ref="act_work_on_promotion" />
+            <field name="signal">action_sc_wop</field>
+        </record>
+
+        <!-- start_targeting_reclam -> work_on_promotion -->
+        <record model="workflow.transition" id="str_wop">
+            <field name="act_from" ref="act_start_targeting_reclam" />
+            <field name="act_to" ref="act_work_on_promotion" />
+            <field name="signal">action_str_wop</field>
+        </record>
+
+        <!-- primary_filling_content -> work_on_promotion -->
+        <record model="workflow.transition" id="pfc_wop">
+            <field name="act_from" ref="act_primary_filling_content" />
+            <field name="act_to" ref="act_work_on_promotion" />
+            <field name="signal">action_pfc_wop</field>
+        </record>
+
+        <!-- start_contest -> start_targeting_reclam -->
+        <record model="workflow.transition" id="sc_str">
+            <field name="act_from" ref="act_start_contest" />
+            <field name="act_to" ref="act_start_targeting_reclam" />
+            <field name="signal">action_sc_str</field>
+        </record>
+
+        <!-- work_on_promotion -> sending_additional_sentence -->
+        <record model="workflow.transition" id="wop_sas">
+            <field name="act_from" ref="act_work_on_promotion" />
+            <field name="act_to" ref="act_sending_additional_sentence" />
+            <field name="signal">action_wop_sas</field>
+        </record>
+
+        <!-- sending_additional_sentence -> closed -->
+        <record model="workflow.transition" id="sas_c">
+            <field name="act_from" ref="act_sending_additional_sentence" />
+            <field name="act_to" ref="act_closed" />
+            <field name="signal">action_closed</field>
+        </record>
+
+    </data>
+</openerp>

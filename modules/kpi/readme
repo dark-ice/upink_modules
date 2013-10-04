@@ -1,0 +1,74 @@
+To migrate 1.. => 2.0:
+
+UPDATE work_calendar SET period=case when strpos(period, '/') = 3 then
+        concat_ws('/', split_part(period, '/', 2), split_part(period, '/', 1))
+      else
+        period
+      end;
+
+UPDATE kpi_kpi k SET period_id=(SELECT n.id FROM
+  kpi_period n
+  left join work_calendar w on (n.name=w.period AND n.calendar=w.calendar_type)
+  WHERE w.id=k.period
+), employee_id=employee, calendar=employee_time, job_id=job_position;
+
+UPDATE kpi_indicators_reference SET active=True;
+
+UPDATE kpi_expert_assesment k SET period_id=(SELECT n.id FROM
+  kpi_period n
+  left join work_calendar w on (n.name=w.period AND n.calendar=w.calendar_type)
+  WHERE w.id=k.period
+), expert_id=expert, employee_id=employee;
+
+UPDATE kpi_smart k SET responsible_id=(SELECT n.employee_id FROM
+  kpi_kpi n
+  WHERE n.id=k.kpi_id
+), initiator_id=(SELECT n.parent_id FROM
+  kpi_kpi n
+  WHERE n.id=k.kpi_id
+), period_id=(SELECT n.period_id FROM
+  kpi_kpi n
+  WHERE n.id=k.kpi_id
+), responsible_head_id=(SELECT n.parent_id FROM
+  kpi_kpi n
+  WHERE n.id=k.kpi_id
+), author_id=(SELECT n.parent_id FROM
+  kpi_kpi n
+  WHERE n.id=k.kpi_id
+), note=criteria, deadline_date=deadline;
+
+INSERT INTO wkf_instance (res_id, res_type, wkf_id, state, uid) (SELECT id res_id, 'kpi.smart' res_type, 41 wkf_id, 'active' state, 1 uid FROM kpi_smart WHERE id NOT IN (SELECT res_id FROM wkf_instance WHERE res_type='kpi.smart'));
+INSERT INTO wkf_workitem (act_id, inst_id, state) (SELECT 499 act_id, id inst_id, 'complete' state FROM wkf_instance WHERE id NOT IN (SELECT inst_id FROM wkf_workitem));
+
+ALTER TABLE income_report_print DROP CONSTRAINT "income_report_print_period_fkey";
+ALTER TABLE kpi_kpi DROP CONSTRAINT "kpi_kpi_period_fkey";
+ALTER TABLE kpi_expert_assesment DROP CONSTRAINT "kpi_expert_assesment_period_fkey";
+
+DROP TABLE employee_retention;
+DROP TABLE employee_award;
+DROP TABLE employee_advance;
+
+DROP TABLE work_calendar;
+
+ALTER TABLE kpi_indicators_reference DROP CONSTRAINT "kpi_indicators_reference_goal_fkey";
+ALTER TABLE kpi_smart DROP CONSTRAINT "kpi_smart_goal_fkey";
+
+DROP TABLE goal_reference;
+
+UPDATE kpi_smart SET state='accepted' WHERE compliance='1';
+UPDATE wkf_workitem SET act_id=476 WHERE inst_id in (SELECT id FROM wkf_instance WHERE res_type='kpi.smart' AND res_id in (SELECT id FROM kpi_smart WHERE state='accepted'));
+
+UPDATE kpi_smart SET state='not_accepted' WHERE compliance='0';
+UPDATE wkf_workitem SET act_id=477 WHERE inst_id in (SELECT id FROM wkf_instance WHERE res_type='kpi.smart' AND res_id in (SELECT id FROM kpi_smart WHERE state='not_accepted'));
+
+UPDATE kpi_smart SET state='cancel' WHERE compliance in ('отменена', 'не актуальна');
+UPDATE wkf_workitem SET act_id=470 WHERE inst_id in (SELECT id FROM wkf_instance WHERE res_type='kpi.smart' AND res_id in (SELECT id FROM kpi_smart WHERE state='cancel'));
+
+UPDATE kpi_smart SET state='transfer' WHERE compliance='перенесена';
+UPDATE wkf_workitem SET act_id=479 WHERE inst_id in (SELECT id FROM wkf_instance WHERE res_type='kpi.smart' AND res_id in (SELECT id FROM kpi_smart WHERE state='transfer'));
+
+
+UPDATE kpi_kpi k SET work_days_1=(SELECT n.days FROM
+  kpi_period n
+  WHERE n.id=k.period_id
+);

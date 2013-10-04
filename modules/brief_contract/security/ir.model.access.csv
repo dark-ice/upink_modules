@@ -1,0 +1,13 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_contract_user","contract user","model_brief_contract","brief.group_manager_moscow",1,1,1,0
+"access_contract_manager","contract manager","model_brief_contract","base.group_sale_salesman",1,1,1,0
+"access_contract_lawyer","contract lawyer","model_brief_contract","brief.group_lawyer",1,1,1,0
+"access_contract_amount_user","contract amount user","model_brief_contract_amount","brief.group_manager_moscow",1,1,1,0
+"access_contract_amount_manager","contract amount manager","model_brief_contract_amount","base.group_sale_salesman",1,1,1,0
+"access_contract_amount_lawyer","contract amount lawyer","model_brief_contract_amount","brief.group_lawyer",1,1,1,0
+"access_contract_history_user","contract history user","model_brief_contract_history","brief.group_manager_moscow",1,1,1,0
+"access_contract_history_manager","contract history manager","model_brief_contract_history","base.group_sale_salesman",1,1,1,0
+"access_contract_history_lawyer","contract history lawyer","model_brief_contract_history","brief.group_lawyer",1,1,1,0
+"access_contract_comment_user","contract comment user","model_brief_contract_comment","brief.group_manager_moscow",1,1,1,0
+"access_contract_comment_manager","contract comment manager","model_brief_contract_comment","base.group_sale_salesman",1,1,1,0
+"access_contract_comment_lawyer","contract comment lawyer","model_brief_contract_comment","brief.group_lawyer",1,1,1,0

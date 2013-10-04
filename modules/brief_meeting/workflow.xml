@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_brief_meeting">
+            <field name="name">brief.meeting</field>
+            <field name="osv">brief.meeting</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- draft -->
+        <record model="workflow.activity" id="act_draft">
+            <field name="wkf_id" ref="wkf_brief_meeting"/>
+            <field name="flow_start">True</field>
+            <field name="name">draft</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='draft')</field>
+        </record>
+
+        <!-- cancel -->
+        <record model="workflow.activity" id="act_cancel">
+            <field name="wkf_id" ref="wkf_brief_meeting"/>
+            <field name="name">cancel</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='cancel')</field>
+        </record>
+
+        <!-- scheduled -->
+        <record model="workflow.activity" id="act_scheduled">
+            <field name="wkf_id" ref="wkf_brief_meeting"/>
+            <field name="name">scheduled</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='scheduled')</field>
+        </record>
+
+        <!-- reschedule -->
+        <record model="workflow.activity" id="act_reschedule">
+            <field name="wkf_id" ref="wkf_brief_meeting"/>
+            <field name="name">reschedule</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='reschedule')</field>
+        </record>
+
+        <!-- held -->
+        <record model="workflow.activity" id="act_held">
+            <field name="wkf_id" ref="wkf_brief_meeting"/>
+            <field name="flow_stop">True</field>
+            <field name="name">held</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='held')</field>
+        </record>
+
+        <!-- canceled -->
+        <record model="workflow.activity" id="act_canceled">
+            <field name="wkf_id" ref="wkf_brief_meeting"/>
+            <field name="flow_stop">True</field>
+            <field name="name">canceled</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='canceled')</field>
+        </record>
+
+
+        <!-- draft -> cancel -->
+        <record model="workflow.transition" id="draft_cancel">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">action_draft_cancel</field>
+        </record>
+
+        <!-- cancel -> draft -->
+        <record model="workflow.transition" id="cancel_draft">
+            <field name="act_from" ref="act_cancel"/>
+            <field name="act_to" ref="act_draft"/>
+            <field name="signal">action_cancel_draft</field>
+        </record>
+
+        <!-- draft -> scheduled -->
+        <record model="workflow.transition" id="draft_scheduled">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_scheduled"/>
+            <field name="signal">action_draft_scheduled</field>
+        </record>
+
+        <!-- scheduled -> canceled -->
+        <record model="workflow.transition" id="scheduled_canceled">
+            <field name="act_from" ref="act_scheduled"/>
+            <field name="act_to" ref="act_canceled"/>
+            <field name="signal">action_scheduled_canceled</field>
+        </record>
+
+        <!-- scheduled -> held -->
+        <record model="workflow.transition" id="scheduled_held">
+            <field name="act_from" ref="act_scheduled"/>
+            <field name="act_to" ref="act_held"/>
+            <field name="signal">action_scheduled_held</field>
+        </record>
+
+        <!-- scheduled -> reschedule -->
+        <record model="workflow.transition" id="scheduled_reschedule">
+            <field name="act_from" ref="act_scheduled"/>
+            <field name="act_to" ref="act_reschedule"/>
+            <field name="signal">action_scheduled_reschedule</field>
+        </record>
+
+        <!-- reschedule -> scheduled -->
+        <record model="workflow.transition" id="reschedule_scheduled">
+            <field name="act_from" ref="act_reschedule"/>
+            <field name="act_to" ref="act_scheduled"/>
+            <field name="signal">action_reschedule_scheduled</field>
+        </record>
+    </data>
+</openerp>

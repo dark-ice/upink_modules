@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!--planning-->
+        <record model='ir.actions.report.xml' id='ir_actions_report_xml_planning'>
+            <field name='report_type'>aeroo</field>
+            <field name='in_format'>oo-ods</field>
+            <field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/>
+            <field name='multi' eval='True'/>
+            <field name='name'>Планирование</field>
+            <field name='report_rml'>everyday_report/report/planning.ods</field>
+            <field name='report_name'>planning.documents</field>
+            <field name='model'>day.report.planning</field>
+            <field name='type'>ir.actions.report.xml</field>
+            <field name='attachment_use' eval='False'/>
+            <field name='parser_loc'>everyday_report/report/parser.py</field>
+            <field name='tml_source'>file</field>
+            <field name='parser_state'>loc</field>
+            <field name='styles_mode'>default</field>
+        </record>
+
+        <!--source-->
+        <record model='ir.actions.report.xml' id='ir_actions_report_xml_source1'>
+            <field name='report_type'>aeroo</field>
+            <field name='in_format'>oo-ods</field>
+            <field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/>
+            <field name='multi' eval='Falses'/>
+            <field name='name'>Источник 1</field>
+            <field name='report_rml'>everyday_report/report/sourse.ods</field>
+            <field name='report_name'>sourse.documents</field>
+            <field name='model'>day.report.source</field>
+            <field name='type'>ir.actions.report.xml</field>
+            <field name='attachment_use' eval='False'/>
+            <field name='parser_loc'>everyday_report/report/parser.py</field>
+            <field name='tml_source'>file</field>
+            <field name='parser_state'>loc</field>
+            <field name='styles_mode'>default</field>
+        </record>
+
+        <!--structure-->
+        <record model='ir.actions.report.xml' id='ir_actions_report_xml_structure'>
+            <field name='report_type'>aeroo</field>
+            <field name='in_format'>oo-ods</field>
+            <field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/>
+            <field name='multi' eval='True'/>
+            <field name='name'>Структура</field>
+            <field name='report_rml'>everyday_report/report/structure.ods</field>
+            <field name='report_name'>structure.documents</field>
+            <field name='model'>day.report.structure</field>
+            <field name='type'>ir.actions.report.xml</field>
+            <field name='attachment_use' eval='False'/>
+            <field name='parser_loc'>everyday_report/report/parser.py</field>
+            <field name='tml_source'>file</field>
+            <field name='parser_state'>loc</field>
+            <field name='styles_mode'>default</field>
+        </record>
+
+        <!--MP-->
+        <record model='ir.actions.report.xml' id='ir_actions_report_xml_MP'>
+            <field name='report_type'>aeroo</field>
+            <field name='in_format'>oo-ods</field>
+            <field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/>
+            <field name='multi' eval='True'/>
+            <field name='name'>МП</field>
+            <field name='report_rml'>everyday_report/report/MP.ods</field>
+            <field name='report_name'>MP.documents</field>
+            <field name='model'>day.report.mp</field>
+            <field name='type'>ir.actions.report.xml</field>
+            <field name='attachment_use' eval='False'/>
+            <field name='parser_loc'>everyday_report/report/parser.py</field>
+            <field name='tml_source'>file</field>
+            <field name='parser_state'>loc</field>
+            <field name='styles_mode'>default</field>
+        </record>
+    </data>
+</openerp>

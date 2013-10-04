@@ -1,0 +1,640 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+        <menuitem name="SMM стратегии" id="smm_strategy.menu_process_smm_strategy" sequence="4"
+                  parent="process_base.menu_process_all"/>
+
+        <record model="ir.ui.view" id="view_smm_strategy_start_tree_2">
+            <field name="name">Список Запуск стратении SMM</field>
+            <field name="model">smm.strategy</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Запуск стратении SMM">
+                    <field name="partner_id"/>
+                    <field name="url"/>
+                    <field name="manager_work_id"/>
+                    <field name="manager_upwork_id"/>
+
+                    <field name="user_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_smm_strategy_start_search" model="ir.ui.view">
+            <field name="name">Список Запуск стратении SMM</field>
+            <field name="model">smm.strategy</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="user_id"/>
+                    <field name="partner_id"/>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_smm_strategy_start_form_2">
+            <field name="name">Форма Запуск стратении SMM</field>
+            <field name="model">smm.strategy</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Запуск стратении SMM">
+                    <group colspan="4">
+                        <field name="check_w"/>
+                        <field name="check_h"/>
+                        <field name="check_s"/>
+                        <field name="check_r"/>
+                        <field name="check_u"/>
+                    </group>
+                    <group colspan="6" col="4">
+                        <field
+                                name="partner_id"
+                                required="1"
+                                on_change="onchange_partner(partner_id)"
+                                attrs="{'readonly':[('state','not in',('draft','agreement_application'))]}"
+                                />
+                        <field name="url" required="1"
+                               attrs="{'readonly':[('state','not in',('draft','agreement_application'))]}"/>
+                        <field name="manager_work_id"/>
+                        <field name="manager_upwork_id"/>
+                        <field name="user_id"/>
+                        <field name="targeted_advertising"
+                               attrs="{'readonly':[('state','not in',('draft','agreement_application'))]}"/>
+                        <field name="contest"
+                               attrs="{'readonly':[('state','not in',('draft','agreement_application'))]}"/>
+                        <field name="lead_management"
+                               attrs="{'readonly':[('state','not in',('draft','agreement_application'))]}"/>
+                        <field name="hidden_marketing"
+                               attrs="{'readonly':[('state','not in',('draft','agreement_application'))]}"/>
+                        <field name="reputation_management"
+                               attrs="{'readonly':[('state','not in',('draft','agreement_application'))]}"/>
+                        <separator string="Услуги" colspan="6" />
+                        <field name="servis_ids" colspan="6" nolabel="1" string="Услуги"
+                               attrs="{'readonly':[('state','not in',('draft','agreement_application'))]}">
+                            <tree string="Услуги">
+                                <field name="name"/>
+                            </tree>
+                        </field>
+                        <separator string="Срок сотрудничества по проекту" colspan="4" />
+                        <field
+                                name="date_partners_from"
+                                required="1"
+                                attrs="{'readonly':[('state', 'not in', ('draft','agreement_application'))]}"/>
+                        <field name="date_partners_to" required="1"
+                               attrs="{'readonly':[('state','not in',('draft','agreement_application'))]}"/>
+                    </group>
+                    <group colspan="4" col="4">
+                        <notebook>
+                            <page string="Данные по оплатам">
+                                <group colspan="4" col="2">
+                                    <separator string="Оплаты" colspan="4"/>
+                                    <field name="payments_ids" nolabel="1" colspan="4" mode="tree"
+                                           attrs="{'readonly':[('state','in',('start_strategy'))]}">
+                                        <tree string="Оплаты" editable="top">
+                                            <field name="sum" required="1"/>
+                                            <field name="pay_currency" required="1" widget="selection"/>
+                                            <field name="pay_date" required="1"/>
+                                            <field name="user_id" required="1"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </page>
+                            <page string="Реализация стратегии"
+                                  attrs="{'invisible':[('state','in',('draft', 'agreement_application'))]}">
+                                <group colspan="2" col="2">
+                                    <separator string="Специалист" colspan="2"/>
+                                    <field name="spec_user_id" nolabel="1"
+                                           attrs="{'required':[('state','not in',('draft','agreement_application'))], 'readonly':[('state','in',('introduce_strategy','start_strategy'))]}"/>
+                                    <separator string="Команда" colspan="2"/>
+                                    <field name="team_ids" colspan="2" nolabel="1" mode="tree"
+                                           attrs="{'readonly':[('state','in',('introduce_strategy','start_strategy'))]}">
+                                        <tree string="Команда">
+                                            <field name="name"/>
+                                        </tree>
+                                    </field>
+                                    <group attrs="{'invisible':[('state','in',('appointment_smm_spec'))]}">
+                                        <separator string="Стратегия" colspan="2"/>
+                                        <newline/>
+                                        <field
+                                                context="{'object': 'smm_strategy'}"
+                                                domain="[('object','=','smm_strategy')]"
+                                                name="strategy_file_id"
+                                                attrs="{'required':[('state','not in',('draft','agreement_application','appointment_smm_spec'))], 'readonly':[('state','in',('approval_strategy','introduce_strategy','start_strategy'))]}"
+                                                nolabel="1"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="История">
+                                <field name="history_id" nolabel="1" colspan="4" mode="tree" readonly="1">
+                                    <tree string="История">
+                                        <field name="us_id"/>
+                                        <field name="cr_date"/>
+                                        <field name="state"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </group>
+                    <newline/>
+                    <group colspan="6"
+                           col="4"
+                           attrs="{'invisible':[('state','in',('draft', 'agreement_application','appointment_smm_spec','preparation_strategy'))]}">
+                        <separator string="Комментарий по доработке" colspan="4"/>
+                        <field name="commentary"
+                               colspan="6"
+                               nolabel="1"
+                               attrs="{ 'readonly':[('state','in',('completion_strategy','introduce_strategy','start_strategy'))]}"/>
+                    </group>
+                    <group>
+                        <field name="state"/>
+                    </group>
+                    <group>
+
+                        <!-- draft -> agreement_application -->
+                        <button name="action_d_aa"
+                                attrs="{'invisible': ['|', ('check_w', '=', False), ('state', '!=', 'draft')]}"
+                                string="Согласование заявки"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- agreement_application -> appointment_smm_spec -->
+                        <button name="action_aa_ass"
+                                attrs="{'invisible': ['|', ('check_h', '=', False), ('state', '!=', 'agreement_application')]}"
+                                string="Назначение SMM специалиста"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+                        <!-- appointment_smm_spec -> preparation_strategy -->
+                        <button name="action_ass_ps"
+                                attrs="{'invisible': ['|', ('check_s', '=', False), ('state', '!=', 'appointment_smm_spec')]}"
+                                string="Составление стратегии"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+                        <!-- preparation_strategy -> approval_strategy -->
+                        <button name="action_ps_as"
+                                attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'preparation_strategy')]}"
+                                string="Утверждение стратегии"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- approval_strategy -> completion_strategy -->
+                        <button name="action_as_cs"
+                                attrs="{'invisible': ['|', ('check_s', '=', False), ('state', '!=', 'approval_strategy')]}"
+                                string="Доработка стратегии"
+                                icon="gtk-media-pause"
+                                />
+
+                        <!-- completion_strategy -> approval_strategy -->
+                        <button name="action_cs_as"
+                                attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'completion_strategy')]}"
+                                string="Утверждение стратегии"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- approval_strategy -> introduce_strategy -->
+                        <button name="action_as_is"
+                                attrs="{'invisible': ['|', ('check_s', '=', False), ('state', '!=', 'approval_strategy')]}"
+                                string="Ознакомление со стратегией"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- introduce_strategy -> creat_charact_commun -->
+                        <button name="action_is_ccc"
+                                attrs="{'invisible': ['|', ('check_u', '=', False), ('state', '!=', 'introduce_strategy')]}"
+                                string="Запуск стратегии"
+                                icon="gtk-apply"
+                                />
+
+                        <!-- start_strategy -> new_view -->
+                        <button name="new_view"
+                                type="object"
+                                string="Перейти на страницу реализации стратегии"
+                                attrs="{'invisible': ['|', ('check_u', '=', False), ('state', '!=', 'creat_charact_commun')]}"
+                                icon="gtk-convert"
+                                />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_smm_strategy_start_action">
+            <field name="name">Запуск стратегии SMM</field>
+            <field name="res_model">smm.strategy</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_smm_strategy_start_search"/>
+            <field name="view_id" ref="view_smm_strategy_start_tree_2"/>
+            <field name="domain">[('state','in',('draft', 'agreement_application', 'appointment_smm_spec', 'preparation_strategy', 'approval_strategy', 'completion_strategy', 'introduce_strategy'))]</field>
+            <field name="context">{}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_strategy_start_tree_2">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_strategy_start_tree_2"/>
+            <field name="act_window_id" ref="window_smm_strategy_start_action"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_strategy_start_form_2">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_strategy_start_form_2"/>
+            <field name="act_window_id" ref="window_smm_strategy_start_action"/>
+        </record>
+
+        <menuitem
+                action="window_smm_strategy_start_action"
+                id="smm_strategy.menu_process_smm_strategy_start"
+                parent="smm_strategy.menu_process_smm_strategy"
+                sequence="1"/>
+
+
+        <record model="ir.ui.view" id="view_smm_strategy_impl_tree_2">
+            <field name="name">Список Реализация стратении SMM</field>
+            <field name="model">smm.strategy</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Реализация стратении SMM">
+                    <field name="partner_id"/>
+                    <field name="url"/>
+                    <field name="manager_upwork_id"/>
+                    <field name="user_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_smm_strategy_impl_form_2">
+            <field name="name">Форма Реализация стратении SMM</field>
+            <field name="model">smm.strategy</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Реализация стратении SMM">
+                    <group colspan="4">
+                        <field name="check_w"/>
+                        <field name="check_h"/>
+                        <field name="check_s"/>
+                        <field name="check_r"/>
+                        <field name="check_u"/>
+                    </group>
+                    <group colspan="6" col="4">
+                        <field name="partner_id" required="1" readonly="1"/>
+                        <field name="url" required="1" readonly="1"/>
+                        <field name="manager_upwork_id"/>
+                        <field name="user_id"/>
+                        <field name="targeted_advertising" />
+                        <field name="contest" readonly="1"/>
+                        <field name="lead_management" readonly="1"/>
+                        <field name="hidden_marketing" />
+                        <field name="reputation_management" readonly="1"/>
+                        <field name="servis_ids" colspan="6" nolabel="1" mode="tree" readonly="1">
+                            <tree string="Услуги">
+                                <field name="name"/>
+                            </tree>
+                        </field>
+                        <separator string="Срок сотрудничества по проекту" colspan="4"/>
+                        <field name="date_partners_from" required="1" readonly="1"/>
+                        <field name="date_partners_to" required="1" readonly="1"/>
+                    </group>
+                    <group colspan="4" col="4">
+                        <notebook>
+                            <page string="Данные по оплатам">
+                                <group colspan="4" col="2">
+                                    <separator string="Оплаты" colspan="4"/>
+                                    <field name="payments_ids" nolabel="1" colspan="4" mode="tree"
+                                           attrs="{'readonly':[('state','in',('closed'))]}">
+                                        <tree string="Оплаты" editable="top">
+                                            <field name="sum" required="1"/>
+                                            <field name="pay_currency" required="1" widget="selection" />
+                                            <field name="pay_date" required="1"/>
+                                            <field name="user_id" required="1"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </page>
+                            <page string="Реализация стратегии">
+                                <group colspan="2" col="2">
+                                    <separator string="Специалист" colspan="2"/>
+                                    <field name="spec_user_id" nolabel="1" required="1"
+                                           attrs="{'readonly':[('state','in',('approval_design','agreement_contest','closed'))]}"/>
+                                    <separator string="Команда" colspan="2"/>
+                                    <field name="team_ids" colspan="2" nolabel="1" mode="tree"
+                                           attrs="{'readonly':[('state','in',('approval_design','agreement_contest','closed'))]}">
+                                        <tree string="Команда">
+                                            <field name="name"/>
+                                        </tree>
+                                    </field>
+                                    <group attrs="{'invisible':[('state','in',('appointment_smm_spec'))]}">
+                                        <separator string="Стратегия" colspan="2"/>
+                                        <newline/>
+                                        <field
+                                                context="{'res_model': 'smm.strategy'}"
+                                                domain="[('res_model','=','smm.strategy')]"
+                                                name="strategy_file_id"
+                                                attrs="{
+                                                'required':[('state','not in',('draft','agreement_application','appointment_smm_spec'))],
+                                                'readonly':[('state','in',('approval_strategy','introduce_strategy','start_strategy'))]}"
+                                                nolabel="1"/>
+                                    </group>
+                                </group>
+                                <separator string="Регулярные работы" colspan="6"/>
+                                <field name="reg_work_ids" nolabel="1" colspan="4" mode="tree"
+                                       attrs="{'readonly':[('state','=','closed')]}">
+                                    <tree string="Регулярные работы" editable="top">
+                                        <field name="date_start"/>
+                                        <field name="date_end"/>
+                                        <field name="amount_of_work"/>
+                                        <field
+                                                name="performer"
+                                                required="1"
+                                                />
+                                        <field name="hours_spent"/>
+                                        <field name="rep_file_id"/>
+                                    </tree>
+                                </field>
+                                <separator string="Показатели SLA SMM" colspan="6"/>
+                                <field name="indicators" mode="tree,form" nolabel="1" colspan="4"
+                                       attrs="{'readonly':[('state','in',('closed'))]}">
+                                    <tree string="Показатели SLA SMM" editable="bottom">
+                                        <field name="date_id" widget="selection"/>
+                                        <field name="sla_id"
+                                               domain="[('strategy_type','=','implementation'),('model','=','smm_strategy')]"
+                                               widget="selection"/>
+                                        <field name="influence"/>
+                                        <field name="plan"/>
+                                        <field name="fact"/>
+                                        <field name="compliance"/>
+                                        <field name="mbo"/>
+                                    </tree>
+                                </field>
+                                <field name="total_sla_ids" mode="tree" nolabel="1" colspan="4" readonly="1">
+                                    <tree string="Итого по каждому отчетному периоду">
+                                        <field name="date_id"/>
+                                        <field name="influence"/>
+                                        <field name="mbo"/>
+                                    </tree>
+                                </field>
+                                <group colspan="2" col="2">
+                                    <separator string="ТЗ на дизайн" colspan="2"/>
+                                    <field nolabel='1'
+                                           colspan='2'
+                                            context="{'object': 'smm_strategy'}"
+                                            domain="[('object','=','smm_strategy')]"
+                                            name="tz_file_id"
+                                            attrs="{'readonly':[('state','in',('approval_design','agreement_contest','closed'))]}"
+                                            />
+
+                                    <separator string="Дизайн" colspan="2"/>
+                                    <field nolabel='1'
+                                           colspan='2'
+                                           context="{'res_model': 'smm.strategy'}"
+                                           domain="[('res_model','=','smm.strategy')]"
+                                           name="design_file_id"
+                                           attrs="{'readonly':[('state','in',('approval_design','agreement_contest','closed'))]}"
+                                            />
+                                    <separator string="Сценарий конкурса" colspan="2"/>
+                                    <field nolabel='1'
+                                           colspan='2'
+                                            context="{'object': 'smm_strategy'}"
+                                            domain="[('object','=','smm_strategy')]"
+                                            name="contes_file_id"
+                                            attrs="{'required':[('state','in',('create_script_contest','agreement_contest', 'start_targeting_reclam', 'start_contest', 'work_on_promotion', 'sending_additional_sentence', 'closed'))], 'readonly':[('state','in',('closed'))]}"
+                                            />
+                                    <separator string="Дополнительное предложение" colspan="2"/>
+                                    <field nolabel='1'
+                                           colspan='2'
+                                            context="{'res_model': 'smm.strategy'}"
+                                            domain="[('res_model','=','smm.strategy')]"
+                                            name="additional_sentence_file_id"
+                                            attrs="{'required':[('state','in',('sending_additional_sentence', 'closed'))], 'readonly':[('state','in',('closed'))]}"
+                                            />
+                                    <group colspan="10" col="4">
+                                        <separator string="Договор:" colspan="4"/>
+                                        <field name="contract_ids" required="1" nolabel="1" colspan="4">
+                                            <tree string="Договор" editable="top">
+                                                <field name="cr_date" readonly="1"/>
+                                                <field name="rep_file_id"/>
+                                            </tree>
+                                            <form string="Договор">
+                                                <field name="rep_file_id"
+                                                       context="{'res_model': 'smm.strategy'}"
+                                                       domain="[('res_model','=','smm.strategy')]"
+                                                        />
+                                            </form>
+                                        </field>
+                                    </group>
+                                    <separator string="Причина остановки работ" colspan="2"/>
+                                    <field
+                                            name="reason_stop_work"
+                                            colspan="2"
+                                            nolabel="1"
+                                            attrs="{
+                                            'required':[('state','in',('sending_additional_sentence', 'closed'))],
+                                            'readonly':[('state','in',('closed'))]}"/>
+                                </group>
+                            </page>
+                            <page string="Переписка по проекту">
+                                <field name="history_id" nolabel="1" colspan="4" mode="tree" readonly="1">
+                                    <tree string="История" editable="top">
+                                        <field name="us_id"/>
+                                        <field name="cr_date"/>
+                                        <field name="state"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Отчеты">
+                                <field name="reports" nolabel="1" colspan="4" mode="tree"
+                                       attrs="{'readonly':[('state','in',('closed'))]}">
+                                    <tree string="Отчеты">
+                                        <field name="create_date" readonly="1"/>
+                                        <field name="rep_file_id" required="1" widget="selection"/>
+                                        <field name="user_id"/>
+                                        <field name="comments"/>
+                                    </tree>
+                                    <form string="Отчеты">
+                                        <field name="rep_file_id"
+                                               required="1"
+                                               context="{'res_model': 'smm.strategy'}"
+                                               domain="[('res_model','=','smm.strategy')]"
+                                                />
+                                        <field name="create_date" readonly="1"/>
+                                        <field name="user_id"/>
+                                        <field name="comments" colspan="4"/>
+                                    </form>
+                                </field>
+                            </page>
+                        </notebook>
+                    </group>
+                    <newline/>
+                    <group colspan="6" col="4"
+                           attrs="{'invisible':[('state','in',('creat_charact_commun', 'primary_filling_content','development_design'))]}">
+                        <separator string="Комментарий по доработке" colspan="4"/>
+                        <field name="commentary" colspan="6" nolabel="1"
+                               attrs="{ 'readonly':[('state','not in',('approval_design'))]}"/>
+                    </group>
+                    <group>
+                        <field name="state"/>
+                    </group>
+                    <group colspan='6'>
+
+                        <!-- creat_charact_commun[start_strategy] -> primary_filling_content -->
+                        <button name="action_ccc_pfc"
+                                attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'creat_charact_commun')]}"
+                                string="Первичное наполнение контентом"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- primary_filling_content -> development_design -->
+                        <group attrs="{'invisible': ['&amp;', ('contest', '=', False), ('targeted_advertising', '=', False)]}">
+                            <button name="action_pfc_dd"
+                                    attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'primary_filling_content')]}"
+                                    string="Разработка дизайна"
+                                    icon="terp-gtk-go-back-rtl"
+                                    />
+                        </group>
+                        <!-- development_design -> approval_design -->
+                        <button name="action_dd_ad"
+                                attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'development_design')]}"
+                                string="Утверждение дизайна"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- approval_design -> completion_design -->
+                        <button name="action_ad_cd"
+                                attrs="{'invisible': ['|', ('check_u', '=', False), ('state', '!=', 'approval_design')]}"
+                                string="Доработка дизайна"
+                                icon="gtk-media-pause"
+                                />
+
+                        <!-- completion_design -> approval_design -->
+                        <button name="action_cd_ad"
+                                attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'completion_design')]}"
+                                string="Утверждение дизайна"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- approval_design -> install_design -->
+                        <button name="action_ad_id"
+                                attrs="{'invisible': ['|', ('check_u', '=', False), ('state', '!=', 'approval_design')]}"
+                                string="Установка дизайна"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- install_design -> create_script_contest -->
+                        <button name="action_id_csc"
+                                attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'install_design')]}"
+                                string="Создание сценария конкурса"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- create_script_contest -> agreement_contest -->
+                        <button name="action_csc_ac"
+                                attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'create_script_contest')]}"
+                                string="Согласование сценария"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- agreement_contest -> start_contest -->
+                        <!-- ('contest', '!=', True) -->
+                        <button name="action_ac_sc"
+                                attrs="{'invisible': ['|', ('check_u', '=', False), '|', ('state', '!=', 'agreement_contest'), ('contest', '!=', True)]}"
+                                string="Запуск конкурса"
+                                />
+
+                        <!-- agreement_contest -> start_targeting_reclam -->
+                        <!-- '&amp;', ('targeted_advertising', '!=', True), ('contest', '!=', False)-->
+                        <group attrs="{'invisible': ['&amp;', ('targeted_advertising', '!=', True), ('contest', '!=', False)]}">
+                            <button name="action_ac_str"
+                                    attrs="{'invisible': ['|', ('check_u', '=', False), ('state', '!=', 'agreement_contest')]}"
+                                    string="Запуск таргетированной рекламы"
+                                    icon="terp-gtk-go-back-rtl"
+                                    />
+                        </group>
+
+
+                        <!-- start_contest -> work_on_promotion -->
+                        <!-- '&amp;', ('targeted_advertising', '!=', False), ('contest', '!=', True) -->
+                        <button name="action_sc_wop"
+                                attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'start_contest')]}"
+                                string="Работа по продвижению"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- primary_filling_content -> work_on_promotion -->
+                        <button name="action_pfc_wop"
+                                attrs="{'invisible': ['|', '|', ('check_r', '=', False), ('state', '!=', 'primary_filling_content'), '|', ('contest', '=', True), ('targeted_advertising', '=', True)]}"
+                                string="Работа по продвижению"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <group attrs="{'invisible': ['&amp;', ('targeted_advertising', '!=', True), ('contest', '!=', True)]}">
+                            <!-- start_targeting_reclam -> work_on_promotion -->
+                            <!-- '&amp;', ('targeted_advertising', '!=', True), ('contest', '!=', True) -->
+                            <button name="action_str_wop"
+                                    attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'start_targeting_reclam')]}"
+                                    string="Работа по продвижению"
+                                    icon="terp-gtk-go-back-rtl"
+                                    />
+
+                            <!-- start_contest -> start_targeting_reclam -->
+                            <!-- '&amp;', ('targeted_advertising', '!=', True), ('contest', '!=', True) -->
+                            <button name="action_sc_str"
+                                    attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'start_contest')]}"
+                                    string="Запуск таргетированной рекламы"
+                                    icon="terp-gtk-go-back-rtl"
+                                    />
+                        </group>
+
+
+                        <!-- work_on_promotion -> sending_additional_sentence -->
+                        <button name="action_wop_sas"
+                                attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'work_on_promotion')]}"
+                                string="Отправка дополнительного предложения"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- sending_additional_sentence -> closed -->
+                        <button name="action_closed"
+                                attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'sending_additional_sentence')]}"
+                                string="Работы закончены"
+                                icon="gtk-apply"
+                                />
+
+                    </group>
+
+                </form>
+            </field>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="window_smm_strategy_impl_action">
+            <field name="name">Реализация стратегии SMM</field>
+            <field name="res_model">smm.strategy</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state','not in',('draft', 'agreement_application', 'appointment_smm_spec', 'preparation_strategy', 'approval_strategy', 'completion_strategy', 'introduce_strategy'))]</field>
+            <field name="view_id" ref="view_smm_strategy_impl_tree_2"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_strategy_impl_tree_2">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_strategy_impl_tree_2"/>
+            <field name="act_window_id" ref="window_smm_strategy_impl_action"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_strategy_impl_form_2">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_strategy_impl_form_2"/>
+            <field name="act_window_id" ref="window_smm_strategy_impl_action"/>
+        </record>
+
+        <menuitem
+                action="window_smm_strategy_impl_action"
+                id="smm_strategy.menu_process_smm_strategy_impl"
+                parent="smm_strategy.menu_process_smm_strategy"
+                sequence="1"
+                />
+    </data>
+</openerp>

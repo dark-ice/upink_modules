@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data noupdate="1">
+    <record id="storage_docs.user_group" model="res.groups">
+        <field name="name">Storage docs / Users</field>
+    </record>
+    <record id="storage_docs.manager_group" model="res.groups">
+        <field name="name">Storage docs / Manager</field>
+    </record>
+    <record id="storage_docs.admin_group" model="res.groups">
+        <field name="name">Storage docs / Admin</field>
+    </record>
+  </data>
+</openerp>

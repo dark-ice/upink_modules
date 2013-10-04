@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_brief">
+            <field name="name">Бриф на просчет</field>
+            <field name="osv">brief.main</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <record model="workflow.activity" id="act_draft">
+            <field name="wkf_id" ref="wkf_brief" />
+            <field name="flow_start">True</field>
+            <field name="name">Черновик</field>
+            <field name="kind">function</field>
+            <field name="action">action_draft()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_accept">
+            <field name="wkf_id" ref="wkf_brief" />
+            <field name="name">Бриф на согласовании</field>
+            <field name="kind">function</field>
+            <field name="action">action_accept()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_rework">
+            <field name="wkf_id" ref="wkf_brief" />
+            <field name="name">Бриф на доработке</field>
+            <field name="kind">function</field>
+            <field name="action">action_rework()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_cancel">
+            <field name="wkf_id" ref="wkf_brief" />
+            <field name="name">Заявка отменена</field>
+            <field name="kind">function</field>
+            <field name="action">action_cancel()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_inwork">
+            <field name="wkf_id" ref="wkf_brief" />
+            <field name="name">Бриф принят</field>
+            <field name="kind">function</field>
+            <field name="action">action_inwork()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_media_accept">
+            <field name="wkf_id" ref="wkf_brief" />
+            <field name="name">Согласование у руководителя</field>
+            <field name="kind">function</field>
+            <field name="action">action_media_accept()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_media_accept_revision">
+            <field name="wkf_id" ref="wkf_brief" />
+            <field name="name">Медиаплан на доработке (Согласование у руководителя)</field>
+            <field name="kind">function</field>
+            <field name="action">action_media_accept_revision()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_media_approval">
+            <field name="wkf_id" ref="wkf_brief" />
+            <field name="name">Медиаплан на утверждении</field>
+            <field name="kind">function</field>
+            <field name="action">action_media_approval()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_partner_refusion">
+            <field name="wkf_id" ref="wkf_brief" />
+            <field name="name">Партнер отказался</field>
+            <field name="kind">function</field>
+            <field name="action">action_partner_refusion()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_media_approval_revision">
+            <field name="wkf_id" ref="wkf_brief" />
+            <field name="name">Медиаплан на доработке (утверждение)</field>
+            <field name="kind">function</field>
+            <field name="action">action_media_approval_revision()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_media_approved">
+            <field name="wkf_id" ref="wkf_brief" />
+            <field name="flow_stop">True</field>
+            <field name="name">Медиаплан утвержден</field>
+            <field name="kind">function</field>
+            <field name="action">action_media_approved()</field>
+        </record>
+
+
+
+        <record model="workflow.transition" id="t1_2">
+            <field name="act_from" ref="act_draft" />
+            <field name="act_to" ref="act_accept" />
+            <field name="signal">action_accept</field>
+        </record>
+
+        <record model="workflow.transition" id="t1_5">
+            <field name="act_from" ref="act_draft" />
+            <field name="act_to" ref="act_cancel" />
+            <field name="signal">action_cancel</field>
+        </record>
+
+        <record model="workflow.transition" id="t2_4">
+            <field name="act_from" ref="act_accept" />
+            <field name="act_to" ref="act_rework" />
+            <field name="signal">action_rework</field>
+        </record>
+
+        <record model="workflow.transition" id="t4_2">
+            <field name="act_from" ref="act_rework" />
+            <field name="act_to" ref="act_accept" />
+            <field name="signal">action_reworked</field>
+        </record>
+
+        <record model="workflow.transition" id="t4_1">
+            <field name="act_from" ref="act_rework" />
+            <field name="act_to" ref="act_cancel" />
+            <field name="signal">action_cancel</field>
+        </record>
+
+        <record model="workflow.transition" id="t4_5">
+            <field name="act_from" ref="act_draft" />
+            <field name="act_to" ref="act_cancel" />
+            <field name="signal">action_cancel</field>
+        </record>
+
+        <record model="workflow.transition" id="t2_3">
+            <field name="act_from" ref="act_accept" />
+            <field name="act_to" ref="act_inwork" />
+            <field name="signal">action_inwork</field>
+        </record>
+
+        <record model="workflow.transition" id="t3_6">
+            <field name="act_from" ref="act_inwork" />
+            <field name="act_to" ref="act_media_accept" />
+            <field name="signal">action_media_accept</field>
+        </record>
+
+        <record model="workflow.transition" id="t6_7">
+            <field name="act_from" ref="act_media_accept" />
+            <field name="act_to" ref="act_media_accept_revision" />
+            <field name="signal">action_media_accept_revision</field>
+        </record>
+
+        <record model="workflow.transition" id="t7_6">
+            <field name="act_from" ref="act_media_accept_revision" />
+            <field name="act_to" ref="act_media_accept" />
+            <field name="signal">action_media_accept</field>
+        </record>
+
+        <record model="workflow.transition" id="t3_9">
+            <field name="act_from" ref="act_media_accept" />
+            <field name="act_to" ref="act_media_approval" />
+            <field name="signal">action_media_approval</field>
+        </record>
+
+        <record model="workflow.transition" id="t6_9">
+            <field name="act_from" ref="act_inwork" />
+            <field name="act_to" ref="act_media_approval" />
+            <field name="signal">action_media_approval</field>
+        </record>
+
+        <record model="workflow.transition" id="t9_10">
+            <field name="act_from" ref="act_media_approval" />
+            <field name="act_to" ref="act_media_approval_revision" />
+            <field name="signal">action_media_approval_revision</field>
+        </record>
+
+        <record model="workflow.transition" id="t10_9">
+            <field name="act_from" ref="act_media_approval_revision" />
+            <field name="act_to" ref="act_media_approval" />
+            <field name="signal">action_media_approval</field>
+        </record>
+
+        <record model="workflow.transition" id="t9_11">
+            <field name="act_from" ref="act_media_approval" />
+            <field name="act_to" ref="act_partner_refusion" />
+            <field name="signal">action_partner_refusion</field>
+        </record>
+
+        <record model="workflow.transition" id="t11_9">
+            <field name="act_from" ref="act_partner_refusion" />
+            <field name="act_to" ref="act_media_approval" />
+            <field name="signal">action_media_approval</field>
+        </record>
+
+        <record model="workflow.transition" id="t9_12">
+            <field name="act_from" ref="act_media_approval" />
+            <field name="act_to" ref="act_media_approved" />
+            <field name="signal">action_media_approved</field>
+        </record>
+
+
+    </data>
+</openerp>

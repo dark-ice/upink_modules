@@ -1,0 +1,187 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="workflow" id="wkf_smm_copyrighting">
+            <field name="name">smm.copyrighting.smm_copyrighting</field>
+            <field name="osv">smm.copyrighting</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <record model="workflow.activity" id="act_in_draft">
+            <field name="wkf_id" ref="wkf_smm_copyrighting" />
+            <field name="flow_start">True</field>
+            <field name="name">черновик</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='draft')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_acceptance_application">
+            <field name="wkf_id" ref="wkf_smm_copyrighting" />
+            <field name="name">принятие заявки</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='acceptance_application')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_application_on_completion">
+            <field name="wkf_id" ref="wkf_smm_copyrighting" />
+            <field name="name">заявка на доработке</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='application_on_completion')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_prep_to_start">
+            <field name="wkf_id" ref="wkf_smm_copyrighting" />
+            <field name="name">подготовка задания к выполнению</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='prep_to_start')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_writing_text">
+            <field name="wkf_id" ref="wkf_smm_copyrighting" />
+            <field name="name">написание текста</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='writing_text')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_approval_text">
+            <field name="wkf_id" ref="wkf_smm_copyrighting" />
+            <field name="name">согласование текста</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='approval_text')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_text_on_completion_app">
+            <field name="wkf_id" ref="wkf_smm_copyrighting" />
+            <field name="name">оработка текста(согласование)</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='text_on_completion_app')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_adoption_text">
+            <field name="wkf_id" ref="wkf_smm_copyrighting" />
+            <field name="name">утверждение текста</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='adoption_text')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_text_on_completion_adop">
+            <field name="wkf_id" ref="wkf_smm_copyrighting" />
+            <field name="name">доработка текста(утверждение)</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='text_on_completion_adop')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_not_important">
+            <field name="wkf_id" ref="wkf_smm_copyrighting" />
+            <field name="name">задание не актуально</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='not_important')</field>
+            <field name="flow_stop">True</field>
+        </record>
+
+        <record model="workflow.activity" id="act_closed">
+            <field name="wkf_id" ref="wkf_smm_copyrighting" />
+            <field name="name">текст утвержден</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='closed')</field>
+            <field name="flow_stop">True</field>
+        </record>
+#----------------Trunc
+
+        <record model="workflow.transition" id="t_1">
+            <field name="act_from" ref="act_in_draft"/>
+            <field name="act_to" ref="act_acceptance_application"/>
+            <field name="signal">action_acceptance_application</field>
+            <field name="condition">check_autor()</field>
+        </record>
+
+        <record model="workflow.transition" id="t_2_1">
+            <field name="act_from" ref="act_acceptance_application" />
+            <field name="act_to" ref="act_application_on_completion" />
+            <field name="signal">action_application_on_completion</field>
+            <field name="group_id" ref="smm_copyrighting.smm_editor"/>
+        </record>
+
+        <record model="workflow.transition" id="t_2_2">
+            <field name="act_from" ref="act_application_on_completion" />
+            <field name="act_to" ref="act_acceptance_application" />
+            <field name="signal">action_acceptance_application</field>
+            <field name="condition">check_autor()</field>
+        </record>
+
+        <record model="workflow.transition" id="t_3">
+            <field name="act_from" ref="act_acceptance_application" />
+            <field name="act_to" ref="act_prep_to_start" />
+            <field name="signal">action_prep_to_start</field>
+            <field name="group_id" ref="smm_copyrighting.smm_editor"/>
+        </record>
+
+        <record model="workflow.transition" id="t_4">
+            <field name="act_from" ref="act_prep_to_start" />
+            <field name="act_to" ref="act_writing_text" />
+            <field name="signal">action_writing_text</field>
+            <field name="group_id" ref="smm_copyrighting.smm_editor"/>
+        </record>
+
+        <record model="workflow.transition" id="t_5">
+            <field name="act_from" ref="act_writing_text" />
+            <field name="act_to" ref="act_approval_text" />
+            <field name="signal">action_approval_text</field>
+            <field name="group_id" ref="smm_copyrighting.smm_copyrighter"/>
+        </record>
+
+        <record model="workflow.transition" id="t_6_1">
+            <field name="act_from" ref="act_approval_text" />
+            <field name="act_to" ref="act_text_on_completion_app" />
+            <field name="signal">action_text_on_completion_app</field>
+            <field name="group_id" ref="smm_copyrighting.smm_editor"/>
+        </record>
+
+        <record model="workflow.transition" id="t_6_2">
+            <field name="act_from" ref="act_text_on_completion_app" />
+            <field name="act_to" ref="act_approval_text" />
+            <field name="signal">action_approval_text</field>
+            <field name="group_id" ref="smm_copyrighting.smm_copyrighter"/>
+        </record>
+
+        <record model="workflow.transition" id="t_7">
+            <field name="act_from" ref="act_approval_text" />
+            <field name="act_to" ref="act_adoption_text" />
+            <field name="signal">action_adoption_text</field>
+            <field name="group_id" ref="smm_copyrighting.smm_editor"/>
+        </record>
+
+        <record model="workflow.transition" id="t_7_1">
+            <field name="act_from" ref="act_adoption_text" />
+            <field name="act_to" ref="act_text_on_completion_adop" />
+            <field name="signal">action_text_on_completion_adop</field>
+            <field name="condition">check_autor()</field>
+        </record>
+
+        <record model="workflow.transition" id="t_7_2">
+            <field name="act_from" ref="act_text_on_completion_adop" />
+            <field name="act_to" ref="act_adoption_text" />
+            <field name="signal">action_adoption_text</field>
+            <field name="group_id" ref="smm_copyrighting.smm_editor"/>
+        </record>
+
+        <record model="workflow.transition" id="t_8">
+            <field name="act_from" ref="act_adoption_text" />
+            <field name="act_to" ref="act_not_important" />
+            <field name="signal">action_not_important</field>
+<!--
+            <field name="condition">check_autor_editor()</field>
+-->
+        </record>
+
+        <record model="workflow.transition" id="t_9">
+            <field name="act_from" ref="act_adoption_text" />
+            <field name="act_to" ref="act_closed" />
+            <field name="signal">action_closed</field>
+            <field name="condition">check_autor()</field>
+        </record>
+
+
+    </data>
+</openerp>

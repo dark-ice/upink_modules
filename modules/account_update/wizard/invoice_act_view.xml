@@ -1,0 +1,79 @@
+<openerp>
+    <data>
+        <record id="view_account_invoice_act" model="ir.ui.view">
+            <field name="name">account.invoice.act.wizard.view</field>
+            <field name="model">account.invoice.act.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Акт сверки">
+                    <field name="account_id" widget="selection"/>
+                    <field name="bank_id"/>
+                    <field name="date_start"/>
+                    <field name="date_end"/>
+                    <separator string="" colspan="4" />
+                    <group col="4" colspan="4">
+                        <button string="Отмена" icon="gtk-close" special="cancel" />
+                        <button name="get_report" string="Провести" type="object" icon="gtk-ok"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+       <!-- Invoice Act Wizard -->
+        <record id="action_account_invoice_act" model="ir.actions.act_window">
+            <field name="name">Акт сверки</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.invoice.act.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_account_invoice_act"/>
+            <field name="context">{}</field>
+            <field name="target">new</field>
+        </record>
+
+
+        <record id="view_account_invoice_act2" model="ir.ui.view">
+            <field name="name">account.invoice.act.wizard.view2</field>
+            <field name="model">account.invoice.act.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Акт сверки">
+                    <field name="account_id" readonly="True"/>
+                    <field name="bank_id" readonly="True"/>
+                    <field name="date_start" readonly="True"/>
+                    <field name="date_end" readonly="True"/>
+                    <field name="prev_saldo" readonly="True"/>
+                    <field name="saldo" readonly="True"/>
+                    <field name="credit" readonly="True"/>
+                    <field name="debit" readonly="True"/>
+                    <field name="act_ids" nolabel="1" colspan="4" readonly="True" widget="one2many_list">
+                        <tree string="Статистика" colors="red:color_type=='out';green:color_type=='in'">
+                            <field name="color_type" invisible="1"/>
+                            <field name="line_type"/>
+                            <field name="line_date"/>
+                            <field name="line_cash"/>
+                        </tree>
+                        <form>
+                            <field name="line_type"/>
+                            <field name="line_date"/>
+                            <field name="line_cash"/>
+                            <field name="doc_id" attrs="{'invisible': [('doc_id', '=', False)]}"/>
+                            <field name="pay_id" attrs="{'invisible': [('pay_id', '=', False)]}"/>
+                        </form>
+                    </field>
+                    <button name="%(account_update_act_pdf)d" string="Распечатать PDF" type="action" icon="gtk-print"/>
+                </form>
+            </field>
+        </record>
+
+       <!-- Invoice Act Wizard -->
+        <record id="action_account_invoice_act2" model="ir.actions.act_window">
+            <field name="name">Акт сверки </field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.invoice.act.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_account_invoice_act2"/>
+        </record>
+
+        <menuitem action="action_account_invoice_act" id="menu_act_report_all2" parent="account.menu_finance_invoice_reports" sequence="5"/>
+    </data>
+</openerp>

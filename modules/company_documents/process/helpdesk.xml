@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- Бизнес-процесс для HelpDesk -->
+        <record model="workflow" id="wkf_help_desk">
+            <field name="name">Бизнес-процесс HelpDesk</field>
+            <field name="osv">help.desk</field>
+            <field name="on_create">True</field>
+        </record>
+        <!-- Workflow activities -->
+
+        <record model="workflow.activity" id="act_helpdesk_draft">
+            <field name="wkf_id" ref="wkf_help_desk"/>
+            <field name="flow_start">True</field>
+            <field name="name">Черновик</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter('draft')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_helpdesk_waiting">
+            <field name="wkf_id" ref="wkf_help_desk"/>
+            <field name="name">На согласовании</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter('waiting')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_helpdesk_rework">
+            <field name="wkf_id" ref="wkf_help_desk"/>
+            <field name="name">На доработке</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter('rework')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_helpdesk_decision">
+            <field name="wkf_id" ref="wkf_help_desk"/>
+            <field name="name">Принятие решения</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter('decision')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_helpdesk_cancel">
+            <field name="wkf_id" ref="wkf_help_desk"/>
+            <field name="name">Отменено</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter('cancel')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_helpdesk_closed">
+            <field name="wkf_id" ref="wkf_help_desk"/>
+            <field name="name">Закрыто принимающим решение</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter('closed')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_helpdesk_inwork">
+            <field name="wkf_id" ref="wkf_help_desk"/>
+            <field name="name">Исполнение</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter('inwork')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_helpdesk_approval">
+            <field name="wkf_id" ref="wkf_help_desk"/>
+            <field name="name">Сдано на утверждение</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter('approval')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_helpdesk_failed">
+            <field name="wkf_id" ref="wkf_help_desk"/>
+            <field name="name">Не выполнено</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter('failed')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_helpdesk_init_accepted">
+            <field name="wkf_id" ref="wkf_help_desk"/>
+            <field name="name">Принято инициатором</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter('init_accepted')</field>
+        </record>
+
+        <record model="workflow.activity" id="act_helpdesk_init_failed">
+            <field name="wkf_id" ref="wkf_help_desk"/>
+            <field name="name">Не принято инициатором</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter('init_failed')</field>
+        </record>
+
+        <!-- Workflow transition -->
+        <!-- draft -> waiting -->
+        <record model="workflow.transition" id="helpdesk1_helpdesk2">
+            <field name="act_from" ref="act_helpdesk_draft"/>
+            <field name="act_to" ref="act_helpdesk_waiting"/>
+            <field name="signal">act_d_w</field>
+        </record>
+        <!-- draft -> decision -->
+        <record model="workflow.transition" id="helpdesk1_helpdesk4">
+            <field name="act_from" ref="act_helpdesk_draft"/>
+            <field name="act_to" ref="act_helpdesk_decision"/>
+            <field name="signal">act_d_de</field>
+        </record>
+        <!-- waiting -> draft -->
+        <record model="workflow.transition" id="helpdesk2_helpdesk1">
+            <field name="act_from" ref="act_helpdesk_waiting"/>
+            <field name="act_to" ref="act_helpdesk_draft"/>
+            <field name="signal">act_w_d</field>
+        </record>
+        <!-- waiting -> decision -->
+        <record model="workflow.transition" id="helpdesk2_helpdesk4">
+            <field name="act_from" ref="act_helpdesk_waiting"/>
+            <field name="act_to" ref="act_helpdesk_decision"/>
+            <field name="signal">act_w_de</field>
+        </record>
+        <!-- decision -> waiting -->
+        <record model="workflow.transition" id="helpdesk4_helpdesk2">
+            <field name="act_from" ref="act_helpdesk_decision"/>
+            <field name="act_to" ref="act_helpdesk_waiting"/>
+            <field name="signal">act_de_w</field>
+        </record>
+        <!-- decision -> draft -->
+        <record model="workflow.transition" id="helpdesk4_helpdesk1">
+            <field name="act_from" ref="act_helpdesk_decision"/>
+            <field name="act_to" ref="act_helpdesk_draft"/>
+            <field name="signal">act_de_d</field>
+        </record>
+        <!-- decision -> rework -->
+        <record model="workflow.transition" id="helpdesk4_helpdesk3">
+            <field name="act_from" ref="act_helpdesk_decision"/>
+            <field name="act_to" ref="act_helpdesk_rework"/>
+            <field name="signal">act_de_re</field>
+        </record>
+        <!-- rework -> decision -->
+        <record model="workflow.transition" id="helpdesk3_helpdesk4">
+            <field name="act_from" ref="act_helpdesk_rework"/>
+            <field name="act_to" ref="act_helpdesk_decision"/>
+            <field name="signal">act_re_de</field>
+        </record>
+        <!-- waiting -> rework -->
+        <record model="workflow.transition" id="helpdesk2_helpdesk3">
+            <field name="act_from" ref="act_helpdesk_waiting"/>
+            <field name="act_to" ref="act_helpdesk_rework"/>
+            <field name="signal">act_w_re</field>
+        </record>
+        <!-- rework -> waiting -->
+        <record model="workflow.transition" id="helpdesk3_helpdesk2">
+            <field name="act_from" ref="act_helpdesk_rework"/>
+            <field name="act_to" ref="act_helpdesk_waiting"/>
+            <field name="signal">act_re_w</field>
+        </record>
+        <!-- draft -> cancel -->
+        <record model="workflow.transition" id="helpdesk1_helpdesk5">
+            <field name="act_from" ref="act_helpdesk_draft"/>
+            <field name="act_to" ref="act_helpdesk_cancel"/>
+            <field name="signal">act_d_c</field>
+        </record>
+        <!-- cancel -> draft -->
+        <record model="workflow.transition" id="helpdesk5_helpdesk1">
+            <field name="act_from" ref="act_helpdesk_cancel"/>
+            <field name="act_to" ref="act_helpdesk_draft"/>
+            <field name="signal">act_c_d</field>
+        </record>
+        <!-- waiting -> cancel -->
+        <record model="workflow.transition" id="helpdesk2_helpdesk5">
+            <field name="act_from" ref="act_helpdesk_waiting"/>
+            <field name="act_to" ref="act_helpdesk_cancel"/>
+            <field name="signal">act_w_c</field>
+        </record>
+        <!-- decision -> closed -->
+        <record model="workflow.transition" id="helpdesk4_helpdesk6">
+            <field name="act_from" ref="act_helpdesk_decision"/>
+            <field name="act_to" ref="act_helpdesk_closed"/>
+            <field name="signal">act_de_cl</field>
+        </record>
+        <!-- closed -> decision -->
+        <record model="workflow.transition" id="helpdesk6_helpdesk4">
+            <field name="act_from" ref="act_helpdesk_closed"/>
+            <field name="act_to" ref="act_helpdesk_decision"/>
+            <field name="signal">act_cl_de</field>
+        </record>
+        <!-- decision -> inwork -->
+        <record model="workflow.transition" id="helpdesk4_helpdesk7">
+            <field name="act_from" ref="act_helpdesk_decision"/>
+            <field name="act_to" ref="act_helpdesk_inwork"/>
+            <field name="signal">act_de_in</field>
+        </record>
+        <!-- inwork -> decision -->
+        <record model="workflow.transition" id="helpdesk7_helpdesk4">
+            <field name="act_from" ref="act_helpdesk_inwork"/>
+            <field name="act_to" ref="act_helpdesk_decision"/>
+            <field name="signal">act_in_de</field>
+        </record>
+        <!-- inwork -> cancel -->
+        <record model="workflow.transition" id="helpdesk7_helpdesk5">
+            <field name="act_from" ref="act_helpdesk_inwork"/>
+            <field name="act_to" ref="act_helpdesk_cancel"/>
+            <field name="signal">act_in_c</field>
+        </record>
+
+        <!-- inwork -> failed -->
+        <record model="workflow.transition" id="helpdesk7_helpdesk8">
+            <field name="act_from" ref="act_helpdesk_inwork"/>
+            <field name="act_to" ref="act_helpdesk_failed"/>
+            <field name="signal">act_in_f</field>
+        </record>
+        <!-- failed -> inwork -->
+        <record model="workflow.transition" id="helpdesk8_helpdesk7">
+            <field name="act_from" ref="act_helpdesk_failed"/>
+            <field name="act_to" ref="act_helpdesk_inwork"/>
+            <field name="signal">act_f_in</field>
+        </record>
+        <!-- inwork -> approval -->
+        <record model="workflow.transition" id="helpdesk7_helpdesk9">
+            <field name="act_from" ref="act_helpdesk_inwork"/>
+            <field name="act_to" ref="act_helpdesk_approval"/>
+            <field name="signal">act_in_app</field>
+        </record>
+        <!-- approval -> inwork -->
+        <record model="workflow.transition" id="helpdesk9_helpdesk7">
+            <field name="act_from" ref="act_helpdesk_approval"/>
+            <field name="act_to" ref="act_helpdesk_inwork"/>
+            <field name="signal">act_app_in</field>
+        </record>
+        <!-- approval -> init_failed -->
+        <record model="workflow.transition" id="helpdesk9_helpdesk10">
+            <field name="act_from" ref="act_helpdesk_approval"/>
+            <field name="act_to" ref="act_helpdesk_init_failed"/>
+            <field name="signal">act_app_if</field>
+        </record>
+        <!-- init_failed -> approval -->
+        <record model="workflow.transition" id="helpdesk10_helpdesk9">
+            <field name="act_from" ref="act_helpdesk_init_failed"/>
+            <field name="act_to" ref="act_helpdesk_approval"/>
+            <field name="signal">act_if_app</field>
+        </record>
+        <!-- approval -> init_accepted -->
+        <record model="workflow.transition" id="helpdesk9_helpdesk11">
+            <field name="act_from" ref="act_helpdesk_approval"/>
+            <field name="act_to" ref="act_helpdesk_init_accepted"/>
+            <field name="signal">act_app_ia</field>
+        </record>
+        <!-- init_accepted -> approval -->
+        <record model="workflow.transition" id="helpdesk11_helpdesk9">
+            <field name="act_from" ref="act_helpdesk_init_accepted"/>
+            <field name="act_to" ref="act_helpdesk_approval"/>
+            <field name="signal">act_ia_app</field>
+        </record>
+    </data>
+</openerp>

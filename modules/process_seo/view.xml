@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_process_seo_tree">
+            <field name="name">Запуск и реализация SEO</field>
+            <field name="model">process.seo</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="partner_id" />
+                    <field name="create_date" />
+                    <field name="responsible_id" />
+                    <field name="user_id" />
+                    <field name="state" />
+                    <field name="service_id" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_process_seo_search">
+            <field name="name">view.process.seo.search</field>
+            <field name="model">process.seo</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="partner_id" />
+                    <field name="create_date" />
+                    <field name="responsible_id" />
+                    <field name="user_id" />
+                    <field name="state" />
+                    <field name="service_id" />
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_process_seo_form">
+            <field name="name">Запуск и реализация SEO</field>
+            <field name="model">process.seo</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="check_a"/>
+                        <field name="check_m"/>
+                        <field name="check_s"/>
+                    </group>
+                    <group colspan="4" col="4">
+                        <field name="partner_id" readonly="1"/>
+                        <field name="service_id" readonly="1"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="responsible_id" readonly="1"/>
+                        <field name="specialist_id" attrs="{'readonly': [('check_m', '=', False)]}"/>
+                    </group>
+                    <separator string="Тип продвижения" colspan="4"/>
+                    <group colspan="4" col="6">
+                        <field name="promotion_word"/>
+                        <field name="promotion_traffic"/>
+                        <field name="seo_audit"/>
+                        <field name="seo_optim"/>
+                        <field name="promotion_other"/>
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Данные по запуску процесса">
+                            <field name="direction" readonly="1"/>
+                            <field name="service_head_id" readonly="1"/>
+                            <separator colspan="4"/>
+
+                            <field name="contract_id" readonly="1"/>
+                            <field name="contract_file" readonly="1"/>
+
+                            <field name="invoice_line_id" invisible="True"/>
+                            <group col="6" colspan="4">
+                                <field name="account_id" readonly="1"/>
+                                <field name="account_file_id"/>
+                                <newline/>
+                                <field name="price" readonly="1"/>
+                                <field name="price_ye" readonly="1"/>
+                                <field name="paid" readonly="1"/><newline/>
+                                <field name="invoice_pay_ids" mode="tree" nolabel="1" colspan="6" domain="[('service_id', '=', service_id)]">
+                                    <tree>
+                                        <field name="pay_date" />
+                                        <field name="name" />
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Данные по стратегии">
+                            <group colspan="4" col="4">
+                                <field name="strategy_ids" nolabel="1" colspan="4">
+                                    <tree string="Стратегия">
+                                        <field name="name"/>
+                                        <field name="user_id"/>
+                                        <field name="create_date"/>
+                                    </tree>
+                                </field>
+                                <field name="task_ids" required="1" nolabel="1" colspan="4">
+                                    <tree string="Задачи в рамках проекта" editable="top">
+                                        <field name="name"/>
+                                        <field name="date_complete"/>
+                                        <field name="create_uid"/>
+                                    </tree>
+                                </field>
+                                <separator colspan="4" string="Комментарий по доработке" />
+                                <field name="comment" colspan="4" nolabel="1"/>
+                                <separator colspan="4" string="Причина остановки работ" />
+                                <field name="reason_stop_work" colspan="4" nolabel="1"/>
+                                </group>
+                        </page>
+                        <page string="Переписка по проекту">
+                            <field name="message_ids" nolabel="1" colspan="4" mode="tree">
+                                <tree string="Переписка по проекту" editable="top">
+                                    <field name="name" required="1" colspan="2"/>
+                                    <field name="create_uid" string="Автор" readonly="1"/>
+                                    <field name="create_date" readonly="1"/>
+                                    <field name="attachment_id"/>
+                                </tree>
+                            </field>
+                            <field name="history_ids" nolabel="1" colspan="4" mode="tree" readonly="1">
+                                <tree string="История">
+                                    <field name="create_uid"/>
+                                    <field name="create_date"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Отчеты">
+                            <separator string="Ежемесячные отчеты" colspan="4"/>
+                            <field name="report_ids" nolabel="1">
+                                <tree string="Отчеты" editable="top">
+                                    <field name="attachment_id"/>
+                                    <field name="create_date"/>
+                                    <field name="create_uid"/>
+                                    <field name="name"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <group colspan="4" col="6">
+                        <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="coordination,drafting,approval,implementation,analysis,finish"
+                           statusbar_colors='{"finish":"orange","revision":"red"}'
+                           colspan="6"
+                            />
+                        <newline/>
+                        <!-- coordination -> drafting -->
+                        <button string="Составление стратегии"
+                                name="drafting"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'coordination'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- drafting, revision -> approval -->
+                        <button string="На утверждение стратегии"
+                                name="approval"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', 'not in', ('drafting','revision')), ('check_s', '=', False)]}"
+                                />
+
+                        <!-- approval -> revision -->
+                        <button string="На доработку стратегии"
+                                name="revision"
+                                type="workflow"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- approval -> implementation -->
+                        <button string="На реализация стратегии"
+                                name="implementation"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- implementation -> analysis -->
+                        <button string="На анализ стратегии"
+                                name="analysis"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'implementation'), ('check_s', '=', False)]}"
+                                />
+
+                        <!-- analysis -> finish -->
+                        <button string="Работы закончены"
+                                name="finish"
+                                type="workflow"
+                                icon="gtk-yes"
+                                attrs="{'invisible': ['|', ('state', '!=', 'analysis'), ('check_s', '=', False)]}"
+                                />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+
+        <record id="window_process_seo" model="ir.actions.act_window">
+            <field name="name">Разработка и реализация стратегии SEO</field>
+            <field name="res_model">process.seo</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_process_seo_tree"/>
+            <field name="search_view_id" ref="view_process_seo_search"/>
+        </record>
+
+        <menuitem action="window_process_seo" id="menu_process_seo" sequence="10" parent="process_launch.menu_process" name="SEO стратегии"/>
+        <menuitem action="window_process_seo" id="menu_process_seo_dev" parent="menu_process_seo"/>
+
+    </data>
+</openerp>

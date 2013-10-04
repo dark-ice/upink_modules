@@ -1,0 +1,3 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"process_smm_user","process_smm user","model_process_smm","base.group_user",1,1,1,0
+"process_smm_files_user","process_smm_files user","model_process_smm_files","base.group_user",1,1,1,0

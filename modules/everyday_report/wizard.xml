@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="print_source_report_view" model="ir.ui.view">
+            <field name="name">source.report_print.form</field>
+            <field name="model">day.report.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Выберите период отчета">
+                    <field name="date_start" />
+                    <field name="date_end"/>
+                    <button icon="gtk-print" name="print_report" string="Получить файл" type="object"/>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_source_wizard" model="ir.actions.act_window">
+            <!--название визарда-->
+            <field name="name">Источники выгрузка</field>
+            <!--сылка на модель то есть саму виртуальную таблицу(сущьность) визарда-->
+            <field name="res_model">day.report.wizard</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <!--види отображений (tree, form и т.д.)-->
+            <field name="view_mode">form</field>
+            <!--способ открытия нашей формы, либо диалог либо попап-->
+            <field name="target">new</field>
+            <field name="view_id" ref="print_source_report_view"/>
+            <field name="context">{'model': 'day.report.source'}</field>
+        </record>
+
+        <menuitem action="action_source_wizard" id="menu_day_report_source_print" parent="menu_every_day_report" sequence="11"/>
+
+
+
+        <record id="action_structure_wizard" model="ir.actions.act_window">
+            <!--название визарда-->
+            <field name="name">Структура выгрузка</field>
+            <!--сылка на модель то есть саму виртуальную таблицу(сущьность) визарда-->
+            <field name="res_model">day.report.wizard</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <!--види отображений (tree, form и т.д.)-->
+            <field name="view_mode">form</field>
+            <!--способ открытия нашей формы, либо диалог либо попап-->
+            <field name="target">new</field>
+            <field name="view_id" ref="print_source_report_view"/>
+            <field name="context">{'model': 'day.report.structure'}</field>
+        </record>
+
+        <menuitem action="action_structure_wizard" id="menu_day_report_structure_print" parent="menu_every_day_report" sequence="21"/>
+    </data>
+</openerp>

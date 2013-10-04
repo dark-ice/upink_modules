@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+  #---- Tree Email Hosting
+    <record model="ir.ui.view" id="view_smm_email_tree">
+        <field name="name">Email Hosting</field>
+        <field name="model">smm.email</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Почта">
+               <field name="name_id" widget="selection"/>
+               <field name="login"/>
+               <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form Email Hosting
+<record model="ir.ui.view" id="view_smm_email_form">
+        <field name="name">SMM - Email Hosting</field>
+        <field name="model">smm.email</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Почта">
+                <group colspan="4" col="10">
+                        <field name="name_id" required="1" widget="selection"/>
+                        <field name="login" required="1" widget="email"/>
+                        <field name="password" required="1"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="responsible_users" groups="base.smm_admin_manager" colspan="10"/>
+                        <separator colspan="10"/>
+                        <field name="recover_word" colspan="10" required="1"/>
+                        <field name="comments" colspan="5"/>
+                        <field name="pre_comment" colspan="5"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+  #---- Tree Email Hosting stage
+    <record model="ir.ui.view" id="view_smm_email_stage_tree">
+        <field name="name">SMM - Email Hosting stage</field>
+        <field name="model">smm.email.stage</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Справочник Почта">
+               <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form email network stage
+<record model="ir.ui.view" id="view_smm_email_stage_form">
+        <field name="name">SMM - Email Hosting stage</field>
+        <field name="model">smm.email.stage</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Справочник Почта">
+                <group colspan="4" col="8">
+                        <field name="name" required="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+#-----
+
+        <record model="ir.actions.act_window" id="window_case_smm_email">
+            <field name="name">SMM - Почта</field>
+            <field name="res_model">smm.email</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_email_tree"/>
+            <field name="help">Почта</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_email_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_email_tree"/>
+            <field name="act_window_id" ref="window_case_smm_email"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_email_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_email_form"/>
+            <field name="act_window_id" ref="window_case_smm_email"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_case_smm_email_stage">
+            <field name="name">SMM - Справочник Почта</field>
+            <field name="res_model">smm.email.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_email_stage_tree"/>
+            <field name="help">Справочник Почта</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_email_stage_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_email_stage_tree"/>
+            <field name="act_window_id" ref="window_case_smm_email_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_email_stage_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_email_stage_form"/>
+            <field name="act_window_id" ref="window_case_smm_email_stage"/>
+        </record>
+
+     <menuitem name="Почта" id="menu_smm_email" action="window_case_smm_email"
+           parent="menu_smm_base" sequence="3" groups="base.smm_manager,base.smm_admin_manager"/>
+     <menuitem name="Справочник почтовых доменов" id="menu_smm_email_stage" action="window_case_smm_email_stage"
+           parent="menu_smm_config" sequence="4" groups="base.smm_admin_manager"/>
+     </data>
+</openerp>

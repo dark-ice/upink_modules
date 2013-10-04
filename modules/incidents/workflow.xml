@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_ink_incidents">
+            <field name="name">wkf.ink.incidents</field>
+            <field name="osv">ink.incidents</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- activity -->
+
+        <!-- draft -->
+        <record model="workflow.activity" id="act_draft">
+            <field name="wkf_id" ref="wkf_ink_incidents"/>
+            <field name="flow_start">True</field>
+            <field name="name">Черновик</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'draft'})</field>
+        </record>
+
+        <!-- cancel -->
+        <record model="workflow.activity" id="act_cancel">
+            <field name="wkf_id" ref="wkf_ink_incidents"/>
+            <field name="name">Отмена</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'cancel'})</field>
+        </record>
+
+        <!-- completion -->
+        <record model="workflow.activity" id="act_completion">
+            <field name="wkf_id" ref="wkf_ink_incidents"/>
+            <field name="name">На доработке инициатором</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'completion'})</field>
+        </record>
+
+        <!-- decision -->
+        <record model="workflow.activity" id="act_decision">
+            <field name="wkf_id" ref="wkf_ink_incidents"/>
+            <field name="name">Принятие решения</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'decision'})</field>
+        </record>
+
+        <!-- in_pipeline -->
+        <record model="workflow.activity" id="act_in_pipeline">
+            <field name="wkf_id" ref="wkf_ink_incidents"/>
+            <field name="name">В работе</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'in_pipeline'})</field>
+        </record>
+
+        <!-- completion_performer -->
+        <record model="workflow.activity" id="act_completion_performer">
+            <field name="wkf_id" ref="wkf_ink_incidents"/>
+            <field name="name">На доработке исполнителем</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'completion_performer'})</field>
+        </record>
+
+        <!-- approval -->
+        <record model="workflow.activity" id="act_approval">
+            <field name="wkf_id" ref="wkf_ink_incidents"/>
+            <field name="name">Сдано на утверждение</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'approval'})</field>
+        </record>
+
+        <!-- accepted -->
+        <record model="workflow.activity" id="act_accepted">
+            <field name="wkf_id" ref="wkf_ink_incidents"/>
+            <field name="name">Принято инициатором</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'accepted'})</field>
+        </record>
+
+        <!-- transition -->
+
+        <!-- draft -> cancel -->
+        <record model="workflow.transition" id="draft_cancel">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">action_cancel</field>
+        </record>
+
+        <!-- draft -> decision -->
+        <record model="workflow.transition" id="draft_decision">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_decision"/>
+            <field name="signal">action_decision</field>
+        </record>
+
+        <!-- decision -> completion -->
+        <record model="workflow.transition" id="decision_completion">
+            <field name="act_from" ref="act_decision"/>
+            <field name="act_to" ref="act_completion"/>
+            <field name="signal">action_completion</field>
+        </record>
+
+        <!-- completion -> decision -->
+        <record model="workflow.transition" id="completion_decision">
+            <field name="act_from" ref="act_completion"/>
+            <field name="act_to" ref="act_decision"/>
+            <field name="signal">action_decision</field>
+        </record>
+
+        <!-- completion -> cancel -->
+        <record model="workflow.transition" id="completion_cancel">
+            <field name="act_from" ref="act_completion"/>
+            <field name="act_to" ref="act_decision"/>
+            <field name="signal">action_cancel</field>
+        </record>
+
+        <!-- decision -> in_pipeline -->
+        <record model="workflow.transition" id="decision_in_pipeline">
+            <field name="act_from" ref="act_decision"/>
+            <field name="act_to" ref="act_in_pipeline"/>
+            <field name="signal">action_in_pipeline</field>
+        </record>
+
+        <!-- in_pipeline -> cancel -->
+        <record model="workflow.transition" id="in_pipeline_cancel">
+            <field name="act_from" ref="act_in_pipeline"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">action_cancel</field>
+        </record>
+
+        <!-- in_pipeline -> approval -->
+        <record model="workflow.transition" id="in_pipeline_approval">
+            <field name="act_from" ref="act_in_pipeline"/>
+            <field name="act_to" ref="act_approval"/>
+            <field name="signal">action_approval</field>
+        </record>
+
+        <!-- approval -> in_pipeline -->
+        <record model="workflow.transition" id="approval_in_pipeline">
+            <field name="act_from" ref="act_approval"/>
+            <field name="act_to" ref="act_in_pipeline"/>
+            <field name="signal">action_in_pipeline</field>
+        </record>
+
+        <!-- approval -> completion_performer -->
+        <record model="workflow.transition" id="approval_completion_performer">
+            <field name="act_from" ref="act_approval"/>
+            <field name="act_to" ref="act_completion_performer"/>
+            <field name="signal">action_completion_performer</field>
+        </record>
+
+        <!-- completion_performer -> approval -->
+        <record model="workflow.transition" id="completion_performer_approval">
+            <field name="act_from" ref="act_completion_performer"/>
+            <field name="act_to" ref="act_approval"/>
+            <field name="signal">action_approval</field>
+        </record>
+
+        <!-- approval -> accepted -->
+        <record model="workflow.transition" id="approval_accepted">
+            <field name="act_from" ref="act_approval"/>
+            <field name="act_to" ref="act_accepted"/>
+            <field name="signal">action_accepted</field>
+        </record>
+    </data>
+</openerp>

@@ -1,0 +1,4 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_ink_incidents_user","ink.incidents user","model_ink_incidents","incidents.user",1,1,1,0
+"access_ink_incidents_history_user","ink.incidents.history user","model_ink_incidents_history","incidents.user",1,1,1,0
+"access_ink_incidents_comment_user","ink.incidents.comment user","model_ink_incidents_comment","incidents.user",1,1,1,0

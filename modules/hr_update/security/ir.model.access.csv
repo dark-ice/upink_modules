@@ -1,0 +1,9 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_hr_employee_babies","hr_employee_babies user","model_hr_employee_babies","base.group_user",1,1,1,1
+"access_hr_employee_university","hr_employee_university user","model_hr_university","base.group_user",1,1,1,1
+"access_hr_language","hr_language user","model_hr_language","base.group_user",1,1,1,1
+"access_hr_employee_language","hr_employee_language user","model_hr_employee_language","base.group_user",1,1,1,1
+"access_res_history","hr_res_history user","model_res_history","base.group_user",1,1,1,1
+"access_hr_employee_certifications","hr_employee_certifications user","model_hr_employee_certifications","base.group_user",1,1,1,1
+"access_hr_employee_external_training","hr_employee_external_training user","model_hr_employee_external_training","base.group_user",1,1,1,1
+"access_hr_employee_access","hr_employee_access user","model_hr_employee_access","base.group_user",1,1,1,1

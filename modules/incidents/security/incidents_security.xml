@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+        <record id="user" model="res.groups">
+            <field name="name">Инциденты / User</field>
+        </record>
+
+        <!-- Правила доступа для групп -->
+        <record id="incidents_user" model="ir.rule">
+            <field name="name">Инциденты: поставлены ему, те, что поставил он, те, что поставлены его подчиненным</field>
+            <field ref="model_ink_incidents" name="model_id"/>
+            <field name="domain_force">['|', ('author_id.user_id.id', '=', user.id), '|', ('author_parent_id.user_id.id', '=', user.id), ('performer_id.user_id.id', '=', user.id)]</field>
+            <field name="perm_read" eval="True" />
+            <field name="perm_create" eval="True" />
+            <field name="perm_write" eval="True" />
+            <field name="perm_unlink" eval="False" />
+            <field name="groups" eval="[(4,ref('incidents.user')),]"/>
+        </record>
+
+    </data>
+</openerp>

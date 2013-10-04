@@ -1,0 +1,21 @@
+﻿<?xml version="1.0"?>
+<openerp>
+<data>
+        <record model="ir.ui.view" id="res_widget_form_inherit">
+        <field name="name">res_widget - inherit</field>
+        <field name="model">res.widget</field>
+        <field name="type">form</field>
+        <field name="priority">1</field>
+        <field name="inherit_id" ref="base.res_widget_form"/>
+        <field name="arch" type="xml">
+          <data>
+             <field name="content" position="replace">
+                <field name="html_text" nolabel="1" colspan="4" widget="text_html"/>
+             </field>
+
+          </data>
+        </field>
+        </record>
+
+</data>
+</openerp>

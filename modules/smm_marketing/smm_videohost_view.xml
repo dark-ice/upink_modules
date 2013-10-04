@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+  #---- Tree Video Hosting
+    <record model="ir.ui.view" id="view_smm_videohost_tree">
+        <field name="name">Video Hosting</field>
+        <field name="model">smm.videohost</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Видеохостинг">
+               <field name="name_id" widget="selection"/>
+               <field name="partner_id" widget="selection"/>
+               <field name="account"/>
+               <field name="types"/>
+               <field name="cr_date"/>
+               <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form Video Hosting
+<record model="ir.ui.view" id="view_smm_videohost_form">
+        <field name="name">SMM - Video Hosting</field>
+        <field name="model">smm.videohost</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Видеохостинг">
+                <group colspan="4" col="10">
+                        <field name="name_id" required="1" widget="selection"/>
+                        <field name="partner_id"/>
+                        <field name="account" required="1"/>
+                        <field name="types" required="1"/>
+                        <field name="cr_date" required="1" groups="base.smm_admin_manager"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="responsible_users" groups="base.smm_admin_manager" colspan="10"/>
+                        <separator colspan="12"/>
+                        <field name="login" required="1"/>
+                        <field name="password" required="1"/>
+                        <field name="url" widget="url" required="1"/>
+                        <field name="email" widget="email" required="1"/>
+                        <separator colspan="12"/>
+                        <field name="comments" colspan="10"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+  #---- Tree Video Hosting stage
+    <record model="ir.ui.view" id="view_smm_videohost_stage_tree">
+        <field name="name">SMM - Video Hosting stage</field>
+        <field name="model">smm.videohost.stage</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Справочник видеохостинг">
+               <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form social network stage
+<record model="ir.ui.view" id="view_smm_videohost_stage_form">
+        <field name="name">SMM - Video Hosting stage</field>
+        <field name="model">smm.videohost.stage</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Справочник видеохостинг">
+                <group colspan="4" col="8">
+                        <field name="name" required="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+#-----
+
+        <record model="ir.actions.act_window" id="window_case_smm_videohost">
+            <field name="name">SMM - Видеохостинг</field>
+            <field name="res_model">smm.videohost</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_videohost_tree"/>
+            <field name="help">Видеохостинг</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_videohost_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_videohost_tree"/>
+            <field name="act_window_id" ref="window_case_smm_videohost"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_videohost_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_videohost_form"/>
+            <field name="act_window_id" ref="window_case_smm_videohost"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_case_smm_videohost_stage">
+            <field name="name">SMM - Справочник видеохостинг</field>
+            <field name="res_model">smm.videohost.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_videohost_stage_tree"/>
+            <field name="help">Справочник видеохостинг</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_videohost_stage_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_videohost_stage_tree"/>
+            <field name="act_window_id" ref="window_case_smm_videohost_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_videohost_stage_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_videohost_stage_form"/>
+            <field name="act_window_id" ref="window_case_smm_videohost_stage"/>
+        </record>
+
+     <menuitem name="Видео хостинг" id="menu_smm_videohost" action="window_case_smm_videohost"
+           parent="menu_smm_base" sequence="0" groups="base.smm_manager,base.smm_admin_manager"/>
+     <menuitem name="Справочник видео хостинг" id="menu_smm_videohost_stage" action="window_case_smm_videohost_stage"
+           parent="menu_smm_config" sequence="1" groups="base.smm_admin_manager"/>
+     </data>
+</openerp>

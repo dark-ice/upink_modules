@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_process_site_planning">
+            <field name="name">wkf.process.site.planning</field>
+            <field name="osv">process.site.planning</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- none -->
+        <record model="workflow.activity" id="act_planning_none">
+            <field name="wkf_id" ref="wkf_process_site_planning"/>
+            <field name="flow_start">True</field>
+            <field name="name">Отсутствует</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'none'})</field>
+        </record>
+        <!-- draft -->
+        <record model="workflow.activity" id="act_planning_draft">
+            <field name="wkf_id" ref="wkf_process_site_planning"/>
+            <field name="name">Не начат</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'draft'})</field>
+        </record>
+        <!-- work -->
+        <record model="workflow.activity" id="act_planning_work">
+            <field name="wkf_id" ref="wkf_process_site_planning"/>
+            <field name="name">В процессе</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'work'})</field>
+        </record>
+        <!-- in_approval -->
+        <record model="workflow.activity" id="act_planning_in_approval">
+            <field name="wkf_id" ref="wkf_process_site_planning"/>
+            <field name="name">На утверждении</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'in_approval'})</field>
+        </record>
+        <!-- rectification -->
+        <record model="workflow.activity" id="act_planning_rectification">
+            <field name="wkf_id" ref="wkf_process_site_planning"/>
+            <field name="name">Исправления</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'rectification'})</field>
+        </record>
+        <!-- approved -->
+        <record model="workflow.activity" id="act_planning_approved">
+            <field name="wkf_id" ref="wkf_process_site_planning"/>
+            <field name="name">Утвержден</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'approved'})</field>
+        </record>
+        <!-- finish -->
+        <record model="workflow.activity" id="act_planning_finish">
+            <field name="wkf_id" ref="wkf_process_site_planning"/>
+            <field name="name">Этап окончен</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'finish'})</field>
+        </record>
+
+        <!-- none -> draft -->
+        <record model="workflow.transition" id="planning_n_d">
+            <field name="act_from" ref="act_planning_none"/>
+            <field name="act_to" ref="act_planning_draft"/>
+            <field name="signal">draft</field>
+        </record>
+        <!-- draft -> none -->
+        <record model="workflow.transition" id="planning_d_n">
+            <field name="act_from" ref="act_planning_draft"/>
+            <field name="act_to" ref="act_planning_none"/>
+            <field name="signal">none</field>
+        </record>
+        <!-- draft -> work -->
+        <record model="workflow.transition" id="planning_d_w">
+            <field name="act_from" ref="act_planning_draft"/>
+            <field name="act_to" ref="act_planning_work"/>
+            <field name="signal">work</field>
+        </record>
+        <!-- work -> in_approval -->
+        <record model="workflow.transition" id="planning_w_ia">
+            <field name="act_from" ref="act_planning_work"/>
+            <field name="act_to" ref="act_planning_in_approval"/>
+            <field name="signal">in_approval</field>
+        </record>
+        <!-- in_approval -> rectification -->
+        <record model="workflow.transition" id="planning_ia_r">
+            <field name="act_from" ref="act_planning_in_approval"/>
+            <field name="act_to" ref="act_planning_rectification"/>
+            <field name="signal">rectification</field>
+        </record>
+        <!-- rectification -> in_approval -->
+        <record model="workflow.transition" id="planning_r_ia">
+            <field name="act_from" ref="act_planning_rectification"/>
+            <field name="act_to" ref="act_planning_in_approval"/>
+            <field name="signal">in_approval</field>
+        </record>
+        <!-- in_approval -> approved -->
+        <record model="workflow.transition" id="planning_ia_a">
+            <field name="act_from" ref="act_planning_in_approval"/>
+            <field name="act_to" ref="act_planning_approved"/>
+            <field name="signal">approved</field>
+        </record>
+        <!-- approved -> work -->
+        <record model="workflow.transition" id="planning_a_w">
+            <field name="act_from" ref="act_planning_approved"/>
+            <field name="act_to" ref="act_planning_work"/>
+            <field name="signal">work</field>
+        </record>
+        <!-- approved -> finish -->
+        <record model="workflow.transition" id="planning_a_f">
+            <field name="act_from" ref="act_planning_approved"/>
+            <field name="act_to" ref="act_planning_finish"/>
+            <field name="signal">finish</field>
+        </record>
+    </data>
+</openerp>

@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record id="view_brief_contract_form" model="ir.ui.view">
+            <field name="name">Создание брифа на договор</field>
+            <field name="model">brief.contract</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Создание брифа на договор">
+                    <!-- Permission -->
+                    <group>
+                        <field name="check_m"/>
+                        <field name="check_r"/>
+                        <field name="check_l"/>
+                        <field name="check_s"/>
+                        <field name="from" invisible="True"/>
+                        <field name="wuser_ids" invisible="True"/>
+                    </group>
+                    <!-- head -->
+                    <group colspan="2" col="32" attrs="{'invisible': [('from', '=', False)]}">
+                        <button string="Отмена" icon="gtk-close" special="cancel" colspan="4"/>
+                        <button name="action_add" type="object" string="Сохранить и закрыть" colspan="4"/>
+                    </group>
+                    <group colspan="4" col="4">
+                        <field name="partner_id" colspan="2" on_change="onchange_partner_id(partner_id)"/>
+                        <field name="lead_id" colspan="2" invisible="True"/>
+                        <field name="usr_id" colspan="2"/>
+
+                        <field name="contract_number" colspan="2"/>
+                        <field name="lawyer_id" colspan="2"/>
+
+                        <field name="contract_date" colspan="2"/>
+                        <field name="responsible_id" colspan="2"/>
+                        <newline/>
+                        <field name="service_id" on_change="onchange_service(service_id)"/>
+                        <field name="service_head_id" readonly="1"/>
+                        <separator colspan="4"/>
+                    </group>
+                    <group colspan="4" col="4">
+                        <separator string="Условия оплаты" colspan="4"/>
+                        <field name="for_calculation" colspan="4"/>
+                        <group colspan="4" col="6" attrs="{'invisible': [('for_calculation', '=', '')]}">
+                            <separator string="Стоимость услуг" colspan="6"/>
+                            <field name="amount"/>
+                            <field name="currency" widget="selection"/>
+                            <field name="term" attrs="{'invisible': [('for_calculation', '=', '3')]}"/>
+                        </group>
+                        <separator colspan="4" />
+                        <field name="payment_schedule" colspan="4" />
+                        <field name="amount_of_payment_ids" colspan="4" attrs="{'invisible': [('payment_schedule', '!=', '0')]}" mode='tree' nolabel="1">
+                            <tree string="Размер платежа" editable="bottom">
+                                <field name="name"/>
+                                <field name="term"/>
+                            </tree>
+                        </field>
+                        <field name="type_of" colspan="4"/>
+                        <separator colspan="4"/>
+                    </group>
+                    <group col="4" colspan="4">
+                        <field colspan="4"
+                               name="bank_id"
+                               context="{'partner_id': partner_id}"
+                               domain="[('partner_id', '=', partner_id)]"
+                                />
+                        <separator colspan="4"/>
+                    </group>
+                    <group col="4" colspan="4">
+                        <field name="delivery_contract" colspan="4"/>
+                        <field name="send_to_email" colspan="4"/>
+                        <field name="delivery_original" colspan="4"/>
+                        <separator colspan="4"/>
+                        <field name="contract_file" colspan="4" attrs="{'invisible': [('state', 'in', ('draft', 'approval', 'completion'))]}" />
+                        <field name="contract_re_file" colspan="4" attrs="{'invisible': [('state', 'in', ('draft', 'approval', 'completion'))]}" />
+                        <field name="contract_approved_file" colspan="4" attrs="{'invisible': [('state', 'in', ('draft', 'approval', 'completion'))]}" />
+                        <field name="icontract_file" colspan="4" attrs="{'invisible': [('state', 'not in', ('send_mail', 'send_express', 'send_courier', 'waiting_receipt', 'receipt_obtained', 'meeting_scheduled', 'meeting_cancel', 'contract_signed'))]}" />
+                        <field name="pcontract_file" colspan="4" attrs="{'invisible': [('state', 'not in', ('receipt_obtained', 'meeting_scheduled', 'contract_signed'))]}" />
+                        <newline />
+                        <!-- Ожидание квитанции -->
+                        <field name="receipt_file" colspan="4" attrs="{'invisible': [('state', 'in', ('draft', 'approval', 'completion'))]}"/>
+                        <separator string="Комментарии"/>
+                        <field name="comment_ids" colspan="4" nolabel="1"/>
+                        <!-- attrs="{'invisible': ['|', ('state', 'not in', ('approval', 'contract_approval', 'approval_partner')), ('comment_rework', '=', '')]}" -->
+                        <group colspan="2" col="4">
+                            <separator string="Комментарий по доработке брифа" colspan="4"/>
+                            <field name="comment_rework" nolabel="1" colspan="4"/>
+                        </group>
+                        <group colspan="2" col="4">
+                            <separator string="Комментарий по доработке договора" colspan="4"/>
+                            <field name="comment_rework_2" nolabel="1" colspan="4"/>
+                        </group>
+                        <group colspan="2" col="4">
+                            <separator string="Комментарий по доработке перед утверждением договора" colspan="4"/>
+                            <field name="comment_rework_3" nolabel="1" colspan="4"/>
+                        </group>
+                        <!-- attrs="{'invisible': [('state', '!=', 'meeting_scheduled')]}" -->
+                        <group colspan="2" col="4">
+                            <separator string="Причины отмены встречи" colspan="4"/>
+                            <field name="canceled_reasons" colspan="4" nolabel="1"/>
+                        </group>
+                        <newline />
+                        <separator string="Прикрепленные файлы" colspan="4"/>
+                        <field name="file_ids"
+                               colspan="4"
+                               nolabel="1"
+                               context="{'object': 'brief_contract_file'}"
+                               domain="[('object','=','brief_contract_file')]"
+                                >
+                            <tree string="Прикрепленные файлы">
+                                <field name="name"/>
+                                <field name="user_id"/>
+                                <field name="create_date" />
+                            </tree>
+                        </field>
+                        <separator colspan="4"/>
+                    </group>
+                    <group colspan="4" col="4">
+                        <field name="state" />
+
+                        <!-- draft -> cancel -->
+                        <button name="action_d_c"
+                                string="Отмена"
+                                icon="gtk-close"
+                                attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- draft -> approval -->
+                        <button name="action_d_a"
+                                string="Отправить бриф на согласование"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- approval -> completion -->
+                        <button name="action_a_c"
+                                string="Отправить бриф на доработку"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_l', '=', False)]}"
+                                />
+
+                        <!-- completion -> approval -->
+                        <button name="action_c_a"
+                                string="Отправить брифна согласование"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'completion'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- approval -> preparation -->
+                        <button name="action_a_p"
+                                string="Подготовка договора"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_l', '=', False)]}"
+                                />
+
+                        <!-- preparation -> contract_approval -->
+                        <button name="action_p_ca"
+                                string="Отправить договор на согласование"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'preparation'), ('check_l', '=', False)]}"
+                                />
+
+                        <!-- contract_approval -> contract_completion -->
+                        <button name="action_ca_cc"
+                                string="На доработку"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'contract_approval'), ('check_s', '=', False)]}"
+                                />
+
+                        <!-- contract_completion -> contract_approval -->
+                        <button name="action_cc_ca"
+                                string="Отправить договор на согласование"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'contract_completion'), ('check_l', '=', False)]}"
+                                />
+
+                        <!-- contract_completion -> cancel2 -->
+                        <button name="action_cc_c2"
+                                string="Отмена"
+                                icon="gtk-close"
+                                attrs="{'invisible': ['|', ('state', '!=', 'contract_completion'), ('check_l', '=', False)]}"
+                                />
+
+                        <!-- cancel2 -> contract_completion -->
+                        <button name="action_с2_сс"
+                                string="Вернуть договор на доработку"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'cancel_2'), ('check_l', '=', False)]}"
+                                />
+
+                        <!-- contract_approval -> contract_agreed -->
+                        <button name="action_ca_cagr"
+                                string="Договор согласован"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'contract_approval'), ('check_s', '=', False)]}"
+                                />
+
+                        <!-- contract_agreed -> approval_partner -->
+                        <button name="action_cagr_ap"
+                                string="Отправить договор на утвеждение"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'contract_agreed'), ('check_l', '=', False)]}"
+                                />
+
+                        <!-- approval_partner -> contract_completion -->
+                        <button name="action_ap_cc"
+                                string="Доработка договора"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval_partner'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- approval_partner -> partner_cancel -->
+                        <button name="action_ap_pc"
+                                string="Отмена"
+                                icon="gtk-close"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval_partner'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- partner_cancel -> approval_partner -->
+                        <button name="action_pc_ap"
+                                string="Отправить договор на утвеждение"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'partner_cancel'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- approval_partner -> contract_approved -->
+                        <button name="action_ap_app"
+                                string="Договор утвержден"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval_partner'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- contract_approved -> send_mail -->
+                        <button name="action_app_sm"
+                                string="Отправление договора по почте России"
+                                icon="terp-mail-message-new"
+                                attrs="{'invisible': ['|', '|', ('state', '!=', 'contract_approved'), ('delivery_contract', '!=', 'mail'), ('check_l', '=', False)]}"
+                                />
+
+                        <!-- contract_approved -> send_express -->
+                        <button name="action_app_se"
+                                string="Отправление договора экспресс-почтой"
+                                icon="terp-mail-message-new"
+                                attrs="{'invisible': ['|', '|', ('state', '!=', 'contract_approved'), ('delivery_contract', '!=', 'express_mail'), ('check_l', '=', False)]}"
+                                />
+
+                        <!-- contract_approved -> send_courier -->
+                        <button name="action_app_sc"
+                                string="Отправка договора курьером"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', '|', ('state', '!=', 'contract_approved'), ('delivery_contract', '!=', 'courier'), ('check_l', '=', False)]}"
+                                />
+
+                        <!-- send_courier -> meeting_scheduled -->
+                        <button name="action_sc_ms"
+                                string="Встреча назначена"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'send_courier'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- send_mail -> waiting_receipt -->
+                        <button name="action_sm_wr"
+                                string="Ожидание квитанции об возврате договора"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'send_mail'), ('check_r', '=', False)]}"
+                                />
+
+                        <!-- send_express -> waiting_receipt -->
+                        <button name="action_se_wr"
+                                string="Ожидание квитанции об возврате договора"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'send_express'), ('check_r', '=', False)]}"
+                                />
+
+                        <!-- waiting_receipt -> meeting_scheduled -->
+                        <button name="action_wr_ms"
+                                string="Встреча назначена"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'waiting_receipt'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- meeting_scheduled -> meeting_cancel -->
+                        <button name="action_ms_mc"
+                                string="Отмена встречи"
+                                icon="gtk-cancel"
+                                attrs="{'invisible': ['|', ('state', '!=', 'meeting_scheduled'), ('check_r', '=', False)]}"
+                                />
+
+                        <!-- meeting_scheduled -> contract_signed -->
+                        <button name="action_ms_cs"
+                                string="Оригинал договора подписан"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'meeting_scheduled'), ('check_r', '=', False)]}"
+                                />
+
+                        <!-- waiting_receipt -> receipt_obtained -->
+                        <button name="action_wr_ro"
+                                string="Квитанция получена"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'waiting_receipt'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- receipt_obtained -> contract_signed -->
+                        <button name="action_ro_cs"
+                                string="Оригинал договора подписан"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'receipt_obtained'), ('check_r', '=', False)]}"
+                                />
+                    </group>
+                    <group col="4" colspan="4">
+                        <separator string="История переходов" colspan="4"/>
+                        <field name="history_ids" nolabel="1" colspan="4">
+                            <tree string="История переходов">
+                                <field name="usr_id" />
+                                <field name="state" />
+                                <field name="create_date" string="Дата перехода" />
+                            </tree>
+                        </field>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record id="view_brief_contract_tree" model="ir.ui.view">
+            <field name="name">Брифы на договор</field>
+            <field name="model">brief.contract</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Список брифов">
+                    <field name="wuser_ids" invisible="True"/>
+                    <field name="id"/>
+                    <field name="usr_id"/>
+                    <field name="partner_id"/>
+                    <field name="create_date"/>
+                    <field name="contract_date"/>
+                    <field name="state"/>
+                    <field name="service_id"/>
+                    <field name="amount"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_brief_contract_search" model="ir.ui.view">
+            <field name="name">Брифы на договор</field>
+            <field name="model">brief.contract</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Поиск по брифам">
+                    <field name="state"/>
+                    <field name="usr_id"/>
+                    <field name="create_date"/>
+                    <field name="contract_date"/>
+                    <field name="service_id"/>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_case_brief_contract">
+            <field name="name">Брифы на договор</field>
+            <field name="res_model">brief.contract</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_brief_contract_tree"/>
+            <!--<field name="search_view_id" ref="view_brief_contract_search"/>-->
+            <!--<field name="context">{'search_default_active':eval('True')}</field>-->
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_brief_contract_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_brief_contract_form"/>
+            <field name="act_window_id" ref="window_case_brief_contract"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_brief_contract_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_brief_contract_tree"/>
+            <field name="act_window_id" ref="window_case_brief_contract"/>
+        </record>
+
+        <menuitem parent="brief.menu_brief"
+                  name="Бриф на договор"
+                  id="menu_brief_contract"
+                  action="window_case_brief_contract"
+                  sequence="3"/>
+
+        <record id="action_brief_add" model="ir.actions.act_window">
+            <field name="name">Создать бриф на договор </field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">brief.contract</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_brief_contract_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <record model="ir.ui.view" id="view_partner_form_upsale_inherit2">
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="brief.view_partner_form_upsale_inherit" />
+            <field name="arch" type="xml">
+                <field colspan="4" name="brief_ids" position="after">
+                    <separator colspan="4" string="Брифы на договор"/>
+                    <button name="create_brief_contract" string="Создать бриф на договор" type="object" default_focus="1" icon="terp-document-new" colspan="4"/>
+                    <field name="brief_contract_ids"
+                           nolabel="1"
+                           colspan="4"
+                           context="{
+                               'partner_id': id,
+                               'partner_name': name,
+                           }"
+                            >
+                        <tree string="Список брифов">
+                            <field name="id"/>
+                            <field name="usr_id"/>
+                            <field name="partner_id"/>
+                            <field name="create_date"/>
+                            <field name="contract_date"/>
+                            <field name="state"/>
+                            <field name="service_id"/>
+                            <field name="amount"/>
+                        </tree>
+                    </field>
+
+                </field>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_lead_form_upsale_inherit2">
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="brief.view_lead_form_upsale_inherit" />
+            <field name="arch" type="xml">
+                <field colspan="4" name="brief_ids" position="after">
+                    <separator colspan="4" string="Брифы на договор"/>
+                    <button name="create_brief_contract" string="Создать бриф на договор" type="object" default_focus="1" icon="terp-document-new" colspan="4"/>
+
+                    <field name="brief_contract_ids"
+                           nolabel="1"
+                           colspan="4"
+                           context="{
+                               'partner_id': id,
+                               'partner_name': name,
+                           }"
+                            >
+                        <tree string="Список брифов">
+                            <field name="id"/>
+                            <field name="usr_id"/>
+                            <field name="partner_id"/>
+                            <field name="create_date"/>
+                            <field name="contract_date"/>
+                            <field name="state"/>
+                            <field name="service_id"/>
+                            <field name="amount"/>
+                        </tree>
+                    </field>
+
+                </field>
+            </field>
+        </record>
+    </data>
+</openerp>

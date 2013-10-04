@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+       
+    <!-- Форма контроллера сообщений для всех типов записок -->
+    <record model="ir.ui.view" id="view_notify_tree">
+        <field name="name">view.notify.tree</field>
+        <field name="model">notify</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Уведомления">
+                <field name="model"/>
+                <field name="name" />
+                <field name="type"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record model="ir.ui.view" id="view_notify_form">
+        <field name="name">view.notify.form</field>
+        <field name="model">notify</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Уведомления">
+                <group colspan="4" col="4">
+                    <field name="id" invisible="1" />
+                    <field name="type" on_change="change_type(type)" />
+                    <field name="model" on_change="change_model(model)"/>
+                    <newline />
+                    <group colspan="4" col="4" attrs="{'invisible': [('type','!=','workflow')]}">
+                        <field name="workflow" readonly="1"/>
+                        <field name="transition" on_change="change_transition(transition)" domain="[('wkf_id', '=', workflow)]"/>
+                        <field name="from_state" readonly="1"/>
+                        <field name="to_state" readonly="1"/>
+                    </group>
+                    <group colspan="4" col="4" attrs="{'invisible': [('type','!=','change')]}">
+                        <field name="changed_field" domain="[('model_id', '=', model)]" />
+                        <field name="clear_field"/>
+                    </group>
+                    <field name="condition" colspan="4"/>
+
+                    <newline />
+                    <field name="mail" colspan="2"/>
+                    <field name="skype" colspan="2" readonly="1"/>
+                    <newline />
+                    <field name="active" colspan="2"/>
+                    <field name="send" colspan="2"/>
+                </group>
+                <group colspan="4" col="12">
+                    <separator string="Сообщение" colspan="12"/>
+                    <group col="4" colspan="8">
+                        <field name="name" colspan="4" />
+                        <field name="message" colspan="4" nolabel="1"/>
+                        <label string="${a}ТЕКСТ &lt;/a&gt;"/>
+                    </group>
+                    <group col="4" colspan="4">
+                        <separator string="Конструктор динамических значений" colspan="4"/>
+                        <field name="model_object_field"
+                               domain="[('model_id','=',model),('ttype','!=','one2many'),('ttype','!=','many2many')]"
+                               on_change="onchange_sub_model_object_value_field(model_object_field)"
+                               colspan="4"/>
+                        <field name="sub_object" readonly="1" colspan="4"/>
+                        <field name="sub_model_object_field"
+                               domain="[('model_id','=',sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]"
+                               colspan="4"
+                               attrs="{'readonly':[('sub_object','=',False)],'required':[('sub_object','!=',False)]}"
+                               on_change="onchange_sub_model_object_value_field(model_object_field,sub_model_object_field)"/>
+                        <field name="null_value" colspan="4"
+                               on_change="onchange_sub_model_object_value_field(model_object_field,sub_model_object_field,null_value)" />
+                        <field name="copyvalue" colspan="4"/>
+                    </group>
+                </group>
+                <group colspan="4" col="6">
+                    <separator string="Кто получает сообщения" colspan="6"/>
+                    <field name="send_group_ids" nolabel="1" colspan="2"/>
+                    <field name="send_users" nolabel="1" colspan="2"/>
+                    <field name="send_field_ids"
+                           nolabel="1"
+                           colspan="2"
+                           domain="[
+                                ('model_id', '=', model),
+                                ('relation', 'in', ('res.users', 'res.groups', 'hr.employee', 'storage.groups'))
+                           ]"
+                            />
+                    <separator string="Кроме" colspan="6"/>
+                    <field name="ignore_users" nolabel="1" colspan="6"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_notify_search">
+            <field name="name">view.notify.search</field>
+            <field name="model">notify</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" />
+                    <field name="type" />
+                    <field name="model"/>
+                    <field name="active"/>
+                    <field name="send"/>
+                </search>
+            </field>
+        </record>
+        
+    <record id="window_notify" model="ir.actions.act_window">
+        <field name="name">Уведомления</field>
+        <field name="res_model">notify</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_notify_tree"/>
+        <field name="search_view_id" ref="view_notify_search"/>
+    </record>
+    
+    
+    <!-- Меню для всех форм -->
+    
+    <menuitem action="window_notify" id="menu_notify_root" name="Уведомления" parent="base.menu_config"/>
+    <menuitem action="window_notify" id="menu_notify" name="Уведомления" parent="menu_notify_root"/>
+
+    </data>
+</openerp>

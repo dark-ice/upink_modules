@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="storage_folders_form" model="ir.ui.view">
+            <field name="name">Дерево папок</field>
+            <field name="model">storage.files</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Дерево папок">
+                    <field name="name" required="1" string="Имя папки"/>
+                    <field name="parent_id" widget="selection" domain="[('is_folder','=',True)]"/>
+                    <newline/>
+                    <field string="Коментарии" name="comment" colspan="3"/>
+                    <group colspan="6">
+                        <field name="user_id" groups="base.group_system"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="storage_folders_tree" model="ir.ui.view">
+            <field name="name">Дерево папок</field>
+            <field name="model">storage.files</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Хранилище данных">
+                    <field name="path" string="Дерево папок"/>
+                    <field name="parent_id" invisible="1"/>
+                    <field name="name" string="Имя папки"/>
+                    <field name="user_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="storage_folders_search_filter" model="ir.ui.view">
+            <field name="name">Дерево папок - фильтр</field>
+            <field name="model">storage.files</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Фильтр категорий">
+                    <filter string="Мои папки" icon="terp-personal" domain="[('user_id','=',uid)]" name="categ_dom"/>
+                    <filter string="Все доступные категории" icon="terp-personal+" domain="[]"/>
+                    <separator orientation="vertical"/>
+                    <field name="name"/>
+                    <field name="parent_id" widget="selection" domain="[('is_folder','=',True)]"/>
+                    <field name="user_id"/>
+                    <newline/>
+                    <group expand="0" string="Группировать по..." colspan="10" col="20">
+                        <filter string="Дереву" icon="terp-green_folder" domain="[]"
+                                context="{'group_by':['path','parent_id']}" separator="1" name="categ_grp"/>
+                        <filter string="Автору" icon="terp-green_folder" domain="[]" context="{'group_by':'user_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="window_storage_folders_action" model="ir.actions.act_window">
+            <field name="name">Дерево папок</field>
+            <field name="res_model">storage.files</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'is_folder':True, 'place_type':''}</field>
+            <field name="domain">[('is_folder','=',True)]</field>
+            <field name="search_view_id" ref="storage_folders_search_filter"/>
+            <field name="view_id" ref="storage_folders_tree"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_storage_folders_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="storage_folders_tree"/>
+            <field name="act_window_id" ref="window_storage_folders_action"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_storage_folders_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="storage_folders_form"/>
+            <field name="act_window_id" ref="window_storage_folders_action"/>
+        </record>
+
+        <menuitem action="window_storage_folders_action" id="storage_folders_menuitem" name="Дерево папок" sequence="2"
+                  parent="storage_files_menu" groups="storage_docs.admin_group"/>
+    </data>
+</openerp>

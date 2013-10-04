@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data noupdate="1">
+        <record id="storage_docs.folder_demo" model="storage.files">
+            <field name="name">Корневая папка</field>
+            <field name="parent_id" eval=""/>
+            <field name="is_folder">True</field>
+            <field name="user_id">1</field>
+        </record>
+</data>
+</openerp>

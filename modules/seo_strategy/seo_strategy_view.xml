@@ -1,0 +1,350 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="view_seo_strategys_tree">
+            <field name="name">SEO - разработка и реализация стратегии</field>
+            <field name="model">seo.strategys</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="SEO стратегия">
+                    <field name="partner_id"/>
+                    <field name="site"/>
+                    <field name="create_date"/>
+                    <field name="manager_work_id"/>
+                    <field name="manager_upwork_id"/>
+                    <field name="respon_user_id"/>
+                    <field name="user_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_seo_strategys_form">
+            <field name="name">SEO - разработка и реализация стратегии</field>
+            <field name="model">seo.strategys</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="SEO стратегия">
+                    <group colspan="4">
+                        <field name="check_w" />
+                        <field name="check_h" />
+                        <field name="check_s" />
+                        <field name="check_r" />
+                        <field name="check_o" />
+                    </group>
+                    <group col="4" colspan="4">
+                        <field
+                               name="partner_id"
+                               required="1"
+                               on_change="onchange_partner(partner_id)"
+                               attrs="{'readonly':[('state','not in',('draft', 'approval_application_start'))]}"
+                                />
+                        <field
+                               name="site"
+                               required="1"
+                               attrs="{'readonly':[('state','not in',('draft', 'approval_application_start'))]}"
+                                />
+                        <field name="user_id" readonly="1"/>
+
+                        <group
+                                attrs="{'invisible':[('state','in',('draft', 'approval_application_start'))]}"
+                                col="2"
+                                colspan="2" >
+                            <field
+                                    name="respon_user_id"
+                                    attrs="{
+                                    'readonly':[('state','not in',('draft', 'approval_application_start', 'appointment_responsible','adoption_strategy'))],
+                                    'required':[('state','not in',('draft', 'approval_application_start'))]
+                                    }"/>
+                        </group>
+
+                        <field name="create_date" readonly="1"/>
+                        <group
+                                attrs="{'invisible':[('state','not in',('appointment_executive', 'implementation_strategy', 'strategy_analysis', 'closed'))]}"
+                               col="2"
+                               colspan="2" >
+                            <field
+                                    name="executive_user_id"
+                                    attrs="{
+                                    'readonly':[('state','in',('implementation_strategy', 'strategy_analysis', 'closed'))],
+                                    'required':[('state','in',('appointment_executive', 'implementation_strategy', 'strategy_analysis', 'closed'))]}"
+                                    />
+                        </group>
+                        <field name="manager_work_id"/>
+                        <field name="manager_upwork_id"/>
+                    </group>
+                    <separator string="Тип продвижения" colspan="4"/>
+                    <group attrs="{'readonly':[('state','not in',('draft', 'approval_application_start'))]}"
+                           colspan="4" col="6">
+                        <field name="promotion_word"/>
+                        <field name="promotion_trafic"/>
+                        <field name="seo_audit"/>
+                        <field name="seo_optim"/>
+                        <field name="promotion_other"/>
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Данные по стратегии">
+                            <group colspan="4" col="2">
+                                <separator string="Услуги" colspan="4"/>
+                                <field name="servis_ids"
+                                       attrs="{'readonly':[('state','not in',('draft', 'approval_application_start'))]}"
+                                       nolabel="1" colspan="4"/>
+
+                                <group colspan="10" col="4">
+                                    <separator string="Договор:" colspan="4"/>
+                                    <field name="contracts_ids" nolabel="1" widget="one2many_list">
+                                        <tree string="Договор" colors="blue:type in ('url',)">
+                                            <field name="datas_fname"/>
+                                            <field name="create_date"/>
+                                            <field name="user_id"/>
+                                            <field name="type" groups="base.group_extended"/>
+                                        </tree>
+                                    </field>
+                                </group>
+
+                                <group attrs="{'invisible':[('state','in',('draft', 'approval_application_start', 'appointment_responsible'))]}">
+                                    <separator string="Стратегия:" colspan="4"/>
+                                    <field name="strategy_ids" nolabel="1" widget="one2many_list">
+                                        <tree string="Стратегия" colors="blue:type in ('url',)">
+                                            <field name="datas_fname"/>
+                                            <field name="create_date"/>
+                                            <field name="user_id"/>
+                                            <field name="type" groups="base.group_extended"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                                <group colspan="10" col="4">
+                                    <field name="task_ids" required="1" nolabel="1" colspan="4">
+                                        <tree string="Задачи в рамках проекта" editable="top">
+                                            <field name="name"/>
+                                            <field name="date_complete"/>
+                                            <field name="user_id"/>
+                                        </tree>
+                                    </field>
+                                </group>
+
+                                <group attrs="{'invisible':[('state','not in',('implementation_strategy', 'strategy_analysis', 'closed'))]}"
+                                       colspan="10">
+                                    <separator string="Причина остановки работ :" colspan="4"/>
+                                    <field name="reason_stop_work" attrs="{'readonly':[('state','==','closed')]}"
+                                           nolabel="1"/>
+                                </group>
+
+                            </group>
+                        </page>
+                        <page string="Реализация стратегии"
+                              attrs="{'invisible':[('state','in',('draft', 'approval_application_start', 'appointment_responsible'))]}">
+                            <group colspan="4" col="2">
+                                <separator string="Показатели SLA SEO" colspan="4"/>
+                                <field name="indicators" mode="tree,form" nolabel="1" colspan="4"
+                                       attrs="{'readonly':[('state','in',('closed'))]}">
+                                    <tree string="Показатели SLA SEO" editable="bottom">
+                                        <field name="date_id" widget="selection"/>
+                                        <field name="sla_id" domain="[('model','=','seo_strategy')]"
+                                               widget="selection"/>
+                                        <field name="influence"/>
+                                        <field name="plan"/>
+                                        <field name="fact"/>
+                                        <field name="compliance"/>
+                                        <field name="mbo"/>
+                                    </tree>
+                                </field>
+                                <field name="total_sla_ids" mode="tree" nolabel="1" colspan="4" readonly="1">
+                                    <tree string="Итого по каждому отчетному периоду">
+                                        <field name="date_id"/>
+                                        <field name="influence"/>
+                                        <field name="mbo"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <!-- attrs="{'invisible':[('state','in',('draft', 'approval_application_start'))]}" -->
+                        <page string="Данные по оплатам">
+                            <group colspan="2" col="2">
+                                <separator string="Оплаты" colspan="4"/>
+                                <field name="payment_id" nolabel="1" colspan="4" mode="tree"
+                                       attrs="{'readonly':[('state','=','closed')]}">
+                                    <tree string="Данные по оплатам" editable="top">
+                                        <field name="pay_date_plane" required="1"/>
+                                        <field name="sum_plane" required="1"/>
+                                        <field name="pay_date_fackt"/>
+                                        <field name="sum_fackt"/>
+                                        <field name="debt_pay"/>
+                                    </tree>
+                                </field>
+                                <field name="debt"/>
+                            </group>
+                        </page>
+                        <page string="Переписка по проекту">
+                            <field name="message_ids" nolabel="1" colspan="4" mode="tree">
+                                <tree string="Переписка по проекту" editable="top">
+                                    <field name="text" required="1" colspan="2"/>
+                                    <field name="usr_id" string="Автор" readonly="1"/>
+                                    <field name="cr_date" readonly="1"/>
+                                    <field name="rep_file_id"/>
+                                </tree>
+                                <form string="Переписка по проекту">
+                                    <field name="rep_file_id"
+                                           context="{'object': 'seo_strategy'}"
+                                           domain="[('object','=','seo_strategy')]"
+                                            />
+                                    <field name="cr_date" readonly="1"/>
+                                    <field name="usr_id"/>
+                                    <field name="text" colspan="4"/>
+                                </form>
+                            </field>
+                            <field name="history_ids" nolabel="1" colspan="4" mode="tree" readonly="1">
+                                <tree string="История">
+                                    <field name="usr_id"/>
+                                    <field name="create_date"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Отчеты">
+                            <separator string="Ежемесячные отчеты" colspan="4"/>
+                            <field name="reports_ids" nolabel="1" widget="one2many_list">
+                                <tree string="Отчеты" colors="blue:type in ('url',)">
+                                    <field name="datas_fname"/>
+                                    <field name="create_date"/>
+                                    <field name="user_id"/>
+                                    <field name="type" groups="base.group_extended"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <group colspan="4" col="2"
+                           attrs="{'invisible':[('state','not in',('adoption_strategy', 'completion_strategy'))]}">
+                        <separator string="Комментарий по доработке" colspan="2"/>
+                        <field name="comment" colspan="2" nolabel="1"
+                               attrs="{'readonly':[('state','==','completion_strategy')]}"/>
+                    </group>
+                    <newline/>
+                    <group>
+                        <field name="state"/>
+                    </group>
+                    <group>
+                        <!-- draft -> approval_application_start -->
+                        <!-- attrs="{'invisible': ['|', ('check_w', '==', False), ('state', '!=', 'draft')]}" -->
+                        <button
+                                name="action_d_ass"
+                                attrs="{'invisible': ['|', ('check_w', '==', False), ('state', '!=', 'draft')]}"
+                                string="Согласование заявки на запуск"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- approval_application_start -> appointment_responsible -->
+                        <!-- attrs="{'invisible': ['|', ('check_h', '==', False), ('state', '!=', 'approval_application_start')]}" -->
+                        <button name="action_aas_ar"
+                                attrs="{'invisible': ['|', ('check_h', '==', False), ('state', '!=', 'approval_application_start')]}"
+                                string="Назначение ответственного"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- appointment_responsible -> preparation_strategy -->
+                        <!-- attrs="{'invisible': ['|', ('check_s', '==', False), ('state', '!=', 'appointment_responsible')]}" -->
+                        <button name="action_ar_ps"
+                                attrs="{'invisible': ['|', ('check_s', '==', False), ('state', '!=', 'appointment_responsible')]}"
+                                string="Составление стратегии"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- preparation_strategy -> adoption_strategy -->
+                        <!-- attrs="{'invisible': ['|', ('check_r', '==', False), ('state', '!=', 'preparation_strategy')]}" -->
+                        <button name="action_ps_as"
+                                attrs="{'invisible': ['|', ('check_r', '==', False), ('state', '!=', 'preparation_strategy')]}"
+                                string="Утверждение стратегии"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- adoption_strategy -> completion_strategy -->
+                        <!-- attrs="{'invisible': ['|', ('check_s', '==', False), ('state', '!=', 'adoption_strategy')]}" -->
+                        <button name="action_as_cs"
+                                attrs="{'invisible': ['|', ('check_s', '==', False), ('state', '!=', 'adoption_strategy')]}"
+                                string="Доработка стратегии"
+                                icon="gtk-media-pause"
+                                />
+
+                        <!-- completion_strategy -> adoption_strategy -->
+                        <!-- attrs="{'invisible': ['|', ('check_r', '==', False), ('state', '!=', 'completion_strategy')]}" -->
+                        <button name="action_cs_as"
+                                attrs="{'invisible': ['|', ('check_r', '==', False), ('state', '!=', 'completion_strategy')]}"
+                                string="Утверждение стратегии"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- adoption_strategy -> appointment_executive -->
+                        <!-- attrs="{'invisible': ['|', ('check_s', '==', False), ('state', '!=', 'adoption_strategy')]}" -->
+                        <button name="action_as_ae"
+                                attrs="{'invisible': ['|', ('check_s', '==', False), ('state', '!=', 'adoption_strategy')]}"
+                                string="Назначение исполнителя"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- appointment_executive -> implementation_strategy -->
+                        <!-- attrs="{'invisible': ['|', ('check_r', '==', False), ('state', '!=', 'appointment_executive')]}" -->
+                        <button name="action_ae_is"
+                                attrs="{'invisible': ['|', ('check_r', '==', False), ('state', '!=', 'appointment_executive')]}"
+                                string="Реализация стратегии"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- implementation_strategy -> strategy_analysis -->
+                        <!-- attrs="{'invisible': ['|', ('check_o', '==', False), ('state', '!=', 'implementation_strategy')]}" -->
+                        <button name="action_is_sa"
+                                attrs="{'invisible': ['|', ('check_o', '=', False), ('state', '!=', 'implementation_strategy')]}"
+                                string="Анализ стратегии"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- strategy_analysis -> preparation_strategy -->
+                        <!-- attrs="{'invisible': ['|', ('check_r', '==', False), ('state', '!=', 'strategy_analysis')]}" -->
+                        <button name="action_sa_ps"
+                                attrs="{'invisible': ['|', ('check_r', '==', False), ('state', '!=', 'strategy_analysis')]}"
+                                string="Составление стратегии"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- strategy_analysis -> implementation_strategy -->
+                        <!-- attrs="{'invisible': ['|', ('check_r', '==', False), ('state', '!=', 'strategy_analysis')]}" -->
+                        <button name="action_sa_is"
+                                attrs="{'invisible': ['|', ('check_r', '==', False), ('state', '!=', 'strategy_analysis')]}"
+                                string="Реализация стратегии"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- implementation_strategy -> closed -->
+                        <!-- attrs="{'invisible': ['|', ('check_o', '==', False), ('state', '!=', 'implementation_strategy')]}" -->
+                        <button name="action_is_c"
+                                attrs="{'invisible': ['|', ('check_o', '=', False), ('state', '!=', 'implementation_strategy')]}"
+                                string="Работы закончены"
+                                icon="gtk-apply"
+                                />
+
+                        <!-- strategy_analysis -> closed -->
+                        <!-- attrs="{'invisible': ['|', ('check_r', '==', False), ('state', '!=', 'strategy_analysis')]}" -->
+                        <button name="action_sa_c"
+                                attrs="{'invisible': ['|', ('check_r', '==', False), ('state', '!=', 'strategy_analysis')]}"
+                                string="Работы закончены"
+                                icon="gtk-apply"
+                                />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_seo_strategys">
+            <field name="name">Разработка и реализация стратегии SEO</field>
+            <field name="res_model">seo.strategys</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_seo_strategys_tree"/>
+        </record>
+
+        <menuitem name="SEO стратегии" id="seo_strategy.menu_process_seo_strategys" sequence="1"
+                  parent="process_base.menu_process_all"/>
+        <menuitem id="seo_strategy.menu_seo_strategys" action="window_seo_strategys"
+                  parent="seo_strategy.menu_process_seo_strategys"/>
+
+    </data>
+</openerp>

@@ -1,0 +1,85 @@
+<openerp>
+    <data>
+        <record id="view_account_invoice_kassa" model="ir.ui.view">
+            <field name="name">account.invoice.kassa.wizard.view</field>
+            <field name="model">account.invoice.kassa.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Касса">
+                    <field name="card_id" widget="selection"/><newline />
+                    <field name="date_start"/>
+                    <field name="date_end"/>
+                    <separator string="" colspan="4" />
+                    <group col="4" colspan="4">
+                        <button string="Отмена" icon="gtk-close" special="cancel" />
+                        <button name="get_report" string="Показать" type="object" icon="gtk-ok"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+       <!-- Invoice Kassa Wizard -->
+        <record id="action_account_invoice_kassa" model="ir.actions.act_window">
+            <field name="name">Касса</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.invoice.kassa.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_account_invoice_kassa"/>
+            <field name="context">{'date_start': time.strftime('%Y-%m-%d'), 'date_end': time.strftime('%Y-%m-%d')}</field>
+            <field name="target">new</field>
+        </record>
+
+
+        <record id="view_account_invoice_kassa2" model="ir.ui.view">
+            <field name="name">account.invoice.kassa.wizard.view2</field>
+            <field name="model">account.invoice.kassa.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Касса">
+                    <field name="card_id" widget="selection"/><newline />
+                    <group colspan="2" col="2">
+                        <field name="date_start"/>
+                        <field name="date_end"/>
+                    </group>
+
+                    <group colspan="2" col="2">
+                        <field name="in_total" readonly="True"/>
+                        <field name="out_total" readonly="True"/>
+                    </group>
+
+                    <field name="saldo" readonly="True"/>
+                    <field name="act_ids" nolabel="1" colspan="4" readonly="True" widget="one2many_list">
+                        <tree string="Статистика" colors="red:color_type=='out';green:color_type=='in'">
+                            <field name="color_type" invisible="1"/>
+                            <field name="line_type"/>
+                            <field name="line_date"/>
+                            <field name="line_in"/>
+                            <field name="line_out"/>
+                        </tree>
+                        <form>
+                            <field name="line_type"/>
+                            <field name="line_date"/>
+                            <field name="line_in" attrs="{'invisible': [('line_in', '=', False)]}"/>
+                            <field name="line_out" attrs="{'invisible': [('line_out', '=', False)]}"/>
+                            <field name="transfer_id" attrs="{'invisible': [('transfer_id', '=', False)]}"/>
+                            <field name="invoice_id" attrs="{'invisible': [('invoice_id', '=', False)]}"/>
+                            <field name="pay_id" attrs="{'invisible': [('pay_id', '=', False)]}"/>
+                        </form>
+                    </field>
+                    <field name="total" readonly="True"/>
+                    <button name="get_report" string="Пересчитать" type="object" icon="gtk-ok"/>
+                </form>
+            </field>
+        </record>
+
+       <!-- Invoice kassa Wizard -->
+        <record id="action_account_invoice_kassa2" model="ir.actions.act_window">
+            <field name="name">Касса </field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.invoice.kassa.wizard</field>
+            <field name="view_id" ref="view_account_invoice_kassa2"/>
+        </record>
+
+        <menuitem action="action_account_invoice_kassa" id="menu_kassa_report_all2" parent="account.menu_finance_invoice_reports" sequence="5"/>
+    </data>
+</openerp>

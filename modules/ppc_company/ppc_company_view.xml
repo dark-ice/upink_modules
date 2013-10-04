@@ -1,0 +1,297 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="view_ppc_company_tree">
+            <field name="name">PPC - запуск и реализация кампании</field>
+            <field name="model">ppc.company</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="PPC кампании">
+                    <field name="partner_id"/>
+                    <field name="site"/>
+                    <field name="create_date"/>
+                    <field name="manager_work_id"/>
+                    <field name="acc_manager_id"/>
+                    <field name="reklam_id"/>
+                    <field name="user_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_ppc_company_form">
+            <field name="name">PPC - запуск и реализация кампании</field>
+            <field name="model">ppc.company</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="PPC кампания">
+                    <field name="usr_permission" />
+                    <group col="4" colspan="4">
+                        <field 
+                            name="partner_id" 
+                            required="1" 
+                            on_change="onchange_partner(partner_id)"
+                            attrs="{'readonly':[('state','not in',('draft'))]}"
+                            
+                            />
+                        <field name="site" required="1" attrs="{'readonly':[('state','not in',('draft'))]}"/>
+                        <field name="user_id" readonly="1" attrs="{'readonly':[('state','not in',('draft'))]}"/>
+                        <field name="reklam_id" required="1" widget="selection"
+                               attrs="{'readonly':[('state','not in',('draft'))]}"/>
+                        <field name="manager_work_id" />
+                        <field name="manager_upwork_id" />
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Данные по оплатам">
+                            <group colspan="4" col="2">
+                                <separator string="Оплаты" colspan="4"/>
+                                <field name="payments" nolabel="1" colspan="4" mode="tree"
+                                       attrs="{'readonly':[('state','in',('closed'))]}">
+                                    <tree string="Данные по оплатам" editable="top">
+                                        <field name="summ_pay" required="1"/>
+                                        <field name="pay_currency" required="1" widget="selection"/>
+                                        <field name="summ_pay_$" required="1" />
+                                        <field name="sum_enrollment_$" required="1" />
+                                        <field name="pay_detetime" required="1"/>
+                                        <field name="user_id"/>
+                                    </tree>
+                                </field>
+                            </group>
+                            <group colspan="4" col="4" attrs="{'readonly':[('state','=', 'closed')]}">
+                                <separator string="Договор:" colspan="4" />
+                                <field name="contract_ids" nolabel="1" colspan="4" >
+                                    <tree string="Договор">
+                                        <field name="create_date"/>
+                                        <field name="rep_file_id" 
+                                            context="{'object': 'ppc_company.contract'}"
+                                            domain="[('object','=','ppc_company.contract')]"
+                                            />
+                                        <field name="usr_id"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Данные по кампании">
+                            <group colspan="4" col="2">
+                                <group attrs="{'invisible':[('state','in',('draft', 'approval_application'))]}"
+                                       colspan="4" col="2">
+                                    <separator string="Аккаунт менеджер" colspan="4"/>
+                                    <field name="acc_manager_id"
+                                           attrs="{'required':[('state','not in',('draft', 'approval_application'))], 'readonly':[('state','in',('draft', 'approval_application'))]}"
+                                           nolabel="1"/>
+                                </group>
+                                <group attrs="{'invisible':[('state','in',('draft', 'approval_application', 'appointment_account_manager'))]}"
+                                       colspan="4" col="2">
+                                    <separator string="Доступы" colspan="4"/>
+                                    <field name="access" nolabel="1" colspan="4" mode="tree"
+                                           attrs="{'readonly':[('state','in',('closed'))]}">
+                                        <tree string="Данные по доступам" editable="top">
+                                            <field name="reklam_id" required="1" widget="selection"/>
+                                            <field name="login" required="1"/>
+                                            <field name="password" required="1"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                                <separator string="Дополнительные данные по кампании:" colspan="4"/>
+                                <field name="additional_data_company"
+                                       attrs="{'readonly':[('state','in',('closed'))]}" nolabel="1"/>
+                                <group attrs="{'invisible':[('state','not in',('implementation_company', 'closed'))]}"
+                                       colspan="4">
+                                    <separator string="Причина остановки кампании:" colspan="4"/>
+                                    <field name="reason_stop_company"
+                                           attrs="{'readonly':[('state','in',('closed'))]}" nolabel="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Реализация кампании">
+                            <group colspan="4" col="2">
+                                <group attrs="{'invisible':[('state','not in',('implementation_company', 'closed'))]}"
+                                       colspan="4">
+                                    <separator string="Показатели SLA PPC" colspan="4"/>
+                                    <field name="indicators" mode="tree,form" nolabel="1" colspan="4"
+                                           attrs="{'readonly':[('state','in',('closed'))]}">
+                                        <tree string="Показатели SLA PPC" editable="bottom">
+                                            <field name="date_id" widget="selection"/>
+                                            <field name="sla_id" domain="[('model','=','ppc_company')]"
+                                                   widget="selection"/>
+                                            <field name="influence"/>
+                                            <field name="plan"/>
+                                            <field name="fact"/>
+                                            <field name="compliance"/>
+                                            <field name="mbo"/>
+                                        </tree>
+                                    </field>
+                                    <field name="total_sla_ids" mode="tree" nolabel="1" colspan="4" readonly="1">
+                                        <tree string="Итого по каждому отчетному периоду">
+                                            <field name="date_id"/>
+                                            <field name="influence"/>
+                                            <field name="mbo"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Переписка по проекту">
+                            <field name="message_ids" nolabel="1" colspan="4" mode="tree">
+                                <tree string="Переписка по проекту" editable="top">
+                                    <field name="text" required="1" colspan="2"/>
+                                    <field name="usr_id" string="Автор" readonly="1" />
+                                    <field name="cr_date" readonly="1" />
+                                    <field name="rep_file_id"
+                                        context="{'object': 'ppc_company.messages'}"
+                                        domain="[('object','=','ppc_company.messages')]"
+                                        />
+                                </tree>
+                            </field>
+                            <field name="history_ids" nolabel="1" colspan="4" mode="tree" readonly="1">
+                                <tree string="История">
+                                    <field name="usr_id"/>
+                                    <field name="create_date"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Отчеты">
+                            <field name="reports" nolabel="1" colspan="4" mode="tree"
+                                   attrs="{'readonly':[('state','in',('closed'))]}">
+                                <tree string="Отчеты">
+                                    <field name="create_date" readonly="1"/>
+                                    <field name="rep_file_id" required="1"
+                                        context="{'object': 'ppc_company.reports'}"
+                                        domain="[('object','=','ppc_company.reports')]"
+                                        />
+                                    <field name="user_id"/>
+                                    <field name="comments"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <group
+                            colspan="4"
+                            col="2"
+                            attrs="{'invisible':[('state','not in',('implementation_company', 'closed', 'adoption_company', 'completion_company'))]}"
+                            >
+                        <separator string="Комментарий по доработке" colspan="4"/>
+                        <field name="comment" colspan="4" nolabel="1"
+                               attrs="{'readonly':[('state','in',('closed', 'implementation_company', 'completion_company'))]}"/>
+                    </group>
+                    <newline/>
+                    <group>
+                        <field name="state"/>
+                    </group>
+                    <group>
+                        <!-- draft -> approval_application -->
+                        <button name="action_d_aa"
+                                attrs="{'invisible': ['|', ('usr_permission', 'not in', ('w', 'wh', 'whc', 'whca', 'wc', 'wca', 'wa', 'wha', 'u', 'uh', 'uhc', 'uhca', 'uc', 'uca', 'ua', 'uha', 'uw', 'uwh', 'uwhc', 'uwhca', 'uwc', 'uwca', 'uwa', 'uwha')), ('state', '!=', 'draft')]}"
+                                string="Согласование заявки"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- approval_application -> appointment_account_manager -->
+                        <button name="action_aa_aam"
+                                attrs="{'invisible': ['|', ('usr_permission', 'not in', ('h', 'wh', 'whc', 'whca', 'hc', 'hca', 'ha')), ('state', '!=', 'approval_application')]}"
+                                string="Назначение аккаунт менеджера"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- appointment_account_manager -> preparation_startup_company -->
+                        <button name="action_aam_psc"
+                                attrs="{'invisible':[
+                                '|', ('usr_permission', 'not in', ('c', 'wc', 'whc', 'whca', 'wca', 'hc', 'hca', 'ca')), ('state','!=','appointment_account_manager')]}"
+                                string="Подготовка запуска кампании"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- preparation_startup_company -> adoption_company -->
+                        <button name="action_psc_ac"
+                                attrs="{'invisible': ['|', ('usr_permission', 'not in', ('a', 'wa', 'wha', 'whca', 'wca', 'ha', 'hca', 'ca')), ('state', '!=', 'preparation_startup_company')]}"
+                                string="Утверждение кампании"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- adoption_company -> completion_company -->
+                        <button name="action_ac_cc"
+                                attrs="{'invisible': ['|', ('usr_permission', 'not in', ('c', 'wc', 'whc', 'whca', 'wca', 'hc', 'hca', 'ca')), ('state', '!=', 'adoption_company')]}"
+                                string="Доработка кампании"
+                                icon="gtk-media-pause"
+                                />
+
+                        <!-- completion_company -> preparation_startup_company -->
+                        <button name="action_cc_psc"
+                                attrs="{'invisible':[
+                                '|', ('usr_permission', 'not in', ('a', 'wa', 'wha', 'whca', 'wca', 'ha', 'hca', 'ca')), ('state','!=','completion_company')]}"
+                                string="Подготовка запуска кампании"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- adoption_company -> implementation_company -->
+                        <button name="action_ac_ic"
+                                attrs="{'invisible':['|', ('usr_permission', 'not in', ('c', 'wc', 'whc', 'whca', 'wca', 'hc', 'hca', 'ca')), ('state','!=','adoption_company')]}"
+                                string="Реализация кампании"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+
+                        <!-- implementation_company -> closed -->
+                        <button name="action_ic_c"
+                                attrs="{'invisible': ['|', ('usr_permission', 'not in', ('a', 'wa', 'wha', 'whca', 'wca', 'ha', 'hca', 'ca')), ('state', '!=', 'implementation_company')]}"
+                                string="кампания остановлена" icon="gtk-jump-to"
+                                />
+
+                        <!-- closed -> implementation_company -->
+                        <button name="action_c_ic"
+                                attrs="{'invisible':['|', ('usr_permission', 'not in', ('a', 'wa', 'wha', 'whca', 'wca', 'ha', 'hca', 'ca')), ('state','!=','closed')]}"
+                                string="Реализация кампании"
+                                icon="terp-gtk-go-back-rtl"
+                                />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_ppc_reklam_stage_tree">
+            <field name="name">Рекламная система</field>
+            <field name="model">ppc.reklam.stage</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Рекламная система" editable="top">
+                    <field name="name" required="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_ppc_reklam_stage_form">
+            <field name="name">Рекламная система</field>
+            <field name="model">ppc.reklam.stage</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Рекламная система">
+                    <group colspan="4" col="8">
+                        <field name="name" required="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_ppc_company">
+            <field name="name">Запуск и реализация кампании PPC</field>
+            <field name="res_model">ppc.company</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_ppc_company_tree"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_view_ppc_reklam_stage">
+            <field name="name">Рекламная система PPC</field>
+            <field name="res_model">ppc.reklam.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_ppc_reklam_stage_tree"/>
+        </record>
+
+        <menuitem name="PPC кампании" id="menu_process_ppc_company" sequence="1"
+                  parent="process_base.menu_process_all"/>
+        <menuitem id="menu_ppc_company" action="window_ppc_company"
+                  parent="menu_process_ppc_company"/>
+        <menuitem id="menu_ppc_reklam_stage" action="window_view_ppc_reklam_stage"
+                  parent="process_base.menu_process_all_config"/>
+    </data>
+</openerp>

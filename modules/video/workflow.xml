@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_video">
+            <field name="name">wkf.video</field>
+            <field name="osv">video</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- draft -->
+        <record model="workflow.activity" id="act_draft">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="flow_start">True</field>
+            <field name="name">draft</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='draft')</field>
+        </record>
+
+        <!-- cancel -->
+        <record model="workflow.activity" id="act_cancel">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="flow_stop">True</field>
+            <field name="name">cancel</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='cancel')</field>
+        </record>
+
+        <!-- approval_application -->
+        <record model="workflow.activity" id="act_approval_application">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="name">approval_application</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='approval_application')</field>
+        </record>
+
+        <!-- drawing -->
+        <record model="workflow.activity" id="act_drawing">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="name">drawing</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='drawing')</field>
+        </record>
+
+        <!-- completion -->
+        <record model="workflow.activity" id="act_completion">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="name">completion</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='completion')</field>
+        </record>
+
+        <!-- approval_tt -->
+        <record model="workflow.activity" id="act_approval_tt">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="name">approval_tt</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='approval_tt')</field>
+        </record>
+
+        <!-- signing -->
+        <record model="workflow.activity" id="act_signing">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="name">signing</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='signing')</field>
+        </record>
+
+        <!-- contract_cancel -->
+        <record model="workflow.activity" id="act_contract_cancel">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="flow_stop">True</field>
+            <field name="name">contract_cancel</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='contract_cancel')</field>
+        </record>
+
+        <!-- development -->
+        <record model="workflow.activity" id="act_development">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="name">development</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='development')</field>
+        </record>
+
+        <!-- choice -->
+        <record model="workflow.activity" id="act_choice">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="name">choice</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='choice')</field>
+        </record>
+
+        <!-- scripting -->
+        <record model="workflow.activity" id="act_scripting">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="name">scripting</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='scripting')</field>
+        </record>
+
+        <!-- approval_scenario -->
+        <record model="workflow.activity" id="act_approval_scenario">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="name">approval_scenario</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='approval_scenario')</field>
+        </record>
+
+        <!-- signing_application -->
+        <record model="workflow.activity" id="act_signing_application">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="name">signing_application</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='signing_application')</field>
+        </record>
+
+        <!-- preparation -->
+        <record model="workflow.activity" id="act_preparation">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="name">preparation</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='preparation')</field>
+        </record>
+
+        <!-- approval -->
+        <record model="workflow.activity" id="act_approval">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="name">approval</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='approval')</field>
+        </record>
+
+        <!-- work -->
+        <record model="workflow.activity" id="act_work">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="name">work</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='work')</field>
+        </record>
+
+        <!-- assertion -->
+        <record model="workflow.activity" id="act_assertion">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="name">assertion</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='assertion')</field>
+        </record>
+
+        <!-- project_cancel -->
+        <record model="workflow.activity" id="act_project_cancel">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="flow_stop">True</field>
+            <field name="name">project_cancel</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='project_cancel')</field>
+        </record>
+
+        <!-- transmission -->
+        <record model="workflow.activity" id="act_transmission">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="name">transmission</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='transmission')</field>
+        </record>
+
+        <!-- transferred -->
+        <record model="workflow.activity" id="act_transferred">
+            <field name="wkf_id" ref="wkf_video"/>
+            <field name="flow_stop">True</field>
+            <field name="name">transferred</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='transferred')</field>
+        </record>
+
+
+        <!-- draft -> cancel -->
+        <record model="workflow.transition" id="d_c">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">action_d_c</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- draft -> approval_application -->
+        <record model="workflow.transition" id="d_aa">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_approval_application"/>
+            <field name="signal">action_d_aa</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- approval_application -> draft -->
+        <record model="workflow.transition" id="aa_d">
+            <field name="act_from" ref="act_approval_application"/>
+            <field name="act_to" ref="act_draft"/>
+            <field name="signal">action_aa_d</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- approval_application -> drawing -->
+        <record model="workflow.transition" id="aa_drwn">
+            <field name="act_from" ref="act_approval_application"/>
+            <field name="act_to" ref="act_drawing"/>
+            <field name="signal">action_aa_drwn</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- drawing -> completion -->
+        <record model="workflow.transition" id="drwn_cmplt">
+            <field name="act_from" ref="act_drawing"/>
+            <field name="act_to" ref="act_completion"/>
+            <field name="signal">action_drwn_cmplt</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- completion -> approval_tt -->
+        <record model="workflow.transition" id="cmplt_apprtt">
+            <field name="act_from" ref="act_completion"/>
+            <field name="act_to" ref="act_approval_tt"/>
+            <field name="signal">action_cmplt_apprtt</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- approval_tt -> completion -->
+        <record model="workflow.transition" id="apprtt_cmplt">
+            <field name="act_from" ref="act_approval_tt"/>
+            <field name="act_to" ref="act_completion"/>
+            <field name="signal">action_apprtt_cmplt</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- approval_tt -> signing -->
+        <record model="workflow.transition" id="apprtt_sgnn">
+            <field name="act_from" ref="act_approval_tt"/>
+            <field name="act_to" ref="act_signing"/>
+            <field name="signal">action_apprtt_sgnn</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- signing -> contract_cancel -->
+        <record model="workflow.transition" id="sgnn_ccncl">
+            <field name="act_from" ref="act_signing"/>
+            <field name="act_to" ref="act_contract_cancel"/>
+            <field name="signal">action_sgnn_ccncl</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- signing -> development -->
+        <record model="workflow.transition" id="sgnn_dvlpmnt">
+            <field name="act_from" ref="act_signing"/>
+            <field name="act_to" ref="act_development"/>
+            <field name="signal">action_sgnn_dvlpmnt</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- development -> choice -->
+        <record model="workflow.transition" id="dvlpmnt_chc">
+            <field name="act_from" ref="act_development"/>
+            <field name="act_to" ref="act_choice"/>
+            <field name="signal">action_dvlpmnt_chc</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- choice -> development -->
+        <record model="workflow.transition" id="chc_dvlpmnt">
+            <field name="act_from" ref="act_choice"/>
+            <field name="act_to" ref="act_development"/>
+            <field name="signal">action_chc_dvlpmnt</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- choice -> scripting -->
+        <record model="workflow.transition" id="chc_scrptn">
+            <field name="act_from" ref="act_choice"/>
+            <field name="act_to" ref="act_scripting"/>
+            <field name="signal">action_chc_scrptn</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- scripting -> approval_scenario -->
+        <record model="workflow.transition" id="scrptn_apprvls">
+            <field name="act_from" ref="act_scripting"/>
+            <field name="act_to" ref="act_approval_scenario"/>
+            <field name="signal">action_scrptn_apprvls</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- approval_scenario -> scripting -->
+        <record model="workflow.transition" id="apprvls_scrptn">
+            <field name="act_from" ref="act_approval_scenario"/>
+            <field name="act_to" ref="act_scripting"/>
+            <field name="signal">action_apprvls_scrptn</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- approval_scenario -> signing_application -->
+        <record model="workflow.transition" id="apprvls_sgnnapp">
+            <field name="act_from" ref="act_approval_scenario"/>
+            <field name="act_to" ref="act_signing_application"/>
+            <field name="signal">action_apprvls_sgnnapp</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- signing_application -> preparation -->
+        <record model="workflow.transition" id="sgnnapp_prprtn">
+            <field name="act_from" ref="act_signing_application"/>
+            <field name="act_to" ref="act_preparation"/>
+            <field name="signal">action_sgnnapp_prprtn</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- preparation -> approval -->
+        <record model="workflow.transition" id="prprtn_apprvl">
+            <field name="act_from" ref="act_preparation"/>
+            <field name="act_to" ref="act_approval"/>
+            <field name="signal">action_prprtn_apprvl</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- approval -> preparation -->
+        <record model="workflow.transition" id="apprvl_prprtn">
+            <field name="act_from" ref="act_approval"/>
+            <field name="act_to" ref="act_preparation"/>
+            <field name="signal">action_apprvl_prprtn</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- approval -> work -->
+        <record model="workflow.transition" id="apprvl_wrk">
+            <field name="act_from" ref="act_approval"/>
+            <field name="act_to" ref="act_work"/>
+            <field name="signal">action_apprvl_wrk</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- work -> assertion -->
+        <record model="workflow.transition" id="wrk_assrtn">
+            <field name="act_from" ref="act_work"/>
+            <field name="act_to" ref="act_assertion"/>
+            <field name="signal">action_wrk_assrtn</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- assertion -> work -->
+        <record model="workflow.transition" id="assrtn_wrk">
+            <field name="act_from" ref="act_assertion"/>
+            <field name="act_to" ref="act_work"/>
+            <field name="signal">action_assrtn_wrk</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- assertion -> project_cancel -->
+        <record model="workflow.transition" id="assrtn_prjc">
+            <field name="act_from" ref="act_assertion"/>
+            <field name="act_to" ref="act_project_cancel"/>
+            <field name="signal">action_assrtn_prjc</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- assertion -> transmission -->
+        <record model="workflow.transition" id="assrtn_trnsm">
+            <field name="act_from" ref="act_assertion"/>
+            <field name="act_to" ref="act_transmission"/>
+            <field name="signal">action_assrtn_trnsm</field>
+            <field name="condition">1 == 1</field>
+        </record>
+
+        <!-- transmission -> transferred -->
+        <record model="workflow.transition" id="assrtn_trnsf">
+            <field name="act_from" ref="act_transmission"/>
+            <field name="act_to" ref="act_transferred"/>
+            <field name="signal">action_assrtn_trnsf</field>
+            <field name="condition">1 == 1</field>
+        </record>
+    </data>
+</openerp>

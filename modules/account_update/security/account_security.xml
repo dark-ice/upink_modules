@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp><data>
+
+    <record id="account.group_account_head" model="res.groups" context="{'noadmin':True}">
+        <field name="name">Руководители направлений</field>
+        <field name="category_id" ref="base.module_category_accounting_and_finance"/>
+        <field name="implied_ids" eval="[(4, ref('account.group_account_invoice'))]"/>
+    </record>
+
+    <record id="account.group_report_all" model="res.groups" context="{'noadmin':True}">
+        <field name="name">Отчеты все поля</field>
+        <field name="category_id" ref="base.module_category_accounting_and_finance"/>
+        <field name="implied_ids" eval="[(4, ref('account.group_account_invoice'))]"/>
+    </record>
+
+    <!-- Правила доступа для групп -->
+    <record id="account_invoice_manager_rule_view" model="ir.rule">
+        <field name="name">Счет и ЗДС: Финансисты и крутики</field>
+        <field ref="model_account_invoice" name="model_id"/>
+        <field name="domain_force">[('state', '!=', 'draft')]</field>
+        <field name="perm_read" eval="True" />
+        <field name="perm_create" eval="True" />
+        <field name="perm_write" eval="True" />
+        <field name="perm_unlink" eval="False" />
+        <field name="groups_id" eval="[(4,ref('account.group_account_user')),(4,ref('account.group_account_manager'))]"/>
+    </record>
+
+    <record id="account_invoice_rule_view" model="ir.rule">
+         <field name="name">Счет и ЗДС: обычные смертные</field>
+        <field ref="model_account_invoice" name="model_id"/>
+        <field name="domain_force">[('user_id.id', '=', user.id)]</field>
+        <field name="perm_read" eval="True" />
+        <field name="perm_create" eval="True" />
+        <field name="perm_write" eval="True" />
+        <field name="perm_unlink" eval="False" />
+        <field name="groups_id" eval="[(4, ref('account.group_account_invoice'))]"/>
+    </record>
+
+</data></openerp>

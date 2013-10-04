@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+        <!-- RUS 2012 - 2013 -->
+        <record model="kpi.period" id="period_rus_2012_01">
+            <field name="month">1</field>
+            <field name="year">2012</field>
+            <field name="calendar">rus</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2012_02">
+            <field name="month">2</field>
+            <field name="year">2012</field>
+            <field name="calendar">rus</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2012_03">
+            <field name="month">3</field>
+            <field name="year">2012</field>
+            <field name="calendar">rus</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2012_04">
+            <field name="month">4</field>
+            <field name="year">2012</field>
+            <field name="calendar">rus</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2012_05">
+            <field name="month">5</field>
+            <field name="year">2012</field>
+            <field name="calendar">rus</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2012_06">
+            <field name="month">6</field>
+            <field name="year">2012</field>
+            <field name="calendar">rus</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2012_07">
+            <field name="month">7</field>
+            <field name="year">2012</field>
+            <field name="calendar">rus</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2012_08">
+            <field name="month">8</field>
+            <field name="year">2012</field>
+            <field name="calendar">rus</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2012_09">
+            <field name="month">9</field>
+            <field name="year">2012</field>
+            <field name="calendar">rus</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2012_10">
+            <field name="month">10</field>
+            <field name="year">2012</field>
+            <field name="calendar">rus</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2012_11">
+            <field name="month">11</field>
+            <field name="year">2012</field>
+            <field name="calendar">rus</field>
+            <field name="days">21</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2012_12">
+            <field name="month">12</field>
+            <field name="year">2012</field>
+            <field name="calendar">rus</field>
+            <field name="days">21</field>
+        </record>
+        
+        <record model="kpi.period" id="period_rus_2013_01">
+            <field name="month">1</field>
+            <field name="year">2013</field>
+            <field name="calendar">rus</field>
+            <field name="days">17</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2013_02">
+            <field name="month">2</field>
+            <field name="year">2013</field>
+            <field name="calendar">rus</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2013_03">
+            <field name="month">3</field>
+            <field name="year">2013</field>
+            <field name="calendar">rus</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2013_04">
+            <field name="month">4</field>
+            <field name="year">2013</field>
+            <field name="calendar">rus</field>
+            <field name="days">22</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2013_05">
+            <field name="month">5</field>
+            <field name="year">2013</field>
+            <field name="calendar">rus</field>
+            <field name="days">18</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2013_06">
+            <field name="month">6</field>
+            <field name="year">2013</field>
+            <field name="calendar">rus</field>
+            <field name="days">19</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2013_07">
+            <field name="month">7</field>
+            <field name="year">2013</field>
+            <field name="calendar">rus</field>
+            <field name="days">23</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2013_08">
+            <field name="month">8</field>
+            <field name="year">2013</field>
+            <field name="calendar">rus</field>
+            <field name="days">22</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2013_09">
+            <field name="month">9</field>
+            <field name="year">2013</field>
+            <field name="calendar">rus</field>
+            <field name="days">21</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2013_10">
+            <field name="month">10</field>
+            <field name="year">2013</field>
+            <field name="calendar">rus</field>
+            <field name="days">23</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2013_11">
+            <field name="month">11</field>
+            <field name="year">2013</field>
+            <field name="calendar">rus</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_rus_2013_12">
+            <field name="month">12</field>
+            <field name="year">2013</field>
+            <field name="calendar">rus</field>
+            <field name="days">22</field>
+        </record>
+        
+        
+        <!-- ua 2012 - 2013 -->
+        <record model="kpi.period" id="period_ua_2012_01">
+            <field name="month">1</field>
+            <field name="year">2012</field>
+            <field name="calendar">ua</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2012_02">
+            <field name="month">2</field>
+            <field name="year">2012</field>
+            <field name="calendar">ua</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2012_03">
+            <field name="month">3</field>
+            <field name="year">2012</field>
+            <field name="calendar">ua</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2012_04">
+            <field name="month">4</field>
+            <field name="year">2012</field>
+            <field name="calendar">ua</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2012_05">
+            <field name="month">5</field>
+            <field name="year">2012</field>
+            <field name="calendar">ua</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2012_06">
+            <field name="month">6</field>
+            <field name="year">2012</field>
+            <field name="calendar">ua</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2012_07">
+            <field name="month">7</field>
+            <field name="year">2012</field>
+            <field name="calendar">ua</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2012_08">
+            <field name="month">8</field>
+            <field name="year">2012</field>
+            <field name="calendar">ua</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2012_09">
+            <field name="month">9</field>
+            <field name="year">2012</field>
+            <field name="calendar">ua</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2012_10">
+            <field name="month">10</field>
+            <field name="year">2012</field>
+            <field name="calendar">ua</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2012_11">
+            <field name="month">11</field>
+            <field name="year">2012</field>
+            <field name="calendar">ua</field>
+            <field name="days">22</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2012_12">
+            <field name="month">12</field>
+            <field name="year">2012</field>
+            <field name="calendar">ua</field>
+            <field name="days">21</field>
+        </record>
+        
+        <record model="kpi.period" id="period_ua_2013_01">
+            <field name="month">1</field>
+            <field name="year">2013</field>
+            <field name="calendar">ua</field>
+            <field name="days">21</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2013_02">
+            <field name="month">2</field>
+            <field name="year">2013</field>
+            <field name="calendar">ua</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2013_03">
+            <field name="month">3</field>
+            <field name="year">2013</field>
+            <field name="calendar">ua</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2013_04">
+            <field name="month">4</field>
+            <field name="year">2013</field>
+            <field name="calendar">ua</field>
+            <field name="days">22</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2013_05">
+            <field name="month">5</field>
+            <field name="year">2013</field>
+            <field name="calendar">ua</field>
+            <field name="days">19</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2013_06">
+            <field name="month">6</field>
+            <field name="year">2013</field>
+            <field name="calendar">ua</field>
+            <field name="days">19</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2013_07">
+            <field name="month">7</field>
+            <field name="year">2013</field>
+            <field name="calendar">ua</field>
+            <field name="days">23</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2013_08">
+            <field name="month">8</field>
+            <field name="year">2013</field>
+            <field name="calendar">ua</field>
+            <field name="days">21</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2013_09">
+            <field name="month">9</field>
+            <field name="year">2013</field>
+            <field name="calendar">ua</field>
+            <field name="days">21</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2013_10">
+            <field name="month">10</field>
+            <field name="year">2013</field>
+            <field name="calendar">ua</field>
+            <field name="days">23</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2013_11">
+            <field name="month">11</field>
+            <field name="year">2013</field>
+            <field name="calendar">ua</field>
+            <field name="days">21</field>
+        </record>
+        <record model="kpi.period" id="period_ua_2013_12">
+            <field name="month">12</field>
+            <field name="year">2013</field>
+            <field name="calendar">ua</field>
+            <field name="days">22</field>
+        </record>
+        
+        <!-- eu 2012 - 2013 -->
+        <record model="kpi.period" id="period_eu_2012_01">
+            <field name="month">1</field>
+            <field name="year">2012</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2012_02">
+            <field name="month">2</field>
+            <field name="year">2012</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2012_03">
+            <field name="month">3</field>
+            <field name="year">2012</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2012_04">
+            <field name="month">4</field>
+            <field name="year">2012</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2012_05">
+            <field name="month">5</field>
+            <field name="year">2012</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2012_06">
+            <field name="month">6</field>
+            <field name="year">2012</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2012_07">
+            <field name="month">7</field>
+            <field name="year">2012</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2012_08">
+            <field name="month">8</field>
+            <field name="year">2012</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2012_09">
+            <field name="month">9</field>
+            <field name="year">2012</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2012_10">
+            <field name="month">10</field>
+            <field name="year">2012</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2012_11">
+            <field name="month">11</field>
+            <field name="year">2012</field>
+            <field name="calendar">eu</field>
+            <field name="days">22</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2012_12">
+            <field name="month">12</field>
+            <field name="year">2012</field>
+            <field name="calendar">eu</field>
+            <field name="days">18</field>
+        </record>
+        
+        <record model="kpi.period" id="period_eu_2013_01">
+            <field name="month">1</field>
+            <field name="year">2013</field>
+            <field name="calendar">eu</field>
+            <field name="days">21</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2013_02">
+            <field name="month">2</field>
+            <field name="year">2013</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2013_03">
+            <field name="month">3</field>
+            <field name="year">2013</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2013_04">
+            <field name="month">4</field>
+            <field name="year">2013</field>
+            <field name="calendar">eu</field>
+            <field name="days">21</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2013_05">
+            <field name="month">5</field>
+            <field name="year">2013</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2013_06">
+            <field name="month">6</field>
+            <field name="year">2013</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2013_07">
+            <field name="month">7</field>
+            <field name="year">2013</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2013_08">
+            <field name="month">8</field>
+            <field name="year">2013</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2013_09">
+            <field name="month">9</field>
+            <field name="year">2013</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2013_10">
+            <field name="month">10</field>
+            <field name="year">2013</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2013_11">
+            <field name="month">11</field>
+            <field name="year">2013</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        <record model="kpi.period" id="period_eu_2013_12">
+            <field name="month">12</field>
+            <field name="year">2013</field>
+            <field name="calendar">eu</field>
+            <field name="days">20</field>
+        </record>
+        
+    </data>
+</openerp>

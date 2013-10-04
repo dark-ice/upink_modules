@@ -1,0 +1,15 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_meeting_user","meeting user","model_brief_meeting","brief.group_manager_moscow",1,1,1,0
+"access_meeting_manager","meeting manager","model_brief_meeting","base.group_sale_salesman",1,1,1,0
+"access_meeting_participants_user","meeting participants user","model_brief_meeting_participants","brief.group_manager_moscow",1,1,1,0
+"access_meeting_participants_manager","meeting participants manager","model_brief_meeting_participants","base.group_sale_salesman",1,1,1,0
+"access_meeting_comments_user","meeting comments user","model_brief_meeting_comments","brief.group_manager_moscow",1,1,1,0
+"access_meeting_comments_manager","meeting comments manager","model_brief_meeting_comments","base.group_sale_salesman",1,1,1,0
+"access_meeting_history_user","meeting history user","model_brief_meeting_history","brief.group_manager_moscow",1,1,1,0
+"access_meeting_history_manager","meeting history manager","model_brief_meeting_history","base.group_sale_salesman",1,1,1,0
+"access_meeting_get_user","meeting need get user","model_brief_meeting_need_get","brief.group_manager_moscow",1,1,1,0
+"access_meeting_get_manager","meeting need get manager","model_brief_meeting_need_get","base.group_sale_salesman",1,1,1,0
+"access_meeting_transfer_user","meeting need transfer user","model_brief_meeting_need_transfer","brief.group_manager_moscow",1,1,1,0
+"access_meeting_transfer_manager","meeting need transfer manager","model_brief_meeting_need_transfer","base.group_sale_salesman",1,1,1,0
+"access_meeting_contacts_user","meeting contacts user","model_brief_meeting_contacts","brief.group_manager_moscow",1,1,1,0
+"access_meeting_contacts_manager","meeting contacts manager","model_brief_meeting_contacts","base.group_sale_salesman",1,1,1,0

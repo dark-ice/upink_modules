@@ -1,0 +1,7 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+        <menuitem name="Процессы" id="menu_process_all" web_icon="images/process.jpg" web_icon_hover="images/process_hover.jpg"/>
+        <menuitem name="Настройки" id="menu_process_all_config" parent="menu_process_all"/>
+     </data>
+</openerp>

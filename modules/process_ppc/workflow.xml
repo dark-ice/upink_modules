@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_process_ppc">
+            <field name="name">wkf.process.ppc</field>
+            <field name="osv">process.ppc</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- coordination -->
+        <record model="workflow.activity" id="act_coordination">
+            <field name="wkf_id" ref="wkf_process_ppc"/>
+            <field name="flow_start">True</field>
+            <field name="name">Согласование заявки на запуск</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'coordination'})</field>
+        </record>
+
+        <!-- drafting -->
+        <record model="workflow.activity" id="act_drafting">
+            <field name="wkf_id" ref="wkf_process_ppc"/>
+            <field name="name">Подготовка запуска кампании</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'drafting'})
+update_partner()</field>
+        </record>
+
+        <!-- revision -->
+        <record model="workflow.activity" id="act_revision">
+            <field name="wkf_id" ref="wkf_process_ppc"/>
+            <field name="name">Доработка кампании</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'revision'})</field>
+        </record>
+
+        <!-- approval -->
+        <record model="workflow.activity" id="act_approval">
+            <field name="wkf_id" ref="wkf_process_ppc"/>
+            <field name="name">Утверждение кампании</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'approval'})</field>
+        </record>
+
+        <!-- implementation -->
+        <record model="workflow.activity" id="act_implementation">
+            <field name="wkf_id" ref="wkf_process_ppc"/>
+            <field name="name">Реализация кампании</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'implementation'})</field>
+        </record>
+
+        <!-- finish -->
+        <record model="workflow.activity" id="act_finish">
+            <field name="wkf_id" ref="wkf_process_ppc"/>
+            <field name="flow_stop">True</field>
+            <field name="name">Кампания остановлена</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'finish'})
+close_launch()</field>
+        </record>
+
+
+        <!-- coordination -> drafting -->
+        <record model="workflow.transition" id="c_d">
+            <field name="act_from" ref="act_coordination"/>
+            <field name="act_to" ref="act_drafting"/>
+            <field name="signal">drafting</field>
+        </record>
+
+        <!-- drafting -> approval -->
+        <record model="workflow.transition" id="d_a">
+            <field name="act_from" ref="act_drafting"/>
+            <field name="act_to" ref="act_approval"/>
+            <field name="signal">approval</field>
+        </record>
+
+        <!-- approval -> revision -->
+        <record model="workflow.transition" id="a_r">
+            <field name="act_from" ref="act_approval"/>
+            <field name="act_to" ref="act_revision"/>
+            <field name="signal">revision</field>
+        </record>
+
+        <!-- revision -> approval -->
+        <record model="workflow.transition" id="r_a">
+            <field name="act_from" ref="act_revision"/>
+            <field name="act_to" ref="act_approval"/>
+            <field name="signal">approval</field>
+        </record>
+
+        <!-- approval -> implementation -->
+        <record model="workflow.transition" id="a_i">
+            <field name="act_from" ref="act_approval"/>
+            <field name="act_to" ref="act_implementation"/>
+            <field name="signal">implementation</field>
+        </record>
+
+        <!-- implementation -> finish -->
+        <record model="workflow.transition" id="i_f">
+            <field name="act_from" ref="act_implementation"/>
+            <field name="act_to" ref="act_finish"/>
+            <field name="signal">finish</field>
+        </record>
+    </data>
+</openerp>

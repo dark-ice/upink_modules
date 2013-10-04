@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+
+        <!-- Создаем группы -->
+        <record id="ppc_company.group_account_manager" model="res.groups">
+            <field name="name">PPC / Аккаунт-менеджер</field>
+        </record>
+        <record id="ppc_company.group_coordinators" model="res.groups">
+            <field name="name">PPC / Координатор</field>
+        </record>
+
+        <!-- Правила доступа для групп -->
+        <record id="tasks_rule_view" model="ir.rule">
+            <field name="name">Задания: Видят</field>
+            <field ref="model_tasks" name="model_id"/>
+            <field name="domain_force">
+                ['|', ('user_id','=',user.id), '|', '&amp;', ('responsible_user','=',user.id), ('state', 'not in', ('draft', 'cancel', 'rw_author')), '&amp;', ('performer','=',user.id), ('state', 'not in', ('draft', 'cancel', 'rw_author', 'agr_responsible'))]
+            </field>
+            <field name="perm_read" eval="True" />
+            <field name="perm_create" eval="False" />
+            <field name="perm_write" eval="False" />
+            <field name="perm_unlink" eval="False" />
+            <field name="groups" eval="[(4, ref('tasks.group_calendar_user'))]"/>
+        </record>
+    </data>
+</openerp>

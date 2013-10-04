@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_day_report_planning_tree">
+            <field name="name">Планирование</field>
+            <field name="model">day.report.planning</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="week_number" invisible="1" />
+                    <field name="date"/>
+                    <field name="plan_work" sum=""/>
+                    <field name="plan_work_account"  sum=""/>
+                    <field name="plan_calling" sum="" />
+                    <field name="plan_calling_account" sum="" />
+                    <field name="plan_dev" sum="" />
+                    <field name="plan_dev_account" sum="" />
+                    <field name="plan_total" sum="" />
+                    <field name="plan_per" sum="" />
+                    <field name="fact_per" sum=""/>
+                    <field name="fact_total" sum="" />
+                    <field name="fact_work" sum="" />
+                    <field name="fact_calling" sum="" />
+                    <field name="fact_dev" sum="" />
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_day_report_planning_search">
+            <field name="name">Планирование</field>
+            <field name="model">day.report.planning</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="date_start" />
+                    <field name="date_end"/>
+
+                </search>
+            </field>
+        </record>
+
+        <record id="window_day_report_planning" model="ir.actions.act_window">
+            <field name="name">Планирование</field>
+            <field name="res_model">day.report.planning</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_day_report_planning_tree"/>
+            <field name="search_view_id" ref="view_day_report_planning_search"/>
+            <field name="context">{'group_by':['week_number'], 'search_default_date_start': time.strftime('%Y-%m-01'), 'search_default_date_end': time.strftime('%Y-%m-%d')}</field>
+        </record>
+
+        <menuitem action="window_day_report_planning" id="menu_day_report_planning" parent="menu_every_day_report" sequence="1"/>
+
+    </data>
+</openerp>

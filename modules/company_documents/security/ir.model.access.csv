@@ -1,0 +1,5 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_company_info_note","company_info_note user","model_company_info_note","base.group_user",1,1,1,1
+"access_company_disposal","company_disposal user","model_company_disposal","base.group_user",1,1,1,1
+"access_company_problem_note","company_problem_note user","model_company_problem_note","base.group_user",1,1,1,1
+"access_company_production_note","company_production_note user","model_company_production_note","base.group_user",1,1,1,1

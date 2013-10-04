@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_res_partner_address_filter_add_phone_ids" model="ir.ui.view">
+            <field name="name">res.partner.address.select.add_phone_ids</field>
+            <field name="model">res.partner.address</field>
+            <field name="type">search</field>
+            <field name="inherit_id" ref="base.view_res_partner_address_filter" />
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="phone_ids"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_partner_address_tree_add_phone_ids" model="ir.ui.view">
+            <field name="name">res.partner.address.tree_add_phone_ids</field>
+            <field name="model">res.partner.address</field>
+            <field name="type">tree</field>
+            <field name="inherit_id" ref="base.view_partner_address_tree"/>
+            <field name="arch" type="xml">
+                <field name="phone" position="replace">
+                </field>
+            </field>
+        </record>
+
+        <record id="view_partner_address_form_update" model="ir.ui.view">
+            <field name="name">res.partner.address.update</field>
+            <field name="model">res.partner.address</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Контакт Партнера">
+                    <group colspan="4" col="6">
+                        <field name="name" required="1" string="ФИО"/>
+                        <field name="function" required="1" string="Должность"/>
+                    </group>
+                    <group colspan="2" col="4">
+                        <separator string="Postal Address" colspan="4"/>
+                        <field name="type" string="Type" colspan="4"/>
+                        <field name="country_id" completion="1"/>
+                        <field name="state_id"/>
+                        <field name="zip" string="Индекс"/>
+                        <field name="city"/>
+                        <field name="street" colspan="4"/>
+                        <field name="street2" string="№ дома,офиса" colspan="4"/>
+                        <group colspan="2" col="2">
+                            <field name="skype_ids" mode="tree" nolabel="1" colspan="4">
+                                <tree string="Skype партнера" editable="top">
+                                    <field name="name"/>
+                                </tree>
+                            </field>
+                            <field name="icq_ids" mode="tree" nolabel="1" colspan="4">
+                                <tree string="ICQ партнера" editable="top">
+                                    <field name="name"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </group>
+                    <group colspan="2" col="2">
+                        <separator string="Communication" colspan="2"/>
+                        <field name="email_ids" mode="tree" nolabel="1" colspan="2">
+                            <tree string="Эл. почта" editable="top">
+                                <field name="name"/>
+                            </tree>
+                        </field>
+                        <field name="site_ids" mode="tree" nolabel="1" colspan="2">
+                            <tree string="Сайты партнера" editable="top">
+                                <field name="name"/>
+                            </tree>
+                        </field>
+                        <field name="phone_ids" mode="tree" nolabel="1" colspan="2">
+                            <tree string="Номера телефонов" editable="top">
+                                <field name="phone"/>
+                                <field name="phone_type"/>
+                            </tree>
+                        </field>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+
+    </data>
+</openerp>

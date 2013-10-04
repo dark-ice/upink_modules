@@ -1,0 +1,7 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_storage_docs.user_group_1","storage.files user","model_storage_files","storage_docs.user_group",1,0,0,0
+"access_storage_docs.user_group_2","storage.groups user","model_storage_groups","storage_docs.user_group",1,0,0,0
+"access_storage_docs.user_group_3","storage.files manager","model_storage_files","storage_docs.manager_group",1,1,1,0
+"access_storage_docs.user_group_4","storage.groups manager","model_storage_groups","storage_docs.manager_group",1,1,1,0
+"access_storage_docs.user_group_5","storage.files admin","model_storage_files","storage_docs.admin_group",1,1,1,1
+"access_storage_docs.user_group_6","storage.groups admin","model_storage_groups","storage_docs.admin_group",1,1,1,1

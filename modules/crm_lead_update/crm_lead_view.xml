@@ -1,0 +1,254 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="view_crm_case_leads_filter_inherit" model="ir.ui.view">
+            <field name="name">CRM - Leads Search inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="type">search</field>
+            <field name="inherit_id" ref="crm.view_crm_case_leads_filter"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="phone_ids"/>
+                </field>
+                <field name="section_id" position="after">
+                    <newline/>
+                    <field name="next_call"/>
+                </field>
+            </field>
+        </record>
+
+
+        <record id="crm_case_tree_view_leads_inherit" model="ir.ui.view">
+            <field name="name">CRM - Leads Tree inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="type">tree</field>
+            <field name="inherit_id" ref="crm.crm_case_tree_view_leads"/>
+            <field name="arch" type="xml">
+                <field name="stage_id" position="before">
+                    <field name="responsible_user" string="Автор"/>
+                </field>
+                <field name="phone" position="replace">
+                    <field name="phone_ids" invisible="1"/>
+                </field>
+                <field name="user_id" position="replace">
+                    <field name="user_id"/>
+                </field>
+                <field name="phone_ids" position="after">
+                    <field name="next_call" invisible="1"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- CRM Lead Form View  domain="[('responsible_users','=', uid)]"-->
+        <record model="ir.ui.view" id="crm.crm_case_form_view_leads_inherit">
+            <field name="name">CRM - Leads Form inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
+            <field name="arch" type="xml">
+                <data>
+                    <field name="partner_name" position="replace">
+                        <field name="partner_name" string="Юридическое название компании"/>
+                    </field>
+                    <field name="fax" position="replace"/>
+                    <field name="title" position="replace"/>
+                    <field name="email_from" position="before">
+                        <field name="site_url_1"/>
+                        <field name="site_url_2"/>
+                    </field>
+                    <field name="email_from" position="after">
+                        <field name="email_2" widget="email"/>
+                    </field>
+                    <field name="categ_id" position="replace">
+                        <field name="categ_id"
+                               widget="selection" required="1"
+                               domain="[('object_id.model','=','crm.lead'),'|',('responsible_users','=',False),('responsible_users','in',uid)]"/>
+                    </field>
+                    <field name="stage_id" position="replace">
+                        <field name="stage_id" required="1"
+                               domain="[('section_ids', '=', section_id)]"/>
+                    </field>
+                    <field name="type" position="after">
+                        <group colspan="6" col="8">
+                            <field name="permissions" invisible="True"/>
+                            <field name="incident"/>
+                            <field name="source"/>
+                            <field name="responsible_user" attrs="{'readonly':[('permissions','!=','Director')]}"/>
+                            <field name="partner_type" readonly="1"/>
+                        </group>
+                    </field>
+                    <page string="Lead" position="after">
+                        <page string="Услуги">
+                            <field name="services_ids" colspan="4" nolabel="1" mode="tree,form">
+                                <tree string="Услуги" editable="top">
+                                    <field name="service_id" required="1"/>
+                                    <field name="comment"/>
+                                </tree>
+                            </field>
+                            <newline/>
+
+                        </page>
+                    </page>
+                </data>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_crm_source_stage_tree">
+            <field name="name">CRM - source tree</field>
+            <field name="model">crm.source.stage</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Источники">
+                    <field name="name"/>
+                    <field name="section_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_crm_source_stage_form">
+            <field name="name">CRM - source form</field>
+            <field name="model">crm.source.stage</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Источники">
+                    <field name="name" required="1"/>
+                    <field name="section_id"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_crm_product_type_tree">
+            <field name="name">CRM - Product type tree</field>
+            <field name="model">crm.patner.product.type</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Тип товара" editable="bottom">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_crm_product_type">
+            <field name="name">CRM - Справочник типов товара</field>
+            <field name="res_model">crm.patner.product.type</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_crm_product_type_tree"/>
+        </record>
+        <menuitem name="Справочник типов товара" id="base.menu_crm_product_type" action="window_crm_product_type"
+                  parent="base.menu_crm_config_lead" groups="base.group_sale_manager"/>
+
+        <record model="ir.actions.act_window" id="window_case_crm_source_stage">
+            <field name="name">CRM - source</field>
+            <field name="res_model">crm.source.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_crm_source_stage_tree"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_create_brief">
+            <field name="name">Создать бриф из кандидата</field>
+            <field name="res_model">brief.main</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="brief.view_brief_form"/>
+            <field name="search_view_id" ref="brief.view_brief_search"/>
+        </record>
+
+        <!--
+        <record model="ir.actions.act_window" id="action_create_brief_meeting">
+            <field name="name">Создать бриф на встречу из кандидата</field>
+            <field name="res_model">brief.meeting</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="brief_meeting.view_brief_meeting_form"/>
+        </record>
+        -->
+        <record model="ir.actions.act_window.view" id="action_brief_form">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="brief.view_brief_form"/>
+            <field name="act_window_id" ref="action_create_brief"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_brief_trees">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="brief.view_brief_trees"/>
+            <field name="act_window_id" ref="action_create_brief"/>
+        </record>
+
+        <menuitem name="Справочник источников кандидата" id="base.menu_crm_source_stage" sequence="15"
+                  action="window_case_crm_source_stage"
+                  parent="base.menu_crm_config_lead" groups="base.group_sale_manager"/>
+
+        <record model="ir.ui.view" id="view_crm_type_base_tree">
+            <field name="name">CRM - type base tree</field>
+            <field name="model">crm.type.base</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Тип базы" editable="bottom">
+                    <field name="name"/>
+                    <field name="partner_type"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_crm_type_base">
+            <field name="name">Справочник типа базы</field>
+            <field name="res_model">crm.type.base</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="view_crm_type_base_tree"/>
+        </record>
+        <menuitem id="base.menu_crm_type_base" sequence="16" action="window_crm_type_base"
+                  parent="base.menu_crm_config_lead" groups="base.group_sale_manager"/>
+
+        <record model="ir.ui.view" id="view_crm_lead_frequency_contacts_tree">
+            <field name="name">crm.lead.frequency.contacts</field>
+            <field name="model">crm.lead</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Частота контактов (кандидата)">
+                    <field name="name" string="Кандидат"/>
+                    <field name="site_url_1"/>
+                    <field name="site_url_2"/>
+                    <field name="stage_id"/>
+                    <field name="write_date"/>
+                    <field name="user_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_crm_case_leads_filter_v2" model="ir.ui.view">
+            <field name="name">CRM - Leads Search</field>
+            <field name="model">crm.lead</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Поиск">
+                    <field name="name" string="Кандидат"/>
+                    <field name="write_date" string="Период даты последнего контакта"/>
+                    <field name="site_url_1"/>
+                    <field name="site_url_2"/>
+                    <field name="stage_id" widget="selection"/>
+                    <field name="user_id"/>
+                    <newline/>
+                    <group expand="0" string="Group By...">
+                        <filter string="этап" context="{'group_by' : 'stage_id'}"/>
+                        <filter string="менеджер" icon="terp-personal" context="{'group_by' : 'user_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_crm_lead_frequency_contacts">
+            <field name="name">Частота контактов (кандидата)</field>
+            <field name="res_model">crm.lead</field>
+            <field name="view_mode">tree</field>
+            <field name="domain">[]</field>
+            <field name="view_id" ref="view_crm_lead_frequency_contacts_tree"/>
+            <field name="search_view_id" ref="view_crm_case_leads_filter_v2"/>
+        </record>
+
+        <menuitem name="Отчет по частоте контактов (кандидата)"
+                  id="base.crm_lead_frequency_contacts"
+                  sequence="1"
+                  action="window_crm_lead_frequency_contacts"
+                  parent="base.next_id_64"/>
+    </data>
+</openerp>

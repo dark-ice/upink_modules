@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_company_help_desk_tree">
+            <field name="name">company.help.desk.tree</field>
+            <field name="model">help.desk</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Список HelpDesk">
+                    <field name="id" string="№"/>
+                    <field name="create_date"/>
+                    <field name="author"/>
+                    <field name="department_manager"/>
+                    <field name="name"/>
+                    <field name="categories_id"/>
+                    <field name="state"/>
+                    <field name="deadline"/>
+                    <field name="send_to" />
+                    <!--<field name="send_manager"/>-->
+                    <field name="responsible_employee" />
+                    <!--<field name="responsible_manager"/>-->
+                    <field name="put_in_time" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_company_help_desk_search">
+            <field name="name">company.help.desk.search</field>
+            <field name="model">help.desk</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="id"/>
+                    <field name="create_date" />
+                    <field name="deadline" />
+                    <field name="author"/>
+                    <field name="categories_id" />
+                    <field name="name"/>
+                    <field name="state"/>
+                    <newline />
+                    <newline />
+                    <group>
+                        <filter icon="STOCK_MEDIA_PLAY"
+                                domain="[('state','not in', ['cancel', 'init_accepted', 'init_failed'])]"
+                                name="active"
+                                string="Активные"/>
+                        <filter icon="STOCK_MEDIA_STOP"
+                                domain="[('state','in', ['cancel', 'init_accepted', 'init_failed'])]"
+                                name="deactive"
+                                string="Неактивные"/>
+                    </group>
+                    <separator orientation="vertical"/>
+                    <group >
+                        <filter icon="terp-personal"
+                                domain="['|', ('author.user_id.id', '=', uid), ('department_manager.user_id.id', '=', uid)]"
+                                name="my"
+                                string="Свои"/>
+                        <filter icon="terp-personal+"
+                                domain="['|', ('send_to.user_id.id', '=', uid), ('responsible_employee.user_id.id', '=', uid)]"
+                                name="their"
+                                string="Поставленные мне"/>
+                        <filter icon="terp-personal+"
+                                domain="['|', ('send_to.user_id.id', '!=', uid), ('responsible_employee.user_id.id', '!=', uid)]"
+                                name="employee"
+                                string="Поставленные моим сотрудникам"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_company_help_desk_form">
+            <field name="name">company.help.desk.form</field>
+            <field name="model">help.desk</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Help Desk">
+                    <group col="6">
+                        <field name="check_a"/>
+                        <field name="check_s"/>
+                        <field name="check_r"/>
+
+                        <field name="check_d"/>
+                        <field name="check_m"/>
+                        <field name="check_h"/>
+                        <newline/>
+                        <field name="check_e"/>
+                    </group>
+                    <group colspan="4" col="6">
+                        <group colspan="2" col="2">
+                            <separator string="Основная информация" colspan="2"/>
+                            <field name="id" string="Порядковый номер"/>
+                            <field name="create_date"/>
+                            <field name="author" on_change="onchange_manager(author, 'author')"/>
+                            <field name="department_manager"/>
+                            <field name="categories_id"
+                                   widget="selection"
+                                   on_change="onchange_categories(categories_id)"
+                                   attrs="{'readonly': ['|', ('check_a', '=', False), ('state', 'not in', ('draft', 'rework'))]}"
+                                    />
+                            <field name="send_to"
+                                   readonly="1"
+                                   on_change="onchange_manager(send_to, 'send_to')"
+                                   />
+                        </group>
+                        <group colspan="4" col="2" attrs="{'readonly':['|', ('check_a', '=', False), ('state', 'not in', ('draft', 'rework'))]}">
+                            <separator string="Заявка" colspan="2" />
+                            <field name="name" attrs="{'readonly':['|', ('check_a', '=', False), ('state', 'not in', ('draft', 'rework'))]}"/>
+                            <field name="content"
+                                   nolabel="1"
+                                   colspan="2"
+                                   attrs="{
+                                   'invisible': [('categories_id', '=', 26)],
+                                   'required': [('categories_id', '!=', 26)],
+                                   'readonly': ['|', ('check_a', '=', False), ('state', 'not in', ('draft', 'rework'))]}"
+                                    />
+                            <group colspan="2" attrs="{'invisible': [('categories_id', '!=', 26)], 'readonly':['|', ('check_a', '=', False), ('state', 'not in', ('draft', 'rework'))]}">
+                                <field name='fio' colspan="4" />
+                                <field name='department_id' colspan="4" />
+                                <field name='job_id' colspan="4" />
+                                <field name='date_of_birth' colspan="4" />
+                                <field name='technique' colspan="4" />
+                                <field name='soft' colspan="4" />
+                                <field name='accounts' colspan="4" />
+                                <field name='extension' colspan="2" />
+                                <field name='number' colspan="2" attrs="{'invisible': [('extension', 'in', ('no', ''))]}"/>
+                                <field name='call_direction' colspan="4" attrs="{'invisible': [('extension', 'in', ('no', ''))]}"/>
+                            </group>
+                        </group>
+                        <group colspan="3" col="4">
+                            <separator string="Принятие решения" colspan="4"/>
+                            <label colspan="4"
+                                   string="Помните, что в работу будут приняты только заявки с адекватными сроками. Цените свое и чужое время!=)"/>
+                            <field name="deadline"
+                                   attrs="{'readonly':[('state','not in',('draft','waiting', 'rework', 'redecision'))]}"/>
+                            <!-- '|', ('access','not in',('decision')) -->
+                            <field name="decision"
+                                   colspan="4"
+                                   attrs="{'readonly':[('state','not in',('decision','closed'))]}"/>
+                            <!-- '|', ('access','not in',('decision')) -->
+                            <field name="responsible_employee"
+                                   colspan="3"
+                                   on_change="onchange_manager(responsible_employee, 'responsible_employee')"
+                                   attrs="{'readonly':[('state','not in',('decision','closed'))]}"/>
+                            <separator string="Комментарий принимающего решение" colspan="4"/>
+                            <!-- '|', ('access','not in',('decision', 'performer')) -->
+                            <field name="comments"
+                                   colspan="4"
+                                   nolabel="1"
+                                   attrs="{'readonly':[('state','not in',('decision','closed'))]}"/>
+                        </group>
+                        <group colspan="3" col="2">
+                            <separator string="Исполнение" colspan="2"/>
+                            <separator string="Комментарий инициатора" colspan="2"/>
+                            <!-- '|', ,('access','not in',('author', 'leader')) -->
+                            <field name="init_comment"
+                                   colspan="2"
+                                   nolabel="1"
+                                   attrs="{'readonly':[('state','not in',('approval', 'redicision'))]}"/>
+                            <separator string="Комментарий исполнителя" colspan="2"/>
+                            <!-- '|', ('access','not in',('responsible', 'performer')-->
+                            <field name="resp_comment"
+                                   colspan="2"
+                                   nolabel="1"
+                                   attrs="{'readonly':['|', ('check_r', '=', False), ('state','!=','inwork')]}"/>
+                        </group>
+                        <group colspan="6" col="23">
+                            <separator string="Этап" colspan="23"/>
+                            <field name="state" widget="statusbar" statusbar_visible="draft,decision,inwork,approval"
+                               statusbar_colors='{"rework":"brown","waiting":"yellow","failed":"red","init_failed":"red","cancel":"gray","init_accepted":"orange"}'/>
+                            <newline />
+                            <!-- draft -> cancel -->
+                            <button
+                                    name="act_d_c"
+                                    icon="STOCK_CLOSE"
+                                    string="Отменить"
+                                    attrs="{'invisible': ['|', ('check_a', '=', False), ('state', '!=', 'draft')]}"
+                                    />
+
+                            <!-- draft -> cancel -->
+                            <button
+                                    name="act_in_c"
+                                    icon="STOCK_CLOSE"
+                                    string="Отменить"
+                                    attrs="{'invisible': ['|', ('check_a', '=', False), ('state', '!=', 'inwork')]}"
+                                    />
+
+                            <!-- draft -> waiting -->
+                            <button
+                                    name="act_d_w"
+                                    icon="STOCK_GO_FORWARD"
+                                    string="На согласование"
+                                    attrs="{'invisible': ['|', '|', ('check_a', '=', False), ('check_d', '=', True), ('state', '!=', 'draft')]}"
+                                    />
+                            <!-- draft -> decision -->
+                            <button
+                                    name="act_d_de"
+                                    icon="STOCK_GO_FORWARD"
+                                    string="Принятие решения"
+                                    attrs="{'invisible': ['|', '|', ('check_a', '=', False), ('check_d', '=', False), ('state', '!=', 'draft')]}"
+                                    />
+                            <!-- waiting -> draft -->
+                            <button
+                                    name="act_w_d"
+                                    icon="STOCK_GO_BACK"
+                                    string="Черновик"
+                                    attrs="{'invisible': ['|', ('check_a', '=', False), ('state', '!=', 'waiting')]}"
+                                    />
+                            <!-- waiting -> rework -->
+                            <button
+                                    name="act_w_re"
+                                    icon="STOCK_GO_BACK"
+                                    string="На доработку"
+                                    attrs="{'invisible': ['|', ('check_d', '=', False), ('state', '!=', 'waiting')]}"
+                                    />
+                            <!-- rework -> waiting -->
+                            <button
+                                    name="act_re_w"
+                                    icon="STOCK_GO_FORWARD"
+                                    string="На согласование"
+                                    attrs="{'invisible': ['|', ('check_a', '=', False), ('state', '!=', 'rework')]}"
+                                    />
+                            <!-- waiting -> decision -->
+                            <button
+                                    name="act_w_de"
+                                    icon="STOCK_GO_FORWARD"
+                                    string="Принятие решения"
+                                    attrs="{'invisible': ['|', '|', ('check_a', '=', True), ('check_d', '=', False), ('state', '!=', 'waiting')]}"
+                                    />
+
+                            <!-- decision -> rework -->
+                            <button
+                                    name="act_de_re"
+                                    icon="STOCK_GO_BACK"
+                                    string="На доработку"
+                                    attrs="{'invisible': ['|', ('check_s', '=', False), ('state', '!=', 'decision')]}"
+                                    />
+
+                            <!-- rework -> decision -->
+                            <button
+                                    name="act_re_de"
+                                    icon="STOCK_GO_FORWARD"
+                                    string="Принятие решения"
+                                    attrs="{'invisible': ['|', '|', ('check_a', '=', False), ('check_e', '=', False), ('state', '!=', 'rework')]}"
+                                    />
+
+                            <!-- decision -> waiting -->
+                            <!--button
+                                    name="act_de_w"
+                                    icon="STOCK_GO_BACK"
+                                    string="На доработку"
+                                    attrs="{'invisible': ['|', '|', ('check_e', '=', True), ('check_s', '=', False),  ('state', '!=', 'decision')]}"
+                                    /-->
+
+                            <!-- decision -> draft -->
+                            <!--button
+                                    name="act_de_d"
+                                    icon="STOCK_GO_BACK"
+                                    string="На доработку"
+                                    attrs="{'invisible': ['|', '|', ('check_e', '=', False), ('check_s', '=', False),  ('state', '!=', 'decision')]}"
+                                    /-->
+
+                            <!-- cancel -> draft -->
+                            <button
+                                    name="act_c_d"
+                                    icon="STOCK_GO_FORWARD"
+                                    string="Черновик"
+                                    attrs="{'invisible': ['|', ('check_a', '=', False), ('state', '!=', 'cancel')]}"
+                                    />
+
+                            <!-- decision -> closed -->
+                            <button
+                                    name="act_de_cl"
+                                    icon="STOCK_CLOSE"
+                                    string="Закрыто принимающим решение"
+                                    attrs="{'invisible': ['|', '|', ('check_s', '=', False), ('state', '!=', 'decision')]}"
+                                    />
+                            <!-- closed -> decision -->
+                            <button
+                                    name="act_cl_de"
+                                    icon="STOCK_GO_FORWARD"
+                                    string="Принятие решения"
+                                    attrs="{'invisible': ['|', ('check_d', '=', False), ('state', '!=', 'closed')]}"
+                                    />
+                            <!-- decision -> inwork -->
+                            <button
+                                    name="act_de_in"
+                                    icon="STOCK_GO_FORWARD"
+                                    string="Исполнение"
+                                    attrs="{'invisible': ['|', ('check_s', '=', False), ('state', '!=', 'decision')]}"
+                                    />
+                            <!-- inwork -> decision -->
+                            <button
+                                    name="act_in_de"
+                                    icon="STOCK_GO_BACK"
+                                    string="Вернуть на принятие решения"
+                                    attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'inwork')]}"
+                                    />
+                            <!-- inwork -> failed -->
+                            <button
+                                    name="act_in_f"
+                                    icon="STOCK_CLOSE"
+                                    string="Не выполнено"
+                                    attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'inwork')]}"
+                                    />
+                            <!-- failed -> inwork -->
+                            <button
+                                    name="act_f_in"
+                                    icon="STOCK_GO_FORWARD"
+                                    string="Исполение"
+                                    attrs="{'invisible': ['|', ('check_s', '=', False), ('state', '!=', 'failed')]}"
+                                    />
+                            <!-- inwork -> approval -->
+                            <button
+                                    name="act_in_app"
+                                    icon="STOCK_GO_FORWARD"
+                                    string="Сдать на утверджение"
+                                    attrs="{'invisible': ['|', ('check_r', '=', False), ('state', '!=', 'inwork')]}"
+                                    />
+                            <!-- approval -> inwork -->
+                            <button
+                                    name="act_app_in"
+                                    icon="STOCK_GO_BACK"
+                                    string="Вернуть на исполение"
+                                    attrs="{'invisible': ['|', ('check_s', '=', False), ('state', '!=', 'approval')]}"
+                                    />
+                            <!-- approval -> init_failed -->
+                            <button
+                                    name="act_app_if"
+                                    icon="STOCK_STOP"
+                                    string="Не принято инициатором"
+                                    attrs="{'invisible': ['|', ('check_a', '=', False), ('state', '!=', 'approval')]}"
+                                    />
+                            <!-- init_failed -> approval -->
+                            <button
+                                    name="act_if_app"
+                                    icon="STOCK_GO_BACK"
+                                    string="Вернуть на утверждение"
+                                    attrs="{'invisible': ['|', ('check_a', '=', False), ('state', '!=', 'init_failed')]}"
+                                    />
+                            <!-- approval -> init_accepted -->
+                            <button
+                                    name="act_app_ia"
+                                    icon="STOCK_APPLY"
+                                    string="Принято инициатором"
+                                    attrs="{'invisible': ['|', ('check_a', '=', False), ('state', '!=', 'approval')]}"
+                                    />
+                            <!-- init_accepted -> approval -->
+                            <button
+                                    name="act_ia_app"
+                                    icon="STOCK_GO_BACK"
+                                    string="Вернуть на утверждение"
+                                    attrs="{'invisible': ['|', ('check_a', '=', False), ('state', '!=', 'init_accepted')]}"
+                                    />
+
+
+
+                    </group>
+                    <group colspan="4"
+                               col="4"
+                               attrs="{'invisible':[('state','not in',('rework','waiting'))]}">
+                        <separator string="Комментарий на доработку" colspan="4"/>
+                        <field name="redo_comment" nolabel="1" colspan="4"/>
+                    </group>
+                    </group>
+                    <group colspan="4">
+                        <separator colspan="4" string="История переходов"/>
+                        <field name="history_ids" nolabel="1" colspan="4" readonly="1">
+                            <tree>
+                                <field name="state"/>
+                                <field name="usr_id" />
+                                <field name="create_date" />
+                            </tree>
+                        </field>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="window_company_help_desk" model="ir.actions.act_window">
+            <field name="name">HelpDesk</field>
+            <field name="res_model">help.desk</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_company_help_desk_tree"/>
+            <field name="search_view_id" ref="view_company_help_desk_search"/>
+            <field name="context">{"search_default_active":eval('True'), "search_default_my":eval('True')}</field>
+            <field name="domain">['|','|','|','|','|',('admin_group.users.id', '=',uid),('author.user_id.id','=',uid),('department_manager.user_id.id','=',uid),('responsible_manager.user_id.id','=',uid),('send_manager.user_id.id','=',uid),'&amp;',('state','not in',('draft','rework','waiting','redecision')),'|',('send_to.user_id.id','=',uid),('responsible_employee.user_id.id','=',uid)]</field>
+        </record>
+
+        <record model="ir.ui.view" id="view_helpd_categories_stage_tree">
+            <field name="name">Категории Help Desk</field>
+            <field name="model">helpd.category.stage</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Категории Help Desk" editable="top">
+                    <field name="name" required="1"/>
+                    <field name="user_res_id" required="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_helpd_categories_stage_form">
+            <field name="name">Категории Help Desk</field>
+            <field name="model">helpd.category.stage</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Категории Help Desk">
+                    <group colspan="4" col="8">
+                        <field name="name" required="1"/>
+                        <field name="user_res_id" required="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_helpd_categories_stage">
+            <field name="name">Категории Help Desk</field>
+            <field name="res_model">helpd.category.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_helpd_categories_stage_tree"/>
+        </record>
+
+
+        <!-- Меню для всех форм -->
+        <menuitem id="company_notes"
+                  name="Служебные документы"
+                  sequence="7"
+                  web_icon="images/docs.png"
+                  web_icon_hover="images/docs-hover.png"
+                />
+        <menuitem id="company_notes_list"
+                  name="Служебные документы"
+                  parent="company_notes"
+                />
+        <menuitem action="window_company_help_desk"
+                  id="help_desk_menuitem"
+                  name="HelpDesk"
+                  parent="company_notes_list"
+                />
+        <menuitem name="Настройки"
+                  id="menu_company_notes_config"
+                  parent="company_notes"
+                />
+        <menuitem action="window_helpd_categories_stage"
+                  id="config_helpd_categories_stage"
+                  parent="menu_company_notes_config"
+                />
+
+        <record id="ir_ui_view_sc_helpdesk" model="ir.ui.view_sc">
+            <field name="name">Helpdesk</field>
+            <field name="resource">ir.ui.menu</field>
+            <field name="res_id" ref="company_documents.help_desk_menuitem"/>
+        </record>
+    </data>
+</openerp>

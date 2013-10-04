@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+
+        <!-- Создаем группы -->
+        <record id="video.group_video" model="res.groups">
+            <field name="name">Видеостудия New</field>
+        </record>
+
+        <!-- Правила доступа для групп -->
+
+        <!-- Открываем меню -->
+
+    </data>
+</openerp>

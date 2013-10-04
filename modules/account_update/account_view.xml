@@ -1,0 +1,1080 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_account_invoice_filter1">
+            <field name="name">account.invoice.select2</field>
+            <field name="model">account.invoice</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <filter string="Счет выставлен" icon="terp-document-new" domain="[('state', '=', 'open')]"/>
+                    <filter string="Счет частично оплачен" icon="terp-dolar" domain="[('state', '=', 'proforma')]"/>
+                    <filter string="Счет полностью оплачен" icon="terp-dolar_ok!" domain="[('state', '=', 'paid')]"/>
+                    <separator orientation="vertical" />
+                    <filter string="ЗД не отгружены" icon="terp-personal" domain="[('state_document', '=', 'none')]"/>
+                    <filter string="ЗД частично отгружены" icon="terp-personal" domain="[('state_document', '=', 'part')]"/>
+                    <filter string="ЗД полностью отгружены" icon="terp-personal" domain="[('state_document', '=', 'full')]"/>
+                    <newline/>
+                    <field name="partner_id" string="Партнер"/>
+                    <field name="number"/>
+                    <field name="date_invoice"/>
+                    <field name="user_id" string="Автор"/>
+                    <field name="paid_date"/>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Автор" icon="terp-personal" context="{'group_by': 'user_id'}"/>
+                        <filter string="Состояние" icon="terp-personal" context="{'group_by': 'state'}"/>
+                        <filter string="Дата выставления счета" icon="terp-personal" context="{'group_by': 'date_invoice'}"/>
+                        <filter string="Тип оплаты" icon="terp-personal" context="{'group_by': 'type_account'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_invoice_tree">
+            <field name="name">account.invoice.tree1</field>
+            <field name="model">account.invoice</field>
+            <field name="priority" eval="1"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree colors="orange:state=='proforma';#00C322:state=='paid';gray:state=='cancel'">
+                    <field name="reference" invisible="1"/>
+                    <field name="name" invisible="1"/>
+                    <field name="id" invisible="1"/>
+                    <field name="check_f" invisible="1"/>
+
+                    <field name="number"/>
+                    <field name="date_invoice" string="Дата счета"/>
+                    <field name="partner_id" string="Партнер"/>
+                    <field name="full_name"/>
+                    <field name="user_id" string="Автор"/>
+                    <field name="currency_id"/>
+                    <field name="a_total" sum=""/>
+                    <field name="a_subtotal" sum=""/>
+                    <field name="type_account"/>
+                    <field name="notes"/>
+
+                    <field name="state"/>
+                    <button type="action"
+                            name="%(action_account_invoice_pay)d"
+                            string="Провести платеж"
+                            attrs="{'invisible': ['|', ('check_f', '=', False), ('state', 'in', ('paid', 'draft'))]}"
+                            icon="gtk-ok"/>
+                    <field name="paid_date"/>
+                    <field name="close_doc_create"/>
+                    <field name="state_document"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_invoice_form">
+            <field name="name">account.invoice.form1</field>
+            <field name="model">account.invoice</field>
+            <field name="priority" eval="1"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Счет">
+                    <group colspan="4">
+                        <field name="check_a"/>
+                        <field name="check_f"/>
+                        <field name="check_r"/>
+                        <field name="id" invisible="1"/>
+                    </group>
+                    <group colspan="4" col="8">
+
+                        <field name="user_id" string="Автор" attrs="{'readonly': [('check_r', '=', False)]}"/>
+                        <field name="date_invoice" on_change="onchange_currency(date_invoice, currency_id)"/>
+                        <field name="number" attrs="{'readonly': [('check_a', '=', False), ('check_f', '=', False)]}"/>
+                        <field name="type_account"/>
+                        <newline/>
+                        <field string="Партнер" name="partner_id" on_change="onchange_bank(partner_id, lead_id)"
+                               options='{"quick_create": false}' attrs="{'readonly': [('lead_id', '!=', False)]}"/>
+                        <field name="lead_id" on_change="onchange_bank(partner_id, lead_id)"
+                               attrs="{'readonly': [('partner_id', '!=', False)]}" invisible="True"/>
+                        <field name="full_name" readonly="True"/>
+                        <field name="plan_paid_date" />
+                        <field name="paid_type" />
+                        <newline/>
+                        <field name="bank_id" required="1" on_change="change_bank(bank_id)"/>
+                        <field name="currency_id" width="50"
+                               on_change="onchange_currency(date_invoice, currency_id)"/>
+                        <field name="rate" width="50"/>
+                        <newline/>
+                        <field name="account_id" string="Фирма" widget="selection" required="1" on_change="onchange_account(account_id)"/>
+                        <field name="tax" invisible="1"/>
+                        <field name="reconciled" invisible="1"/>
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Счет">
+                            <field colspan="4" name="invoice_line" nolabel="1" widget="one2many_list"
+                                   context="{'type': type, 'account_id': account_id, 'description': number}" />
+
+                            <group col="6" colspan="2">
+                                <field name="untaxed"/>
+                                <field name="a_tax"/>
+                                <field name="a_total"/>
+                            </group>
+                            <group col="4" colspan="2">
+                                <field name="state" widget="statusbar" statusbar_visible="draft,open,paid"
+                                       statusbar_colors='{"proforma":"blue","cancel":"red"}'/>
+                                <group col="8" colspan="4" groups="base.group_user">
+
+                                    <!-- cancel -> draft -->
+                                    <button name="draft"
+                                            icon="gtk-go-back"
+                                            string="В черновик"
+                                            colspan="1"
+                                            attrs="{'invisible': [
+                                                '|', ('state', '!=', 'cancel'), ('check_a', '=', False)
+                                            ]}"
+                                            />
+
+                                    <!-- draft -> cancel -->
+                                    <button name="cancel"
+                                            icon="gtk-cancel"
+                                            string="Отмена"
+                                            colspan="1"
+                                            attrs="{'invisible': [
+                                                '|', ('state', '!=', 'draft'), ('check_a', '=', False)
+                                            ]}"
+                                            />
+
+                                    <!-- draft -> open -->
+                                    <button name="invoice_open"
+                                            icon="gtk-go-forward"
+                                            string="Выставить счет"
+                                            colspan="1"
+                                            attrs="{'invisible': [
+                                                '|', ('state', '!=', 'draft'), ('check_a', '=', False)
+                                            ]}"
+                                            />
+
+                                    <!-- open -> proforma -->
+                                    <button name="invoice_proforma"
+                                            icon="gtk-go-forward"
+                                            string="Частично оплачен"
+                                            colspan="1"
+                                            attrs="{'invisible': [
+                                                '|', ('state', '!=', 'open'), ('check_f', '=', False)
+                                            ]}"
+                                            />
+
+                                    <!-- open, proforma -> paid -->
+                                    <button name="invoice_paid"
+                                            icon="gtk-ok"
+                                            string="Оплачен полностью"
+                                            colspan="1"
+                                            attrs="{'invisible': [
+                                                '|', ('state', 'not in', ('proforma', 'open')), ('check_f', '=', False)
+                                            ]}"
+                                            />
+                                    <newline/>
+                                    <!-- attrs="{'invisible': [('lang', '=', 'ru')]}"  -->
+                                    <button name="%(account_update_payment_ru)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Распечатать счет на оплату" type="action" icon="gtk-print" context="{'print': 'yes'}"/>
+
+                                    <button name="%(account_update_payment_ua)d" attrs="{'invisible': [('lang', '!=', 'ua')]}" string="Распечатать счет на оплату" type="action" icon="gtk-print"/>
+                                    <button name="%(account_update_post_pdf)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Распечатать конверт" type="action" icon="gtk-print"/>
+                                </group>
+                            </group>
+                            <separator string="Комментарий" colspan="4"/>
+                            <field name="notes" colspan="4" nolabel="1"/>
+                        </page>
+                        <page string="Платеж">
+                            <button type="action"
+                                    name="%(action_account_invoice_pay)d"
+                                    string="Провести платеж"
+                                    context="{'invoice_id': id, 'type_account': type_account}"
+                                    attrs="{'invisible': [('check_f', '=', False)]}"
+                                    icon="gtk-ok"/>
+                            <field colspan="4" name="pay_ids" nolabel="1" widget="one2many_list" readonly="1">
+                                <tree string="Платежи">
+                                    <field name="id"/>
+                                    <field name="date_pay"/>
+                                    <field name="total"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Закрывающие документы">
+                            <group col="10" colspan="4">
+                                <field name="lang" invisible="1" />
+                                <button type="action"
+                                    name="%(action_account_invoice_document)d"
+                                    string="Сформировать закрывающий документ"
+                                    context="{'invoice_id': id, 'name': 'completion_ru'}"
+                                    attrs="{'invisible': [('check_f', '=', False)]}"
+                                    icon="gtk-ok"
+                                    />
+                            </group>
+
+                            <field name="document_ids" nolabel="1" colspan="4" attrs="{'readonly': [('check_f', '=', False)]}">
+                                <tree string="Закрывающие документы">
+                                    <!--field name="name"/-->
+                                    <field name="lang" invisible="1"/>
+                                    <field name="document_date"/>
+                                    <field name="document_cash"/>
+                                    <!-- attrs="{'invisible': [('name', '!=', 'completion_ru')]}"
+                                    attrs="{'invisible': [('name', '!=', 'completion_ua')]}"
+                                    attrs="{'invisible': [('name', '!=', 'payment_ru')]}" -->
+                                    <button name="%(account_update_completion_ru)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Акт выполненных работ" type="action" icon="gtk-print"/>
+                                    <button name="%(account_update_completion_ua)d" attrs="{'invisible': [('lang', '!=', 'ua')]}" string="Акт выполненных работ" type="action" icon="gtk-print"/>
+                                    <button name="%(account_update_invoice)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Счет-фактура" type="action" icon="gtk-print"/>
+                                </tree>
+                                <form  string="Закрывающие документы">
+                                    <field name="invoice_id" invisible="1" />
+                                    <field name="name" invisible="1" />
+                                    <field name="document_date"/>
+                                    <field name="document_cash"/>
+                                    <field name="document_line_id" nolabel="1" colspan="4"  widget="one2many_list">
+                                        <tree string="Платеж" editable="top">
+                                            <field name="service_id" readonly="1"/>
+                                            <field name="name" sum="Сумма платежа"/>
+                                        </tree>
+                                    </field>
+                                </form>
+                            </field>
+                            <button name="%(account_update_payment_ru)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Распечатать счет на оплату (без печати)" type="action" icon="gtk-print" context="{'print': 'no'}"/>
+
+                            <button name="%(account_update_payment_ua)d" attrs="{'invisible': [('lang', '!=', 'ua')]}" string="Распечатать счет на оплату (без печати)" type="action" icon="gtk-print" context="{'print': 'no'}"/>
+                            <button name="%(ir_actions_report_xml_all_list)d" string="Распечатать все документы в Excel"  attrs="{'invisible': ['|', ('lang', '!=', 'ru'), ('check_f', '=', False)]}" type="action" icon="gtk-print" />
+                        </page>
+                        <page string="История">
+                            <separator string="История переходов" colspan="4"/>
+                            <field name="history_ids" nolabel="1" colspan="4" readonly="1">
+                                <tree>
+                                    <field name="state"/>
+                                    <field name="create_uid"/>
+                                    <field name="create_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_invoice_line_tree_inherit">
+            <field name="name">view_invoice_line_tree.inherit</field>
+            <field name="model">account.invoice.line</field>
+            <field name="type">tree</field>
+            <field name="inherit_id" ref="account.view_invoice_line_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree[@string='Invoice Line']" position="replace">
+                    <tree string="Invoice Line" editable="top">
+                        <field name="service_id" required="1"/>
+                        <field name="account_id" invisible="1" required="1"/>
+                        <field name="price_unit"
+                               string="Стоимость $"
+                               on_change="onchange_price(parent.currency_id, parent.date_invoice, paid, price_unit, 0)"/>
+                        <field name="price_currency" string="Стоимость в валюте счета" on_change="onchange_price(parent.currency_id, parent.date_invoice, paid, 0, price_currency)" required="1"/>
+                        <field name="paid" readonly="1"/>
+                        <field name="price_subtotal" string="Долг"/>
+                    </tree>
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_invoice_line_form_inherit">
+            <field name="name">account.invoice.line.form.inherit</field>
+            <field name="model">account.invoice.line</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="account.view_invoice_line_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form[@string='Invoice Line']" position="replace">
+                    <form string="Позиция счета">
+                        <field name="service_id"/>
+                        <field name="account_id" invisible="1"/>
+                        <field name="price_unit"
+                                 string="Стоимость $"
+                                 on_change="onchange_price(price_unit, parent.currency_id, parent.date_invoice, paid)"/>
+                        <field name="price_currency" string="Стоимость в валюте счета" readonly="1"/>
+                        <field name="paid" readonly="1"/>
+                        <field name="price_subtotal" string="Долг"/>
+                    </form>
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_form_inherit">
+            <field name="name">account.account.form.inherit</field>
+            <field name="model">account.account</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="account.view_account_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='parent_id']" position="replace"/>
+                <xpath expr="//field[@name='child_consol_ids']" position="replace"/>
+                <xpath expr="//separator[@string='Consolidated Children']" position="replace"/>
+                <xpath expr="//separator[@string='Default Taxes']" position="replace"/>
+                <xpath expr="//field[@name='tax_ids']" position="replace"/>
+                <xpath expr="//page[@string='General Information']/newline" position="before">
+                    <group col="4" colspan="4">
+                        <field name="full"/>
+                        <field name="inn"/>
+                        <field name="kpp"/>
+                        <field name="bik"/>
+                        <field name="bank"/>
+                        <field name="bank_number"/>
+                        <field name="account_number"/>
+                        <field name="address"/>
+                        <field name="phone"/>
+                        <field name="responsible"/>
+                        <field name="lang"/>
+                        <field name="stamp" widget='image'/>
+                    </group>
+                </xpath>
+                <xpath expr="//field[@name='reconcile']" position="after">
+                    <group col="4" colspan="4">
+                        <separator colspan="4" string="Для нумерации"/>
+                        <field name="suffix"/>
+                        <field name="count"/>
+                        <field name="step"/>
+                    </group>
+                </xpath>
+                <xpath expr="//separator[@string='Reconcile']" position="replace">
+                    <separator string="Налог" colspan="2"/>
+                </xpath>
+                <xpath expr="//field[@name='reconcile']" position="replace">
+                    <field name="tax"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="window_account_invoice">
+            <field name="name">Счет</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_account_invoice_tree"/>
+            <field name="search_view_id" ref="view_account_invoice_filter1"/>
+            <field name="domain">[('type','=','out_invoice')]</field>
+            <field name="context">{'default_type': 'out_invoice', 'type': 'out_invoice', 'journal_type': 'purchase', 'search_default_date_invoice': time.strftime('%Y-%m-%d')}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="av_account_invoice_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_account_invoice_form"/>
+            <field name="act_window_id" ref="window_account_invoice"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="av_account_invoice_tree">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_account_invoice_tree"/>
+            <field name="act_window_id" ref="window_account_invoice"/>
+        </record>
+
+
+        <record model="ir.ui.view" id="view_account_request_money_form">
+            <field name="name">account.invoice.form2</field>
+            <field name="model">account.invoice</field>
+            <field name="priority" eval="1"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="ЗДС">
+                    <group colspan="4">
+                        <field name="check_a"/>
+                        <field name="check_f"/>
+                        <field name="check_p"/>
+                        <field name="id" invisible="1"/>
+                    </group>
+                    <group colspan="4" col="6">
+                        <group colspan="2" col="2">
+                            <field name="id" string="№ ЗДС" />
+                            <field name="user_id" string="Автор" readonly="1"/>
+                            <field name="division_id" string="Направление" required="1" widget="selection" on_change="change_division(division_id)"/>
+                            <field name="type_getter" required="1" on_change="change_getter(type_getter)"/>
+                            <field name="lead_id" invisible="True"/>
+                            <field name="get_division" invisible="True" />
+                            <field name="partner_id" string="Партнер"
+                               attrs="{
+                               'invisible': [('type_getter', '=', 'employee')],
+                               'required': [('type_getter', '!=', 'employee'), ('division', '=', False)],
+                               'readonly': [('division', '=', True)]}"/>
+                            <field name='division'  attrs="{'invisible': ['|', ('type_getter', '=', 'employee'), ('get_division', '=', False)], 'required': [('type_getter', '!=', 'employee'), ('partner_id', '=', False)]}"/>
+                            <field name="employee_id"
+                               attrs="{'invisible': [('type_getter', '!=', 'employee')], 'required': [('type_getter', '=', 'employee')]}"/>
+                            <field name="categ_id" required="1" widget="selection"/>
+                            <field name="payment_details" required="1"/>
+                        </group>
+                        <group colspan="2" col="2">
+                            <field name="date_invoice" string="Дата выставления ЗДС" required="True"/>
+                            <field name="date_mr" attrs="{'readonly': [('check_f', '=', False)]}"/>
+                            <field name="type_account" required="1" on_change="change_type(type_account)"/>
+                            <field name="card_id" required="1" domain="[('type_account', '=', type_account)]"
+                               on_change="change_card(card_id)"/>
+                            <field name="companies_distribution" required="True"/>
+                        </group>
+                        <group colspan="2" col="2">
+                            <field name="total_mr" required="1" on_change="change_cash(total_mr, change_mr, overrun_mr)"/>
+                            <field name="currency_id" readonly="1"/>
+                            <field name="change_mr" on_change="change_cash(total_mr, change_mr, overrun_mr)"/>
+                            <field name="overrun_mr" on_change="change_cash(total_mr, change_mr, overrun_mr)" attrs="{'readonly': [('check_f', '=', False)]}"/>
+                            <field name="commission_mr" attrs="{'readonly': [('check_f', '=', False)]}"/>
+                            <field name="cash_mr" attrs="{'readonly': [('check_f', '=', False)]}"/>
+                        </group>
+                    </group>
+                    <group col="4" colspan="4">
+                        <field name="attachment_ids" nolabel="1" colspan="4" widget="one2many_list">
+                            <tree string="Вложения" colors="blue:type in ('url',)">
+                                <field name="datas_fname"/>
+                                <field name="create_date"/>
+                                <field name="user_id"/>
+                                <field name="type" groups="base.group_extended"/>
+                            </tree>
+                        </field>
+                        <separator string="Комментарий" colspan="4"/>
+                        <field name="comment" colspan="4" nolabel="1"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm,proforma2,close"
+                               statusbar_colors='{"proforma2":"blue","cancel":"red"}'/>
+                        <group col="8" colspan="4" groups="base.group_user">
+                            <!-- cancel -> draft -->
+                            <button name="draft"
+                                    icon="gtk-go-back"
+                                    string="В черновик"
+                                    colspan="1"
+                                    attrs="{'invisible': [
+                                        '|', ('state', '!=', 'cancel'), ('check_a', '=', False)
+                                    ]}"
+                                    />
+                            <!-- draft -> cancel -->
+                            <button name="cancel"
+                                    icon="gtk-cancel"
+                                    string="Отмена"
+                                    colspan="1"
+                                    attrs="{'invisible': ['&amp;',
+                                        '|', ('state', '!=', 'draft'), ('check_a', '=', False),
+                                        '|', ('state', '!=', 'confirm'), '&amp;', ('check_p', '=', False), ('check_f', '=', False)
+                                    ]}"
+                                    />
+
+                            <!-- draft -> confirm -->
+                            <button name="out_confirm"
+                                    icon="gtk-go-forward"
+                                    string="На утверждение"
+                                    colspan="1"
+                                    attrs="{'invisible': [
+                                                '|', ('state', '!=', 'draft'), ('check_a', '=', False)
+                                            ]}"
+                                    />
+
+                            <!-- confirm -> proforma2 -->
+                            <button name="out_proforma"
+                                    icon="gtk-go-forward"
+                                    string="Проведение оплаты"
+                                    colspan="1"
+                                    attrs="{'invisible': [
+                                                '|', ('state', '!=', 'confirm'), '&amp;', ('check_p', '=', False), ('check_f', '=', False)
+                                            ]}"
+                                    />
+
+                            <!-- proforma2 -> close -->
+                            <button name="out_close"
+                                    icon="gtk-ok"
+                                    string="Закрытие ЗДС"
+                                    colspan="1"
+                                    attrs="{'invisible': [
+                                                '|', ('state', '!=', 'proforma2'), ('check_f', '=', False)
+                                            ]}"
+                                    />
+                        </group>
+                        <separator string="История переходов" colspan="4"/>
+                        <field name="history_ids" nolabel="1" colspan="4" readonly="1">
+                            <tree>
+                                <field name="state"/>
+                                <field name="create_uid"/>
+                                <field name="create_date"/>
+                            </tree>
+                        </field>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_request_money_tree">
+            <field name="name">account.invoice.tree.mr</field>
+            <field name="model">account.invoice</field>
+            <field name="priority" eval="1"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree colors="orange:state=='confirm';green:state=='close';gray:state=='cancel';red:state=='proforma2'">
+                    <field name="check_a" invisible="1"/>
+                    <field name="check_f" invisible="1"/>
+                    <field name="check_p" invisible="1"/>
+                    <field name="id" string="№ ЗДС"/>
+                    <field name="division_id"/>
+                    <field name="check_man_id"/>
+                    <field name="categ_id"/>
+                    <field name="card_id"/>
+                    <field name="cash_mr" string="Сумма ЗДС" sum="Сумма ЗДС"/>
+                    <field name="currency_id"/>
+                    <field name="payment_details" width="100"/>
+                    <field name="date_invoice" string="Дата выставления ЗДС"/>
+                    <field name="date_mr"/>
+                    <field name="companies_distribution" string="Up/INK"/>
+                    <field name="user_id" string="Автор"/>
+                    <field name="state"/>
+                    <!-- cancel -> draft -->
+                    <button name="draft"
+                            icon="gtk-go-back"
+                            string="В черновик"
+                            colspan="1"
+                            attrs="{'invisible': [
+                                        '|', ('state', '!=', 'cancel'), ('check_a', '=', False)
+                                    ]}"
+                            />
+                    <!-- draft -> cancel -->
+                    <button name="cancel"
+                            icon="gtk-cancel"
+                            string="Отмена"
+                            colspan="1"
+                            attrs="{'invisible': ['&amp;',
+                                        '|', ('state', '!=', 'draft'), ('check_a', '=', False),
+                                        '|', ('state', '!=', 'confirm'), '&amp;', ('check_p', '=', False), ('check_f', '=', False)
+                                    ]}"
+                            />
+
+                    <!-- draft -> confirm -->
+                    <button name="out_confirm"
+                            icon="gtk-go-forward"
+                            string="На утверждение"
+                            colspan="1"
+                            attrs="{'invisible': [
+                                                '|', ('state', '!=', 'draft'), ('check_a', '=', False)
+                                            ]}"
+                            />
+
+                    <!-- confirm -> proforma2 -->
+                    <button name="out_proforma"
+                            icon="gtk-go-forward"
+                            string="Проведение оплаты"
+                            colspan="1"
+                            attrs="{'invisible': [
+                                                '|', ('state', '!=', 'confirm'), '&amp;', ('check_p', '=', False), ('check_f', '=', False)
+                                            ]}"
+                            />
+
+                    <!-- proforma2 -> close -->
+                    <button name="out_close"
+                            icon="gtk-ok"
+                            string="Закрытие ЗДС"
+                            colspan="1"
+                            attrs="{'invisible': [
+                                                '|', ('state', '!=', 'proforma2'), ('check_f', '=', False)
+                                            ]}"
+                            />
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_request_money_filter">
+            <field name="name">account.invoice.search.mr</field>
+            <field name="name">account.invoice.search.mr</field>
+            <field name="model">account.invoice</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <filter string="На утверждении" icon="terp-personal" domain="[('state', '=', 'confirm')]"/>
+                    <filter string="Утвержденные" icon="terp-personal" domain="[('state', '=', 'proforma2')]"/>
+                    <filter string="Закрытые ЗДС" icon="terp-personal" domain="[('state', '=', 'close')]"/>
+                    <field name="id" string="№ ЗДС"/>
+                    <field name="division_id" string="Направление" />
+                    <field name="categ_id"/>
+                    <field name="card_id"/>
+                    <field name="cash_mr" string="Сумма ЗДС"/>
+                    <field name="currency_id"/>
+                    <field name="date_invoice" string="Дата выставления ЗДС"/>
+                    <field name="date_mr"/>
+                    <field name="companies_distribution"/>
+                    <field name="user_id" string="Автор"/>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Направление" icon="terp-calendar" context="{'group_by': 'division_id'}"/>
+                        <filter string="Автор" icon="terp-personal" context="{'group_by': 'user_id'}"/>
+                        <filter string="Состояние" icon="terp-personal" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_account_request_money">
+            <field name="name">ЗДС</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_account_request_money_tree"/>
+            <field name="search_view_id" ref="view_account_request_money_filter"/>
+            <field name="domain">[('type','=','in_invoice')]</field>
+            <field name="context">{'default_type': 'in_invoice', 'type': 'in_invoice', 'journal_type': 'purchase', 'search_default_date_invoice': time.strftime('%Y-%m-%d')}</field>
+        </record>
+        <record model="ir.actions.act_window.view" id="av_account_request_money_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_account_request_money_form"/>
+            <field name="act_window_id" ref="window_account_request_money"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="av_account_request_money_tree">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_account_request_money_tree"/>
+            <field name="act_window_id" ref="window_account_request_money"/>
+        </record>
+
+
+        <record model="ir.ui.view" id="view_account_invoice_pay_form">
+            <field name="name">account.invoice.pay.form</field>
+            <field name="model">account.invoice.pay</field>
+            <field name="priority" eval="1"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Платежи">
+                    <group colspan="4" col="6">
+                        <field name="invoice_id" invisible="True"/>
+                        <field name="id"/>
+                        <field name="date_pay"/>
+                        <field name="total"/>
+                        <field name="partner_id" readonly="True"/>
+                        <field name="lead_id" readonly="True"/>
+                        <field name="type_account"/>
+                        <field name="card_id" domain="[('type_account', '=', type_account)]"
+                               on_change="change_card(card_id)"/>
+                        <field name="currency_id" attrs="{'readonly': [('type_account', '!=', 'cash')]}"/>
+                        <field name="getter" colspan="6"
+                               attrs="{'invisible': [('type_account', '!=', 'cashless')], 'required': [('type_account', '=', 'cashless')]}"/>
+                        <field name="invoice_pay_ids" nolabel="1" colspan="6"
+                               attrs="{'invisible': [('invoice_id', '=', False)]}">
+                            <tree string="Разбивка платежа">
+                                <field name="service_id"/>
+                                <field name="name"/>
+                            </tree>
+                        </field>
+                        <separator string="Примечание" colspan="6"/>
+                        <field name="note" nolabel="1" colspan="6"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_invoice_pay_tree">
+            <field name="name">account.invoice.pay.tree</field>
+            <field name="model">account.invoice.pay</field>
+            <field name="priority" eval="1"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="id"/>
+                    <field name="total" sum="Сумма платежа"/>
+                    <field name="date_pay"/>
+                    <field name="invoice_id" string="Счет"/>
+                    <field name="partner_id"/>
+                    <field name="lead_id"/>
+                    <field name="type_account"/>
+                    <field name="card_id"/>
+                    <field name="note"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_invoice_pay_filter">
+            <field name="name">account.invoice.pay.search</field>
+            <field name="model">account.invoice.pay</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="id"/>
+                    <field name="total" sum="Сумма платежа"/>
+                    <field name="invoice_id" string="Счет"/>
+                    <field name="date_pay"/>
+                    <field name="type_account"/>
+                    <field name="card_id"/>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Счет" icon="terp-personal" context="{'group_by': 'invoice_id'}"/>
+                        <filter string="Дата оплаты" icon="terp-personal" context="{'group_by': 'date_pay'}"/>
+                        <filter string="Касса/банк/кошелек" icon="terp-personal" context="{'group_by': 'card_id'}"/>
+                        <filter string="Форма оплаты" icon="terp-personal" context="{'group_by': 'type_account'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_account_invoice_pay">
+            <field name="name">Платежи</field>
+            <field name="res_model">account.invoice.pay</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_account_invoice_pay_tree"/>
+            <field name="search_view_id" ref="view_account_invoice_pay_filter"/>
+            <field name="context">{}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="av_account_invoice_pay_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_account_invoice_pay_form"/>
+            <field name="act_window_id" ref="window_account_invoice_pay"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="av_account_invoice_pay_tree">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_account_invoice_pay_tree"/>
+            <field name="act_window_id" ref="window_account_invoice_pay"/>
+        </record>
+
+
+        <record model="ir.ui.view" id="view_account_invoice_document_form">
+            <field name="name">account.invoice.documents.form</field>
+            <field name="model">account.invoice.documents</field>
+            <field name="priority" eval="1"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group colspan="4" col="6">
+                        <field name="name" invisible="1" />
+                        <field name="invoice_id" string="Счет"/>
+                        <field name="partner_id"/>
+                        <field name="user_id"/>
+                        <field name="a_total"/>
+                        <field name="date_invoice"/>
+                        <field name="document_state"/>
+                        <field name="document_date"/>
+                        <field name="document_cash"/>
+
+                        <field name="document_line_id" nolabel="1" colspan="4"  widget="one2many_list">
+                            <tree string="Платеж" editable="top">
+                                <field name="service_id" readonly="1"/>
+                                <field name="name" sum="Сумма платежа"/>
+                            </tree>
+                        </field>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_invoice_document_tree">
+            <field name="name">account.invoice.documents.tree</field>
+            <field name="model">account.invoice.documents</field>
+            <field name="priority" eval="1"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="lang" invisible="1"/>
+                    <field name="invoice_id" string="Счет"/>
+                    <field name="partner_id"/>
+                    <field name="user_id"/>
+                    <field name="a_total"/>
+                    <field name="date_invoice"/>
+                    <field name="document_date"/>
+                    <field name="document_cash"/>
+                    <field name="document_state"/>
+                    <button name="%(account_update_completion_ru)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Акт выполненных работ" type="action" icon="gtk-print"/>
+                    <button name="%(account_update_completion_ua)d" attrs="{'invisible': [('lang', '!=', 'ua')]}" string="Акт выполненных работ" type="action" icon="gtk-print"/>
+                    <button name="%(account_update_invoice)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Счет-фактура" type="action" icon="gtk-print"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_invoice_document_filter">
+            <field name="name">account.invoice.documents.search</field>
+            <field name="model">account.invoice.documents</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <filter icon="terp-go-year"
+                            string="Год"
+                            domain="[('document_date','&lt;=', time.strftime('%%Y-%%m-%%d')),('document_date','&gt;=',time.strftime('%%Y-01-01'))]"
+                            help="Текущий год"
+                            context="{'group_by':'document_date'}"/>
+
+                    <filter icon="terp-go-month"
+                            string="Месяц"
+                            name="month"
+                            domain="[('document_date','&lt;=',(datetime.date.today() + relativedelta(day=31)).strftime('%%Y-%%m-%%d')),('document_date','&gt;=',(datetime.date.today() - relativedelta(day=1)).strftime('%%Y-%%m-%%d'))]"
+                            help="Текущий месяц"
+                            context="{'group_by':'document_date'}"/>
+                    <filter icon="terp-go-today"
+                            string="День"
+                            separator="1"
+                            name="day"
+                            domain="[('document_date','=', time.strftime('%%Y-%%m-%%d'))]"
+                            help="Сегодня"/>
+
+                    <separator orientation="vertical"/>
+
+                    <field name="number" string="Счет"/>
+                    <field name="partner_id"/>
+                    <field name="user_id"/>
+                    <field name="a_total"/>
+                    <field name="date_invoice"/>
+                    <field name="document_date"/>
+                    <field name="document_cash"/>
+                    <field name="document_state"/>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Счет" icon="terp-personal" context="{'group_by': 'invoice_id'}"/>
+                        <filter string="Дата оплаты" icon="terp-personal" context="{'group_by': 'document_date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_account_invoice_document">
+            <field name="name">ЗД</field>
+            <field name="res_model">account.invoice.documents</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_account_invoice_document_tree"/>
+            <field name="search_view_id" ref="view_account_invoice_document_filter"/>
+            <field name="context">{}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="av_account_invoice_document_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_account_invoice_document_form"/>
+            <field name="act_window_id" ref="window_account_invoice_document"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="av_account_invoice_document_tree">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_account_invoice_document_tree"/>
+            <field name="act_window_id" ref="window_account_invoice_document"/>
+        </record>
+
+
+        <record model="ir.ui.view" id="view_account_invoice_card_form">
+            <field name="name">account.invoice.card.form</field>
+            <field name="model">account.invoice.card</field>
+            <field name="priority" eval="1"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Платежи">
+                    <group colspan="4" col="6">
+                        <field name="name"/>
+                        <field name="currency_id"/>
+                        <field name="type_account"/>
+                        <field name="cash_in"/>
+                        <field name="cash_out"/>
+                        <field name="cash"/>
+                    </group>
+                    <group>
+                        <separator string="Кто может отправить" colspan="2"/>
+                        <separator string="Кто может получить" colspan="2"/>
+                        <newline/>
+                        <field name="sent_users_ids" colspan="2" nolabel="1"/>
+                        <field name="get_users_ids" colspan="2" nolabel="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_invoice_card_tree">
+            <field name="name">account.invoice.card.tree</field>
+            <field name="model">account.invoice.card</field>
+            <field name="priority" eval="1"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="currency_id"/>
+                    <field name="type_account"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_account_invoice_card">
+            <field name="name">Касса/банк/кошелек</field>
+            <field name="res_model">account.invoice.card</field>
+            <field name="view_id" ref="view_account_invoice_card_tree"/>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+        </record>
+        <record model="ir.actions.act_window" id="window_account_invoice_division">
+            <field name="name">Направление</field>
+            <field name="res_model">account.invoice.division</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+        </record>
+
+
+        <record model="ir.ui.view" id="view_account_invoice_category_tree">
+            <field name="name">account.invoice.category.tree</field>
+            <field name="model">account.invoice.category</field>
+            <field name="priority" eval="1"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="parent_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_account_invoice_category">
+            <field name="name">Статьи расходов</field>
+            <field name="res_model">account.invoice.category</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_account_invoice_category_tree"/>
+            <field name="context">{}</field>
+        </record>
+
+
+        <record model="ir.ui.view" id="view_account_invoice_transfer_form">
+            <field name="name">account.invoice.transfer.funds.form</field>
+            <field name="model">account.invoice.transfer.funds</field>
+            <field name="priority" eval="1"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Перемещение">
+                    <field name="check_s"/><field name="check_g"/>
+                    <field name="id" colspan="4" readonly="True"/>
+                    <group colspan="4" col="5">
+                        <group col="4" colspan="2">
+                            <field name="out_date" colspan="4"/>
+                            <field name="out_type_account" colspan="4"/>
+                            <field name="out_card_id" domain="[('type_account', '=', out_type_account)]"
+                                   on_change="change_card(out_card_id, 'out')" colspan="4"/>
+                            <field name="out_total" on_change="change_rate(in_currency_id, out_currency_id, out_total, rate)"/>
+                            <field name="out_currency_id"
+                                   on_change="change_rate(in_currency_id, out_currency_id, out_total, rate)"
+                                   readonly="1"/>
+                        </group>
+                        <separator orientation="vertical"/>
+                        <group col="4" colspan="2">
+
+                            <field name="in_date" colspan="4"/>
+                            <field name="in_type_account" colspan="4"/>
+                            <field name="in_card_id" domain="[('type_account', '=', in_type_account)]"
+                                   on_change="change_card(in_card_id, 'in')" colspan="4"/>
+                            <field name="in_total"
+                                   on_change="change_rate(in_currency_id, out_currency_id, out_total, rate)"
+                                    />
+                            <field name="in_currency_id"
+                                   on_change="change_rate(in_currency_id, out_currency_id, out_total, rate)"
+                                   readonly="1"/>
+                        </group>
+                        <separator colspan="4"/>
+                        <field name="rate"
+                               on_change="change_rate(in_currency_id, out_currency_id, out_total, rate)"
+                               />
+                        <field name="commission"/>
+                        <separator string="Комментарий" colspan="4"/>
+                        <field name="comment" nolabel="1" colspan="4"/>
+                    </group>
+                    <group colspan="8">
+                        <field name="state" widget="statusbar" statusbar_visible="draft,sent,received"
+                               statusbar_colors='{"sent":"yellow","received":"green"}'/>
+                        <newline />
+                        <!-- received -> sent -->
+                        <button name="sent"
+                                icon="gtk-go-back"
+                                string="Вернуть деньги"
+                                attrs="{'invisible': ['|', ('state', '!=', 'received'), ('check_g', '=', False)]}"
+                                />
+                        <!-- sent -> draft -->
+                        <button name="draft"
+                                icon="gtk-go-back"
+                                string="Отменить перемещение"
+                                attrs="{'invisible': ['|', ('state', '!=', 'sent'), ('check_s', '=', False)]}"
+                                />
+
+                        <!-- draft -> sent -->
+                        <button name="sent"
+                                icon="gtk-go-forward"
+                                string="Отправить деньги"
+                                attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_s', '=', False)]}"
+                                />
+                        <!-- sent -> received -->
+                        <button name="received"
+                                icon="gtk-go-forward"
+                                string="Получить деньги"
+                                attrs="{'invisible': ['|', ('state', '!=', 'sent'), ('check_g', '=', False)]}"
+                                />
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_invoice_transfer_tree">
+            <field name="name">account.invoice.transfer.funds.tree</field>
+            <field name="model">account.invoice.transfer.funds</field>
+            <field name="priority" eval="1"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree  colors="red:state=='sent';black:state=='received';gray:state=='draft'">
+                    <field name="state" invisible="1"/>
+                    <field name="id"/>
+                    <field name="out_date"/>
+                    <field name="out_card_id"/>
+                    <field name="out_currency_id"/>
+                    <field name="out_total"/>
+                    <field name="commission"/>
+                    <field name="in_date"/>
+                    <field name="in_card_id"/>
+                    <field name="in_currency_id"/>
+                    <field name="in_total"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_invoice_transfer_filter">
+            <field name="name">account.invoice.transfer.funds.search</field>
+            <field name="model">account.invoice.transfer.funds</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="id"/>
+                    <field name="out_date"/>
+                    <field name="out_type_account"/>
+                    <field name="out_card_id"/>
+                    <field name="out_currency_id"/>
+                    <field name="out_total"/>
+                    <field name="in_date"/>
+                    <field name="in_type_account"/>
+                    <field name="in_card_id"/>
+                    <field name="in_currency_id"/>
+                    <field name="in_total"/>
+                    <newline/>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_account_invoice_transfer">
+            <field name="name">Перемещение</field>
+            <field name="res_model">account.invoice.transfer.funds</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_account_invoice_transfer_tree"/>
+            <field name="search_view_id" ref="view_account_invoice_transfer_filter"/>
+            <field name="context">{}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="av_account_invoice_transfer_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_account_invoice_transfer_form"/>
+            <field name="act_window_id" ref="window_account_invoice_transfer"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="av_account_invoice_transfer_tree">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_account_invoice_transfer_tree"/>
+            <field name="act_window_id" ref="window_account_invoice_transfer"/>
+        </record>        
+
+        <menuitem id="account.menu_finance_root" parent="account.menu_finance" name="Счета и ЗДС" sequence="0" groups="account.group_account_invoice"/>
+        <menuitem action="window_account_request_money" id="account.menu_finance_mr" parent="account.menu_finance_root" name="ЗДС"
+                  sequence="1" groups="account.group_account_head"/>
+        <menuitem action="window_account_invoice" id="account.menu_finance_invoice" parent="account.menu_finance_root" name="Счета на оплату"
+                  sequence="2" groups="account.group_account_invoice"/>
+        <menuitem action="window_account_invoice_pay" id="account.menu_finance_invoice_pay" parent="account.menu_finance_root"
+                  name="Платежи" sequence="3" groups="account.group_account_user"/>
+        <menuitem action="window_account_invoice_document" id="account.menu_finance_invoice_document" parent="account.menu_finance_root"
+                  name="ЗД" sequence="3" groups="account.group_account_user"/>
+        <menuitem action="window_account_invoice_transfer" id="account.menu_finance_invoice_transfer"
+                  parent="account.menu_finance_root"
+                  name="Перемещения" sequence="3" groups="account.group_account_user"/>
+        <menuitem id="account.menu_finance_invoice_settings" parent="account.menu_finance_root"
+                  name="Справочники" sequence="4" groups="account.group_account_user"/>
+        <menuitem action="window_account_invoice_card" id="account.menu_finance_invoice_settings_card" parent="account.menu_finance_invoice_settings"
+                  name="Касса/банк/кошелек" sequence="1"/>
+        <menuitem action="window_account_invoice_division" id="account.menu_finance_invoice_settings_division" parent="account.menu_finance_invoice_settings"
+                  name="Направление" sequence="2"/>
+        <menuitem action="window_account_invoice_category" id="account.menu_finance_invoice_settings_category" parent="account.menu_finance_invoice_settings"
+                  name="Статьи расходов" sequence="3"/>
+        <menuitem id="base.menu_action_currency_form" parent="account.menu_finance_invoice_settings" sequence="20"/>
+
+
+        <!-- Hide menu -->
+        <menuitem id="account.menu_finance_receivables" name="Customers" parent="account.menu_finance" sequence="2" groups="base.group_system"/>
+        <menuitem id="account.menu_finance_payables" name="Suppliers" parent="account.menu_finance" sequence="3" groups="base.group_system"/>
+        <menuitem id="account.menu_finance_bank_and_cash" name="Bank and Cash" parent="account.menu_finance" sequence="4"
+             groups="base.group_system"/>
+        <menuitem id="account.menu_finance_periodical_processing" name="Periodical Processing" parent="account.menu_finance" sequence="9"  groups="base.group_system"/>
+        <menuitem id="account.menu_finance_charts" name="Charts" parent="account.menu_finance"  groups="base.group_system" sequence="6"/>
+        <menuitem id="account.menu_finance_configuration" name="Configuration" parent="account.menu_finance" sequence="14" groups="base.group_system"/>
+        <menuitem id="account.menu_finance_entries" name="Journal Entries" parent="account.menu_finance" sequence="5" groups="base.group_system"/>
+    </data>
+</openerp>

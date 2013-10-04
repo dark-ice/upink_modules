@@ -1,0 +1,7 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_outsourcing_contact_center_manager_out","out.campaign out_manager","model_out_campaign","outsourcing_contact_centr.manager",1,1,0,0
+"access_outsourcing_contact_center_supervisor_out","out.campaign out_supervisor","model_out_campaign","outsourcing_contact_centr.supervisor",1,1,0,0
+"access_outsourcing_contact_center_leader_out","out.campaign out_leader","model_out_campaign","outsourcing_contact_centr.leader",1,1,1,0
+"access_outsourcing_contact_center_manager_in","in.campaign out_manager","model_in_campaign","outsourcing_contact_centr.manager",1,1,0,0
+"access_outsourcing_contact_center_supervisor_in","in.campaign out_supervisor","model_in_campaign","outsourcing_contact_centr.supervisor",1,1,0,0
+"access_outsourcing_contact_center_leader_in","in.campaign out_leader","model_in_campaign","outsourcing_contact_centr.leader",1,1,1,0

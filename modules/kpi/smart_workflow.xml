@@ -1,0 +1,227 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_kpi_smart">
+            <field name="name">wkf.kpi.smart</field>
+            <field name="osv">kpi.smart</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- activity -->
+
+        <!-- draft -->
+        <record model="workflow.activity" id="act_draft">
+            <field name="wkf_id" ref="wkf_kpi_smart"/>
+            <field name="flow_start">True</field>
+            <field name="name">Черновик</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'draft'})</field>
+        </record>
+
+        <!-- cancel -->
+        <record model="workflow.activity" id="act_cancel">
+            <field name="wkf_id" ref="wkf_kpi_smart"/>
+            <field name="name">Отмена</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'cancel'})</field>
+        </record>
+
+        <!-- agreement -->
+        <record model="workflow.activity" id="act_agreement">
+            <field name="wkf_id" ref="wkf_kpi_smart"/>
+            <field name="name">Согласование с руковолителем направления</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'agreement'})</field>
+        </record>
+
+        <!-- revision -->
+        <record model="workflow.activity" id="act_revision">
+            <field name="wkf_id" ref="wkf_kpi_smart"/>
+            <field name="name">Доработка</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'revision'})</field>
+        </record>
+
+        <!-- inwork -->
+        <record model="workflow.activity" id="act_inwork">
+            <field name="wkf_id" ref="wkf_kpi_smart"/>
+            <field name="name">Задача поставлена</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'inwork'})</field>
+        </record>
+
+        <!-- delegated -->
+        <record model="workflow.activity" id="act_delegated">
+            <field name="wkf_id" ref="wkf_kpi_smart"/>
+            <field name="name">Задача делегирована</field>
+            <field name="kind">function</field>
+            <field name="action">action_transfer('delegated')</field>
+        </record>
+
+        <!-- done -->
+        <record model="workflow.activity" id="act_done">
+            <field name="wkf_id" ref="wkf_kpi_smart"/>
+            <field name="name">Задача выполнена</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'done'})</field>
+        </record>
+
+        <!-- accepted -->
+        <record model="workflow.activity" id="act_accepted">
+            <field name="wkf_id" ref="wkf_kpi_smart"/>
+            <field name="name">Задача принята</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'accepted'})</field>
+            <field name="flow_stop">True</field>
+        </record>
+
+        <!-- not_accepted -->
+        <record model="workflow.activity" id="act_not_accepted">
+            <field name="wkf_id" ref="wkf_kpi_smart"/>
+            <field name="name">Задача не принята</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'not_accepted'})</field>
+            <field name="flow_stop">True</field>
+        </record>
+
+        <!-- removed -->
+        <record model="workflow.activity" id="act_removed">
+            <field name="wkf_id" ref="wkf_kpi_smart"/>
+            <field name="name">Задача снята</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'removed'})</field>
+            <field name="flow_stop">True</field>
+        </record>
+
+        <!-- transfer -->
+        <record model="workflow.activity" id="act_transfer">
+            <field name="wkf_id" ref="wkf_kpi_smart"/>
+            <field name="name">Перенос</field>
+            <field name="kind">function</field>
+            <field name="action">action_transfer()</field>
+            <field name="flow_stop">True</field>
+        </record>
+
+
+        <!-- transition -->
+
+        <!-- draft -> cancel -->
+        <record model="workflow.transition" id="draft_cancel">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">action_cancel</field>
+        </record>
+
+        <!-- cancel -> draft -->
+        <record model="workflow.transition" id="cancel_draft">
+            <field name="act_from" ref="act_cancel"/>
+            <field name="act_to" ref="act_draft"/>
+            <field name="signal">action_draft</field>
+        </record>
+
+        <!-- draft -> agreement -->
+        <record model="workflow.transition" id="draft_agreement">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_agreement"/>
+            <field name="signal">action_agreement</field>
+        </record>
+
+        <!-- draft -> inwork -->
+        <record model="workflow.transition" id="draft_inwork">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_inwork"/>
+            <field name="signal">action_inwork</field>
+        </record>
+
+        <!-- agreement -> draft -->
+        <record model="workflow.transition" id="agreement_draft">
+            <field name="act_from" ref="act_agreement"/>
+            <field name="act_to" ref="act_draft"/>
+            <field name="signal">action_draft</field>
+        </record>
+
+        <!-- agreement -> revision -->
+        <record model="workflow.transition" id="agreement_revision">
+            <field name="act_from" ref="act_agreement"/>
+            <field name="act_to" ref="act_revision"/>
+            <field name="signal">action_revision</field>
+        </record>
+
+        <!-- revision -> agreement -->
+        <record model="workflow.transition" id="revision_agreement">
+            <field name="act_from" ref="act_revision"/>
+            <field name="act_to" ref="act_agreement"/>
+            <field name="signal">action_agreement</field>
+        </record>
+
+        <!-- agreement -> cancel -->
+        <record model="workflow.transition" id="agreement_cancel">
+            <field name="act_from" ref="act_agreement"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">action_cancel</field>
+        </record>
+
+        <!-- revision -> cancel -->
+        <record model="workflow.transition" id="revision_cancel">
+            <field name="act_from" ref="act_revision"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">action_cancel</field>
+        </record>
+
+        <!-- agreement -> inwork -->
+        <record model="workflow.transition" id="agreement_inwork">
+            <field name="act_from" ref="act_agreement"/>
+            <field name="act_to" ref="act_inwork"/>
+            <field name="signal">action_inwork</field>
+        </record>
+
+        <!-- inwork -> removed -->
+        <record model="workflow.transition" id="inwork_removed">
+            <field name="act_from" ref="act_inwork"/>
+            <field name="act_to" ref="act_removed"/>
+            <field name="signal">action_removed</field>
+        </record>
+
+        <!-- inwork -> transfer -->
+        <record model="workflow.transition" id="inwork_transfer">
+            <field name="act_from" ref="act_inwork"/>
+            <field name="act_to" ref="act_transfer"/>
+            <field name="signal">action_transfer</field>
+        </record>
+
+        <!-- inwork -> delegated -->
+        <record model="workflow.transition" id="inwork_delegated">
+            <field name="act_from" ref="act_inwork"/>
+            <field name="act_to" ref="act_delegated"/>
+            <field name="signal">action_delegated</field>
+        </record>
+
+        <!-- inwork -> done -->
+        <record model="workflow.transition" id="inwork_done">
+            <field name="act_from" ref="act_inwork"/>
+            <field name="act_to" ref="act_done"/>
+            <field name="signal">action_done</field>
+        </record>
+
+        <!-- delegated -> done -->
+        <record model="workflow.transition" id="delegated_done">
+            <field name="act_from" ref="act_delegated"/>
+            <field name="act_to" ref="act_done"/>
+            <field name="signal">action_done</field>
+        </record>
+
+        <!-- done -> accepted -->
+        <record model="workflow.transition" id="done_accepted">
+            <field name="act_from" ref="act_done"/>
+            <field name="act_to" ref="act_accepted"/>
+            <field name="signal">action_accepted</field>
+        </record>
+
+        <!-- done -> not_accepted -->
+        <record model="workflow.transition" id="done_not_accepted">
+            <field name="act_from" ref="act_done"/>
+            <field name="act_to" ref="act_not_accepted"/>
+            <field name="signal">action_not_accepted</field>
+        </record>
+    </data>
+</openerp>

@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record id="view_video_start_form" model="ir.ui.view">
+            <field name="name">Запуск VIDEO</field>
+            <field name="model">video</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Создание брифа на договор">
+                    <!-- Permission -->
+                    <group>
+                        <field name="check_m"/>
+                        <field name="check_v"/>
+                        <field name="check_h"/>
+                    </group>
+                    <group colspan="4" col="4">
+                        <field name="usr_id"/>
+                        <field name="partner_id"
+                               on_change="onchange_partner(partner_id)"
+                               attrs="{'readonly':[('state','!=','draft')]}"
+                                />
+                        <field name="responsible_id"/>
+                    </group>
+                    <group colspan="4" col="4">
+                        <field name="product_type" colspan="4"/>
+                        <field name="budget"/>
+
+                        <separator colspan="4" col="4"/>
+                        <field name="template_file" colspan="4"/>
+                        <group colspan="4" attrs="{'invisible': [('state', 'in', ('draft', 'cancel', 'approval_application'))]}">
+                            <field name="completion_tt_file" colspan="4"/>
+                            <field name="comment_rework" colspan="4" attrs="{'invisible': [('state', 'in', ('drawing', 'completion'))]}"/>
+                            <field name="contract_date" attrs="{'invisible': [('state', 'in', ('drawing', 'completion', 'approval_tt'))]}"/>
+                            <separator colspan="4"/>
+                        </group>
+
+                        
+                        <group colspan="4" col="4" attrs="{'invisible': [('state', 'in', ('draft', 'cancel', 'approval_application', 'drawing', 'completion', 'approval_tt', 'signing', 'contract_cancel'))]}">
+                            <field name="variant_ids" colspan="4" nolabel="1">
+                                <tree string="Варианты идей">
+                                    <field name="name"/>
+                                    <field name="create_date" />
+                                </tree>
+                            </field>
+                            <field name="idea_file" colspan="4" attrs="{'invisible': [('state', '=', 'development')]}"/>
+                            <field name="comment_rework_idea" colspan="4" attrs="{'invisible': [('state', '=', 'development')]}"/>
+                            <separator colspan="4"/>
+                            <field name="scenario_file" colspan="4"  attrs="{'invisible': [('state', 'in', ('choice', 'development'))]}"/>
+                            <field name="agreed_scenario_file" colspan="4" attrs="{'invisible': [('state', 'in', ('choice', 'development', 'scripting'))]}"/>
+                            <field name="comment_rework_scenario" colspan="4" attrs="{'invisible': [('state', 'in', ('choice', 'development', 'scripting'))]}"/>
+                            <separator colspan="4"/>
+                            <field name="application_date_ids" colspan="4" nolabel="1" attrs="{'invisible': [('state', 'in', ('choice', 'development', 'scripting', 'approval_scenario'))]}">
+                                <tree string="Приложения к договору" editable="top">
+                                    <field name="file"/>
+                                    <field name="name"/>
+                                    <field name="create_date" />
+                                </tree>
+                            </field>
+                            <separator colspan="4"/>
+                            <field name="param_ids" nolabel="1" colspan="4" attrs="{'invisible': [('state', 'in', ('choice', 'development', 'scripting', 'approval_scenario', 'signing_application'))]}">
+                                <tree string="Параметры создаваемого продукта" editable="top">
+                                    <field name="name"/>
+                                    <field name="create_date"/>
+                                </tree>
+                            </field>
+                            <field name="selected_param_file" colspan="4"  attrs="{'invisible': [('state', 'in', ('choice', 'development', 'scripting', 'approval_scenario', 'signing_application'))]}"/>
+                            <field name="comment_rw" colspan="2"  attrs="{'invisible': [('state', 'in', ('choice', 'development', 'scripting', 'approval_scenario', 'signing_application', 'preparation'))]}"/>
+                            <button string="Отправить уведомление о добавленных параметрах"
+                                    type="object"
+                                    name="send_message"
+                                    icon="terp-mail-message-new"
+                                    colspan="4"
+                                    attrs="{'invisible': ['|', ('state', 'not in', ('preparation', 'approval')), ('check_v', '=', False)]}"
+                                    />
+                            <separator colspan="4"/>
+                            <field name="test_url" colspan="4" attrs="{'invisible': [('state', 'not in', ('work', 'assertion', 'project_cancel', 'transmission', 'transferred'))]}"/>
+                            <field name="payment_ids" nolabel="1" colspan="4"  attrs="{'invisible': [('state', 'not in', ('assertion', 'project_cancel', 'transmission', 'transferred'))]}">
+                                <tree string="Оплаты" editable="top">
+                                    <field name="name"/>
+                                    <field name="pay_currency" widget="selection"/>
+                                    <field name="summ_pay"/>
+                                    <field name="summ_pay_$"/>
+                                    <field name="sum_enrollment_$"/>
+                                    <field name="usr_id"/>
+                                </tree>
+                            </field>
+                            <field name="comment_work" colspan="4"  attrs="{'invisible': [('state', 'not in', ('assertion', 'project_cancel', 'transmission', 'transferred'))]}"/>
+
+                            <field name="real_url" colspan="4"  attrs="{'invisible': [('state', 'not in', ('transmission', 'transferred'))]}"/>
+                            <separator colspan="4"/>
+                        </group>
+
+                    </group>
+                    <group colspan="4">
+                        <field name="state" nolabel="4"/>
+
+                        <!-- draft -> cancel -->
+                        <button name="action_d_c"
+                                string="Отмена"
+                                icon="gtk-close"
+                                attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- draft -> approval_application -->
+                        <button name="action_d_aa"
+                                string="На согласование"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- approval_application -> draft -->
+                        <button name="action_aa_d"
+                                string="На доработку"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval_application'), ('check_h', '=', False)]}"
+                                />
+
+                        <!-- approval_application -> drawing -->
+                        <button name="action_aa_drwn"
+                                string="Составление шаблона ТЗ"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval_application'), ('check_h', '=', False)]}"
+                                />
+
+                        <!-- drawing -> completion -->
+                        <button name="action_drwn_cmplt"
+                                string="На заполнение ТЗ"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'drawing'), ('check_v', '=', False)]}"
+                                />
+
+                        <!-- completion -> approval_tt -->
+                        <button name="action_cmplt_apprtt"
+                                string="На согласование ТЗ"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'completion'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- approval_tt -> completion -->
+                        <button name="action_apprtt_cmplt"
+                                string="Вернуть на заполнение ТЗ"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval_tt'), ('check_v', '=', False)]}"
+                                />
+
+                        <!-- approval_tt -> signing -->
+                        <button name="action_apprtt_sgnn"
+                                string="На подписание договора"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval_tt'), ('check_v', '=', False)]}"
+                                />
+
+                        <!-- signing -> contract_cancel -->
+                        <button name="action_sgnn_ccncl"
+                                string="Отмена"
+                                icon="gtk-close"
+                                attrs="{'invisible': ['|', ('state', '!=', 'signing'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- signing -> development -->
+                        <button name="action_sgnn_dvlpmnt"
+                                string="Разработка идей"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'signing'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- development -> choice -->
+                        <button name="action_dvlpmnt_chc"
+                                string="Выбор идеи"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'development'), ('check_v', '=', False)]}"
+                                />
+
+                        <!-- choice -> development -->
+                        <button name="action_chc_dvlpmnt"
+                                string="Вернуть на разработку идей"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'choice'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- choice -> scripting -->
+                        <button name="action_chc_scrptn"
+                                string="Составление сценария"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'choice'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- scripting -> approval_scenario -->
+                        <button name="action_scrptn_apprvls"
+                                string="На согласование сценария"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'scripting'), ('check_v', '=', False)]}"
+                                />
+
+                        <!-- approval_scenario -> scripting -->
+                        <button name="action_apprvls_scrptn"
+                                string="Вернуть на составение сценария"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval_scenario'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- approval_scenario -> signing_application -->
+                        <button name="action_apprvls_sgnnapp"
+                                string="Подписание приложения к договору"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval_scenario'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- signing_application -> preparation -->
+                        <button name="action_sgnnapp_prprtn"
+                                string="Подготовительные работы к разработке проекта"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'signing_application'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- preparation -> approval -->
+                        <button name="action_prprtn_apprvl"
+                                string="На согласование"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'preparation'), ('check_v', '=', False)]}"
+                                />
+
+                        <!-- approval -> preparation -->
+                        <button name="action_apprvl_prprtn"
+                                string="Вернуть на разработку"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- approval -> work -->
+                        <button name="action_apprvl_wrk"
+                                string="Работа над проектом"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- work -> assertion -->
+                        <button name="action_wrk_assrtn"
+                                string="Утверждение заказчиком"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'work'), ('check_v', '=', False)]}"
+                                />
+
+                        <!-- assertion -> work -->
+                        <button name="action_assrtn_wrk"
+                                string="Вернуть на доработку"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'assertion'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- assertion -> project_cancel -->
+                        <button name="action_assrtn_prjc"
+                                string="Отмена"
+                                icon="gtk-close"
+                                attrs="{'invisible': ['|', ('state', '!=', 'assertion'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- assertion -> transmission -->
+                        <button name="action_assrtn_trnsm"
+                                string="Передача проекта"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'assertion'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- transmission -> transferred -->
+                        <button name="action_assrtn_trnsf"
+                                string="Передать проект"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'transmission'), ('check_v', '=', False)]}"
+                                />
+
+                    </group>
+                    <group col="4" colspan="4">
+                        <separator string="История переходов" colspan="4"/>
+                        <field name="history_ids" nolabel="1" colspan="4">
+                            <tree>
+                                <field name="state" />
+                                <field name="usr_id" />
+                            </tree>
+                        </field>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_video_start_tree" model="ir.ui.view">
+            <field name="name">Запуск VIDEO</field>
+            <field name="model">video</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Список брифов">
+                    <field name="id"/>
+                    <field name="usr_id"/>
+                    <field name="responsible_id"/>
+                    <field name="partner_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_case_video_start">
+            <field name="name">Запуск Video</field>
+            <field name="res_model">video</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_video_start_tree"/>
+            <field name="domain">[('state', 'in', ('draft', 'cancel', 'approval_application', 'drawing', 'completion', 'approval_tt', 'signing', 'contract_cancel'))]</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_video_start_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_video_start_form"/>
+            <field name="act_window_id" ref="window_case_video_start"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_video_start_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_video_start_tree"/>
+            <field name="act_window_id" ref="window_case_video_start"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_case_video_dev">
+            <field name="name">Разработка Video</field>
+            <field name="res_model">video</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_video_start_tree"/>
+            <field name="domain">[('state', 'not in', ('draft', 'cancel', 'approval_application', 'drawing', 'completion', 'approval_tt', 'signing', 'contract_cancel'))]</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_video_start_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_video_start_form"/>
+            <field name="act_window_id" ref="window_case_video_start"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_video_start_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_video_start_tree"/>
+            <field name="act_window_id" ref="window_case_video_start"/>
+        </record>
+
+        <menuitem name="Подготовка к производству Видео"
+                  id="menu_video"
+                  parent="process_base.menu_process_all"
+                  sequence="8"
+                />
+
+        <menuitem
+                action="window_case_video_start"
+                name="Запуск Видео"
+                id="menu_video_start"
+                parent="menu_video"
+                sequence="1"/>
+
+        <menuitem
+                action="window_case_video_dev"
+                name="Разработка Видео"
+                id="menu_video_dev"
+                parent="menu_video"
+                sequence="2"/>
+    </data>
+</openerp>

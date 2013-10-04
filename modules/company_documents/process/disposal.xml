@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+    <!-- Бизнес-процесс для информационной записки -->
+   <record model="workflow" id="wkf_disposal_note">
+        <field name="name">Бизнес-процесс Распоряжения</field>
+        <field name="osv">company.disposal</field>
+        <field name="on_create">True</field>
+    </record>
+      
+    <!-- Workflow activities -->
+    
+    <record model="workflow.activity" id="act_disposal_draft">
+        <field name="wkf_id" ref="wkf_disposal_note" />
+        <field name="flow_start">True</field>
+        <field name="name">Черновик</field>
+        <field name="kind">function</field>
+        <field name="action">write({'state': 'draft'})</field>
+    </record>
+
+    <record model="workflow.activity" id="act_disposal_waiting">
+        <field name="wkf_id" ref="wkf_disposal_note" />
+        <field name="name">На утверждении</field>
+        <field name="kind">function</field>
+        <field name="action">write({'state': 'waiting'})</field>
+    </record>
+    
+    <record model="workflow.activity" id="act_disposal_rework">
+        <field name="wkf_id" ref="wkf_disposal_note" />
+        <field name="name">На доработке</field>
+        <field name="kind">function</field>
+        <field name="action">write({'state': 'rework'})</field>
+    </record>
+    
+    <record model="workflow.activity" id="act_disposal_published">
+        <field name="wkf_id" ref="wkf_disposal_note" />
+        <field name="name">Утверждено</field>
+        <field name="kind">function</field>
+        <field name="action">write({'state': 'approved'})</field>
+    </record>
+    
+    <record model="workflow.activity" id="act_disposal_cancel">
+        <field name="wkf_id" ref="wkf_disposal_note" />
+        <field name="name">Отменено</field>
+        <field name="kind">function</field>
+        <field name="action">write({'state': 'cancel'})</field>
+    </record>
+    
+    <!-- Workflow transition -->
+    
+    <record model="workflow.transition" id="a1_a2">
+        <field name="act_from" ref="act_disposal_draft" />
+        <field name="act_to" ref="act_disposal_waiting" />
+        <field name="signal">action_waiting</field>
+        <field name="condition">check_author()</field>
+    </record>
+    
+    <record model="workflow.transition" id="a2_a1">
+        <field name="act_from" ref="act_disposal_waiting" />
+        <field name="act_to" ref="act_disposal_draft" />
+        <field name="signal">action_draft</field>
+        <field name="condition">check_author()</field>
+    </record>
+    
+    <record model="workflow.transition" id="a2_a4">
+        <field name="act_from" ref="act_disposal_waiting" />
+        <field name="act_to" ref="act_disposal_published" />
+        <field name="signal">action_approved</field>
+        <field name="condition">check_chief()</field>
+    </record>
+    
+    <record model="workflow.transition" id="a4_a2">
+        <field name="act_from" ref="act_disposal_published" />
+        <field name="act_to" ref="act_disposal_waiting" />
+        <field name="signal">action_waiting</field>
+        <field name="condition">check_chief()</field>
+    </record>
+    
+    <record model="workflow.transition" id="a2_a3">
+        <field name="act_from" ref="act_disposal_waiting" />
+        <field name="act_to" ref="act_disposal_rework" />
+        <field name="signal">action_rework</field>
+        <field name="condition">check_chief()</field>
+    </record>
+    
+    <record model="workflow.transition" id="a3_a2">
+        <field name="act_from" ref="act_disposal_rework" />
+        <field name="act_to" ref="act_disposal_waiting" />
+        <field name="signal">action_waiting</field>
+        <field name="condition">check_author()</field>
+    </record>
+    
+    <record model="workflow.transition" id="a1_a5">
+        <field name="act_from" ref="act_disposal_draft" />
+        <field name="act_to" ref="act_disposal_cancel" />
+        <field name="signal">action_cancel</field>
+        <field name="condition">check_author()</field>
+    </record>
+    
+    </data>
+</openerp>

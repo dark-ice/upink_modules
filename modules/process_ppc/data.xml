@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record model="process.ppc.advertising" id="yandex_direct">
+            <field name="name">Яндекс.Директ</field>
+        </record>
+        <record model="process.ppc.advertising" id="yandex_market">
+            <field name="name">Яндекс.Маркет</field>
+        </record>
+        <record model="process.ppc.advertising" id="googel_adwords">
+            <field name="name">Google.Adwords</field>
+        </record>
+        <record model="process.ppc.advertising" id="begun">
+            <field name="name">Бегун</field>
+        </record>
+        <record model="process.ppc.advertising" id="bayan">
+            <field name="name">БаЯн</field>
+        </record>
+        <record model="process.ppc.advertising" id="google_banner">
+            <field name="name">Google banner</field>
+        </record>
+    </data>
+</openerp>

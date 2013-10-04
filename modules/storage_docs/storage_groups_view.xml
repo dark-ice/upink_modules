@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="storage_groups_form" model="ir.ui.view">
+            <field name="name">Группы доступа к хранилищу данных</field>
+            <field name="model">storage.groups</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Группы доступа">
+                    <field name="name" required="1"/>
+                    <field name="user_id" groups="base.group_system"/>
+                    <field name="create_date"/>
+                    <field string="Коментарии" name="comment" colspan="4"/>
+                    <field name="is_all"/>
+                    <field name="users_group" attrs="{'invisible': ['|',('create_date','==',''),('is_all','==',True)]}"
+                           colspan="4" nolabel="1"/>
+                </form>
+            </field>
+        </record>
+
+        <record id="storage_groups_tree" model="ir.ui.view">
+            <field name="name">Группы доступа к хранилищу данных</field>
+            <field name="model">storage.groups</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Группы доступа">
+                    <field name="name"/>
+                    <field name="users_group" string="Кол. пользователей в группе"/>
+                    <field name="user_id"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="window_storage_groups_action" model="ir.actions.act_window">
+            <field name="name">Группы доступа к хранилищу данных</field>
+            <field name="res_model">storage.groups</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="storage_groups_tree"/>
+        </record>
+
+        <menuitem action="window_storage_groups_action"
+                  id="storage_groups_menuitem"
+                  sequence="3"
+                  name="Группы доступа"
+                  parent="storage_files_menu"
+                  groups="storage_docs.admin_group,storage_docs.manager_group"
+                />
+    </data>
+</openerp>

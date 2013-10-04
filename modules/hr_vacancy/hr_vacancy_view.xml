@@ -1,0 +1,287 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+  #---- Tree vacancy view
+    <record model="ir.ui.view" id="view_hr_vacancy_tree">
+        <field name="name">Создание заявки на вакансию</field>
+        <field name="model">hr.vacancy</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Вакансии" colors="blue:state in ('draft');green:state in ('action_closed','action_in_the_work');" >
+               <field name="create_date" />
+                <field name="user_id" />
+                <field name="department_id" invisible="True" />
+                <field name="job_id" />
+                <field name="applicant_user" />
+                <field name="state" />
+                <field name="responsible_user" />
+                <field name="vacancy_enddate" />
+            <button name="action_agreement" string="На согласование" states="draft,completion_agr" icon="terp-gtk-go-back-rtl"/>
+            <button name="action_for_completion_agr" string="На доработку(Согласование)" states="agreement" icon="gtk-media-pause"/>
+            <button name="action_approval" string="На утверждение" states="agreement,completion_app" icon="terp-gtk-go-back-rtl"/>
+            <button name="action_for_completion_app" string="На доработку(Утверждение)" states="approval" icon="gtk-media-pause"/>
+            <button name="action_appointment" string="Назначение ответственного" states="approval" icon="terp-gtk-go-back-rtl"/>
+            <button name="action_adoption_of_the_work" string="Принятие в работу" states="appointment,completion_adop" icon="terp-gtk-go-back-rtl"/>
+            <button name="action_for_completion_adop" string="На доработку(Принятие в работу)" states="adoption_in_work" icon="gtk-media-pause"/>
+            <button name="action_in_the_work" string="В работу" states="adoption_in_work,closed" icon="terp-gtk-go-back-rtl"/>
+            <button name="action_closed" string="Вакансия закрыта" states="in_the_work" icon="gtk-jump-to"/>
+            </tree>
+        </field>
+    </record>
+
+#----Vacancy
+<record model="ir.ui.view" id="view_hr_vacancy_form">
+        <field name="name">Applicants - Create Applicants</field>
+        <field name="model">hr.vacancy</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Вакансии - Создание заявки">
+                <group colspan="4" col="8">
+                        <field name="job_id" required="1" on_change="onchange_department(job_id)" default_focus="1"  attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                        <field name="department_id" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}" />
+                        <field name="create_date" readonly="1"/>
+                        <field name="user_id" readonly="1" />
+                        <field name="valid_user" readonly="1" />
+                        <field name="accept_user" readonly="1"/>
+                        <field name="responsible_user" groups="base.hrsup_group_hr_vacancy" />
+                        <field name="vacancy_enddate" groups="base.hrsup_group_hr_vacancy"/>
+                        <field name="applicant_user" attrs="{'readonly':[('state','!=','in_the_work')]}" groups="base.hrsup_group_hr_vacancy,base.recruit_group"/>
+                </group>
+                <notebook colspan="3">
+                    <page string="Описание заявки">
+                        <group col="2" colspan="2">
+                            <field name="causes" required="1" widget="selection" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                            <field name="funct_pos" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                        </group>
+                        <group col="2" colspan="2">
+                            <field name="numbers" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                            <field name="perspekt_up" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                        </group>
+                    </page>
+                    <page string="Требование к кандидатам">
+                        <group col="2" colspan="2">
+                        <separator colspan="4" string="Образование"/>
+                            <field name="education" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                            <field name="pre_education" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                        </group>
+                        <group col="2" colspan="2">
+                        <separator colspan="4" string="Опыт работы"/>
+                            <field name="experience" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))],'required':[('state','in',('draft'))]}"/>
+                            <field name="pre_experience" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                        </group>
+                        <group col="2" colspan="2">
+                        <separator colspan="4" string="Возраст"/>
+                            <field name="in_y" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                            <field name="to_y" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                        <separator colspan="4" string="Пол"/>
+                            <field name="sex" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                        </group>
+                        <group col="2" colspan="2">
+                        <separator colspan="4" string="Знание иностранных языков ( укажите степень владения)"/>
+                            <field name="a_lang" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                            <field name="b_lang" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                        </group>
+                        <group col="2" colspan="2">
+                        <separator colspan="4" string="Знание компьютера"/>
+                            <field name="pc_knowledge" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                            <field name="pre_pc_knowledge" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                        </group>
+                   </page>
+                   <page string="Условия работы">
+                       <group col="2" colspan="2">
+                          <field name="regime_emp" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                          <separator colspan="3" string="Форма найма"/>
+                          <field name="form_recruit" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                          <separator colspan="3" string="Заработная плата"/>
+                          <field name="zp_trial_period" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                          <field name="zp_aftrial_period" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                          <separator colspan="3" string="Длительность испытательного срока"/>
+                          <field name="long_trial_period" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                       </group>
+                       <group col="2" colspan="2">
+                          <field name="trips" required="1" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                          <field name="dop_zp" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                          <field name="social_package" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                          <field name="vacancy_coments" attrs="{'readonly':[('state','not in',('draft','completion_agr','completion_app','completion_adop',''))]}"/>
+                       </group>
+                 </page>
+                </notebook>
+                <group col="20" colspan="4">
+                <field name="state" readonly="1"/>
+            <button name="action_agreement" string="На согласование" states="draft,completion_agr" icon="terp-gtk-go-back-rtl"/>
+            <button name="action_canceled" string="Отменена" states="draft,agreement,approval,in_the_work"  icon="gtk-cancel"/>
+            <button name="action_for_completion_agr" string="На доработку(Согласование)" states="agreement" icon="gtk-media-pause"/>
+            <button name="action_approval" string="На утверждение" states="agreement,completion_app" icon="terp-gtk-go-back-rtl"/>
+            <button name="action_for_completion_app" string="На доработку(Утверждение)" states="approval" icon="gtk-media-pause"/>
+            <button name="action_appointment" string="Назначение ответственного" states="approval" icon="terp-gtk-go-back-rtl"/>
+            <button name="action_adoption_of_the_work" string="Принятие в работу" states="appointment,completion_adop" icon="terp-gtk-go-back-rtl"/>
+            <button name="action_for_completion_adop" string="На доработку(Принятие в работу)" states="adoption_in_work" icon="gtk-media-pause"/>
+            <button name="action_in_the_work" string="В работу" states="adoption_in_work,closed" icon="terp-gtk-go-back-rtl"/>
+            <button name="action_closed" string="Вакансия закрыта" states="in_the_work" icon="gtk-jump-to"/>
+            <newline/>
+            <field name="state_coment" attrs="{'readonly':[('state','!=','agreement'),('state','!=','approval'),('state','!=','adoption_in_work')]}"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hr_vacancy_search_filter" model="ir.ui.view">
+        <field name="name">Заявки на вакансию - фильтр</field>
+        <field name="model">hr.vacancy</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Фильтр состояний">
+                <filter icon="terp-check" string="В работе"
+                domain="[('state','=','in_the_work')]"
+                help="Заявки в работе"
+                />
+                <filter icon="terp-document-new" string="Новые"
+                domain="[('state','=','draft')]"
+                help="Новые - только созданные заявки"
+                />
+                <filter icon="terp-gtk-media-pause" string="На доработку"
+                domain="[('state','in',('completion_agr','completion_app','completion_adop'))]"
+                help="Заявки отправленные на доработку"
+                />
+                <filter icon="terp-camera_test" string="Завершенные"
+                domain="[('state','=','closed')]"
+                help="Закрытые вакансии"
+                />
+                <field name="create_date"/>
+                <field name="department_id" invisible="True" widget="selection"/>
+                <newline />
+                <field name="job_id" widget="selection"/>
+                <field name="state"/>
+                <newline />
+                <group expand="0" string="Группировать по..." colspan="10" col="20">
+                    <filter string="Автор заявки" icon="terp-personal" domain="[]"  context="{'group_by':'user_id'}"/>
+                    <filter string="Направление" icon="terp-personal+" domain="[]" context="{'group_by':'department_id'}"/>
+                    <separator orientation="vertical"/>
+                    <filter string="Должность" icon="terp-gtk-select-all" domain="[]" context="{'group_by':'job_id'}"/>
+                    <filter string="Ответственный за выполнение" icon="terp-personal" domain="[]" context="{'group_by':'responsible_user'}"/>
+                    <filter string="Дата создания" icon="terp-go-month" domain="[]" context="{'group_by':'create_date'}"/>
+                    <separator orientation="vertical"/>
+                    <filter string="Процессы" icon="terp-stock_effects-object-colorize" domain="[]" context="{'group_by':'state'}"/>
+                    <separator orientation="vertical"/>
+                    <filter string="Сроки выполнения заявки" icon="terp-go-month" domain="[]" context="{'group_by':'vacancy_enddate'}"/>
+                </group>
+           </search>
+        </field>
+    </record>
+
+  #---- Tree vacancy stage view
+    <record model="ir.ui.view" id="view_hr_vacancy_stage_tree">
+        <field name="name">Справочник причин возникновения вакансий - список</field>
+        <field name="model">hr.vacancy.stage</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Справочник">
+               <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+#----Vacancy stage form
+    <record model="ir.ui.view" id="view_hr_vacancy_stage_form">
+        <field name="name">Справочник причин возникновения вакансий - форма</field>
+        <field name="model">hr.vacancy.stage</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Справочник - Причины возникновения вакансии">
+              <field name="name" required="1" default_focus="1"/>
+            </form>
+        </field>
+    </record>
+    
+    
+#-----
+    <record model="ir.ui.view" id="view_hr_vacancy_control_tree">
+        <field name="name">Справочник контроля обработки вакансий - список</field>
+        <field name="model">hr.vacancy.control</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Справочник - Контроль обработки вакансий">
+               <field name="state"/>
+               <field name="time" />
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_hr_vacancy_control_form">
+        <field name="name">Справочник контроля обработки вакансий - форма</field>
+        <field name="model">hr.vacancy.control</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Справочник - Контроль обработки вакансий">
+                <group col="6" colspan="4">
+                    <field name="state" />
+                    <field name="time_type" />
+                    <field name="time" />
+                    <newline />
+                    <field name="message" colspan="6" />
+                    <newline />
+                    <field name="send_to" />
+                    <field name="users" colspan="3" attrs="{'invisible':[('send_to','!=','users')],'required':[('send_to','=','users')]}" />
+                </group>
+            </form>
+        </field>
+    </record>
+    
+      <record model="ir.actions.act_window" id="window_case_catvacancy">
+            <field name="name">Заявки на вакансию</field>
+            <field name="res_model">hr.vacancy</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_hr_vacancy_tree"/>
+            <field name="search_view_id" ref="view_hr_vacancy_search_filter"/>
+            <field name="help">Заявки на открытие вакансий на должности в компании</field>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_hr_vacancy_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_hr_vacancy_tree"/>
+            <field name="act_window_id" ref="window_case_catvacancy"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_hr_vacancy_form_view">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_hr_vacancy_form"/>
+            <field name="act_window_id" ref="window_case_catvacancy"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_case_catvacancy_stage">
+            <field name="name">Справочник причин возникновения вакансий</field>
+            <field name="res_model">hr.vacancy.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_hr_vacancy_stage_tree"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_hr_vacancy_stage_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_hr_vacancy_stage_tree"/>
+            <field name="act_window_id" ref="window_case_catvacancy_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_hr_vacancy_stage_form_view">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_hr_vacancy_stage_form"/>
+            <field name="act_window_id" ref="window_case_catvacancy_stage"/>
+        </record>
+        
+        <record model="ir.actions.act_window" id="window_hr_vacancy_control">
+            <field name="name">Справочник контроля обработки заявок</field>
+            <field name="res_model">hr.vacancy.control</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_hr_vacancy_control_tree" />
+        </record>
+        
+        <menuitem id="hr_vacancy.menu_vacancy_control" name="Справочник контроля" parent="hr.menu_hr_management" action="window_hr_vacancy_control" sequence="1"/>
+
+    <menuitem
+            name="Вакансии"
+            parent="base.menu_crm_case_job_req_main"
+            id="menu_crm_case_catvacancy" action="window_case_catvacancy" groups="base.sup_group_hr_vacancy,base.hrsup_group_hr_vacancy,base.valid_group_hr_vacancy,base.recruit_group" sequence="8"/>
+    <menuitem id="hr_vacancy.menu_vacancy_stage" name="Справочник для вакансий" parent="hr.menu_hr_management" groups="base.group_system" action="window_case_catvacancy_stage" sequence="8"/>
+    </data>
+</openerp>

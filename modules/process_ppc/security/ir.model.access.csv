@@ -1,0 +1,4 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"process_ppc_user","process_ppc user","model_process_ppc","base.group_user",1,1,1,0
+"process_ppc_access_user","process_ppc_access user","model_process_ppc_access","base.group_user",1,1,1,0
+"process_ppc_advertising_user","process_ppc_advertising user","model_process_ppc_advertising","base.group_user",1,1,1,0

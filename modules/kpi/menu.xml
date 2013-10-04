@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- Основное меню -->
+        <menuitem parent="hr.menu_hr_root" name="KPI" sequence="10" id="menu_hr_kpi_root" groups="base.group_user"/>
+
+        <menuitem name="Денежные вопросы" sequence="10" parent="menu_hr_kpi_root" id="menu_kpi_money" groups="kpi.hr_kpi"/>
+        <menuitem name="Справочники" sequence="11" parent="menu_hr_kpi_root" id="menu_kpi_settings" groups="kpi.hr_kpi"/>
+
+        <menuitem parent="menu_hr_kpi_root" name="KPI" sequence="1" id="menu_kpi_kpi" action="action_kpi_kpi" groups="base.group_user"/>
+        <menuitem parent="menu_hr_kpi_root" name="SMART-задачи" sequence="2" id="menu_kpi_smart" action="action_kpi_smart" groups="base.group_user"/>
+        <menuitem parent="menu_hr_kpi_root" name="Экспертная оценка" sequence="3" id="menu_hr_kpi_ea" action="action_kpi_expert_assesment" groups="base.group_user"/>
+        <menuitem parent="menu_hr_kpi_root" name="KPI Сводный список" sequence="4" id="menu_hr_kpi_kpi_hr" action="action_kpi_hr" groups="kpi.hr_kpi"/>
+
+        <menuitem parent="menu_hr_kpi_root" name="Получить файл" sequence="5" id="menu_print_income_report" action="action_print_income_report" groups="kpi.hr_kpi" />
+
+        <!-- Денежные вопросы -->
+        <menuitem parent="menu_kpi_money" name="Зачисление официальной ЗП" sequence="1" id="menu_kpi_enrollment" action="action_kpi_enrollment" groups="account.group_account_user"/>
+        <menuitem parent="menu_kpi_money" name="Налог с официальной ЗП" sequence="2" id="menu_kpi_tax" action="action_kpi_tax" groups="account.group_account_user"/>
+        <menuitem parent="menu_kpi_money" name="Аванс" sequence="3" id="menu_kpi_advance" action="action_kpi_advance" groups="account.group_account_user"/>
+        <menuitem parent="menu_kpi_money" name="Удержания" sequence="4" id="menu_kpi_retention" action="action_kpi_retention" groups="kpi.hr_kpi"/>
+        <menuitem parent="menu_kpi_money" name="Премии" sequence="5" id="menu_kpi_award" action="action_kpi_award"/>
+
+        <!-- Справочники -->
+        <menuitem parent="menu_kpi_settings" name="Справочник показателей" sequence="6" id="menu_hr_kpi_indicators" action="action_kpi_indicators" groups="kpi.hr_kpi"/>
+        <menuitem parent="menu_kpi_settings" name="Периоды" sequence="7" id="menu_hr_kpi_period" action="action_kpi_period" groups="kpi.hr_kpi"/>
+        <menuitem parent="menu_kpi_settings" name="Грейды и категории" sequence="8" id="menu_hr_kpi_grade" action="action_kpi_grade" groups="kpi.hr_kpi" />
+        <menuitem parent="menu_kpi_settings" name="История изменения грейдов" sequence="9" id="menu_hr_kpi_grade_history" action="action_kpi_grade_history" groups="base.group_extended" />
+    </data>
+</openerp>

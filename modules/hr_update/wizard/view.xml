@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="wizard_grade" model="ir.ui.view">
+            <!--наименование формы, обращение к виртуальной таблице визарда, тип документа-->
+            <field name="name">grade.wizard.form</field>
+            <field name="model">grade.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <!--обявление самой формы-->
+                <form string="Изменение грейда">
+                    <field name="history_date" colspan="4" on_change="get_period(history_date, employee_id)"/>
+                    <!--поля взятые из сущьности виртуальной таблицы модели-->
+                    <group colspan="2" col="2">
+                        <field name="grade_id"/>
+                        <field name="dy_cash" attrs="{'invisible': [('grade_id', '!=', 46)]}" />
+                    </group>
+                    <group colspan="2" col="2">
+                        <field name="next_grade_id"/>
+                        <field name="next_dy_cash" attrs="{'invisible': [('next_grade_id', '!=', 46)]}"/>
+                    </group>
+
+                    <field name="employee_id" invisible='1'/>
+                    <group colspan="4">
+                        <!--кнопки в которых описывается поведение. Они либо стандартны либо завязаны на выхове метода описанного в модели-->
+                        <button string="Cancel" special="cancel" icon="gtk-cancel"/>
+                        <button string="Сохранить" name="save_grade_date" type="object" icon="STOCK_EDIT" />
+                    </group>
+                </form>
+            </field>
+        </record>
+<!--id уникальный ключ не отыгрывает роль. Action нужен для инициализации саомой формы а не обработки событий на ней-->
+        <record id="action_grade_wizard" model="ir.actions.act_window">
+            <!--название визарда-->
+            <field name="name">Grade</field>
+            <!--сылка на модель то есть саму виртуальную таблицу(сущьность) визарда-->
+            <field name="res_model">grade.wizard</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <!--види отображений (tree, form и т.д.)-->
+            <field name="view_mode">form</field>
+            <!--способ открытия нашей формы, либо диалог либо попап-->
+            <field name="target">new</field>
+        </record>
+   </data>
+</openerp>

@@ -1,0 +1,564 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- KPI -->
+        <record model="ir.ui.view" id="view_kpi_kpi_form">
+            <field name="name">kpi.kpi.form</field>
+            <field name="model">kpi.kpi</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="KPI" >
+                    <group colspan="4" col="6">
+                        <field name="check_e"/>
+                        <field name="check_h"/>
+                        <field name="check_r"/>
+                        <field name="id" invisible="1" />
+                        <field name="formalized" invisible="1" />
+                    </group>
+                    <group colspan="4" attrs="{'readonly':
+                        [ '|', '|',
+                        '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
+                        '&amp;', ('check_h', '=', False), ('state', 'in', ('waiting' ,'planned_revision', 'passed', 'agreed_revision')),
+                        '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
+                        ]}">
+                        <field name="employee_id" />
+                        <field name="parent_id" />
+                        <field name="job_id" />
+                        <field name="create_date" />
+                        <field name="period_id"
+                               domain="[('calendar', '=', calendar)]"
+                               on_change="change_period(employee_id, period_id, calendar)"
+                               attrs="{'readonly': [('id', '!=', False), ('state', '!=', 'draft')]}"
+                                />
+                        <field name="calendar" on_change="change_calendar(calendar, period_id)" />
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Ключевые показатели">
+                            <field name="mbo_ids" colspan="4" nolabel="1" mode="tree" attrs="{'readonly':
+                                [ '|', '|',
+                                '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
+                                '&amp;', ('check_h', '=', False), ('state', 'in', ('waiting' ,'planned_revision', 'passed', 'agreed_revision')),
+                                '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
+                                ]}">
+                                <tree editable="top" string="Ключевые показатели">
+                                    <field name="name" domain="[('type', '=', 'mbo')]"/>
+                                    <field name="units" string="Е.И."/>
+                                    <field name="weight" sum="Сумма"/>
+                                    <field name="previous_period"/>
+                                    <field name="plan" attrs="{'readonly': [('name', 'in', (5, 6))]}"/>
+                                    <field name="fact" attrs="{'readonly': [('name', 'in', (5, 6))]}"/>
+                                    <field name="percentage"/>
+                                    <field name="mbo" sum="Сумма"/>
+                                </tree>
+                            </field>
+                            <field name="without_mbo" on_change="change_mbo(without_mbo)" attrs="{'readonly': [('check_h', '=', False)]}"/>
+                            <field name="total_mbo" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)"/>
+                        </page>
+                        <page string="SMART-задачи">
+                            <field nolabel="1" name="smart_ids" colspan="4" context="{'responsible_id': employee_id}" attrs="{'readonly':
+                                [ '|', '|',
+                                '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
+                                '&amp;', ('check_h', '=', False), ('state', 'in', ('waiting' ,'planned_revision', 'passed', 'agreed_revision')),
+                                '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
+                                ]}">
+                                <tree string="SMART-задачи" colors="red:color=='red';orange:color=='yellow';green:color=='green';gray:color=='gray'">
+                                    <field name="color" invisible="1" />
+                                    <field name="check_a" invisible="1" />
+                                    <field name="check_i" invisible="1" />
+                                    <field name="check_r" invisible="1" />
+                                    <field name="check_m" invisible="1" />
+                                    <field name="check_e" invisible="1" />
+
+                                    <field name="nbr" />
+                                    <field name="name" />
+                                    <field name="deadline_date"/>
+
+                                    <field name="state"/>
+
+                                    <!-- draft, agreement, revision -> cancel -->
+                                    <button string="Отмена"
+                                            name="action_cancel"
+                                            type="workflow"
+                                            icon="gtk-cancel"
+                                            attrs="{'invisible': [
+                                                '&amp;', '|', ('state', 'not in', ('draft', 'revision')), ('check_a', '=', False),
+                                                '|', ('state', '!=', 'agreement'), ('check_m', '=', False)
+                                                ]
+                                                }"
+                                            />
+
+                                    <!-- cancel -> draft -->
+                                    <button string="Черновик"
+                                            name="action_draft"
+                                            type="workflow"
+                                            icon="gtk-go-forward"
+                                            attrs="{'invisible': ['|', ('state', '!=', 'cancel'), ('check_a', '=', False)]}"
+                                            />
+
+                                    <!-- draft,revision -> agreement -->
+                                    <button string="На согласование"
+                                            name="action_agreement"
+                                            type="workflow"
+                                            icon="gtk-go-forward"
+                                            attrs="{'invisible': ['&amp;',
+                                                 '|', ('state', '!=', 'revision'), ('check_a', '=', False),
+                                                 '|', ('state', '!=', 'draft'), '|', ('check_e', '=', True), ('check_a', '=', False)
+                                                 ]}"
+                                            />
+
+                                    <!-- agreement -> revision -->
+                                    <button string="На доработку"
+                                            name="action_revision"
+                                            type="workflow"
+                                            icon="gtk-go-back"
+                                            attrs="{'invisible': ['|', ('state', '!=', 'agreement'), ('check_m', '=', False)]}"
+                                            />
+
+                                    <!-- draft, agreement -> inwork -->
+                                    <button string="Задача поставлена"
+                                            name="action_inwork"
+                                            type="workflow"
+                                            icon="gtk-go-forward"
+                                            attrs="{'invisible': ['&amp;',
+                                                 '|', ('state', '!=', 'agreement'), ('check_m', '=', False),
+                                                 '|', ('state', '!=', 'draft'), '|', ('check_e', '=', False), ('check_a', '=', False)
+                                                 ]}"
+                                            />
+
+                                    <!-- inwork -> removed -->
+                                    <button string="Задача снята"
+                                            name="action_removed"
+                                            type="workflow"
+                                            icon="gtk-cancel"
+                                            attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_i', '=', False)]}"
+                                            />
+
+                                    <!-- inwork -> transfer -->
+                                    <button string="Задача перенесена"
+                                            name="action_transfer"
+                                            type="workflow"
+                                            icon="terp-stock_effects-object-colorize"
+                                            attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_i', '=', False)]}"
+                                            />
+
+                                    <!-- inwork -> delegated -->
+                                    <button string="Задача делегирована"
+                                            name="action_delegated"
+                                            type="workflow"
+                                            icon="terp-personal+"
+                                            context="{'delegate': True}"
+                                            attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_r', '=', False)]}"
+                                            />
+
+                                    <!-- inwork,delegated -> done -->
+                                    <button string="Задача выполнена"
+                                            name="action_done"
+                                            type="workflow"
+                                            icon="gtk-go-forward"
+                                            attrs="{'invisible': ['|', ('state', 'not in', ('inwork', 'delegated')), ('check_r', '=', False)]}"
+                                            />
+
+                                    <!-- done -> accepted -->
+                                    <button string="Задача принята"
+                                            name="action_accepted"
+                                            type="workflow"
+                                            icon="gtk-yes"
+                                            attrs="{'invisible': ['|', ('state', '!=', 'done'), ('check_i', '=', False)]}"
+                                            />
+
+                                    <!-- done -> not_accepted -->
+                                    <button string="Задача не принята"
+                                            name="action_not_accepted"
+                                            type="workflow"
+                                            icon="gtk-no"
+                                            attrs="{'invisible': ['|', ('state', '!=', 'done'), ('check_i', '=', False)]}"
+                                            />
+
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Рабочие дни">
+                            <group attrs="{'readonly':
+                                [ '|', '|',
+                                '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
+                                '&amp;', ('check_h', '=', False), ('state', 'in', ('waiting' ,'planned_revision', 'passed', 'agreed_revision')),
+                                '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
+                                ]}">
+                                <field name="work_days_1" on_change="change_days(period_id, employee_id, fact_days)" readonly="1" />
+                                <field name="schedule" attrs="{'readonly': [('check_h', '=', False)]}" />
+                                <field name="night_work" attrs="{'invisible': [('job_id', 'not in', (26, 107, 208, 75))], 'readonly':
+                                [ '|', '|',
+                                '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
+                                '&amp;', ('check_h', '=', False), ('state', 'in', ('waiting' ,'planned_revision', 'passed', 'agreed_revision')),
+                                '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
+                                ]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)" />
+                                <field name="weekend_work" attrs="{'invisible': [('job_id', 'not in', (26, 107, 208, 75))], 'readonly':
+                                [ '|', '|',
+                                '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
+                                '&amp;', ('check_h', '=', False), ('state', 'in', ('waiting' ,'planned_revision', 'passed', 'agreed_revision')),
+                                '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
+                                ]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)" />
+                                <field name="fact_days" on_change="change_days(period_id, employee_id, fact_days)"  attrs="{'readonly':
+                                [ '|', '|',
+                                '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
+                                '&amp;', ('check_h', '=', False), ('state', 'in', ('waiting' ,'planned_revision', 'passed', 'agreed_revision')),
+                                '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
+                                ]}"/>
+                                <field name="holidays" readonly="1" />
+                                <field name="days" readonly="1" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)" />
+                            </group>
+                        </page>
+                        <page string="Экспертная оценка">
+                            <field colspan="4" name="experts_ids" nolabel="1" attrs="{'readonly': [('check_h', '=', False)]}">
+                                <tree string="Экспертные оценки">
+                                    <field name="name" readonly="True"/>
+                                    <field name="job_id" readonly="True"/>
+                                </tree>
+                            </field>
+
+                            <field colspan="4" name="expert_assesments" nolabel="1" mode="tree" attrs="{'readonly': [('check_h', '=', False)]}">
+                                <tree string="Экспертная оценка">
+                                    <field name="state"/>
+                                    <field name="expert_id"/>
+                                    <field name="employee_id"/>
+                                    <field name="period_id" />
+
+                                    <field name="client"/>
+                                    <field name="client_comments"/>
+
+                                    <field name="standards"/>
+                                    <field name="standards_comments" />
+
+                                    <field name="quality"/>
+                                    <field name="quality_comments"/>
+
+                                    <field name="mean"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Партнеры" attrs="{'invisible': [('job_id', 'not in', (28, 65, 10, 202, 208, 75, 51, 118, 37, 70, 190, 119, 120, 150, 36, 66, 38, 110, 138, 148, 158, 159, 160, 161, 162, 73))]}">
+                            <group col="6" colspan="4" attrs="{'readonly':
+                                [ '|', '|',
+                                '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
+                                '&amp;', ('check_h', '=', False), ('state', 'in', ('waiting' ,'planned_revision', 'passed', 'agreed_revision')),
+                                '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
+                                ]}">
+                                <field name="partners_prev" />
+                                <field name="partners" />
+                                <field name="partners_canceled" />
+                            </group>
+                        </page>
+                        <page string="SLA">
+                            <field name="sla_ids" colspan="4" nolabel="1" mode="tree" attrs="{'readonly':
+                                    [ '|', '|',
+                                    '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
+                                    '&amp;', ('check_h', '=', False), ('state', 'in', ('waiting' ,'planned_revision', 'passed', 'agreed_revision')),
+                                    '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
+                                    ]}">
+                                <tree editable="top" string="SLA">
+                                    <field name="name" domain="[('type', '=', 'sla')]"/>
+                                    <field name="units" string="Е.И."/>
+                                    <field name="weight" sum="Сумма"/>
+                                    <field name="previous_period"/>
+                                    <field name="plan" attrs="{'readonly': [('name', 'in', (5, 6))]}"/>
+                                    <field name="fact" attrs="{'readonly': [('name', 'in', (5, 6))]}"/>
+                                    <field name="percentage"/>
+                                    <field name="mbo" sum="Сумма"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="SLA - 2" attrs="{'invisible': [('job_id', 'not in', (21, 124))]}">
+                            <field name="sla2_ids" colspan="4" nolabel="1" mode="tree" attrs="{'readonly':
+                                    [ '|', '|',
+                                    '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
+                                    '&amp;', ('check_h', '=', False), ('state', 'in', ('waiting' ,'planned_revision', 'passed', 'agreed_revision')),
+                                    '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
+                                    ]}"
+                                    >
+                                <tree editable="top" string="SLA - 2">
+                                    <field name="site" />
+                                    <field name="name" domain="[('type', '=', 'sla-2')]"/>
+                                    <field name="units" string="Е.И."/>
+                                    <field name="previous_period"/>
+                                    <field name="plan"/>
+                                    <field name="fact"/>
+                                    <field name="percentage"/>
+                                    <field name="mbo" avg="Среднее"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="SLA по структуре продаж" attrs="{'invisible': [('employee_id', 'not in', (10, 18, 618))]}">
+                            <field name="sla_sale_ids" colspan="4" nolabel="1" mode="tree" attrs="{'readonly':
+                                    [ '|', '|',
+                                    '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
+                                    '&amp;', ('check_h', '=', False), ('state', 'in', ('waiting' ,'planned_revision', 'passed', 'agreed_revision')),
+                                    '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
+                                    ]}">
+                                <tree editable="top" string="SLA по структуре продаж">
+                                    <field name="name" domain="[('type', '=', 'sale')]"/>
+                                    <field name="units" string="Е.И."/>
+                                    <field name="weight" sum="Сумма"/>
+                                    <field name="plan" attrs="{'readonly': [('name', 'in', (5, 6))]}"/>
+                                    <field name="fact" attrs="{'readonly': [('name', 'in', (5, 6))]}"/>
+                                    <field name="percentage"/>
+                                    <field name="mbo" sum="Сумма"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Расчет ЗП">
+                            <group colspan="4" col="4">
+                                <field name="upsale_employment" attrs="{'readonly':
+                                [ '|', '|',
+                                '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
+                                '&amp;', ('check_h', '=', False), ('state', 'in', ('waiting' ,'planned_revision', 'passed', 'agreed_revision')),
+                                '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
+                                ]}"/>
+                                <field name="ink_employment" attrs="{'readonly':
+                                [ '|', '|',
+                                '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
+                                '&amp;', ('check_h', '=', False), ('state', 'in', ('waiting' ,'planned_revision', 'passed', 'agreed_revision')),
+                                '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
+                                ]}"/>
+                            </group>
+                            <group colspan="4" col="4" >
+                                <group colspan="2">
+                                    <field name="grade" colspan="4" readonly="1"/>
+                                    <field name="grade_cash" colspan="4" attrs="{'readonly': ['|', ('grade', '!=', False), ('grade', '!=', 46)]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)"/>
+
+                                    <field name="cash_night" colspan="4" attrs="{'invisible': [('job_id', 'not in', (26, 107, 208, 75))]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)" />
+                                    <field name="cash_weekend" colspan="4" attrs="{'invisible': [('job_id', 'not in', (26, 107, 208, 75))]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)" />
+
+                                    <field name="sv" colspan="4" attrs="{'readonly': [('check_h', '=', False)]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)" />
+                                </group>
+                                <group colspan="2">
+                                    <field name="salary" readonly="1" />
+                                    <field name="variable" readonly="1" />
+                                </group>
+                                <separator string="Совокупный доход" colspan="4" />
+                                <field name="total" readonly="1" colspan="4"  nolabel="1" on_change="change_pay(total, retention, advance, formal_cash, award)"  />
+                                <label string="Совокупный доход = окладная часть * (количество отработанных дней для расчета ЗП / рабочие дни в отчетном периоде) + переменная часть * mbo + (работа в ночные смены.КЦ + работа в выходные.КЦ)" colspan="4"/>
+                                <separator colspan="4" />
+                            </group>
+                            <group colspan="4" col="6">
+                                <group colspan="2">
+                                    <field name="award" colspan="4" on_change="change_pay(total, retention, advance, formal_cash, formal_tax, award)" />
+                                    <field name="retention" colspan="4" on_change="change_pay(total, retention, advance, formal_cash, formal_tax, award)"  />
+                                    <field name="advance" colspan="4" on_change="change_pay(total, retention, advance, formal_cash, formal_tax, award)"  />
+                                </group>
+                                <group colspan="2">
+                                    <field name="formal_cash" colspan="4" attrs="{'invisible': [('formalized', '=', False)]}" on_change="change_pay(total, retention, advance, formal_cash, award)"  />
+                                    <field name="formal_tax" colspan="4" attrs="{'invisible': [('formalized', '=', False)]}" />
+                                </group>
+                                <newline />
+                                <separator string="Сумма к зачислению" colspan="6" />
+                                <field name="total_pay" colspan="6" nolabel="1" />
+                                <label string="Сумма к зачислению(помимо официальной ЗП) = совокупный доход + премия - удержания - аванс - официальная ЗП - налог с официальной ЗП" colspan="6"/>
+                            </group>
+                        </page>
+                        <page string="Дополнительно">
+                            <group colspan="4">
+                                <separator string="Комментарии"/>
+                                <field name="comment" colspan="4" nolabel="1" />
+                                <field name="attachment_ids" nolabel="1" colspan="4" widget="one2many_list">
+                                    <tree string="Вложения" colors="blue:type in ('url',)">
+                                        <field name="datas_fname"/>
+                                        <field name="create_date"/>
+                                        <field name="user_id"/>
+                                        <field name="type" groups="base.group_extended"/>
+                                    </tree>
+                                </field>
+
+                                <field name="history_ids" nolabel="1" colspan="4" readonly="1">
+                                    <tree string="История переходов">
+                                        <field name="state"/>
+                                        <field name="usr_id" />
+                                        <field name="create_date" />
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+
+                    <group colspan="4">
+                        <field name="state"
+                               widget="statusbar"
+                               statusbar_visible="draft,waiting,planned,passed,agreed,saved"
+                               statusbar_colors='{"cancel":"gray"}'
+                                />
+                        <newline />
+                        <!-- cancel, waiting -> draft -->
+                        <button name="action_draft"
+                                icon="terp-document-new"
+                                string="Черновик"
+                                attrs="{'invisible': ['|', ('state', 'not in', ('cancel', 'waiting')), ('check_e', '=', False)]}"
+                                />
+
+                        <!-- draft, waiting_revision -> waiting -->
+                        <button name="action_waiting"
+                                icon="gtk-go-forward"
+                                string="На утверждение планов"
+                                attrs="{'invisible': ['|', ('state', 'not in', ('draft', 'waiting_revision')), ('check_e', '=', False)]}"
+                                />
+                        <!-- planned -> waiting -->
+                        <button name="action_waiting"
+                                icon="gtk-go-back"
+                                string="Отмена действия"
+                                attrs="{'invisible': ['|', ('state', '!=', 'planned'), ('check_r', '=', False)]}"
+                                />
+
+                        <!-- waiting -> waiting_revision -->
+                        <button name="action_waiting_revision"
+                                icon="terp-gtk-media-pause"
+                                string="На доработку"
+                                attrs="{'invisible': ['|', ('state', '!=', 'waiting'), ('check_h', '=', False)]}"
+                                />
+
+                        <!-- waiting, planned_reversion -> planned -->
+                        <button name="action_planned"
+                                icon="gtk-go-forward"
+                                string="Утвердить планы на месяц"
+                                attrs="{'invisible': ['|', ('state', 'not in', ('waiting', 'planned_revision')), ('check_h', '=', False)]}"
+                                />
+
+                        <!-- passed -> planned -->
+                        <button name="action_planned"
+                                icon="gtk-go-back"
+                                string="Отмена действия"
+                                attrs="{'invisible': ['|', ('state', '!=', 'passed'), ('check_e', '=', False)]}"
+                                />
+
+                        <!-- planned -> planned_reversion-->
+                        <button name="action_planned_revision"
+                                icon="terp-gtk-media-pause"
+                                string="На доработку"
+                                attrs="{'invisible': ['|', ('state', '!=', 'planned'), ('check_e', '=', False)]}"
+                                />
+
+                        <!-- planned, passed_reversion -> passed-->
+                        <button name="action_passed"
+                                icon="gtk-go-forward"
+                                string="Сдать руководителю"
+                                attrs="{'invisible': ['|', ('state', 'not in', ('planned', 'passed_revision')), ('check_e', '=', False)]}"
+                                />
+
+                        <!-- agreed -> passed -->
+                        <button name="action_passed"
+                                icon="gtk-go-back"
+                                string="Отмена действия"
+                                attrs="{'invisible': ['|', ('state', '!=', 'agreed'), ('check_e', '=', False)]}"
+                                />
+
+                        <!-- passed -> passed_reversion-->
+                        <button name="action_passed_revision"
+                                icon="terp-gtk-media-pause"
+                                string="На доработку"
+                                attrs="{'invisible': ['|', ('state', '!=', 'passed'), ('check_h', '=', False)]}"
+                                />
+
+                        <!-- passed, agreed_revision -> agreed -->
+                        <button name="action_agreed"
+                                icon="gtk-go-forward"
+                                string="Утвердить"
+                                attrs="{'invisible': ['|', ('state', 'not in', ('passed', 'agreed_revision')), ('check_h', '=', False)]}"
+                                />
+
+                        <!-- saved -> agreed -->
+                        <button name="action_agreed"
+                                icon="gtk-go-back"
+                                string="Утвердить"
+                                attrs="{'invisible': ['|', ('state', '!=', 'saved'), ('check_r', '=', False)]}"
+                                />
+
+                        <!-- agreed -> agreed_revision -->
+                        <button name="action_agreed_revision"
+                                icon="terp-gtk-media-pause"
+                                string="На доработку"
+                                attrs="{'invisible': ['|', ('state', '!=', 'agreed'), ('check_r', '=', False)]}"
+                                />
+
+                        <!-- agreed -> saved -->
+                        <button name="action_saved"
+                                icon="gtk-go-forward"
+                                string="Сохранить"
+                                attrs="{'invisible': ['|', ('state', '!=', 'agreed'), ('check_r', '=', False)]}"
+                                />
+
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_kpi_tree">
+            <field name="name">kpi.kpi.tree</field>
+            <field name="model">kpi.kpi</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="KPI">
+                    <field name="name" invisible="1"/>
+                    <field name="employee_id"/>
+                    <field name="period_id"/>
+                    <field name="parent_id"/>
+                    <field name="job_id"/>
+                    <field name="calendar"/>
+                    <field name="state"/>
+
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_kpi_search">
+            <field name="name">kpi.kpi.search</field>
+            <field name="model">kpi.kpi</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="period_id" domain="[('calendar', '=', 'rus')]" />
+                    <field name="calendar" groups="base.group_extended" />
+                    <field name="job_id"/>
+                    <field name="employee_id" >
+                        <filter icon="terp-personal"
+                                string="Мои KPI"
+                                domain="[('employee_id.user_id','=',uid)]"/>
+                    </field>
+                    <field name="parent_id" >
+                        <filter icon="terp-personal"
+                                string="Моих сотрудников"
+                                help="KPI в которых я руководитель"
+                                domain="[('parent_id.user_id','=',uid)]"/>
+                    </field>
+                    <field name="state"/>
+                    <newline />
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Период" icon="terp-calendar" context="{'group_by': 'period_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Статус" icon="terp-calendar" context="{'group_by': 'state'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Сотрудник" icon="terp-personal" context="{'group_by': 'employee_id'}"/>
+                        <filter string="Руководитель" icon="terp-personal" context="{'group_by': 'parent_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_kpi_kpi">
+            <field name="name">KPI</field>
+            <field name="res_model">kpi.kpi</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="auto_refresh">1</field>
+            <field name="view_id" ref="view_kpi_kpi_tree"/>
+            <field name="search_view_id" ref="view_kpi_kpi_search"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_kpi_hr">
+            <field name="name">KPI</field>
+            <field name="res_model">kpi.kpi</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_kpi_kpi_tree"/>
+            <field name="search_view_id" ref="view_kpi_kpi_search"/>
+            <field name="domain">[('state','in',('planned','agreed','saved'))]</field>
+        </record>
+
+    </data>
+</openerp>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+        <record id="support_inksystem.supp_manager" model="res.groups">
+            <field name="name">Supp.sale / Supervisor</field>
+        </record>
+        <record id="support_inksystem.supp_admin_manager" model="res.groups">
+            <field name="name">Supp.sale / Admin</field>
+        </record>
+        <record id="support_inksystem.supp_users" model="res.groups">
+            <field name="name">Supp.sale / User</field>
+        </record>
+    </data>
+</openerp>

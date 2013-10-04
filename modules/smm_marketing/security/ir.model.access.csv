@@ -1,0 +1,5 @@
+﻿"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_smm_manager_smm_socialnet","smm.socialnet smm_manager","model_smm_socialnet","base.smm_manager",1,1,1,0
+"access_smm_admin_manager_smm_socialnet","smm.socialnet smm_admin_manager","model_smm_socialnet","base.smm_admin_manager",1,1,1,1
+"access_smm_admin_manager_smm_socialnet_right_stage","smm.socialnet.right.stage smm_admin_manager","model_smm_socialnet_right_stage","base.smm_admin_manager",1,1,1,1
+"access_smm_admin_manager_smm_socialnet_stage","smm_socialnet_stage smm_admin_manager","model_smm_socialnet_right_stage","base.smm_admin_manager",1,1,1,1

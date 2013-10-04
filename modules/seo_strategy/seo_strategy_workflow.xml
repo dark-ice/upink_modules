@@ -1,0 +1,187 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="workflow" id="wkf_seo_strategys">
+            <field name="name">seo.strategys.seo_strategys</field>
+            <field name="osv">seo.strategys</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- draft -->
+        <record model="workflow.activity" id="act_in_draft">
+            <field name="wkf_id" ref="wkf_seo_strategys" />
+            <field name="flow_start">True</field>
+            <field name="name">черновик</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='draft')</field>
+        </record>
+
+        <!-- approval_application_start -->
+        <record model="workflow.activity" id="act_approval_application_start">
+            <field name="wkf_id" ref="wkf_seo_strategys" />
+            <field name="name">согласование заявки на запуск</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='approval_application_start')</field>
+        </record>
+
+        <!-- appointment_responsible -->
+        <record model="workflow.activity" id="act_appointment_responsible">
+            <field name="wkf_id" ref="wkf_seo_strategys" />
+            <field name="name">назначение ответственного</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='appointment_responsible')</field>
+        </record>
+
+        <!-- preparation_strategy -->
+        <record model="workflow.activity" id="act_preparation_strategy">
+            <field name="wkf_id" ref="wkf_seo_strategys" />
+            <field name="name">составление стратегии</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='preparation_strategy')</field>
+        </record>
+
+        <!-- adoption_strategy -->
+        <record model="workflow.activity" id="act_adoption_strategy">
+            <field name="wkf_id" ref="wkf_seo_strategys" />
+            <field name="name">утверждение стратегии</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='adoption_strategy')</field>
+        </record>
+
+        <!-- completion_strategy -->
+        <record model="workflow.activity" id="act_completion_strategy">
+            <field name="wkf_id" ref="wkf_seo_strategys" />
+            <field name="name">доработка стратегии</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='completion_strategy')</field>
+        </record>
+
+        <!-- appointment_executive -->
+        <record model="workflow.activity" id="act_appointment_executive">
+            <field name="wkf_id" ref="wkf_seo_strategys" />
+            <field name="name">назначение исполнителя</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='appointment_executive')</field>
+        </record>
+
+        <!-- implementation_strategy -->
+        <record model="workflow.activity" id="act_implementation_strategy">
+            <field name="wkf_id" ref="wkf_seo_strategys" />
+            <field name="name">реализация стратегии</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='implementation_strategy')</field>
+        </record>
+
+        <!-- strategy_analysis -->
+        <record model="workflow.activity" id="act_strategy_analysis">
+            <field name="wkf_id" ref="wkf_seo_strategys" />
+            <field name="name">анализ стратегии</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='strategy_analysis')</field>
+        </record>
+
+        <!-- closed -->
+        <record model="workflow.activity" id="act_closed">
+            <field name="wkf_id" ref="wkf_seo_strategys" />
+            <field name="name">работы закончены</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='closed')</field>
+            <field name="flow_stop">True</field>
+        </record>
+
+
+        <!-- draft -> approval_application_start -->
+        <record model="workflow.transition" id="d_aas">
+            <field name="act_from" ref="act_in_draft"/>
+            <field name="act_to" ref="act_approval_application_start"/>
+            <field name="signal">action_d_ass</field>
+        </record>
+
+        <!-- approval_application_start -> appointment_responsible -->
+        <record model="workflow.transition" id="aas_ar">
+            <field name="act_from" ref="act_approval_application_start" />
+            <field name="act_to" ref="act_appointment_responsible" />
+            <field name="signal">action_aas_ar</field>
+        </record>
+
+        <!-- appointment_responsible -> preparation_strategy -->
+        <record model="workflow.transition" id="ar_ps">
+            <field name="act_from" ref="act_appointment_responsible" />
+            <field name="act_to" ref="act_preparation_strategy" />
+            <field name="signal">action_ar_ps</field>
+        </record>
+
+        <!-- preparation_strategy -> adoption_strategy -->
+        <record model="workflow.transition" id="ps_as">
+            <field name="act_from" ref="act_preparation_strategy" />
+            <field name="act_to" ref="act_adoption_strategy" />
+            <field name="signal">action_ps_as</field>
+        </record>
+
+        <!-- adoption_strategy -> completion_strategy -->
+        <record model="workflow.transition" id="as_cs">
+            <field name="act_from" ref="act_adoption_strategy" />
+            <field name="act_to" ref="act_completion_strategy" />
+            <field name="signal">action_as_cs</field>
+        </record>
+
+        <!-- completion_strategy -> adoption_strategy -->
+        <record model="workflow.transition" id="cs_as">
+            <field name="act_from" ref="act_completion_strategy" />
+            <field name="act_to" ref="act_adoption_strategy" />
+            <field name="signal">action_cs_as</field>
+        </record>
+
+        <!-- adoption_strateg -> appointment_executive -->
+        <record model="workflow.transition" id="as_ae">
+            <field name="act_from" ref="act_adoption_strategy" />
+            <field name="act_to" ref="act_appointment_executive" />
+            <field name="signal">action_as_ae</field>
+        </record>
+
+        <!-- appointment_executive -> implementation_strategy -->
+        <record model="workflow.transition" id="ae_is">
+            <field name="act_from" ref="act_appointment_executive" />
+            <field name="act_to" ref="act_implementation_strategy" />
+            <field name="signal">action_ae_is</field>
+        </record>
+
+        <!-- implementation_strategy -> strategy_analysis -->
+        <record model="workflow.transition" id="is_sa">
+            <field name="act_from" ref="act_implementation_strategy" />
+            <field name="act_to" ref="act_strategy_analysis" />
+            <field name="signal">action_is_sa</field>
+        </record>
+
+        <!-- strategy_analysis -> preparation_strategy -->
+        <record model="workflow.transition" id="sa_ps">
+            <field name="act_from" ref="act_strategy_analysis" />
+            <field name="act_to" ref="act_preparation_strategy" />
+            <field name="signal">action_sa_ps</field>
+        </record>
+
+        <!-- strategy_analysis -> implementation_strategy -->
+        <record model="workflow.transition" id="sa_is">
+            <field name="act_from" ref="act_strategy_analysis" />
+            <field name="act_to" ref="act_implementation_strategy" />
+            <field name="signal">action_sa_is</field>
+        </record>
+
+        <!-- implementation_strategy -> closed -->
+        <record model="workflow.transition" id="is_c">
+            <field name="act_from" ref="act_implementation_strategy" />
+            <field name="act_to" ref="act_closed" />
+            <field name="signal">action_is_c</field>
+        </record>
+
+        <!-- strategy_analysis -> closed -->
+        <record model="workflow.transition" id="sa_c">
+            <field name="act_from" ref="act_strategy_analysis" />
+            <field name="act_to" ref="act_closed" />
+            <field name="signal">action_sa_c</field>
+        </record>
+
+
+    </data>
+</openerp>

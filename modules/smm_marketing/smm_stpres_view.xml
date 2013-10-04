@@ -1,0 +1,225 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+  #---- Tree Articles and Press Releases
+    <record model="ir.ui.view" id="view_smm_stpres_tree">
+        <field name="name">Articles and Press Releases</field>
+        <field name="model">smm.stpres</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Статьи/пресс-релизы">
+               <field name="name_id" widget="selection"/>
+               <field name="partner_id" required="1"/>
+               <field name="rights_id" required="1" widget="selection"/>
+               <field name="url" widget="url"/>
+               <field name="cr_date"/>
+               <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form Articles and Press Releases
+    <record model="ir.ui.view" id="view_smm_stpres_form">
+        <field name="name">SMM - Articles and Press Releases</field>
+        <field name="model">smm.stpres</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Статьи/пресс-релизы">
+                <group colspan="4" col="14">
+                        <field name="name_id" required="1" widget="selection"/>
+                        <field name="partner_id"/>
+                        <field name="tema" required="1"/>
+                        <field name="rights_id" required="1" widget="selection"/>
+                        <field name="cr_date" required="1" groups="base.smm_admin_manager"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="responsible_users" groups="base.smm_admin_manager" colspan="10"/>
+                        <separator colspan="14"/>
+                        <field name="login" required="1"/>
+                        <field name="password" required="1"/>
+                        <field name="account" required="1"/>
+                        <field name="url" widget="url" required="1"/>
+                        <field name="email" widget="email" required="1"/>
+                        <field name="type_id" widget="selection" required="1"/>
+                        <field name="comments" colspan="12"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+  #---- Tree Articles and Press Releases stage
+    <record model="ir.ui.view" id="view_smm_stpres_stage_tree">
+        <field name="name">SMM - Articles and Press Releases stage</field>
+        <field name="model">smm.stpres.stage</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Справочник статьи/пресс-релизы">
+               <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form Articles and Press Releases stage
+<record model="ir.ui.view" id="view_smm_stpres_stage_form">
+        <field name="name">SMM - Articles and Press Releases stage</field>
+        <field name="model">smm.stpres.stage</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Справочник статьи/пресс-релизы">
+                <group colspan="4" col="8">
+                        <field name="name" required="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+#---- Tree Articles and Press Releases rights stage
+    <record model="ir.ui.view" id="view_smm_stpres_rights_stage_tree">
+        <field name="name">SMM - Articles and Press Releases rights stage</field>
+        <field name="model">smm.stpres.rights.stage</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Справочник прав статьи/пресс-релизы">
+               <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form Articles and Press Releases rights stage
+<record model="ir.ui.view" id="view_smm_stpres_stage_rights_form">
+        <field name="name">SMM - Articles and Press Releases rights stage</field>
+        <field name="model">smm.stpres.rights.stage</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Справочник прав статьи/пресс-релизы">
+                <group colspan="4" col="8">
+                        <field name="name" required="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+#---- Tree Articles and Press Releases types stage
+    <record model="ir.ui.view" id="view_smm_stpres_type_stage_tree">
+        <field name="name">SMM - Articles and Press Releases type stage</field>
+        <field name="model">smm.stpres.type.stage</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Справочник типов статьи/пресс-релизы">
+               <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form Articles and Press Releases types stage
+<record model="ir.ui.view" id="view_smm_stpres_stage_type_form">
+        <field name="name">SMM - Articles and Press Releases types stage</field>
+        <field name="model">smm.stpres.type.stage</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Справочник типов статьи/пресс-релизы">
+                <group colspan="4" col="8">
+                        <field name="name" required="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+#-----
+
+        <record model="ir.actions.act_window" id="window_case_smm_stpres">
+            <field name="name">SMM - Статьи/пресс-релизы</field>
+            <field name="res_model">smm.stpres</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_stpres_tree"/>
+            <field name="help">Статьи/пресс-релизы</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_stpres_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_stpres_tree"/>
+            <field name="act_window_id" ref="window_case_smm_stpres"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_stpres_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_stpres_form"/>
+            <field name="act_window_id" ref="window_case_smm_stpres"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_case_smm_stpres_stage">
+            <field name="name">SMM - Справочник статьи/пресс-релизы</field>
+            <field name="res_model">smm.stpres.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_stpres_stage_tree"/>
+            <field name="help">Справочник статьи/пресс-релизы</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_stpres_stage_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_stpres_stage_tree"/>
+            <field name="act_window_id" ref="window_case_smm_stpres_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_stpres_stage_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_stpres_stage_form"/>
+            <field name="act_window_id" ref="window_case_smm_stpres_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_case_smm_stpres_rights_stage">
+            <field name="name">SMM - Справочник прав статьи/пресс-релизы</field>
+            <field name="res_model">smm.stpres.rights.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_stpres_rights_stage_tree"/>
+            <field name="help">Справочник прав статьи/пресс-релизы</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_rights_stpres_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_stpres_rights_stage_tree"/>
+            <field name="act_window_id" ref="window_case_smm_stpres_rights_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_stpres_stage_rights_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_stpres_stage_rights_form"/>
+            <field name="act_window_id" ref="window_case_smm_stpres_rights_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_case_smm_stpres_type_stage">
+            <field name="name">SMM - Справочник типов статьи/пресс-релизы</field>
+            <field name="res_model">smm.stpres.type.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_stpres_type_stage_tree"/>
+            <field name="help">Справочник типов статьи/пресс-релизы</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_type_stpres_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_stpres_type_stage_tree"/>
+            <field name="act_window_id" ref="window_case_smm_stpres_type_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_stpres_stage_type_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_stpres_stage_type_form"/>
+            <field name="act_window_id" ref="window_case_smm_stpres_type_stage"/>
+        </record>
+
+     <menuitem name="Статьи/пресс-релизы" id="menu_smm_stpres" action="window_case_smm_stpres"
+           parent="menu_smm_base" sequence="8" groups="base.smm_manager,base.smm_admin_manager"/>
+     <menuitem name="Справочник статьи/пресс-релизы" id="menu_smm_stpres_stage" action="window_case_smm_stpres_stage"
+           parent="menu_smm_config" sequence="9" groups="base.smm_admin_manager"/>
+     <menuitem name="Справочник прав статьи/пресс-релизы" id="menu_smm_stpres_rights_stage" action="window_case_smm_stpres_rights_stage"
+           parent="menu_smm_config" sequence="9" groups="base.smm_admin_manager"/>
+     <menuitem name="Справочник типов статьи/пресс-релизы" id="menu_smm_stpres_type_stage" action="window_case_smm_stpres_type_stage"
+           parent="menu_smm_config" sequence="9" groups="base.smm_admin_manager"/>
+     </data>
+</openerp>

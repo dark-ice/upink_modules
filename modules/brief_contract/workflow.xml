@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_brief_contract">
+            <field name="name">brief.contract</field>
+            <field name="osv">brief.contract</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- draft -->
+        <record model="workflow.activity" id="act_draft">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="flow_start">True</field>
+            <field name="name">draft</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='draft')</field>
+        </record>
+
+        <!-- cancel -->
+        <record model="workflow.activity" id="act_cancel">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="flow_stop">True</field>
+            <field name="name">cancel</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='cancel')</field>
+        </record>
+
+        <!-- cancel2 -->
+        <record model="workflow.activity" id="act_cancel2">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="flow_stop">True</field>
+            <field name="name">cancel2</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='cancel_2')</field>
+        </record>
+
+        <!-- approval -->
+        <record model="workflow.activity" id="act_approval">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="name">approval</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='approval')</field>
+        </record>
+
+        <!-- completion -->
+        <record model="workflow.activity" id="act_completion">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="name">completion</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='completion')</field>
+        </record>
+
+        <!-- preparation -->
+        <record model="workflow.activity" id="act_preparation">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="name">preparation</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='preparation')</field>
+        </record>
+
+        <!-- contract_approval -->
+        <record model="workflow.activity" id="act_contract_approval">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="name">contract_approval</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='contract_approval')</field>
+        </record>
+
+        <!-- contract_completion -->
+        <record model="workflow.activity" id="act_contract_completion">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="name">contract_completion</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='contract_completion')</field>
+        </record>
+
+        <!-- contract_agreed -->
+        <record model="workflow.activity" id="act_contract_agreed">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="name">contract_agreed</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='contract_agreed')</field>
+        </record>
+
+        <!-- approval_partner -->
+        <record model="workflow.activity" id="act_approval_partner">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="name">approval_partner</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='approval_partner')</field>
+        </record>
+
+        <!-- partner_cancel -->
+        <record model="workflow.activity" id="act_partner_cancel">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="name">partner_cancel</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='partner_cancel')</field>
+        </record>
+
+        <!-- contract_approved -->
+        <record model="workflow.activity" id="act_contract_approved">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="name">contract_approved</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='contract_approved')</field>
+        </record>
+
+        <!-- send_mail -->
+        <record model="workflow.activity" id="act_send_mail">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="name">send_mail</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='send_mail')</field>
+        </record>
+
+        <!-- send_express -->
+        <record model="workflow.activity" id="act_send_express">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="name">send_express</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='send_express')</field>
+        </record>
+
+        <!-- send_courier -->
+        <record model="workflow.activity" id="act_send_courier">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="name">send_courier</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='send_courier')</field>
+        </record>
+
+        <!-- waiting_receipt -->
+        <record model="workflow.activity" id="act_waiting_receipt">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="name">waiting_receipt</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='waiting_receipt')</field>
+        </record>
+
+        <!-- receipt_obtained -->
+        <record model="workflow.activity" id="act_receipt_obtained">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="name">receipt_obtained</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='receipt_obtained')</field>
+        </record>
+
+        <!-- meeting_scheduled -->
+        <record model="workflow.activity" id="act_meeting_scheduled">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="name">meeting_scheduled</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='meeting_scheduled')</field>
+        </record>
+
+        <!-- meeting_cancel -->
+        <record model="workflow.activity" id="act_meeting_cancel">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="flow_stop">True</field>
+            <field name="name">meeting_cancel</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='meeting_cancel')</field>
+        </record>
+
+        <!-- contract_signed -->
+        <record model="workflow.activity" id="act_contract_signed">
+            <field name="wkf_id" ref="wkf_brief_contract"/>
+            <field name="flow_stop">True</field>
+            <field name="name">contract_signed</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='contract_signed')</field>
+        </record>
+
+
+        <!-- draft -> cancel -->
+        <record model="workflow.transition" id="d_c">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">action_d_c</field>
+        </record>
+
+        <!-- draft -> approval -->
+        <record model="workflow.transition" id="d_a">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_approval"/>
+            <field name="signal">action_d_a</field>
+        </record>
+
+        <!-- approval -> completion -->
+        <record model="workflow.transition" id="a_c">
+            <field name="act_from" ref="act_approval"/>
+            <field name="act_to" ref="act_completion"/>
+            <field name="signal">action_a_c</field>
+        </record>
+
+        <!-- completion -> approval -->
+        <record model="workflow.transition" id="c_a">
+            <field name="act_from" ref="act_completion"/>
+            <field name="act_to" ref="act_approval"/>
+            <field name="signal">action_c_a</field>
+        </record>
+
+        <!-- approval -> preparation -->
+        <record model="workflow.transition" id="a_p">
+            <field name="act_from" ref="act_approval"/>
+            <field name="act_to" ref="act_preparation"/>
+            <field name="signal">action_a_p</field>
+        </record>
+
+        <!-- preparation -> contract_approval -->
+        <record model="workflow.transition" id="p_ca">
+            <field name="act_from" ref="act_preparation"/>
+            <field name="act_to" ref="act_contract_approval"/>
+            <field name="signal">action_p_ca</field>
+        </record>
+
+        <!-- contract_approval -> contract_completion -->
+        <record model="workflow.transition" id="ca_cc">
+            <field name="act_from" ref="act_contract_approval"/>
+            <field name="act_to" ref="act_contract_completion"/>
+            <field name="signal">action_ca_cc</field>
+        </record>
+
+        <!-- contract_completion -> contract_approval -->
+        <record model="workflow.transition" id="cc_ca">
+            <field name="act_from" ref="act_contract_completion"/>
+            <field name="act_to" ref="act_contract_approval"/>
+            <field name="signal">action_cc_ca</field>
+        </record>
+
+        <!-- contract_completion -> cancel_2 -->
+        <record model="workflow.transition" id="cc_c2">
+            <field name="act_from" ref="act_contract_completion"/>
+            <field name="act_to" ref="act_cancel2"/>
+            <field name="signal">action_cc_c2</field>
+        </record>
+
+        <!-- cancel_2 -> contract_completion -->
+        <record model="workflow.transition" id="c2_cc">
+            <field name="act_from" ref="act_cancel2"/>
+            <field name="act_to" ref="act_contract_completion"/>
+            <field name="signal">action_c2_cc</field>
+        </record>
+
+        <!-- contract_approval -> contract_agreed -->
+        <record model="workflow.transition" id="ca_cagr">
+            <field name="act_from" ref="act_contract_approval"/>
+            <field name="act_to" ref="act_contract_agreed"/>
+            <field name="signal">action_ca_cagr</field>
+        </record>
+
+        <!-- contract_agreed -> approval_partner -->
+        <record model="workflow.transition" id="cagr_ap">
+            <field name="act_from" ref="act_contract_agreed"/>
+            <field name="act_to" ref="act_approval_partner"/>
+            <field name="signal">action_cagr_ap</field>
+        </record>
+
+        <!-- approval_partner -> contract_completion -->
+        <record model="workflow.transition" id="ap_cc">
+            <field name="act_from" ref="act_approval_partner"/>
+            <field name="act_to" ref="act_contract_completion"/>
+            <field name="signal">action_ap_cc</field>
+        </record>
+
+        <!-- approval_partner -> partner_cancel -->
+        <record model="workflow.transition" id="ap_pc">
+            <field name="act_from" ref="act_approval_partner"/>
+            <field name="act_to" ref="act_partner_cancel"/>
+            <field name="signal">action_ap_pc</field>
+        </record>
+
+        <!-- partner_cancel -> approval_partner -->
+        <record model="workflow.transition" id="pc_ap">
+            <field name="act_from" ref="act_partner_cancel"/>
+            <field name="act_to" ref="act_approval_partner"/>
+            <field name="signal">action_pc_ap</field>
+        </record>
+
+        <!-- approval_partner -> contract_approved -->
+        <record model="workflow.transition" id="ap_app">
+            <field name="act_from" ref="act_approval_partner"/>
+            <field name="act_to" ref="act_contract_approved"/>
+            <field name="signal">action_ap_app</field>
+        </record>
+
+        <!-- contract_approved -> send_mail -->
+        <record model="workflow.transition" id="app_sm">
+            <field name="act_from" ref="act_contract_approved"/>
+            <field name="act_to" ref="act_send_mail"/>
+            <field name="signal">action_app_sm</field>
+        </record>
+
+        <!-- contract_approved -> send_express -->
+        <record model="workflow.transition" id="app_se">
+            <field name="act_from" ref="act_contract_approved"/>
+            <field name="act_to" ref="act_send_express"/>
+            <field name="signal">action_app_se</field>
+        </record>
+
+        <!-- contract_approved -> send_courier -->
+        <record model="workflow.transition" id="app_sc">
+            <field name="act_from" ref="act_contract_approved"/>
+            <field name="act_to" ref="act_send_courier"/>
+            <field name="signal">action_app_sc</field>
+        </record>
+
+        <!-- send_courier -> meeting_scheduled -->
+        <record model="workflow.transition" id="sc_ms">
+            <field name="act_from" ref="act_send_courier"/>
+            <field name="act_to" ref="act_meeting_scheduled"/>
+            <field name="signal">action_sc_ms</field>
+        </record>
+
+        <!-- send_mail -> waiting_receipt -->
+        <record model="workflow.transition" id="sm_wr">
+            <field name="act_from" ref="act_send_mail"/>
+            <field name="act_to" ref="act_waiting_receipt"/>
+            <field name="signal">action_sm_wr</field>
+        </record>
+
+        <!-- send_express -> waiting_receipt -->
+        <record model="workflow.transition" id="se_wr">
+            <field name="act_from" ref="act_send_express"/>
+            <field name="act_to" ref="act_waiting_receipt"/>
+            <field name="signal">action_se_wr</field>
+        </record>
+
+        <!-- waiting_receipt -> meeting_scheduled -->
+        <record model="workflow.transition" id="wr_ms">
+            <field name="act_from" ref="act_waiting_receipt"/>
+            <field name="act_to" ref="act_meeting_scheduled"/>
+            <field name="signal">action_wr_ms</field>
+        </record>
+
+        <!-- meeting_scheduled -> meeting_cancel -->
+        <record model="workflow.transition" id="ms_mc">
+            <field name="act_from" ref="act_meeting_scheduled"/>
+            <field name="act_to" ref="act_meeting_cancel"/>
+            <field name="signal">action_ms_mc</field>
+        </record>
+
+        <!-- meeting_scheduled -> contract_signed -->
+        <record model="workflow.transition" id="ms_cs">
+            <field name="act_from" ref="act_meeting_scheduled"/>
+            <field name="act_to" ref="act_contract_signed"/>
+            <field name="signal">action_ms_cs</field>
+        </record>
+
+        <!-- waiting_receipt -> receipt_obtained -->
+        <record model="workflow.transition" id="wr_ro">
+            <field name="act_from" ref="act_waiting_receipt"/>
+            <field name="act_to" ref="act_receipt_obtained"/>
+            <field name="signal">action_wr_ro</field>
+        </record>
+
+        <!-- receipt_obtained -> contract_signed -->
+        <record model="workflow.transition" id="ro_cs">
+            <field name="act_from" ref="act_receipt_obtained"/>
+            <field name="act_to" ref="act_contract_signed"/>
+            <field name="signal">action_ro_cs</field>
+        </record>
+    </data>
+</openerp>

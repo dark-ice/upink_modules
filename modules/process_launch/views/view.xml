@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_process_launch_tree">
+            <field name="name">view.process.launch.tree</field>
+            <field name="model">process.launch</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="direction"/>
+                    <field name="partner_id"/>
+                    <field name="service_id"/>
+                    <field name="create_date"/>
+                    <field name="user_id"/>
+                    <field name="responsible_id"/>
+                    <field name="state"/>
+                    <field name="process_state"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_process_launch_search">
+            <field name="name">view.process.launch.search</field>
+            <field name="model">process.launch</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="partner_id"/>
+                    <field name="direction"/>
+                    <field name="service_id"/>
+                    <field name="user_id"/>
+                    <field name="responsible_id" string="Менеджер по развитию"/>
+                    <field name="create_date"/>
+                </search>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_process_launch_form">
+            <field name="name">view.process.launch.form</field>
+            <field name="model">process.launch</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group colspan="4">
+                        <field name="check_a"/>
+                        <field name="check_m"/>
+                    </group>
+                    <group colspan="4" col="4">
+                        <field name="user_id" readonly="True"/>
+                        <field name="create_date" readonly="True"/>
+                        <field name="partner_id" on_change="onchange_partner_id(partner_id)"/>
+                        <field name="responsible_id" readonly="True"/>
+
+                        <separator colspan="4"/>
+                        <field name="service_id" on_change="onchange_service_id(partner_id, service_id)"/><newline/>
+                        <field name="direction" readonly="True" />
+                        <field name="service_head_id" readonly="True" />
+
+                        <group colspan="4" attrs="{'invisible': [('direction', '!=', 'SMM')]}">
+                            <separator colspan="4"/>
+                            <field name="reputation_management"/>
+                            <field name="targeted_advertising"/>
+                            <field name="lead_management"/>
+                            <field name="hidden_marketing"/>
+                            <separator string="Срок сотрудничества по проекту" colspan="4" />
+                            <group colspan="4">
+                                <field name="date_partners_from"/>
+                                <field name="date_partners_to"/>
+                            </group>
+                        </group>
+                        <group colspan="4" attrs="{'invisible': [('direction', '!=', 'CALL')]}">
+                            <separator colspan="4"/>
+                            <field name="call_type" />
+                        </group>
+                        <separator colspan="4"/>
+
+                        <field name="contract_id" on_change="onchange_contract_id(contract_id)" context="{'partner_id': partner_id, 'service_id': service_id}"/>
+                        <field name="contract_file" readonly="True" />
+
+                        <field name="invoice_line_id" invisible="True"/>
+                        <group col="6" colspan="4">
+                            <field name="account_id" on_change="onchange_account_id(account_id, service_id)"/>
+                            <field name="account_file_id"/>
+                            <field name="pay_date"/>
+                            <newline/>
+                            <field name="price" readonly="True"/>
+                            <field name="price_ye" readonly="True" />
+                            <field name="paid" readonly="True" /><newline/>
+                            <field name="invoice_pay_ids" mode="tree" nolabel="1" colspan="6" domain="[('service_id', '=', service_id)]">
+                                <tree>
+                                    <field name="pay_date" />
+                                    <field name="name" />
+                                </tree>
+                            </field>
+                            <separator colspan="6" string="Медиаплан/коммерческое предложение"/>
+                            <field
+                                name="rep_file_id"
+                                required="1"
+                                context="{'object': 'brief'}"
+                                domain="[('object','=','brief')]"
+                                nolabel="1"
+                                colspan="6"/>
+                        </group>
+                        <separator string="Комментарий по доработке" colspan="4"/>
+                            <field name="comment" colspan="4" nolabel="1"/>
+                        <group colspan="4" col="6">
+                            <field name="state"
+                               widget="statusbar"
+                               statusbar_visible="draft,agreement,in_process,finish"
+                               statusbar_colors='{"finish":"orange","revision":"red","cancel":"gray"}'
+                               colspan="6"
+                                />
+                            <newline/>
+                            <!-- draft, agreement, revision -> cancel -->
+                            <button string="Отмена"
+                                name="cancel"
+                                type="workflow"
+                                icon="gtk-cancel"
+                                attrs="{'invisible': [
+                                '&amp;', '|', ('state', 'not in', ('draft', 'revision')), ('check_a', '=', False),
+                                '|', ('state', '!=', 'agreement'), ('check_m', '=', False)
+                                ]
+                                }"
+                                />
+
+                            <!-- cancel -> draft -->
+                            <button string="Черновик"
+                                name="draft"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'cancel'), ('check_m', '=', False)]}"
+                                />
+
+                            <!-- draft,revision -> agreement -->
+                            <button string="Запуск процесса"
+                                name="agreement"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_a', '=', False)]}"
+                                />
+                            <button string="На согласование руководителю"
+                                name="agreement"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'revision'), ('check_a', '=', False)]}"
+                                />
+
+                            <!-- agreement -> revision -->
+                            <button string="На доработку"
+                                name="revision"
+                                type="workflow"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'agreement'), ('check_m', '=', False)]}"
+                                />
+
+                            <!-- agreement -> in_process -->
+                            <button string="Запуск процесса"
+                                name="in_process"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'agreement'), ('check_m', '=', False)]}"
+                                />
+
+                            <field name="process_id" invisible="1"/>
+                            <button string="Запуск процесса"
+                                name="process_create"
+                                type="object"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'in_process'), ('process_id', '!=', False)]}"
+                                />
+                        </group>
+                        <group colspan="4" col="2">
+                            <field name="history_ids" readonly="1" nolabel="1">
+                                <tree string="История переходов">
+                                    <field name="create_uid"/>
+                                    <field name="create_date"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </group>
+
+                </form>
+            </field>
+        </record>
+
+        <record id="window_process_launch" model="ir.actions.act_window">
+            <field name="name">Единая карточка запуска процесса</field>
+            <field name="res_model">process.launch</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_process_launch_tree"/>
+            <field name="search_view_id" ref="view_process_launch_search"/>
+        </record>
+
+        <record id="window_process_launch_partner" model="ir.actions.act_window">
+            <field name="name">Единая карточка запуска процесса</field>
+            <field name="res_model">process.launch</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_process_launch_form"/>
+            <field name="auto_refresh" eval="1"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem name="Процессы" action="window_process_launch" id="menu_process" web_icon="images/process.jpg" web_icon_hover="images/process_hover.jpg" sequence="5"/>
+        <menuitem action="window_process_launch" id="menu_process_launch" sequence="0" parent="menu_process"/>
+
+    </data>
+</openerp>

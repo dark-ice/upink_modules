@@ -1,0 +1,335 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="workflow" id="wkf_inc_campaign">
+            <field name="name">outsource.in</field>
+            <field name="osv">in.campaign</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- draft -->
+        <record model="workflow.activity" id="act_in_draft">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="flow_start">True</field>
+            <field name="name">черновик</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='draft')</field>
+        </record>
+
+
+        <!-- preparation_template -->
+        <record model="workflow.activity" id="act_in_preparation_template">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">подготовка шаблона ТЗ</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='preparation_template')</field>
+        </record>
+
+        <!-- sent_template_to_manager -->
+        <record model="workflow.activity" id="act_in_sent_template_to_manager">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">шаблон ТЗ отправлен менеджеру</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='sent_template_to_manager')</field>
+        </record>
+
+        <!-- filling_tz -->
+        <record model="workflow.activity" id="act_in_filling_tz">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">заполнение ТЗ</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='filling_tz')</field>
+        </record>
+
+        <!-- agreement_tz -->
+        <record model="workflow.activity" id="act_in_agreement_tz">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">согласование ТЗ</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='agreement_tz')</field>
+        </record>
+
+        <!-- tz_on_completion -->
+        <record model="workflow.activity" id="act_in_tz_on_completion">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">ТЗ на доработке</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='tz_on_completion')</field>
+        </record>
+
+        <!-- preparation_screenplay -->
+        <record model="workflow.activity" id="act_in_preparation_screenplay">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">подготовка сценария</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='preparation_screenplay')</field>
+        </record>
+
+        <!-- approval_screenplay -->
+        <record model="workflow.activity" id="act_in_approval_screenplay">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">утверждение сценария</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='approval_screenplay')</field>
+        </record>
+
+        <!-- screenplay_on_completion -->
+        <record model="workflow.activity" id="act_in_screenplay_on_completion">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">сценарий на доработку</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='screenplay_on_completion')</field>
+        </record>
+
+        <!-- training_agents -->
+        <record model="workflow.activity" id="act_in_training_agents">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">обучение агентов</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='training_agents')</field>
+        </record>
+
+        <!-- testing_agents_partner -->
+        <record model="workflow.activity" id="act_in_testing_agents_partner">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">тестирование агентов партнером</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='testing_agents_partner')</field>
+        </record>
+
+        <!-- teh_configuring_project -->
+        <record model="workflow.activity" id="act_in_teh_configuring_project">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">тех. настройка проекта</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='teh_configuring_project')</field>
+        </record>
+
+        <!-- preparation_report_form -->
+        <record model="workflow.activity" id="act_in_preparation_report_form">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">подготовка формы отчета</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='preparation_report_form')</field>
+        </record>
+
+        <!-- approval_report_form -->
+        <record model="workflow.activity" id="act_in_approval_report_form">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">согласование формы отчета</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='approval_report_form')</field>
+        </record>
+
+        <!-- report_form_on_completion -->
+        <record model="workflow.activity" id="act_in_on_completion_report_form">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">доработка формы отчета</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='report_form_on_completion')</field>
+        </record>
+
+        <!-- coordination_organ_quaeres -->
+        <record model="workflow.activity" id="act_in_coordination_organ_quaeres">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">согласование орг. вопросо</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='coordination_organ_quaeres')</field>
+        </record>
+
+        <!-- project_implementation -->
+        <record model="workflow.activity" id="act_in_project_implementation">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">реализация проекта</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='project_implementation')</field>
+        </record>
+
+        <!-- agreement_reporting -->
+        <record model="workflow.activity" id="act_in_agreement_reporting">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">согласование отчетности</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='agreement_reporting')</field>
+        </record>
+
+        <!-- closed -->
+        <record model="workflow.activity" id="act_in_closed">
+            <field name="wkf_id" ref="wkf_inc_campaign" />
+            <field name="name">проект завершен</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='closed')</field>
+        </record>
+
+
+        <!-- draft -> preparation_template -->
+        <record model="workflow.transition" id="d_pt">
+            <field name="act_from" ref="act_in_draft"/>
+            <field name="act_to" ref="act_in_preparation_template"/>
+            <field name="signal">action_d_pt</field>
+        </record>
+
+        <!-- preparation_template -> sent_template_to_manager -->
+        <record model="workflow.transition" id="pt_sttm">
+            <field name="act_from" ref="act_in_preparation_template" />
+            <field name="act_to" ref="act_in_sent_template_to_manager" />
+            <field name="signal">action_pt_sttm</field>
+        </record>
+
+        <!-- sent_template_to_manager -> filling_tz -->
+        <record model="workflow.transition" id="sttm_ft">
+            <field name="act_from" ref="act_in_sent_template_to_manager" />
+            <field name="act_to" ref="act_in_filling_tz" />
+            <field name="signal">action_sttm_ft</field>
+        </record>
+
+        <!-- filling_tz -> agreement_tz -->
+        <record model="workflow.transition" id="ft_at">
+            <field name="act_from" ref="act_in_filling_tz" />
+            <field name="act_to" ref="act_in_agreement_tz" />
+            <field name="signal">action_ft_at</field>
+        </record>
+
+        <!-- agreement_tz -> tz_on_completion -->
+        <record model="workflow.transition" id="at_toc">
+            <field name="act_from" ref="act_in_agreement_tz" />
+            <field name="act_to" ref="act_in_tz_on_completion" />
+            <field name="signal">action_at_toc</field>
+        </record>
+
+        <!-- tz_on_completion -> agreement_tz -->
+        <record model="workflow.transition" id="toc_at">
+            <field name="act_from" ref="act_in_tz_on_completion" />
+            <field name="act_to" ref="act_in_agreement_tz" />
+            <field name="signal">action_toc_at</field>
+        </record>
+
+        <!-- agreement_tz -> preparation_screenplay -->
+        <record model="workflow.transition" id="at_ps">
+            <field name="act_from" ref="act_in_agreement_tz" />
+            <field name="act_to" ref="act_in_preparation_screenplay" />
+            <field name="signal">action_at_ps</field>
+        </record>
+
+        <!-- preparation_screenplay -> approval_screenplay -->
+        <record model="workflow.transition" id="ps_as">
+            <field name="act_from" ref="act_in_preparation_screenplay" />
+            <field name="act_to" ref="act_in_approval_screenplay" />
+            <field name="signal">action_ps_as</field>
+        </record>
+
+        <!-- approval_screenplay -> screenplay_on_completion -->
+        <record model="workflow.transition" id="as_soc">
+            <field name="act_from" ref="act_in_approval_screenplay" />
+            <field name="act_to" ref="act_in_screenplay_on_completion" />
+            <field name="signal">action_as_soc</field>
+        </record>
+
+        <!-- screenplay_on_completion -> approval_screenplay -->
+        <record model="workflow.transition" id="soc_as">
+            <field name="act_from" ref="act_in_screenplay_on_completion" />
+            <field name="act_to" ref="act_in_approval_screenplay" />
+            <field name="signal">action_soc_as</field>
+        </record>
+
+        <!-- approval_screenplay -> training_agents -->
+        <record model="workflow.transition" id="as_ta">
+            <field name="act_from" ref="act_in_approval_screenplay" />
+            <field name="act_to" ref="act_in_training_agents" />
+            <field name="signal">action_as_ta</field>
+        </record>
+
+        <!-- training_agents -> testing_agents_partner -->
+        <record model="workflow.transition" id="ta_tap">
+            <field name="act_from" ref="act_in_training_agents" />
+            <field name="act_to" ref="act_in_testing_agents_partner" />
+            <field name="signal">action_ta_tap</field>
+        </record>
+
+        <!-- testing_agents_partner -> training_agents -->
+        <record model="workflow.transition" id="tap_ta">
+            <field name="act_from" ref="act_in_testing_agents_partner" />
+            <field name="act_to" ref="act_in_training_agents" />
+            <field name="signal">action_tap_ta</field>
+        </record>
+
+        <!-- testing_agents_partner -> teh_configuring_project -->
+        <record model="workflow.transition" id="tap_tcp">
+            <field name="act_from" ref="act_in_testing_agents_partner" />
+            <field name="act_to" ref="act_in_teh_configuring_project" />
+            <field name="signal">action_tap_tcp</field>
+        </record>
+
+        <!-- teh_configuring_project -> preparation_report_form -->
+        <record model="workflow.transition" id="tcp_prf">
+            <field name="act_from" ref="act_in_teh_configuring_project" />
+            <field name="act_to" ref="act_in_preparation_report_form" />
+            <field name="signal">action_tcp_prf</field>
+        </record>
+
+        <!-- preparation_report_form -> approval_report_form -->
+        <record model="workflow.transition" id="prf_arf">
+            <field name="act_from" ref="act_in_preparation_report_form" />
+            <field name="act_to" ref="act_in_approval_report_form" />
+            <field name="signal">action_prf_arf</field>
+        </record>
+
+        <!-- approval_report_form -> on_completion_report_form -->
+        <record model="workflow.transition" id="arf_ocrf">
+            <field name="act_from" ref="act_in_approval_report_form" />
+            <field name="act_to" ref="act_in_on_completion_report_form" />
+            <field name="signal">action_arf_ocrf</field>
+        </record>
+
+        <!-- on_completion_report_form -> approval_report_form -->
+        <record model="workflow.transition" id="ocrf_arf">
+            <field name="act_from" ref="act_in_on_completion_report_form" />
+            <field name="act_to" ref="act_in_approval_report_form" />
+            <field name="signal">action_ocrf_arf</field>
+        </record>
+
+        <!-- approval_report_form -> coordination_organ_quaeres -->
+        <record model="workflow.transition" id="arf_coq">
+            <field name="act_from" ref="act_in_approval_report_form" />
+            <field name="act_to" ref="act_in_coordination_organ_quaeres" />
+            <field name="signal">action_arf_coq</field>
+        </record>
+
+        <!-- coordination_organ_quaeres -> project_implementation -->
+        <record model="workflow.transition" id="coq_pi">
+            <field name="act_from" ref="act_in_coordination_organ_quaeres" />
+            <field name="act_to" ref="act_in_project_implementation" />
+            <field name="signal">action_coq_pi</field>
+        </record>
+
+        <!-- project_implementation -> agreement_reporting -->
+        <record model="workflow.transition" id="pi_ar">
+            <field name="act_from" ref="act_in_project_implementation" />
+            <field name="act_to" ref="act_in_agreement_reporting" />
+            <field name="signal">action_pi_ar</field>
+        </record>
+
+        <!-- agreement_reporting -> project_implementation -->
+        <record model="workflow.transition" id="ar_pi">
+            <field name="act_from" ref="act_in_agreement_reporting" />
+            <field name="act_to" ref="act_in_project_implementation" />
+            <field name="signal">action_ar_pi</field>
+        </record>
+
+        <!-- agreement_reporting -> closed -->
+        <record model="workflow.transition" id="ar_c">
+            <field name="act_from" ref="act_in_agreement_reporting" />
+            <field name="act_to" ref="act_in_closed" />
+            <field name="signal">action_closed</field>
+        </record>
+
+        <!-- closed -> agreement_reporting -->
+        <record model="workflow.transition" id="c_ar">
+            <field name="act_from" ref="act_in_closed" />
+            <field name="act_to" ref="act_in_agreement_reporting" />
+            <field name="signal">action_c_ar</field>
+        </record>
+
+    </data>
+</openerp>

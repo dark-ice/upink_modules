@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+        <record id="outsourcing_contact_centr.manager" model="res.groups">
+            <field name="name">Outsourcing Contact Center/ Manager</field>
+        </record>
+        <record id="outsourcing_contact_centr.supervisor" model="res.groups">
+            <field name="name">Outsourcing Contact Center / Supervisor</field>
+        </record>
+        <record id="outsourcing_contact_centr.leader" model="res.groups">
+            <field name="name">Outsourcing Contact Center / Leader</field>
+        </record>
+
+    </data>
+</openerp>

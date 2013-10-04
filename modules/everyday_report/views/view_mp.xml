@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_day_report_mp_tree">
+            <field name="name">МП</field>
+            <field name="model">day.report.mp</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="week_number" invisible="1" />
+                    <field name="date"/>
+
+                    <field name="web_plan" sum=""/>
+                    <field name="web_fact" sum=""/>
+                    <field name="web_cash" sum=""/>
+
+                    <field name="call_plan" sum=""/>
+                    <field name="call_fact" sum=""/>
+                    <field name="call_cash" sum=""/>
+
+                    <field name="seo_plan" sum=""/>
+                    <field name="seo_fact" sum=""/>
+                    <field name="seo_cash" sum=""/>
+
+                    <field name="ppc_plan" sum=""/>
+                    <field name="ppc_fact" sum=""/>
+                    <field name="ppc_cash" sum=""/>
+
+                    <field name="smm_plan" sum=""/>
+                    <field name="smm_fact" sum=""/>
+                    <field name="smm_cash" sum=""/>
+
+                    <field name="video_plan" sum=""/>
+                    <field name="video_fact" sum=""/>
+                    <field name="video_cash" sum=""/>
+
+                    <field name="mp_plan" sum=""/>
+                    <field name="mp_fact" sum=""/>
+                    <field name="mp_cash" sum=""/>
+
+                    <field name="moscow_plan" sum=""/>
+                    <field name="moscow_fact" sum=""/>
+                    <field name="moscow_cash" sum=""/>
+
+                    <field name="total_fact" sum=""/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_day_report_mp_search">
+            <field name="name">МП</field>
+            <field name="model">day.report.mp</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="date_start" />
+                    <field name="date_end"/>
+
+                </search>
+            </field>
+        </record>
+
+        <record id="window_day_report_mp" model="ir.actions.act_window">
+            <field name="name">МП</field>
+            <field name="res_model">day.report.mp</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_day_report_mp_tree"/>
+            <field name="search_view_id" ref="view_day_report_mp_search"/>
+            <field name="context">{'group_by':['week_number'], 'search_default_date_start': time.strftime('%Y-%m-01'), 'search_default_date_end': time.strftime('%Y-%m-%d')}</field>
+        </record>
+
+        <menuitem action="window_day_report_mp" id="menu_day_report_mp" parent="menu_every_day_report" sequence="30"/>
+
+    </data>
+</openerp>

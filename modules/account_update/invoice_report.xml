@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+        <!-- Reports -->
+        <report auto="False"
+                id="account_update_completion_ru"
+                model="account.invoice.documents"
+                name="account.completion.ru"
+                file="account_update/report/completion_ru.mako"
+                string="Акт выполенных работ Россия"
+                report_type="webkit"
+                webkit_header="ir_header_webkit_portrait"/>
+
+        <report auto="False"
+                id="account_update_completion_ua"
+                model="account.invoice.documents"
+                name="account.completion.ua"
+                file="account_update/report/completion_ru.mako"
+                string="Акт выполенных работ Украина"
+                report_type="webkit"
+                webkit_header="ir_header_webkit_portrait"/>
+
+        <report auto="False"
+                id="account_update_payment_ru"
+                model="account.invoice"
+                name="account.payment.ru"
+                file="account_update/report/payment_ru.mako"
+                string="Счет на оплату Россия"
+                report_type="webkit"
+                webkit_header="ir_header_webkit_portrait"/>
+
+        <report auto="False"
+                id="account_update_payment_ua"
+                model="account.invoice"
+                name="account.payment.ua"
+                file="account_update/report/payment_ua.mako"
+                string="Счет на оплату Украина"
+                report_type="webkit"
+                webkit_header="ir_header_webkit_portrait"/>
+
+        <report auto="False"
+                id="account_update_invoice"
+                model="account.invoice.documents"
+                name="invoice.ru"
+                file="account_update/report/invoice.mako"
+                string="Счет-фактура"
+                report_type="webkit"
+                webkit_header="ir_header_webkit_landscape"/>
+
+        <report auto="False"
+                id="account_update_act_pdf"
+                model="account.invoice.act.wizard"
+                name="account.act.pdf"
+                file="account_update/wizard/act_pdf.mako"
+                string="Акт сверки"
+                report_type="webkit"
+                webkit_header="ir_header_webkit_landscape"/>
+
+        <report auto="False"
+                id="account_update_post_pdf"
+                model="account.invoice"
+                name="post"
+                file="account_update/report/postman.mako"
+                string="Почтовый конверт"
+                report_type="webkit"
+                webkit_header="ir_header_webkit_landscape"/>
+
+
+        <record model='ir.actions.report.xml' id='ir_actions_report_xml_all_list'>
+            <field name='report_type'>aeroo</field>
+            <field name='in_format'>oo-ods</field>
+            <field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/>
+            <field name='multi' eval='False'/>
+            <field name='name'>Все документы в экселе</field>
+            <field name='report_rml'>account_update/report/reports.ods</field>
+            <field name='report_name'>all.documents</field>
+            <field name='model'>account.invoice</field>
+            <field name='type'>ir.actions.report.xml</field>
+            <field name='attachment_use' eval='False'/>
+            <field name='parser_loc'>account_update/report/parser.py</field>
+            <field name='tml_source'>file</field>
+            <field name='parser_state'>loc</field>
+            <field name='styles_mode'>default</field>
+        </record>
+    </data>
+</openerp>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="storage_files_form" model="ir.ui.view">
+            <field name="name">Хранилище данных</field>
+            <field name="model">storage.files</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Хранилище данных">
+                    <field name="parent_id" widget="selection" required="1" domain="[('is_folder','=',True)]"/>
+                    <field name="name" required="1"/>
+                    <newline/>
+                    <separator colspan="4"/>
+                    <group colspan="4">
+                        <field name="place_type" colspan="2" attrs="{'readonly': [('create_date','!=',False)]}"/>
+                        <group attrs="{'invisible': ['|',('place_type', '==', 'web'),('place_type', '==', '')]}"
+                               colspan="2">
+                            <field name="data" filename="name" on_change="onchange_path(name)"/>
+                            <newline/>
+                            <field name="type" required="1"/>
+                            <field name="url" widget="url" invisible="1"/>
+                        </group>
+
+                        <group attrs="{'invisible': [('place_type', '!=', 'web')]}" colspan="2">
+                            <field name="web_url" widget="url" on_change="onchange_weburl(web_url)"/>
+                        </group>
+                    </group>
+                    <newline/>
+                    <separator colspan="4"/>
+                    <field name="create_date"/>
+                    <field string="Коментарии" name="comment" colspan="6"/>
+                    <field name="user_id" groups="base.group_system"/>
+                    <field name="sendto_all" groups="storage_docs.manager_group,storage_docs.admin_group"
+                           attrs="{'invisible': [('create_date','==',False)]}"/>
+                    <group col="3" colspan="4" attrs="{'invisible': [('create_date','==',False)]}"
+                           groups="storage_docs.manager_group,storage_docs.admin_group">
+                        <field name="groups_user" nolabel="1"/>
+                        <field name="responsible_user" nolabel="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="storage_files_tree" model="ir.ui.view">
+            <field name="name">Хранилище данных. Список</field>
+            <field name="model">storage.files</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Хранилище данных">
+                    <field name="path" string="Полный путь к файлу"/>
+                    <field name="parent_id" invisible="1"/>
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="user_id"/>
+                    <field name="create_date"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="storage_files_search_filter" model="ir.ui.view">
+            <field name="name">Хранилище данных - фильтр</field>
+            <field name="model">storage.files</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Фильтр категорий">
+                    <filter string="Мои документы" icon="terp-personal" name="personal_files"
+                            domain="[('user_id','=',uid)]"/>
+                    <!--
+                                   <filter name="access_document" icon="terp-check" domain="['|','|',('responsible_user','in',uid),('user_id','=',uid),('groups_user.storage_groups.id','in',uid)]" groups="base.group_system" /> "search_default_access_document": 1,
+                    -->
+                    <separator orientation="vertical"/>
+                    <field name="name"/>
+                    <field name="parent_id" widget="selection" domain="[('is_folder','=',True)]"/>
+                    <field name="user_id"/>
+                    <field name="type"/>
+                    <field name="create_date"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="window_storage_files_action" model="ir.actions.act_window">
+            <field name="name">Хранилище данных</field>
+            <field name="domain">[]</field>
+            <field name="context">{"search_default_folder_id":eval('False'), 'is_folder':False, 'place_type':'binary'}</field>
+            <field name="domain">[('is_folder','=',False)]</field>
+            <field name="res_model">storage.files</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="storage_files_tree"/>
+            <field name="search_view_id" ref="storage_files_search_filter"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_storage_files_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="storage_files_tree"/>
+            <field name="act_window_id" ref="window_storage_files_action"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_storage_files_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="storage_files_form"/>
+            <field name="act_window_id" ref="window_storage_files_action"/>
+        </record>
+
+        <menuitem id="storage_files_root"
+                  name="Документы"
+                  web_icon="images/storage_files-hover.png"
+                  web_icon_hover="images/storage_files.png"
+                  action="window_storage_files_action"
+                  groups="storage_docs.user_group,storage_docs.admin_group,storage_docs.manager_group"
+                />
+
+        <menuitem id="storage_files_menu"
+                  name="Папки/Документы"
+                  parent="storage_files_root"
+                  groups="storage_docs.user_group,storage_docs.admin_group,storage_docs.manager_group"
+                />
+
+        <menuitem action="window_storage_files_action"
+                  id="storage_file_menuitem"
+                  name="Документы"
+                  sequence="1"
+                  parent="storage_files_menu"
+                  groups="storage_docs.user_group,storage_docs.admin_group,storage_docs.manager_group"
+                />
+
+    </data>
+</openerp>

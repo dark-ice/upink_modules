@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+
+        <!-- Создаем группы -->
+        <record id="brief.group_lawyer" model="res.groups">
+            <field name="name">Юрист</field>
+        </record>
+
+        <!-- Открываем меню -->
+        <record model='ir.ui.menu' id='menu_brief_contract'>
+            <field name="groups_id" eval="[(4,ref('brief.group_lawyer')),(4,ref('brief.group_manager_moscow')),(4,ref('base.group_sale_salesman'))]"/>
+        </record>
+
+
+    </data>
+</openerp>

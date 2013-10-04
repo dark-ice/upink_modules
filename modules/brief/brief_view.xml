@@ -1,0 +1,1475 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record id="view_brief_form" model="ir.ui.view">
+            <field name="name">Создание брифа</field>
+            <field name="model">brief.main</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Создание брифа">
+                    <field name="permissions" invisible="True"/>
+                    <field name="usergroup" invisible="True"/>
+                    <field name="from" invisible="True"/>
+                    <field name="check_m" />
+                    <field name="check_r" />
+                    <field name="check_h" />
+                    <field name="check_s" />
+
+                    <group colspan="2" col="32" attrs="{'invisible': [('from', '=', False)]}">
+                        <button string="Отмена" icon="gtk-close" special="cancel" colspan="4"/>
+                        <button name="action_add" type="object" string="Сохранить и закрыть" colspan="4"/>
+                    </group>
+                    <newline/>
+                    <group colspan="4" col="8">
+                        <field name="user_id"/>
+
+                        <field name="specialist_id" attrs="{'readonly':[('permissions','!=','Spec_Director')]}"/>
+                        <field name="responsible_user" attrs="{'readonly':[('permissions','!=','Director')]}"/>
+                        <field name="create_date"/>
+                        <field name="partner_name" readonly="1" on_change="onchange_cand_id(partner_id)" context="{'lead': True}"/>
+                        <field name="partner_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="services_ids" on_change="onchange_select(services_ids)"/>
+                        <field name="deadline"/>
+                        <field name="subject"/>
+                        <field name="work_state"/>
+                        <newline/>
+                        <group colspan="8" col="4">
+                            <field name="loyality_id" string="Программы лояльности" colspan="4"/>
+                        </group>
+                        <newline/>
+                        <group colspan="8" col="4">
+                            <separator colspan="4" string="Медиаплан/коммерческое предложение"/>
+                            <newline/>
+                            <field 
+                                name="rep_file_id" 
+                                required="1" 
+                                context="{'object': 'brief'}"
+                                domain="[('object','=','brief')]" 
+                                nolabel="1"
+                                colspan="4"/>
+                            <field name="file_name" colspan="3" readonly="True"/>
+                            <field name="media_plan"
+                                   filename="file_name"
+                                   on_change="onchange_filename('file_name', file_name)"
+                                   nolabel="1"
+                                   readonly="True"/>
+                        </group>
+                        <group colspan="8" col="4">
+                            <field name="sum_mediaplan"/>
+                            <field name="currency"/>
+                        </group>
+
+                        <separator colspan="8"/>
+                    </group>
+
+                    <!-- Динамические поля -->
+                    <group attrs="{'readonly':[('state','in',('accept','cancel','inwork'))]}" colspan="4" col="4">
+
+                        <group attrs="{'invisible':[('web_sites_cb','==',False)]}" colspan="4" col="4">
+                            <field name="web_sites_cb" invisible="True"/>
+                            <field name="web_sites_cbr" invisible="True"/>
+                            <field name="web_sites" attrs="{'required':[('web_sites_cbr','==',True)]}" colspan="4"/>
+                            <label string="Если нет сайта на данный момент или сайт находится в разработке, то необходимо писать (кратко) тематику в которой работает потенциальный партнер."
+                                   colspan="4"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('startup_date_cb','==',False)]}" colspan="4" col="4">
+                            <field name="startup_date_cb" invisible="True"/>
+                            <field name="startup_date_cbr" invisible="True"/>
+                            <field name="startup_date"
+                                   attrs="{'required':[('startup_date_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+                            <label string="Необходимо для правильной стратегии позиционирования" colspan="2"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('target_region_cb','==',False)]}" colspan="4" col="4">
+                            <field name="target_region_cb" invisible="True"/>
+                            <field name="target_region_cbr" invisible="True"/>
+                            <field name="target_region"
+                                   attrs="{'required':[('target_region_cbr','==',True)],'invisible':[('target_region_cb','==',False)]}"
+                                   colspan="2"/>
+                            <group colspan="2" col="4">
+                                <label string="Максимально охватив регионы, в которых осуществляется деятельность Вашей компании (филиалы, доставка в регионы)"
+                                       colspan="4"/>
+                                <field name="another_region" colspan="4"/>
+                            </group>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('cms_name_cb','==',False)]}" colspan="4" col="4">
+                            <field name="cms_name_cb" invisible="True"/>
+                            <field name="cms_name_cbr" invisible="True"/>
+
+                            <field name="cms_name" attrs="{'required':[('cms_name_cbr','==',True)]}"  colspan="2"/>
+                            <label string="Необходимо, чтобы оценить трудозатраты по внедрению изменений и текстов." colspan="2"/>
+                            <separator colspan="4" />
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('exp_visit_cb','==',False)]}" colspan="4" col="4">
+                            <field name="exp_visit_cb" invisible="True"/>
+                            <field name="exp_visit_cbr" invisible="True"/>
+                            <field name="exp_visit"
+                                   attrs="{'required':[('exp_visit_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+                            <label string="Для анализа поведения пользователя при выполнении ожидаемых действий. Варинаты: звонок, онлайн-заявка, знакомство с брендом и т.п."
+                                   colspan="2" />
+                            <separator colspan="4" />
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('name_cb','==',False)]}" colspan="4" col="4">
+                            <field name="name_cb" invisible="True"/>
+                            <field name="name_cbr" invisible="True"/>
+                            <field name="name"
+                                   attrs="{'required':[('name_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+                            <label string="Можно без фамилии" colspan="2"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('job_position_cb','==',False)]}" colspan="4" col="4">
+                            <field name="job_position_cb" invisible="True"/>
+                            <field name="job_position_cbr" invisible="True"/>
+                            <field name="job_position" attrs="{'required':[('job_position_cbr','==',True)]}" colspan="4"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('phone_cb','==',False)]}" colspan="4" col="4">
+                            <field name="phone_cb" invisible="True"/>
+                            <field name="phone_cbr" invisible="True"/>
+                            <field name="phone" attrs="{'required':[('phone_cbr','==',True)]}" colspan="4"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('email_cb','==',False)]}" colspan="4" col="4">
+                            <field name="email_cb" invisible="True"/>
+                            <field name="email_cbr" invisible="True"/>
+                            <field name="email" attrs="{'required':[('email_cbr','==',True)]}" colspan="4"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('context_adv_cb','==',False)]}" colspan="4" col="4">
+                            <field name="context_adv_cb" invisible="True"/>
+                            <field name="context_adv_cbr" invisible="True"/>
+                            <field name="context_adv"
+                                   attrs="{'required':[('context_adv_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Доля пользователей на поисковую систему. 60 %% Яндекс 35 %% Google 5 %% другие системы Выбирая, только одну систему, Вы теряете часть потенциальных покупателей"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('company_theme_cb','==',False)]}" colspan="4" col="4">
+                            <field name="company_theme_cb" invisible="True"/>
+                            <field name="company_theme_cbr" invisible="True"/>
+                            <field name="company_theme"
+                                   attrs="{'required':[('company_theme_cbr','==',True)]}"
+                                   colspan="4"
+                                    />
+
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('targ_keywords_cb','==',False)]}" colspan="4" col="4">
+                            <field name="targ_keywords_cb" invisible="True"/>
+                            <field name="targ_keywords_cbr" invisible="True"/>
+
+                            <field name="targ_keywords"
+                                   attrs="{'required':[('targ_keywords_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Если есть наработанные ключевые слова, вы можете их прикрепить отдельным файлом EXCEL для анализа соответствия страниц вашим запросам"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('site_age_cb','==',False)]}" colspan="4" col="4">
+                            <field name="site_age_cb" invisible="True"/>
+                            <field name="site_age_cbr" invisible="True"/>
+
+                            <field name="site_age"
+                                   attrs="{'required':[('site_age_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+                            <label string="Важный показатель, от которого зависит срок и сложность продвижения."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('act_prior_cb','==',False)]}" colspan="4" col="4">
+                            <field name="act_prior_cb" invisible="True"/>
+                            <field name="act_prior_cbr" invisible="True"/>
+
+                            <field name="act_prior"
+                                   attrs="{'required':[('act_prior_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Подробное описание ключевых направлений деятельности. Какие направления пользуются большим и постоянным спросом, какие приносят бОльшие деньги."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('out_services_cb','==',False)]}" colspan="4" col="4">
+                            <field name="out_services_cb" invisible="True"/>
+                            <field name="out_services_cbr" invisible="True"/>
+
+                            <field name="out_services"
+                                   attrs="{'required':[('out_services_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+                            <label string="Услуги выбираются только из предложенного списка, если есть необходимость в нескольких услугах, то оставляется два варианта. В том случае, если потенциального партнера интересует одна или иная услуга, то необходимо оставить два варианта, а необходимость сравнения двух вариантов услуг описать в пункте – Примечание."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('in_services_cb','==',False)]}" colspan="4" col="4">
+                            <field name="in_services_cb" invisible="True"/>
+                            <field name="in_services_cbr" invisible="True"/>
+
+                            <field name="in_services"
+                                   attrs="{'required':[('in_services_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Услуги выбираются только из предложенного списка, если есть необходимость в нескольких услугах, то оставляется два варианта. В том случае, если потенциального партнера интересует одна или иная услуга, то необходимо оставить два варианта, а необходимость сравнения двух вариантов услуг описать в пункте – Примечание."
+                                   colspan="4"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('social_pres_cb','==',False)]}" colspan="4" col="4">
+                            <field name="social_pres_cb" invisible="True"/>
+                            <field name="social_pres_cbr" invisible="True"/>
+
+                            <field name="social_pres"
+                                   attrs="{'required':[('social_pres_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Необходимо для наиболее точного определения позиционирования и представленности компании в Интернете"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('comp_adv_cb','==',False)]}" colspan="4" col="4">
+                            <field name="comp_adv_cb" invisible="True"/>
+                            <field name="comp_adv_cbr" invisible="True"/>
+
+                            <field name="comp_adv"
+                                   attrs="{'required':[('comp_adv_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Чтобы оценить отражает ли сайт Ваши сильные стороны."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('duration_cb','==',False)]}" colspan="4" col="4">
+                            <field name="duration_cb" invisible="True"/>
+                            <field name="duration_cbr" invisible="True"/>
+
+                            <field name="duration"
+                                   attrs="{'required':[('duration_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+                            <label string="Вариант «Очень быстро» или самостоятельно придуманные сроки – не подходит! Сроки должны оговариваться с Партнером для расчета  стоимости проекта. В том случае если для Партнера сроки не важны, то следует написать – на усмотрение КЦ"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('operators_asis_cb','==',False)]}" colspan="4" col="4">
+                            <field name="operators_asis_cb" invisible="True"/>
+                            <field name="operators_asis_cbr" invisible="True"/>
+
+                            <field name="operators_asis"
+                                   attrs="{'required':[('operators_asis_cbr','==',True)]}"
+                                   colspan="4"
+                                    />
+
+                            <label string="Если при разговоре понятно, что Партнер уже ведет бизнес, то наверняка у него уже кто-то отвечает на звонки. Необходимо уточнить эту информацию , т.е.: кто и сколько чел. (если отвечает сам директор, то это тоже необходимо отметить в данном пункте)."
+                                   colspan="4"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('sales_type_cb','==',False)]}" colspan="4" col="4">
+                            <field name="sales_type_cb" invisible="True"/>
+                            <field name="sales_type_cbr" invisible="True"/>
+
+                            <field name="sales_type"
+                                   attrs="{'required':[('sales_type_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Мы создадим рекламную кампанию для определенной целевой аудитории Ваших клиентов, учитывая специфику того или иного способа продаж."
+                                   colspan="2"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('social_net_cb','==',False)]}" colspan="4" col="4">
+                            <field name="social_net_cb" invisible="True"/>
+                            <field name="social_net_cbr" invisible="True"/>
+
+                            <field name="social_net"
+                                   attrs="{'required':[('social_net_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Необходимо для формирования стратегии кампании."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('analytics_cb','==',False)]}" colspan="4" col="4">
+                            <field name="analytics_cb" invisible="True"/>
+                            <field name="analytics_cbr" invisible="True"/>
+
+                            <field name="analytics"
+                                   attrs="{'required':[('analytics_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+                            <label string="Чтобы проанализировать трафик, нам необходимы доступы к системам аналитики. Это могут быть как гостевые доступы, так и администратора."
+                                   colspan="2"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('int_mark_cb','==',False)]}" colspan="4" col="4">
+                            <field name="int_mark_cb" invisible="True"/>
+                            <field name="int_mark_cbr" invisible="True"/>
+
+                            <field name="int_mark"
+                                   attrs="{'required':[('int_mark_cbr','==',True)]}"
+                                   colspan="2"/>
+
+                            <label string="Для оценки влияния рекламных кампаний на конверсию сайта."
+                                   colspan="2"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('algorithm_cb','==',False)]}" colspan="4" col="4">
+                            <field name="algorithm_cb" invisible="True"/>
+                            <field name="algorithm_cbr" invisible="True"/>
+
+                            <field name="algorithm"
+                                   attrs="{'required':[('algorithm_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+                            <label string="Необходимое условие для просчета, которое может повысить конверсию продаж.
+                             Вариант 1. Один прозвон. Первый прозвон – оправка информации заинтересованным – передача контактов менеджерам Партнера.
+Вариант 2. Два прозвона. Первый прозвон -отправление информации заинтересованным – второй прозвон – подтверждение интереса по информации – передача менеджерам партнера."
+                            colspan="2"
+                            />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('operators_tobe_cb','==',False)]}" colspan="4" col="4">
+                            <field name="operators_tobe_cb" invisible="True"/>
+                            <field name="operators_tobe_cbr" invisible="True"/>
+
+                            <field name="operators_tobe"
+                                   attrs="{'required':[('operators_tobe_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="В этом пункте важно зафиксировать виденье партнера на количество сотрудников из этого можно также сделать вывод на какие масштабы и суммы рассчитывает потенциальный Партнер ."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('main_compete_cb','==',False)]}" colspan="4" col="4">
+                            <field name="main_compete_cb" invisible="True"/>
+                            <field name="main_compete_cbr" invisible="True"/>
+
+                            <field name="main_compete"
+                                   attrs="{'required':[('main_compete_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Анализируя работу Ваших конкурентов, мы предложим Вам стратегию по их опережению"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('webmasters_cb','==',False)]}" colspan="4" col="4">
+                            <field name="webmasters_cb" invisible="True"/>
+                            <field name="webmasters_cbr" invisible="True"/>
+
+                            <field name="webmasters"
+                                   attrs="{'required':[('webmasters_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Чтобы проанализировать отношение поисковых систем, нам необходимы доступы к панелям для вебмастеров. Это могут быть как гостевые доступы, так и администратора."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('budget_cb','==',False)]}" colspan="4" col="4">
+                            <field name="budget_cb" invisible="True"/>
+                            <field name="budget_cbr" invisible="True"/>
+
+                            <field name="budget"
+                                   attrs="{'required':[('budget_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Важно понимать какой рекламный бюджет для расчёта максимально эффективной стратегии и для понимания соизмеримости запроса Партнера с его ожиданиями и фактической готовностью работать"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('leads_num_cb','==',False)]}" colspan="4" col="4">
+                            <field name="leads_num_cb" invisible="True"/>
+                            <field name="leads_num_cbr" invisible="True"/>
+
+                            <field name="leads_num"
+                                   attrs="{'required':[('leads_num_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Обязательный пункт. Для услуги «Активные продажи по телефону (Холодные звонки)» минимальное количество контактов – 500 шт. По остальным услугам минимальное количество контактов – 250 шт."
+                                   colspan="2"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('adv_types_cb','==',False)]}" colspan="4" col="4">
+                            <field name="adv_types_cb" invisible="True"/>
+                            <field name="adv_types_cbr" invisible="True"/>
+
+                            <field name="adv_types"
+                                   attrs="{'required':[('adv_types_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Необходимо для сопровождения и поддержания общей стилистики других рекламных направлений."
+                                   colspan="2"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('adv_object_cb','==',False)]}" colspan="4" col="4">
+                            <field name="adv_object_cb" invisible="True"/>
+                            <field name="adv_object_cbr" invisible="True"/>
+
+                            <field name="adv_object" attrs="{'required':[('adv_object_cbr','==',True)]}" colspan="4"/>
+
+                            <label string="Необходимо для формирования стратегии кампании." colspan="4"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('database_type_cb','==',False)]}" colspan="4" col="4">
+                            <field name="database_type_cb" invisible="True"/>
+                            <field name="database_type_cbr" invisible="True"/>
+
+                            <field name="database_type"
+                                   attrs="{'required':[('database_type_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Отметить чья  БД – Партнера или ее мы формируем самостоятельно. Формирование базы КЦ для Партнера ведется только по юр. лицам. Формирование БД физ. лиц КЦ не предоставляется. Услуги по БД физ. лиц реализуются только в том случае, если  она предоставлена Партнерам хотя бы в формате: ФИО и номер телефона "
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('work_schedule_cb','==',False)]}" colspan="4" col="4">
+                            <field name="work_schedule_cb" invisible="True"/>
+                            <field name="work_schedule_cbr" invisible="True"/>
+
+                            <field name="work_schedule"
+                                   attrs="{'required':[('work_schedule_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Основной интерес представляет то, в какое время можно связываться с их менеджерами, закрепленными за нашим проектом."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('soc_services_cb','==',False)]}" colspan="4" col="4">
+                            <field name="soc_services_cb" invisible="True"/>
+                            <field name="soc_services_cbr" invisible="True"/>
+
+                            <field name="soc_services"
+                                   attrs="{'required':[('soc_services_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Ваши предпочтения и предложения по выбору стратегии продвижения"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('user_wanted_cb','==',False)]}" colspan="4" col="4">
+                            <field name="user_wanted_cb" invisible="True"/>
+                            <field name="user_wanted_cbr" invisible="True"/>
+
+                            <field name="user_wanted"
+                                   attrs="{'required':[('user_wanted_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Желаемое количество посетителей и примеры сайтов с такой посещаемостью."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('call_can_cb','==',False)]}" colspan="4" col="4">
+                            <field name="call_can_cb" invisible="True"/>
+                            <field name="call_can_cbr" invisible="True"/>
+
+                            <field name="call_can"
+                                   attrs="{'required':[('call_can_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Время работы отмечается в формате (например): с  12.00 до 23.00, с понедельника по пятницу, с 11.00 до 19.30 в субботу и с 09.00 до 20.00 в воскресенье. Если Партнера интересует круглосуточное обслуживание, то фиксируем это пожелание и уточняем только дни недели, когда необходимо круглосуточное обслуживание."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('target_age_cb','==',False)]}" colspan="4" col="4">
+                            <field name="target_age_cb" invisible="True"/>
+                            <field name="target_age_cbr" invisible="True"/>
+
+                            <field name="target_age"
+                                   attrs="{'required':[('target_age_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Чем подробнее Вы заполните данный пункт, тем точнее будет охвачена необходимая Вам аудитория"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('target_sex_cb','==',False)]}" colspan="4" col="4">
+                            <field name="target_sex_cb" invisible="True"/>
+                            <field name="target_sex_cbr" invisible="True"/>
+
+                            <field name="target_sex"
+                                   attrs="{'required':[('target_sex_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Чем подробнее Вы заполните данный пункт, тем точнее будет охвачена необходимая Вам аудитория "
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('target_income_cb','==',False)]}" colspan="4" col="4">
+                            <field name="target_income_cb" invisible="True"/>
+                            <field name="target_income_cbr" invisible="True"/>
+
+                            <field name="target_income"
+                                   attrs="{'required':[('target_income_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Чем подробнее Вы заполните данный пункт, тем точнее будет охвачена необходимая Вам аудитория"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('target_activ_cb','==',False)]}" colspan="4" col="4">
+                            <field name="target_activ_cb" invisible="True"/>
+                            <field name="target_activ_cbr" invisible="True"/>
+
+                            <field name="target_activ"
+                                   attrs="{'required':[('target_activ_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Чем подробнее Вы заполните данный пункт, тем точнее будет охвачена необходимая Вам аудитория"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('target_living_cb','==',False)]}" colspan="4" col="4">
+                            <field name="target_living_cb" invisible="True"/>
+                            <field name="target_living_cbr" invisible="True"/>
+
+                            <field name="target_living"
+                                   attrs="{'required':[('target_living_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Чем подробнее Вы заполните данный пункт, тем точнее будет охвачена необходимая Вам аудитория"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('target_inter_cb','==',False)]}" colspan="4" col="4">
+                            <field name="target_inter_cb" invisible="True"/>
+                            <field name="target_inter_cbr" invisible="True"/>
+
+                            <field name="target_inter"
+                                   attrs="{'required':[('target_inter_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Чем подробнее Вы заполните данный пункт, тем точнее будет охвачена необходимая Вам аудитория"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('add_mat_cb','==',False)]}" colspan="4" col="4">
+                            <field name="add_mat_cb" invisible="True"/>
+                            <field name="add_mat_cbr" invisible="True"/>
+
+                            <field name="add_mat"
+                                   attrs="{'required':[('add_mat_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Чем больше материалов для обучения, набросков речевых модулей или сценариев предоставит Партнер, тем легче и качественней будет реализовываться подготовка проекта и обучение по нем операторов."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('calls_num_cb','==',False)]}" colspan="4" col="4">
+                            <field name="calls_num_cb" invisible="True"/>
+                            <field name="calls_num_cbr" invisible="True"/>
+
+                            <field name="calls_num"
+                                   attrs="{'required':[('calls_num_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Необходимо указать цифры в каждом пункте, также обращаю внимание на то, что под контактом подразумевается : звонок, письмо по e-mail, isq, Skype, on-lane чат"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('receive_file_cb','==',False)]}" colspan="4" col="4">
+                            <field name="receive_file_cb" invisible="True"/>
+                            <field name="receive_file_cbr" invisible="True"/>
+
+                            <field name="receive_file"
+                                   attrs="{'required':[('receive_file_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Необходимо для определения объема работ."
+                                   colspan="2"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('partner_mat_cb','==',False)]}" colspan="4" col="4">
+                            <field name="partner_mat_cb" invisible="True"/>
+                            <field name="partner_mat_cbr" invisible="True"/>
+
+                            <field name="partner_mat"
+                                   attrs="{'required':[('partner_mat_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="К дополнительным материалам относятся: КП, прайсы, обращение, презентации, портфолио и т.д. Если есть, то было бы хорошо получить вместе с брифом, если в стадии разработки, то необходимо постараться уточнить, что именно будет в данных материалах. В том случае, если у партнера не сформированы КП для потенциальных клиентов или др. материалы, то мы их можем разрабатывать."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('talk_time_cb','==',False)]}" colspan="4" col="4">
+                            <field name="talk_time_cb" invisible="True"/>
+                            <field name="talk_time_cbr" invisible="True"/>
+
+                            <field name="talk_time"
+                                   attrs="{'required':[('talk_time_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Среднее время разговора как правило составляет 2 минуты, но в зависимости от тематики оно может меняться"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('lang_cb','==',False)]}" colspan="4" col="4">
+                            <field name="lang_cb" invisible="True"/>
+                            <field name="lang_cbr" invisible="True"/>
+
+                            <field name="lang" attrs="{'required':[('lang_cbr','==',True)]}" colspan="2"/>
+
+                            <group colspan="2">
+                                <label string="Необходимо оставить нужный вариант" colspan="4"/>
+                                <newline/>
+                                <field name="another_lang" nolabel="1" colspan="4"/>
+                            </group>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('forums_tobe_cb','==',False)]}" colspan="4" col="4">
+                            <field name="forums_tobe_cb" invisible="True"/>
+                            <field name="forums_tobe_cbr" invisible="True"/>
+
+                            <field name="forums_tobe"
+                                   attrs="{'required':[('forums_tobe_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Перечень площадок, которые Вы считаете необходимыми для работы"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('adv_duration_cb','==',False)]}" colspan="4" col="4">
+                            <field name="adv_duration_cb" invisible="True"/>
+                            <field name="adv_duration_cbr" invisible="True"/>
+
+                            <field name="adv_duration"
+                                   attrs="{'required':[('adv_duration_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Необходимо для формирования стратегии кампании."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('smm_optimiz_cb','==',False)]}" colspan="4" col="4">
+                            <field name="smm_optimiz_cb" invisible="True"/>
+                            <field name="smm_optimiz_cbr" invisible="True"/>
+
+                            <field name="smm_optimiz"
+                                   attrs="{'required':[('smm_optimiz_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Необходимо для перенаправления пользователей с сайта в соцмедиа."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('ivr_cb','==',False)]}" colspan="4" col="4">
+                            <field name="ivr_cb" invisible="True"/>
+                            <field name="ivr_cbr" invisible="True"/>
+
+                            <field name="ivr"
+                                   attrs="{'required':[('ivr_cbr','==',True)]}"
+                                   colspan="2"/>
+
+                            <label string="Данная функция является дополнительной при запуске проекта, не требует дополнительной оплаты в случае, когда производится одна базовая запись автоответчика и «Приветственного!» IVR"
+                                   colspan="2"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('info_req_cb','==',False)]}" colspan="4" col="4">
+                            <field name="info_req_cb" invisible="True"/>
+                            <field name="info_req_cbr" invisible="True"/>
+
+                            <field name="info_req"
+                                   attrs="{'required':[('info_req_cbr','==',True)]}"
+                                   colspan="2"/>
+
+                            <label string="Необходимо для составления стратегии продвижения и позиционирования"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('report_req_cb','==',False)]}" colspan="4" col="4">
+                            <field name="report_req_cb" invisible="True"/>
+                            <field name="report_req_cbr" invisible="True"/>
+
+                            <field name="report_req"
+                                   attrs="{'required':[('report_req_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Вариант «предоставить все записи» или самостоятельно придуманные варианты – не подходят! Пожелания должны оговариваться с Партнером для расчета  стоимости проекта. В том случае, если требования по формам отчетности у Партнера на данный момент не сформированы, то следует написать – на усмотрение КЦ"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('work_object_cb','==',False)]}" colspan="4" col="4">
+                            <field name="work_object_cb" invisible="True"/>
+                            <field name="work_object_cbr" invisible="True"/>
+
+                            <field name="work_object"
+                                   attrs="{'required':[('work_object_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Определение целей поможет нам подобрать необходимую именно для Вас специфику продвижения и пути использования рекламных инструментов"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('tel_type_cb','==',False)]}" colspan="4" col="4">
+                            <field name="tel_type_cb" invisible="True"/>
+                            <field name="tel_type_cbr" invisible="True"/>
+
+                            <field name="tel_type"
+                                   attrs="{'required':[('tel_type_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <group colspan="2">
+                                <label string="Данная функция является дополнительной при запуске проекта, не требует дополнительной оплаты в случае, когда производится одна базовая запись автоответчика и «Приветственного!» IVR" colspan="4"/>
+                                <newline/>
+                                <field name="an_tel_type" nolabel="1" colspan="4"/>
+                            </group>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('question_par_cb','==',False)]}" colspan="4" col="4">
+                            <field name="question_par_cb" invisible="True"/>
+                            <field name="question_par_cbr" invisible="True"/>
+
+                            <field name="question_par"
+                                   attrs="{'required':[('question_par_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Необходимо для эффективной работы и достижения желаемого результата"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('media_expec_cb','==',False)]}" colspan="4" col="4">
+                            <field name="media_expec_cb" invisible="True"/>
+                            <field name="media_expec_cbr" invisible="True"/>
+
+                            <field name="media_expec"
+                                   attrs="{'required':[('media_expec_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Необходимо для составления стратегии продвижения и позиционирования.Варианты: повысить лояльность аудитории к бренду/повысить узнаваемость/увеличить продажи/промо запуска нового товара или услуги и т.п."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('ad_comp_dur_cb','==',False)]}" colspan="4" col="4">
+                            <field name="ad_comp_dur_cb" invisible="True"/>
+                            <field name="ad_comp_dur_cbr" invisible="True"/>
+
+                            <field name="ad_comp_dur"
+                                   attrs="{'required':[('ad_comp_dur_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Необходимо для правильного составления стратегии продвижения"
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('work_dir_cb','==',False)]}" colspan="4" col="4">
+                            <field name="work_dir_cb" invisible="True"/>
+                            <field name="work_dir_cbr" invisible="True"/>
+
+                            <field name="work_dir"
+                                   attrs="{'required':[('work_dir_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Информация, которая может понадобиться при организации работы специалистов."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('soc_reasons_cb','==',False)]}" colspan="4" col="4">
+                            <field name="soc_reasons_cb" invisible="True"/>
+                            <field name="soc_reasons_cbr" invisible="True"/>
+
+                            <field name="soc_reasons"
+                                   attrs="{'required':[('soc_reasons_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Ваши мотивы помогут нам определить пути продвижения."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('another_plase_reklam_cb','==',False)]}" colspan="4" col="4">
+                            <field name="another_plase_reklam_cb" invisible="True"/>
+                            <field name="another_plase_reklam_cbr" invisible="True"/>
+
+                            <field name="another_plase_reklam"
+                                   attrs="{'required':[('another_plase_reklam_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Указав все места размещения в прошлом, мы поможем найти лучшие варианты для будущей рекламной кампании."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('type_of_promotion_cb','==',False)]}" colspan="4" col="4">
+                            <field name="type_of_promotion_cb" invisible="True"/>
+                            <field name="type_of_promotion_cbr" invisible="True"/>
+
+                            <field name="type_of_promotion"
+                                   attrs="{'required':[('type_of_promotion_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Сделайте выбор."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('tech_spec_cb','==',False)]}" colspan="4" col="4">
+                            <field name="tech_spec"
+                                   attrs="{'required':[('tech_spec_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+                            <field name="tech_spec_cb" invisible="True"/>
+                            <field name="tech_spec_cbr" invisible="True"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('other_direction_reclam_cb','==',False)]}" colspan="4" col="4">
+                            <field name="other_direction_reclam_cb" invisible="True"/>
+                            <field name="other_direction_reclam_cbr" invisible="True"/>
+
+                            <field name="other_direction_reclam"
+                                   attrs="{'required':[('other_direction_reclam_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Необходимо для наиболее точного определения позиционирования и представленности компании в Интернете."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('obj_keys_cb','==',False)]}" colspan="4" col="4">
+                            <field name="obj_keys_cb" invisible="True"/>
+                            <field name="obj_keys_cbr" invisible="True"/>
+
+                            <field name="obj_keys"
+                                   attrs="{'required':[('obj_keys_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Определение целей и критериев их измерения помогут нам подобрать необходимую именно для Вас специфику продвижения и пути использования инструментов соцмедиа. Варианты: достичь роста последователей в соцсетях/привлечь количество людей на сайт/получить определенное количество анкет/получить определенное количество действий и т.п."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('give_presents_cb','==',False)]}" colspan="4" col="4">
+                            <field name="give_presents_cb" invisible="True"/>
+                            <field name="give_presents_cbr" invisible="True"/>
+
+                            <field name="give_presents"
+                                   attrs="{'required':[('give_presents_cbr','==',True)]}"
+                                   colspan="2"
+                                    />
+
+                            <label string="Информация, которая может понадобится при организации конкурсов и акций."
+                                   colspan="2"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('planned_budget_cb','==',False)]}" colspan="4" col="4">
+                            <field name="planned_budget" attrs="{'required':[('planned_budget_cbr','==',True)]}" colspan="4"/>
+                            <field name="planned_budget_cb" invisible="True"/>
+                            <field name="planned_budget_cbr" invisible="True"/>
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+                        <!--
+                        <group attrs="{'invisible':[('brief_file_id_cb','==',False)]}">
+                            <field name="brief_file_id" 
+                                string="Загрузка брифа"
+                                attrs="{'required':[('brief_file_id_cbr','==',True)]}" 
+                                context="{'object': 'brief.brief'}"
+                                domain="[('object','=','brief.brief')]" 
+                                colspan="4"/>
+                            <field name="brief_file_id_cb" invisible="True"/>
+                            <field name="brief_file_id_cbr" invisible="True"/>
+                            <separator/>
+                        </group>
+                        <newline/>
+                        
+                        <group attrs="{'invisible':[('tender_file_id_cb','==',False)]}">
+                            <separator colspan="8" string="Загрузка брифа"/>
+                            <field name="tender_file_id" 
+                                nolabel="1"
+                                attrs="{'required':[('tender_file_id_cbr','==',True)]}" 
+                                context="{'object': 'brief'}"
+                                domain="[('object','=','brief')]" 
+                                colspan="4"/>
+                            <field name="tender_file_id_cb" invisible="True"/>
+                            <field name="tender_file_id_cbr" invisible="True"/>
+                            <separator/>
+                        </group>
+                        <newline/>
+                        -->
+                        <group attrs="{'invisible':[('tender_cb','==',False)]}" colspan="4" col="4">
+                            <field name="tender" attrs="{'required':[('tender_cbr','==',True)]}" colspan="4"/>
+                            <field name="tender_cb" invisible="True" />
+                            <field name="tender_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('solvency_cb','==',False)]}" colspan="4" col="4">
+                            <field name="solvency" attrs="{'required':[('solvency_cbr','==',True)]}" colspan="4" />
+                            <field name="solvency_cb" invisible="True" />
+                            <field name="solvency_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('history_and_cb','==',False)]}" colspan="4" col="4">
+                            <field name="history_and" attrs="{'required':[('history_and_cbr','==',True)]}" colspan="4" />
+                            <field name="history_and_cb" invisible="True" />
+                            <field name="history_and_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('develop_info_cb','==',False)]}" colspan="4" col="4">
+                            <field name="develop_info" attrs="{'required':[('develop_info_cbr','==',True)]}" colspan="4" />
+                            <field name="develop_info_cb" invisible="True" />
+                            <field name="develop_info_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('another_content_cb','==',False)]}" colspan="4" col="4">
+                            <field name="another_content" attrs="{'required':[('another_content_cbr','==',True)]}" colspan="4" />
+                            <field name="another_content_cb" invisible="True" />
+                            <field name="another_content_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('text_content_cb','==',False)]}" colspan="4" col="4">
+                            <field name="text_content" attrs="{'required':[('text_content_cbr','==',True)]}" colspan="4" />
+                            <field name="text_content_cb" invisible="True" />
+                            <field name="text_content_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('need_text_cb','==',False)]}" colspan="4" col="4">
+                            <field name="need_text" attrs="{'required':[('need_text_cbr','==',True)]}" colspan="4" />
+                            <field name="need_text_cb" invisible="True" />
+                            <field name="need_text_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('vol_text_cb','==',False)]}" colspan="4" col="4">
+                            <field name="vol_text" attrs="{'required':[('vol_text_cbr','==',True)]}" colspan="4" />
+                            <field name="vol_text_cb" invisible="True" />
+                            <field name="vol_text_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('sources_seo_cb','==',False)]}" colspan="4" col="4">
+                            <field name="sources_seo" attrs="{'required':[('sources_seo_cbr','==',True)]}" colspan="4" />
+                            <field name="sources_seo_cb" invisible="True" />
+                            <field name="sources_seo_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('newsmaker_cb','==',False)]}" colspan="4" col="4">
+                            <field name="newsmaker" attrs="{'required':[('newsmaker_cbr','==',True)]}" colspan="4" />
+                            <field name="newsmaker_cb" invisible="True" />
+                            <field name="newsmaker_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('in_silence_cb','==',False)]}" colspan="4" col="4">
+                            <field name="in_silence" attrs="{'required':[('in_silence_cbr','==',True)]}" colspan="4" />
+                            <field name="in_silence_cb" invisible="True" />
+                            <field name="in_silence_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('purpose_cb','==',False)]}" colspan="4" col="4">
+                            <field name="purpose" attrs="{'required':[('purpose_cbr','==',True)]}" colspan="4" />
+                            <field name="purpose_cb" invisible="True" />
+                            <field name="purpose_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('what_sell_cb','==',False)]}" colspan="4" col="4">
+                            <field name="what_sell" attrs="{'required':[('what_sell_cbr','==',True)]}" colspan="4" />
+                            <field name="what_sell_cb" invisible="True" />
+                            <field name="what_sell_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('where_cb','==',False)]}" colspan="4" col="4">
+                            <field name="where" attrs="{'required':[('where_cbr','==',True)]}" colspan="4" />
+                            <field name="where_cb" invisible="True" />
+                            <field name="where_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('sources_info_cb','==',False)]}" colspan="4" col="4">
+                            <field name="sources_info" attrs="{'required':[('sources_info_cbr','==',True)]}" colspan="4" />
+                            <field name="sources_info_cb" invisible="True" />
+                            <field name="sources_info_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('distinguishes_cb','==',False)]}" colspan="4" col="4">
+                            <field name="distinguishes" attrs="{'required':[('distinguishes_cbr','==',True)]}" colspan="4" />
+                            <field name="distinguishes_cb" invisible="True" />
+                            <field name="distinguishes_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('problem_resolve_cb','==',False)]}" colspan="4" col="4">
+                            <field name="problem_resolve" attrs="{'required':[('problem_resolve_cbr','==',True)]}" colspan="4" />
+                            <field name="problem_resolve_cb" invisible="True" />
+                            <field name="problem_resolve_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('hidden_desires_cb','==',False)]}" colspan="4" col="4">
+                            <field name="hidden_desires" attrs="{'required':[('hidden_desires_cbr','==',True)]}" colspan="4" />
+                            <field name="hidden_desires_cb" invisible="True" />
+                            <field name="hidden_desires_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('benefit_cb','==',False)]}" colspan="4" col="4">
+                            <field name="benefit" attrs="{'required':[('benefit_cbr','==',True)]}" colspan="4" />
+                            <field name="benefit_cb" invisible="True" />
+                            <field name="benefit_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('why_you_cb','==',False)]}" colspan="4" col="4">
+                            <field name="why_you" attrs="{'required':[('why_you_cbr','==',True)]}" colspan="4" />
+                            <field name="why_you_cb" invisible="True" />
+                            <field name="why_you_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('marketing_cb','==',False)]}" colspan="4" col="4">
+                            <field name="marketing" attrs="{'required':[('marketing_cbr','==',True)]}" colspan="4" />
+                            <field name="marketing_cb" invisible="True" />
+                            <field name="marketing_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('transfer_cb','==',False)]}" colspan="4" col="4">
+                            <field name="transfer" attrs="{'required':[('transfer_cbr','==',True)]}" colspan="4" />
+                            <field name="transfer_cb" invisible="True" />
+                            <field name="transfer_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                        <group attrs="{'invisible':[('access_ids_cb','==',False), ('transfer','==',False)]}" colspan="4" col="4">
+                            <field 
+                                name="access_ids" 
+                                nolabel="1" 
+                                colspan="4" 
+                                mode="tree" 
+                                attrs="{'required':[('access_ids_cbr','==',True)]}"
+                                >
+                                <tree string=" Доступы, предоставляемые партнером" editable='top'>
+                                    <field name="type"/>
+                                    <field name="link"/>
+                                    <field name="login"/>
+                                    <field name="pswd"/>
+                                </tree>
+                            </field>
+                            <field name="access_ids_cb" invisible="True" />
+                            <field name="access_ids_cbr" invisible="True" />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
+                    </group>
+                    <group colspan="4">
+                        <separator string="Примечания менеджера" colspan="4"/>
+                        <field name="notes" nolabel="1" colspan="4"/>
+                        <separator string="Коментарии по доработке МП" colspan="4"/>
+                        <field name="comment_revision" nolabel="1" colspan="4"/>
+                        <separator string="Комментарий медиапланера" colspan="4"/>
+                        <field name="comment_mp" nolabel="1" attrs="{'required': [('state', 'in', ('inwork'))]}" colspan="4"/>
+                    </group>
+                    <newline/>
+
+                    <group colspan="4" col="13">
+                        <field name="check_leader" invisible="1" />
+                        <field name="state"
+                               widget="statusbar"
+                               statusbar_visible="draft,accept,inwork,media_accept,media_approval,media_approved"
+                               statusbar_colors='{"cancel":"gray", "media_approved":"orange", "partner_refusion": "red", "rework": "magenta", "media_accept_rev": "magenta", "media_approval_r": "magenta"}'
+                                />
+                        <newline />
+
+                        <button string="Черновик"
+                                name="action_draft"
+                                attrs="{'invisible': ['|', ('state', '!=', 'cancel'), ('check_m', '=', False)]}"
+                                icon="terp-document-new"
+                                 />
+
+                        <button string="Отменить"
+                                name="action_cancel"
+                                attrs="{'invisible': ['|', ('state', 'not in', ('draft', 'rework')), ('check_m', '=', False)]}"
+                                icon="gtk-cancel"
+                                />
+
+                        <button string="Отправить бриф на согласование"
+                                name="action_accept"
+                                attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_m', '=', False)]}"
+                                icon="gtk-go-forward"
+                                />
+
+                        <button string="На доработку"
+                                name="action_rework"
+                                attrs="{'invisible': ['|', ('state', '!=', 'accept'), ('check_r', '=', False)]}"
+                                icon="gtk-go-back"
+                                />
+
+                        <button string="Повторно отправить бриф"
+                                name="action_reworked"
+                                attrs="{'invisible': ['|', ('state', '!=', 'rework'), ('check_m', '=', False)]}"
+                                icon="gtk-go-forward"
+                                />
+
+                        <button string="Принять бриф"
+                                name="action_inwork"
+                                attrs="{'invisible': ['|', ('state', '!=', 'accept'), ('check_r', '=', False)]}"
+                                icon="gtk-go-forward"
+                                />
+
+                        <button string="Отправить медиаплан на согласование с руководителем"
+                                name="action_media_accept"
+                                attrs="{'invisible': ['&amp;',
+                                '|', '|', ('check_leader', '=', False), ('state', '!=', 'inwork'), ('check_r', '=', False),
+                                '|', ('state', '!=', 'media_accept_rev'), ('check_r', '=', False)]}"
+                                icon="gtk-go-forward"
+                                />
+
+                        <button string="Медиаплан на доработку"
+                                name="action_media_accept_revision"
+                                attrs="{'invisible': ['|', ('state', '!=', 'media_accept'), ('check_h', '=', False)]}"
+                                icon="gtk-go-back"
+                                />
+
+                        <button string="Отправить на утверждение"
+                                name="action_media_approval"
+                                attrs="{'invisible': ['&amp;',
+                                '|', '|', ('check_leader', '=', True), ('state', '!=', 'inwork'), ('check_r', '=', False),
+                                '|', ('state', '!=', 'media_accept'), ('check_h', '=', False)]}"
+                                icon="gtk-go-forward"
+                                />
+
+                        <button string="Отправить на утверждение"
+                                name="action_media_approval"
+                                attrs="{'invisible': ['|', ('state', '!=', 'media_approval_r'), ('check_r', '=', False)]}"
+                                icon="gtk-go-forward"
+                                />
+
+                        <button string="Отправить на утверждение"
+                                name="action_media_approval"
+                                attrs="{'invisible': ['|', ('state', '!=', 'partner_refusion'), ('check_m', '=', False)]}"
+                                icon="gtk-go-forward"
+                                />
+
+                        <button string="Партнер отказался"
+                                name="action_partner_refusion"
+                                attrs="{'invisible': ['|', ('state', '!=', 'media_approval'), ('check_m', '=', False)]}"
+                                icon="gtk-go-back"
+                                />
+
+                        <button string="На доработку"
+                                name="action_media_approval_revision"
+                                attrs="{'invisible': ['|', ('state', '!=', 'media_approval'), ('check_m', '=', False)]}"
+                                icon="gtk-go-back"
+                                />
+
+                        <button string="Утвердить медиаплан"
+                                name="action_media_approved"
+                                attrs="{'invisible': ['|', ('state', '!=', 'media_approval'), ('check_m', '=', False)]}"
+                                icon="gtk-yes"
+                                />
+
+                    </group>
+                    <field name="history_ids" nolabel="1" colspan="4" mode="tree" readonly="1">
+                        <tree string="История">
+                            <field name="us_id"/>
+                            <field name="create_date"/>
+                            <field name="state"/>
+                        </tree>
+                    </field>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_brief_search" model="ir.ui.view">
+            <field name="name">Поиск по брифам</field>
+            <field name="model">brief.main</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Поиск по брифам">
+                    <field name="user_id"/>
+                    <field name="specialist_id"/>
+                    <field name="partner_name"/>
+                    <field name="services_ids"/>
+                    <field name="state"/>
+                    <field name="partner_id"/>
+                    <field name="accept_date"/>
+                    <field name="usergroup" domain="[('name', 'ilike', 'очередь')]" widget="selection"/>
+                    <field name="work_state" />
+                </search>
+            </field>
+        </record>
+
+        <record id="view_brief_trees" model="ir.ui.view">
+            <field name="name">Брифы</field>
+            <field name="model">brief.main</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Список брифов">
+                    <field name="id"/>
+                    <field name="user_id"/>
+                    <field name="specialist_id"/>
+                    <field name="partner_name"/>
+                    <field name="services_ids"/>
+                    <field name="state"/>
+                    <field name="partner_id"/>
+                    <field name="usergroup"/>
+                    <field name="responsible_user"/>
+                    <field name="write_date"/>
+                    <field name="accept_date"/>
+                    <field name="work_state"/>
+                </tree>
+            </field>
+        </record>
+
+    </data>
+</openerp>

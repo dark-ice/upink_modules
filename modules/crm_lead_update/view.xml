@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="crm_lead_form" model="ir.ui.view">
+            <field name="name">CRM: Кандидаты базовая форма</field>
+            <field name="model">crm.lead</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Кандидаты">
+                    <group colspan="4" col="8">
+                        <field name="id"/>
+                        <field name="permissions"/>
+                        <field name="type"/>
+                        <field name="company_type"/>
+                    </group>
+                    <group colspan="4" col="8">
+                        <field name="name" required="1" string="Основной сайт"/>
+                        <field name="user_id"/>
+                        <field name="priority"/>
+                        <field name="responsible_user" string="Автор" attrs="{'readonly':[('permissions','!=','Director')]}"/>
+                        <field name="section_id" widget="selection"/>
+                        <field name="stage_id" domain="[('section_ids', '=', section_id)]"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+    </data>
+</openerp>
+

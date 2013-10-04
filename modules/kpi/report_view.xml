@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="view_income_report">
+            <field name="name">income.report.view</field>
+            <field name="model">income.report</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Список KPI">
+                    <field name="period_id" />
+                    <field name="grade" />
+                    <field name="employee_id" />
+                    <field name="job_id" />
+                    <field name="sv" />
+                    <field name="total_pay" />
+                    <field name="formal_cash" />
+                    <field name="formal_tax" />
+                    <field name="days_worked" />
+                    <field name="retention" />
+                    <field name="advance" />
+                    <field name="award" />
+                </tree>
+            </field>
+        </record>
+
+
+
+        <record id="print_income_report_view" model="ir.ui.view">
+            <field name="name">income.report_print.form</field>
+            <field name="model">income.report.print</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Выберите период отчета">
+                    <field name="period_id" domain="[('calendar', '=', 'rus')]"/>
+                    <button icon="gtk-print" name="print_report" string="Получить файл" type="object"/>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_print_income_report" model="ir.actions.act_window">
+            <field name="name">Account Central Journal</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">income.report.print</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="print_income_report_view"/>
+        </record>
+
+    </data>
+</openerp>

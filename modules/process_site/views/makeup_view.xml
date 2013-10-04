@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_process_site_makeup_tree">
+            <field name="name">view.process.site.makeup.tree</field>
+            <field name="model">process.site.makeup</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="site_id" />
+                    <field name="plan_date_st" />
+                    <field name="plan_date_fn" />
+                    <field name="real_date_st" />
+                    <field name="real_date_fn" />
+                    <field name="manager_id" />
+                    <field name="state" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_process_site_makeup_search">
+            <field name="name">view.process.site.makeup.search</field>
+            <field name="model">process.site.makeup</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="site_id" />
+                    <field name="plan_date_st" />
+                    <field name="plan_date_fn" />
+                    <field name="manager_id" />
+                    <field name="state" />
+                    <newline />
+                    <group>
+                        <filter icon="STOCK_MEDIA_PLAY"
+                                domain="[('state', 'not in', ('none', 'draft', 'finish'))]"
+                                name="active"
+                                string="Активные"/>
+                        <filter icon="STOCK_MEDIA_STOP"
+                                domain="[('state', 'in', ('none', 'draft', 'finish'))]"
+                                name="deactive"
+                                string="Неактивные"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_process_site_makeup_form">
+            <field name="name">view.process.site.makeup.form</field>
+            <field name="model">process.site.makeup</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <field name="partner_id"/><field name="service_id"/>
+                    <group colspan="2" col="4">
+                        <field name="plan_date_st" colspan="4" readonly="1"/>
+                        <field name="plan_date_fn" colspan="4" readonly="1"/>
+                        <separator colspan="4" />
+                        <field name="real_date_st" colspan="4" readonly="1"/>
+                        <field name="real_date_fn" colspan="4" readonly="1"/>
+                    </group>
+                    <group colspan="2" col="4">
+                        <field name="manager_id" colspan="4"/>
+                        <field name="specialist_ids" nolabel="1" colspan="4" readonly="1" mode="tree">
+                            <tree string="Ответственные специалисты">
+                                <field name="name"/>
+                            </tree>
+                        </field>
+                    </group>
+
+                    <separator colspan="4" string="Файлы на утверждение"/>
+                    <field name="approval_file_ids" nolabel="1" colspan="4">
+                        <tree string="Файлы на утверждение">
+                            <field name="datas_fname"/>
+                            <field name="create_date"/>
+                            <field name="user_id"/>
+                            <field name="type" groups="base.group_extended"/>
+                        </tree>
+                    </field>
+                    <separator colspan="4" string="Комментарии"/>
+                    <field name="comment_ids" colspan="4" nolabel="1">
+                        <tree string="Комментарии" editable="top">
+                            <field name="name"/>
+                            <field name="create_date"/>
+                            <field name="create_uid" string="Автор"/>
+                        </tree>
+                    </field>
+                    <separator colspan="4" string="Подписанные файлы"/>
+                    <field name="signed_file_ids" nolabel="1" colspan="4">
+                        <tree string="Подписанные файлы">
+                            <field name="datas_fname"/>
+                            <field name="create_date"/>
+                            <field name="user_id"/>
+                            <field name="type" groups="base.group_extended"/>
+                        </tree>
+                    </field>
+                    <group colspan="4" col="6">
+                        <field name="state"
+                               widget="statusbar"
+                               statusbar_visible="none,draft,work,in_approval,approved,finish"
+                               statusbar_colors='{"finish":"orange","rectification":"red"}'
+                               colspan="6"
+                                />
+                    </group>
+                </form>
+            </field>
+        </record>
+        
+        <record id="window_process_site_makeup" model="ir.actions.act_window">
+            <field name="name">Верстка</field>
+            <field name="res_model">process.site.makeup</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_process_site_makeup_tree"/>
+            <field name="search_view_id" ref="view_process_site_makeup_search"/>
+            <field name="context">{"search_default_active":eval('True')}</field>
+            <field name="domain">[]</field>
+        </record>
+
+        <menuitem action="window_process_site_makeup" id="menu_process_site_makeup" parent="menu_process_site" sequence="30"/>
+    </data>
+</openerp>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_process_site_stage_tree">
+            <field name="name">view.process.site.stage.tree</field>
+            <field name="model">process.site.stage</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Этапы">
+                    <field name="check_s" invisible="1" />
+                    <field name="check_e" invisible="1" />
+                    <field name="id" invisible="1" />
+                    <field name="stage" />
+                    <field name="plan_date_st" />
+                    <field name="plan_date_fn" />
+                    <field name="real_date_st" />
+                    <field name="real_date_fn" />
+                    <field name="manager_id" />
+                    <field name="stage_state" />
+                    <button type="object"
+                            name="add_stage"
+                            string="Включить"
+                            context="{'stage_id': id}"
+                            attrs="{'invisible': [('check_s', '=', False)]}"
+                            icon="gtk-ok"/>
+
+                    <button type="object"
+                            name="off_stage"
+                            string="Отключить"
+                            context="{'stage_id': id}"
+                            attrs="{'invisible': [('check_e', '=', False)]}"
+                            icon="gtk-no"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_process_site_stage_form">
+            <field name="name">view.process.site.stage.form</field>
+            <field name="model">process.site.stage</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Этапы">
+                    <field name="stage" readonly="1" colspan="4"/>
+                    <field name="plan_date_st" required="1"/>
+                    <field name="plan_date_fn" required="1"/>
+                    <separator colspan="4"/>
+                    <field name="real_date_st"  readonly="1"/>
+                    <field name="real_date_fn"  readonly="1"/>
+                    <field name="manager_id" required="1"/><newline/>
+                    <field name="specialist_ids" colspan="4"/>
+                    <newline />
+                    <field name="stage_state" />
+                    <newline />
+                    <group>
+                        <button string="Отмена" icon="gtk-close" special="cancel" invisible="'add' not in context"/>
+                        <button name="save" type="object" string="Добавить" icon="gtk-ok" invisible="'add' not in context"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+    </data>
+</openerp>

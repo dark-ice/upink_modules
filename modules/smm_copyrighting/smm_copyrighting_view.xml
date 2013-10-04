@@ -1,0 +1,242 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+
+    <record model="ir.ui.view" id="view_smm_copyrighting_tree">
+        <field name="name">СММ - копирайтинг</field>
+        <field name="model">smm.copyrighting</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Копирайтинг">
+               <field name="partner_id"/>
+               <field name="site"/>
+               <field name="create_date"/>
+               <field name="agent_id"/>
+               <field name="order_type"/>
+               <field name="user_id"/>
+               <field name="state"/>
+
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_smm_copyrighting_form">
+        <field name="name">СММ - копирайтинг</field>
+        <field name="model">smm.copyrighting</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Копирайтинг" col="1">
+                <group colspan="2" col="4">
+                    <field 
+                        name="partner_id" 
+                        required="1" 
+                        on_change="onchange_partner(partner_id)"
+                        attrs="{'readonly':['|',('state','in',('closed', 'not_important')), ('state','not in',('draft', 'application_on_completion', ''))]}"
+                        />
+                    <field 
+                        name="site" 
+                        required="1" 
+                        attrs="{'readonly':['|',('state','in',('closed', 'not_important')), ('state','not in',('draft', 'application_on_completion', ''))]}"
+                        />
+                    <field 
+                        name="user_id" 
+                        readonly="1"/>
+                    <field 
+                        name="order_type" 
+                        required="1" 
+                        attrs="{'readonly':['|',('state','in',('closed', 'not_important')), ('state','not in',('draft', 'application_on_completion', ''))]}"
+                        />
+                    <field 
+                        name="agent_id" 
+                        attrs="{'required':[('state','in',('prep_to_start'))], 'readonly':[('state','in',('closed', 'not_important'))]}"
+                        groups="smm_copyrighting.smm_editor"
+                        />
+                    <newline />
+                    <field name="date_customer" />
+                    <field name="date_runtime" />
+                    <field name="manager_work_id"/>
+                    <field name="manager_upwork_id"/>
+                </group>
+                <newline/>
+                <notebook>
+                    <page string="Основные данные">
+                        <separator string="ТЗ по написанию текста:" colspan="4" />
+                        <field 
+                            name="tz_name" 
+                            required="1" 
+                            nolabel="1" 
+                            attrs="{'readonly':['|',('state','not in',('draft', 'application_on_completion', '')), ('state','in',('closed', 'not_important'))]}"
+                            />
+                        <field 
+                            name="tz" 
+                            nolabel="1" 
+                            on_change="onchange_filename('tz_name',tz_name)" 
+                            attrs="{'readonly':['|',('state','not in',('draft', 'application_on_completion', '')), ('state','in',('closed', 'not_important'))]}" 
+                            filename="tz_name"
+                            />
+                        <separator string="Написанный текст:" colspan="4" />
+                        <field
+                                name="text_wr_name"
+                                required="1"
+                                nolabel="1"
+                                attrs="{'readonly':['|',('state','not in',('draft', 'application_on_completion', '')), ('state','in',('closed', 'not_important'))]}"
+                                />
+                        <field
+                                name="text_wr"
+                                nolabel="1"
+                                on_change="onchange_filename('text_wr_name',text_wr_name)"
+                                attrs="{'readonly':['|',('state','not in',('draft', 'application_on_completion', '')), ('state','in',('closed', 'not_important'))]}"
+                                filename="text_wr_name"
+                                />
+                    </page>
+                    <page string="Переписка по проекту">
+                        <field name="message_ids" nolabel="1" mode="tree" colspan="2">
+                            <tree string="Переписка по проекту" editable="top">
+                                <field name="text" required="1"/>
+                                <field name="usr_id" string="Автор" readonly="1" />
+                                <field name="cr_date" readonly="1" />
+                            </tree>
+                            <newline/>
+                            <form string="Переписка по проекту">
+                                <field name="cr_date" readonly="1"/>
+                                <field name="usr_id"/>
+                                <field name="text" colspan="4"/>
+                            </form>
+                        </field>
+                        <newline />
+                        <field name="history_ids" nolabel="1" mode="tree" readonly="1"  colspan="2">
+                            <tree string="История">
+                                <field name="usr_id"/>
+                                <field name="create_date"/>
+                                <field name="state"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+                <separator string="Комментарий по доработке" />
+                <newline/>
+                <field name="comment" nolabel="1" attrs="{'readonly':[('state','in',('closed', 'not_important', 'text_on_completion_app', 'text_on_completion_adop', 'application_on_completion'))]}"/>
+                <separator string="Управление процессом"/>
+                <group>
+                    <newline/>
+                    <field name="state" />
+                </group>
+                <group>
+                    <button
+                        name="action_acceptance_application"
+                        attrs="{'invisible':[('state','not in',('draft', 'application_on_completion', ''))]}"
+                        string="Принятие заявки"
+                        icon="terp-gtk-go-back-rtl"
+                        />
+                    <button
+                       name="action_application_on_completion"
+                        attrs="{'invisible':[('state','in', ('acceptance_application'))]}" string="Заявка на доработке"
+                        icon="gtk-media-pause"
+                        />
+                    <button
+                        name="action_prep_to_start"
+                        attrs="{'invisible':[('state','not in',('acceptance_application'))]}"
+                        string="Подготовка задания к выполнению"
+                        icon="terp-gtk-go-back-rtl"
+                        />
+                    <button
+                        name="action_writing_text"
+                        attrs="{'invisible':[('state','not in',('prep_to_start'))]}"
+                        string="Написание текста"
+                        icon="terp-gtk-go-back-rtl"
+                        />
+                    <button 
+                        name="action_approval_text"
+                        attrs="{'invisible':[('state','not in',('writing_text', 'text_on_completion_app'))]}" 
+                        string="Согласование текста" 
+                        icon="terp-gtk-go-back-rtl"
+                        />
+                    <button 
+                        name="action_text_on_completion_app"
+                        attrs="{'invisible':[('state','!=','approval_text')]}" 
+                        string="Доработка текста(согласование)" 
+                        icon="gtk-media-pause"
+                        />
+                    <button 
+                        name="action_adoption_text"
+                        attrs="{'invisible':[('state','not in',('approval_text','text_on_completion_adop'))]}" 
+                        string="Утверждение текста" 
+                        icon="terp-gtk-go-back-rtl"
+                        />
+                    <button 
+                        name="action_text_on_completion_adop"
+                        attrs="{'invisible':[('state','not in',('adoption_text'))]}" 
+                        string="Доработка текста(утверждение)" 
+                        icon="gtk-media-pause"
+                        />
+                    <button 
+                        name="action_not_important"
+                        attrs="{'invisible':[('state','not in',('adoption_text'))]}" 
+                        string="Задание не актуально" 
+                        icon="gtk-cancel"
+                        />
+                    <button 
+                        name="action_closed"
+                        attrs="{'invisible':[('state','not in',('adoption_text'))]}" 
+                        string="Текст утвержден" 
+                        icon="gtk-apply"
+                        />
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_group_agents_stage_tree">
+        <field name="name">Группа для копирайтинга</field>
+        <field name="model">group.agents.stage</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Группа" editable="top">
+                <field name="agent_group_id" required="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_group_agents_stage_form">
+        <field name="name">Группа для копирайтинга</field>
+        <field name="model">group.agents.stage</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="СГруппа">
+                <group colspan="4" col="8">
+                    <field name="agent_group_id" required="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="window_smm_copyrighting">
+        <field name="name">Заявка на копирайтинг</field>
+        <field name="res_model">smm.copyrighting</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_smm_copyrighting_tree"/>
+    </record>
+
+    <record model="ir.actions.act_window" id="window_view_group_agents_stage">
+        <field name="name">Группа для копирайтинга</field>
+        <field name="res_model">group.agents.stage</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_group_agents_stage_tree"/>
+        <field name="help">Необходимо создать только одну запись с группой, для фильтрации исполнителей.</field>
+    </record>
+
+    <menuitem 
+        name="Копирайтинг" 
+        id="menu_process_copyrighting" 
+        sequence="1"
+        parent="process_base.menu_process_all"/>
+    <menuitem 
+        id="menu_smm_copyrighting" 
+        action="window_smm_copyrighting"
+        parent="menu_process_copyrighting"/>
+    <menuitem 
+        id="menu_smm_group_agent_stage" 
+        action="window_view_group_agents_stage"
+        parent="process_base.menu_process_all_config"/>
+    </data>
+</openerp>

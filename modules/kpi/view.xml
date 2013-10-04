@@ -1,0 +1,659 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <!-- Периоды -->
+        <record model="ir.ui.view" id="view_kpi_period_tree">
+            <field name="name">kpi.period.tree</field>
+            <field name="model">kpi.period</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Период">
+                    <field name="name"/>
+                    <field name="days"/>
+                    <field name="calendar"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_period_form">
+            <field name="name">kpi.period.form</field>
+            <field name="model">kpi.period</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Период">
+                    <field name="name" colspan="4"/>
+                    <field name="month"/>
+                    <field name="year" />
+                    <field name="days" />
+                    <field name="calendar" />
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_period_search">
+            <field name="name">kpi.period.search</field>
+            <field name="model">kpi.period</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <group>
+                        <filter icon="terp-personal"
+                                domain="[('calendar','=', 'rus')]"
+                                name="calendar_ru"
+                                string="Календарь России"
+                                />
+                        <filter icon="terp-personal"
+                                domain="[('calendar','=', 'ua')]"
+                                name="calendar_ua"
+                                string="Календарь Украины"
+                                />
+                        <filter icon="terp-personal"
+                                domain="[('calendar','=', 'eu')]"
+                                name="calendar_eu"
+                                string="Календарь Евросоюза"
+                                />
+                        <separator orientation="vertical"/>
+                        <filter icon="terp-go-year"
+                                domain="[('year','=', time.strftime('%%Y'))]"
+                                name="year"
+                                string="Текущий год"
+                                />
+                        <filter icon="terp-go-month"
+                                domain="[('year','=', time.strftime('%%Y')), ('month','=', int(time.strftime('%%m')))]"
+                                name="month"
+                                string="Текущий месяц"
+                                />
+                    </group>
+
+                    <newline />
+                    <field name="name" />
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Тип каленедаря" icon="terp-personal" context="{'group_by':'calendar'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_kpi_period">
+            <field name="name">Периоды</field>
+            <field name="res_model">kpi.period</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_kpi_period_tree"/>
+            <field name="search_view_id" ref="view_kpi_period_search"/>
+            <field name="context">{"search_default_year":eval('True')}</field>
+        </record>
+
+
+        <!-- Грейды и категории -->
+        <record model="ir.ui.view" id="view_kpi_grade_tree">
+            <field name="name">kpi.grade.tree</field>
+            <field name="model">kpi.grade</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Грейды и категории" editable="top">
+                    <field name="name"/>
+                    <field name="cash"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_grade_form">
+            <field name="name">kpi.grade.form</field>
+            <field name="model">kpi.grade</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Грейды и категории">
+                    <field name="name"/>
+                    <field name="cash" />
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_kpi_grade">
+            <field name="name">Грейды и категории</field>
+            <field name="res_model">kpi.grade</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="auto_refresh">1</field>
+            <field name="view_id" ref="view_kpi_grade_tree"/>
+        </record>
+
+        <!-- Update HR form -->
+        <record id="view_employee_form_inherit2" model="ir.ui.view">
+            <field name="name">hr.employee.form.inherit2</field>
+            <field name="model">hr.employee</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="hr_update.view_employee_form_inherit"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='parent_id']" position="after">
+                    <field name="maternity"/>
+                    <field name="formalized"/>
+                </xpath>
+
+                <xpath expr="//field[@name='category']" position="after">
+                    <field name="grade_id" colspan="2" groups="kpi.hr_kpi"/>
+                    <field name="grade_history_ids" colspan="4" nolabel="1" readonly="True" />
+                    <field name="retention_ids" colspan="2" nolabel="1" readonly="True" />
+                    <field name="award_ids" colspan="2" nolabel="1" readonly="True" />
+                </xpath>
+
+
+            </field>
+        </record>
+
+        <!-- Ключевые показатели -->
+        <record model="ir.ui.view" id="view_kpi_indicators_form">
+            <field name="name">kpi.indicators.reference.form</field>
+            <field name="model">kpi.indicators.reference</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Показатели" >
+                    <group colspan="4" col="8">
+                        <field name="name" />
+                        <field name="units" />
+                        <field name="type" />
+                        <field name="active" />
+                        <field name="index_type" />
+                        <field name="formula" colspan="8" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_indicators_tree">
+            <field name="name">kpi.indicators.reference.tree</field>
+            <field name="model">kpi.indicators.reference</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Список показателей" >
+                    <field name="name" />
+                    <field name="units" />
+                    <field name="type" />
+                    <field name="active" />
+                    <field name="index_type" />
+                    <field name="formula"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_indicators_search">
+            <field name="name">kpi.indicators.reference.search</field>
+            <field name="model">kpi.indicators.reference</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <group>
+                        <filter icon="terp-check"
+                                domain="['|', ('active','=', True), ('active','=', False)]"
+                                name="active"
+                                string="+ не активные"
+                                />
+                        <separator orientation="vertical"/>
+                        <filter icon="terp-tools"
+                                domain="[('index_type','=', True)]"
+                                name="index_type"
+                                string="Перевыполняемый"
+                                />
+                    </group>
+
+                    <newline />
+                    <field name="name" />
+                    <field name="units" />
+                    <field name="type" />
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_kpi_indicators">
+            <field name="name">Справочник показателей</field>
+            <field name="res_model">kpi.indicators.reference</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_kpi_indicators_tree"/>
+            <field name="search_view_id" ref="view_kpi_indicators_search"/>
+            <field name="context">{}</field>
+        </record>
+
+        <!-- Зачисление официальной ЗП -->
+        <record model="ir.ui.view" id="view_kpi_enrollment_form">
+            <field name="name">kpi.enrollment.formal.form</field>
+            <field name="model">kpi.enrollment.formal</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Зачисление официальной ЗП" >
+                    <group colspan="4">
+                        <field name="employee_id" on_change="onchange_employee(employee_id)"/>
+                        <field name="period_id" domain="[('calendar', '=', calendar)]"/>
+                        <field name="cash" />
+                        <field name="type" required="1"/>
+                        <field name="calendar" readonly="1" on_change="onchange_calendar(calendar, period_id)"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_enrollment_tree">
+            <field name="name">kpi.enrollment.formal.tree</field>
+            <field name="model">kpi.enrollment.formal</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Зачисление официальной ЗП" >
+                    <field name="period_id" />
+                    <field name="employee_id" />
+                    <field name="cash" />
+                    <field name="type"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_enrollment_search">
+            <field name="name">kpi.enrollment.formal.search</field>
+            <field name="model">kpi.enrollment.formal</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="period_id" domain="[('calendar', '=', 'rus')]" />
+                    <field name="employee_id" />
+                    <newline />
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Период" icon="terp-calendar" context="{'group_by': 'period_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Сотрудник" icon="terp-personal" context="{'group_by': 'employee_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_kpi_enrollment">
+            <field name="name">Зачисление официальной ЗП</field>
+            <field name="res_model">kpi.enrollment.formal</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_kpi_enrollment_tree"/>
+            <field name="search_view_id" ref="view_kpi_enrollment_search"/>
+        </record>
+        
+        <!-- Налог с официальной ЗП -->
+        <record model="ir.ui.view" id="view_kpi_tax_form">
+            <field name="name">kpi.formal.tax.form</field>
+            <field name="model">kpi.formal.tax</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Налог с официальной ЗП" >
+                    <group colspan="4">
+                        <field name="employee_id" on_change="onchange_employee(employee_id)" />
+                        <field name="period_id" domain="[('calendar', '=', calendar)]" />
+                        <field name="cash" />
+                        <field name="calendar" readonly="1" on_change="onchange_calendar(calendar, period_id)"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_tax_tree">
+            <field name="name">kpi.formal.tax.tree</field>
+            <field name="model">kpi.formal.tax</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Налог с официальной ЗП" >
+                    <field name="period_id" />
+                    <field name="employee_id" />
+                    <field name="cash" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_tax_search">
+            <field name="name">kpi.formal.tax.search</field>
+            <field name="model">kpi.formal.tax</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="period_id" domain="[('calendar', '=', 'rus')]" />
+                    <field name="employee_id" />
+                    <newline />
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Период" icon="terp-calendar" context="{'group_by': 'period_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Сотрудник" icon="terp-personal" context="{'group_by': 'employee_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_kpi_tax">
+            <field name="name">Налог с официальной ЗП</field>
+            <field name="res_model">kpi.formal.tax</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_kpi_tax_tree"/>
+            <field name="search_view_id" ref="view_kpi_tax_search"/>
+        </record>
+
+        <!-- Аванс -->
+        <record model="ir.ui.view" id="view_kpi_advance_form">
+            <field name="name">kpi.advance.form</field>
+            <field name="model">kpi.advance</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Аванс" >
+                    <group colspan="4">
+                        <field name="employee_id" on_change="onchange_employee(employee_id)"/>
+                        <field name="period_id" domain="[('calendar', '=', calendar)]"/>
+                        <field name="cash" />
+                        <field name="calendar" readonly="1" on_change="onchange_calendar(calendar, period_id)"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_advance_tree">
+            <field name="name">kpi.advance.tree</field>
+            <field name="model">kpi.advance</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Аванс" >
+                    <field name="period_id" />
+                    <field name="employee_id" />
+                    <field name="cash" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_advance_search">
+            <field name="name">kpi.advance.search</field>
+            <field name="model">kpi.advance</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="period_id" domain="[('calendar', '=', 'rus')]" />
+                    <field name="employee_id" />
+                    <newline />
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Период" icon="terp-calendar" context="{'group_by': 'period_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Сотрудник" icon="terp-personal" context="{'group_by': 'employee_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_kpi_advance">
+            <field name="name">Аванс</field>
+            <field name="res_model">kpi.advance</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_kpi_advance_tree"/>
+            <field name="search_view_id" ref="view_kpi_advance_search"/>
+        </record>
+
+        <!-- Удержания -->
+        <record model="ir.ui.view" id="view_kpi_retention_form">
+            <field name="name">kpi.retention.form</field>
+            <field name="model">kpi.retention</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Удержания" >
+                    <group colspan="4">
+                        <field name="employee_id" on_change="onchange_employee(employee_id)"/>
+                        <field name="period_id" domain="[('calendar', '=', calendar)]"/>
+                        <field name="cash" />
+                        <field name="note" />
+                        <field name="calendar" readonly="1" on_change="onchange_calendar(calendar, period_id)"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_retention_tree">
+            <field name="name">kpi.retention.tree</field>
+            <field name="model">kpi.retention</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Удержания" >
+                    <field name="period_id" />
+                    <field name="employee_id" />
+                    <field name="cash" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_retention_search">
+            <field name="name">kpi.retention.search</field>
+            <field name="model">kpi.retention</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="period_id" domain="[('calendar', '=', 'rus')]" />
+                    <field name="employee_id" />
+                    <newline />
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Период" icon="terp-calendar" context="{'group_by': 'period_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Сотрудник" icon="terp-personal" context="{'group_by': 'employee_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_kpi_retention">
+            <field name="name">Удержания</field>
+            <field name="res_model">kpi.retention</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_kpi_retention_tree"/>
+            <field name="search_view_id" ref="view_kpi_retention_search"/>
+        </record>
+
+        <!-- Премии -->
+        <record model="ir.ui.view" id="view_kpi_award_form">
+            <field name="name">kpi.award.form</field>
+            <field name="model">kpi.award</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Премии" >
+                    <group colspan="4">
+                        <field name="employee_id" on_change="onchange_employee(employee_id)"/>
+                        <field name="period_id" domain="[('calendar', '=', calendar)]"/>
+                        <field name="cash" />
+                        <field name="note" />
+                        <field name="calendar" readonly="1" on_change="onchange_calendar(calendar, period_id)"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_award_tree">
+            <field name="name">kpi.award.tree</field>
+            <field name="model">kpi.award</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Премии" >
+                    <field name="period_id" />
+                    <field name="employee_id" />
+                    <field name="cash" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_award_search">
+            <field name="name">kpi.award.search</field>
+            <field name="model">kpi.award</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="period_id" domain="[('calendar', '=', 'rus')]" />
+                    <field name="employee_id" />
+                    <newline />
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Период" icon="terp-calendar" context="{'group_by': 'period_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Сотрудник" icon="terp-personal" context="{'group_by': 'employee_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_kpi_award">
+            <field name="name">Премии</field>
+            <field name="res_model">kpi.award</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_kpi_award_tree"/>
+            <field name="search_view_id" ref="view_kpi_award_search"/>
+        </record>
+
+        <!-- ЭО -->
+        <record model="ir.ui.view" id="view_kpi_exper_assesment_tree">
+            <field name="name">kpi.expert.assesment.tree</field>
+            <field name="model">kpi.expert.assesment</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Экспертная оценка">
+                    <field name="state"/>
+                    <field name="expert_id"/>
+                    <field name="employee_id"/>
+                    <field name="period_id" domain="[('calendar', '=', 'rus')]" />
+                    <field name="client"/>
+                    <field name="standards"/>
+                    <field name="quality"/>
+                    <field name="mean"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_kpi_exper_assesment_form">
+            <field name="name">kpi.expert.assesment.form</field>
+            <field name="model">kpi.expert.assesment</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Экспертная оценка">
+                    <group colspan="4" col="8">
+                        <field name="kpi_id"/>
+                        <field name="expert_id"/>
+                        <field name="employee_id"/>
+                        <field name="period_id"/>
+                        <group colspan="8" col="6">
+                            <field name="client" required="1"/>
+                            <field name="standards" required="1"/>
+                            <field name="quality" required="1"/>
+                            <field name="client_note1" attrs="{'required':[('client','in',('-2','-1','1','2'))]}"/>
+                            <field name="standards_note1"
+                                   attrs="{'required':[('standards','in',('-2','-1','1','2'))]}"/>
+                            <field name="quality_note1" attrs="{'required':[('quality','in',('-2','-1','1','2'))]}"/>
+                            <field name="client_note2" attrs="{'required':[('client','in',('-2','-1','1','2'))]}"/>
+                            <field name="standards_note2"
+                                   attrs="{'required':[('standards','in',('-2','-1','1','2'))]}"/>
+                            <field name="quality_note2" attrs="{'required':[('quality','in',('-2','-1','1','2'))]}"/>
+                            <field name="client_note3" attrs="{'required':[('client','in',('-2','-1','1','2'))]}"/>
+                            <field name="standards_note3"
+                                   attrs="{'required':[('standards','in',('-2','-1','1','2'))]}"/>
+                            <field name="quality_note3" attrs="{'required':[('quality','in',('-2','-1','1','2'))]}"/>
+                            <field name="mean"/>
+                            <newline/>
+                            <field name="state" colspan="4"/>
+                            <button type="object" name="action_draft" string="В черновик" icon="gtk-go-back"
+                                    states="work"/>
+                            <button type="object" name="action_work" string="Отправить" icon="gtk-go-forward"
+                                    states="draft"/>
+                        </group>
+
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_kpi_expert_assesment_search">
+            <field name="name">kpi.expert.assesment.search</field>
+            <field name="model">kpi.expert.assesment</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="period_id" domain="[('calendar', '=', 'rus')]" />
+                    <field name="employee_id" />
+                    <field name="expert_id" />
+                    <field name="mean" />
+                    <field name="state" />
+                    <newline />
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Период" icon="terp-calendar" context="{'group_by': 'period_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Сотрудник" icon="terp-personal" context="{'group_by': 'employee_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_kpi_expert_assesment">
+            <field name="name">Экспертная оценка</field>
+            <field name="res_model">kpi.expert.assesment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_kpi_exper_assesment_tree"/>
+            <field name="search_view_id" ref="view_kpi_expert_assesment_search"/>
+            <field name="domain">[('expert_id.user_id.id','=',uid)]</field>
+        </record>
+
+        <!-- История изменения грейдов -->
+        <record model="ir.ui.view" id="view_kpi_grade_history_form">
+            <field name="name">kpi.grade.history.form</field>
+            <field name="model">kpi.grade.history</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="История изменения грейдов" >
+                    <group colspan="4">
+                        <field name="employee_id"/>
+                        <field name="period_id"/>
+                        <field name="next_grade_id" />
+                        <field name="create_date" />
+                        <field name="create_uid" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_grade_history_tree">
+            <field name="name">kpi.grade.history.tree</field>
+            <field name="model">kpi.grade.history</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="История изменения грейдов" >
+                    <field name="employee_id"/>
+                    <field name="period_id"/>
+                    <field name="next_grade_id" />
+                    <field name="grade_id" string="Предыдущий грейд"/>
+                    <field name="create_date" />
+                    <field name="create_uid" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_grade_history_search">
+            <field name="name">kpi.grade.history.search</field>
+            <field name="model">kpi.grade.history</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="period_id" domain="[('calendar', '=', 'rus')]" />
+                    <field name="employee_id" />
+                    <newline />
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Период" icon="terp-calendar" context="{'group_by': 'period_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Сотрудник" icon="terp-personal" context="{'group_by': 'employee_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_kpi_grade_history">
+            <field name="name">История изменения грейдов</field>
+            <field name="res_model">kpi.grade.history</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,page</field>
+            <field name="view_id" ref="view_kpi_grade_history_tree"/>
+            <field name="search_view_id" ref="view_kpi_grade_history_search"/>
+        </record>
+    </data>
+</openerp>

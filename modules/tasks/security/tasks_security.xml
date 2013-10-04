@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+
+        <!-- Создаем группы -->
+        <record id="tasks.group_calendar_user" model="res.groups">
+            <field name="name">Задания / Пользователь</field>
+        </record>
+
+        <!-- Правила доступа для групп -->
+        <record id="tasks_rule_view" model="ir.rule">
+            <field name="name">Задания: Видят</field>
+            <field ref="model_tasks" name="model_id"/>
+            <field name="domain_force">['|', ('user_id','=',user.id), '|', '&amp;', ('responsible_id','=',user.id), ('state', 'not in', ('draft', 'cancel')), '|', '&amp;', ('performer_id','=',user.id), ('state', 'not in', ('draft', 'cancel', 'rw_author', 'agr_responsible')), ('manager_id', '=', user.id)]</field>
+            <field name="perm_read" eval="True" />
+            <field name="perm_create" eval="False" />
+            <field name="perm_write" eval="False" />
+            <field name="perm_unlink" eval="False" />
+            <field name="groups" eval="[(4, ref('tasks.group_calendar_user'))]"/>
+        </record>
+
+        <record id="tasks_rule_author_edit" model="ir.rule">
+            <field name="name">Задания: Редактируют</field>
+            <field ref="model_tasks" name="model_id"/>
+            <field name="domain_force">['|', '|', ('user_id','=',user.id), ('responsible_id','=',user.id), ('performer_id','=',user.id)]</field>
+            <field name="perm_read" eval="False" />
+            <field name="perm_create" eval="False" />
+            <field name="perm_write" eval="True" />
+            <field name="perm_unlink" eval="False" />
+            <field name="groups" eval="[(4, ref('tasks.group_calendar_user'))]"/>
+        </record>
+
+        <record id="tasks_rule_author_unlink" model="ir.rule">
+            <field name="name">Задания: Удаляет и Создает только Автор</field>
+            <field ref="model_tasks" name="model_id"/>
+            <field name="domain_force">[('user_id','=',user.id)]</field>
+            <field name="perm_read" eval="False" />
+            <field name="perm_create" eval="True" />
+            <field name="perm_write" eval="False" />
+            <field name="perm_unlink" eval="True" />
+            <field name="groups" eval="[(4, ref('tasks.group_calendar_user'))]"/>
+        </record>
+    </data>
+</openerp>

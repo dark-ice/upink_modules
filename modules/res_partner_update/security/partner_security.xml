@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+
+        <!-- Создаем группы -->
+        <record id="base.partner_extended" model="res.groups">
+            <field name="name">Продажи / Расширенный вид партнеров</field>
+        </record>
+
+        <record id="base.sale_user" model="res.groups">
+            <field name="name">Продажи / Менеджеры</field>
+        </record>
+
+        <record id="base.sale_head" model="res.groups">
+            <field name="name">Продажи / Супервайзеры</field>
+        </record>
+
+        <!-- Правила доступа для групп -->
+
+        <!-- Открываем меню -->
+
+    </data>
+</openerp>

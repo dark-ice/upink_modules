@@ -1,0 +1,7 @@
+#corner p.astcalls a {
+    text-shadow: 0 0 0.2em #9a0404, 0 0 0.2em #9a0404, 0 0 0.2em #9a0404, 0 0 0.2em #9a0404;
+}
+#corner p.astcalls img {
+    vertical-align: middle;
+    margin-right: 0.5em;
+}

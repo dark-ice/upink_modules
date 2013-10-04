@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data noupdate="1">
+    <record id="base.smm_manager" model="res.groups">
+        <field name="name">SMM / Manager</field>
+    </record>
+    <record id="base.smm_admin_manager" model="res.groups">
+        <field name="name">SMM / Adminmanager</field>
+    </record>
+  </data>
+</openerp>
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

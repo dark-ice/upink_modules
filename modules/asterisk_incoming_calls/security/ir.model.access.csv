@@ -1,0 +1,3 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_asterisk_server","asterisk.server manager","model_asterisk_server","base.group_system",1,1,1,1
+"access_asterisk_phones_booke","tel.reference manager","model_tel_reference","base.group_user",1,1,1,0

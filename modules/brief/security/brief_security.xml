@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data noupdate="1">
+
+    <record id="brief.group_service_specialist" model="res.groups">
+        <field name="name">Специалист обслуживающего подразделения</field>
+    </record>
+	<record id="brief.group_service_director" model="res.groups">
+        <field name="name">Директор обслуживающего подразделения</field>
+    </record>
+    <record id="brief.group_sales_manager" model="res.groups">
+        <field name="name">Продажи / Менеджер по привлечению партнеров</field>
+    </record>
+	<record id="brief.group_support_manager" model="res.groups">
+        <field name="name">Продажи / Менеджер по работе с партнерами</field>
+    </record>
+	<record id="brief.group_sales_director" model="res.groups">
+        <field name="name">Продажи / Руководитель по привлечению партнеров</field>
+    </record>
+	<record id="brief.group_support_director" model="res.groups">
+        <field name="name">Продажи / Руководитель по работе с партнерами</field>
+    </record>
+</data>
+</openerp>

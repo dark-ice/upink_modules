@@ -1,0 +1,1283 @@
+﻿# -*- coding: utf-8 -*-
+from openerp import tools
+from openerp.osv import fields, osv
+from openerp.osv.orm import Model
+
+
+AVAILABLE_PRIORITIES = [
+    ('1', 'Наивысший'),
+    ('2', 'Высокий'),
+    ('3', 'Нормальный'),
+    ('4', 'Низкий'),
+    ('5', 'Самый низкий'),
+]
+
+
+class res_partner_address(Model):
+    _name = 'res.partner.address'
+    _inherit = 'res.partner.address'
+
+    def email_to_partner(self, cr, uid, ids, context=None):
+        """
+            Отправляет письмо по адресу партнера
+        """
+        action_id = self.pool.get('ir.actions.act_window').search(cr, uid, [('name', '=', 'Письмо кандидату')],
+                                                                  context=context)
+        if action_id:
+            data = self.pool.get('ir.actions.act_window').read(cr, uid, action_id[0], context=context)
+            accounts = self.pool.get('poweremail.core_accounts').search(cr, uid, [('user', '=', uid)])
+            partner_address_data = self.browse(cr, uid, ids[0])
+            if len(accounts) == 1:
+                user_account = accounts[0]
+            else:
+                user_account = False
+            data.update({
+                'nodestroy': True,
+                'context': {
+                    'partner': ids[0],
+                    'pem_to': partner_address_data.email,
+                    'pem_account_id': user_account,
+                    'state': 'na',
+                    'folder': 'outbox',
+                }
+            })
+            return data
+        return False
+
+    def _get_phones(self, cr, uid, ids, field_name, arg, context=None):
+        res = {}
+        data = self.browse(cr, uid, ids)
+
+        for address in data:
+            res[address.id] = ",\n".join([a.phone for a in address.phone_ids if a.phone])
+        return res
+
+    def _get_skype(self, cr, uid, ids, field_name, arg, context=None):
+        res = {}
+        data = self.browse(cr, uid, ids)
+
+        for address in data:
+            res[address.id] = ",\n".join([a.name for a in address.skype_ids if a.name])
+        return res
+
+    def _get_site(self, cr, uid, ids, field_name, arg, context=None):
+        res = {}
+        data = self.browse(cr, uid, ids)
+
+        for address in data:
+            res[address.id] = ",\n".join([a.name for a in address.site_ids if a.name])
+        return res
+
+    def _get_email(self, cr, uid, ids, field_name, arg, context=None):
+        res = {}
+        data = self.browse(cr, uid, ids)
+
+        for address in data:
+            res[address.id] = ",\n".join([a.name for a in address.email_ids if a.name])
+        return res
+
+    def _get_icq(self, cr, uid, ids, field_name, arg, context=None):
+        res = {}
+        data = self.browse(cr, uid, ids)
+
+        for address in data:
+            res[address.id] = ",\n".join([a.name for a in address.icq_ids if a.name])
+        return res
+
+    def _search_site(self, cr, uid, obj, name, args, context):
+        site_ids = self.pool.get('res.partner.address.site').search(cr, uid, [('name', args[0][1], args[0][2])],
+                                                                    context=context)
+        address_ids = self.pool.get('res.partner.address').search(cr, uid, [('site_ids', 'in', site_ids)],
+                                                                  context=context)
+        if address_ids:
+            return [('id', 'in', address_ids)]
+        return [('id', '=', '0')]
+
+    def _search_phone(self, cr, uid, obj, name, args, context):
+        site_ids = self.pool.get('tel.reference').search(
+            cr,
+            uid,
+            [
+                '|', ('phone', args[0][1], args[0][2]),
+                ('phone_for_search', args[0][1], args[0][2])
+            ],
+            context=context)
+        address_ids = self.pool.get('res.partner.address').search(cr, uid, [('phone_ids', 'in', site_ids)],
+                                                                  context=context)
+
+        if address_ids:
+            return [('id', 'in', address_ids)]
+        return [('id', '=', '0')]
+
+    def _search_email(self, cr, uid, obj, name, args, context):
+        site_ids = self.pool.get('res.partner.address.email').search(cr, uid, [('name', args[0][1], args[0][2])],
+                                                                     context=context)
+        address_ids = self.pool.get('res.partner.address').search(cr, uid, [('email_ids', 'in', site_ids)],
+                                                                  context=context)
+
+        if address_ids:
+            return [('id', 'in', address_ids)]
+        return [('id', '=', '0')]
+
+    def _search_skype(self, cr, uid, obj, name, args, context):
+        site_ids = self.pool.get('res.partner.address.skype').search(cr, uid, [('name', args[0][1], args[0][2])],
+                                                                     context=context)
+        address_ids = self.pool.get('res.partner.address').search(cr, uid, [('skype_ids', 'in', site_ids)],
+                                                                  context=context)
+
+        if address_ids:
+            return [('id', 'in', address_ids)]
+        return [('id', '=', '0')]
+
+    def _search_icq(self, cr, uid, obj, name, args, context):
+        site_ids = self.pool.get('res.partner.address.icq').search(cr, uid, [('name', args[0][1], args[0][2])],
+                                                                   context=context)
+        address_ids = self.pool.get('res.partner.address').search(cr, uid, [('icq_ids', 'in', site_ids)],
+                                                                  context=context)
+
+        if address_ids:
+            return [('id', 'in', address_ids)]
+        return [('id', '=', '0')]
+
+    def _check_site_full(self, cr, uid, ids, context=None):
+        for record in self.read(cr, uid, ids, ['site_ids']):
+            if not record['site_ids']:
+                return False
+        return True
+
+    def _check_phone_full(self, cr, uid, ids, context=None):
+        for record in self.read(cr, uid, ids, ['phone_ids']):
+            if not record['phone_ids']:
+                return False
+        return True
+
+    def insert_site_name(self, cr, uid, ids, context):
+        if context['site_ids']:
+            return {'value': {'site_ids': [(0, 0, {'name': context['site_ids']})], }}
+
+    _columns = {
+        'state_ec': fields.char('Область', size=250),
+        'country_ec': fields.char('Страна', size=250),
+        'partner_site': fields.char('Сайт партнера', size=250),
+        'partner_site_two': fields.char('Сайт партнера (2)', size=250),
+        'email_two': fields.char('Эл.Почта (2)', size=250),
+        'skype': fields.char('Skype', size=250),
+        'msn': fields.char('MSN', size=250),
+        'yahoo': fields.char('Yahoo', size=250),
+        'icq': fields.char('ICQ', size=250),
+        'gg': fields.char('GG', size=250),
+        'site_ids': fields.one2many('res.partner.address.site', 'address_id', 'Сайты', required=True),
+        'skype_ids': fields.one2many('res.partner.address.skype', 'address_id', 'Skype'),
+        'icq_ids': fields.one2many('res.partner.address.icq', 'address_id', 'ICQ'),
+        'email_ids': fields.one2many('res.partner.address.email', 'address_id', 'Эл. почта'),
+
+        'phones_all': fields.function(_get_phones, type="char", obj="res.partner.address", method=True,
+                                      string="Телефоны", fnct_search=_search_phone),
+        'phone_default': fields.related('phone_ids', 'phone', type='char', size=128, string='Телефон'),
+
+        'skype_all': fields.function(_get_skype, type="char", obj="res.partner.address", method=True, string="Skype",
+                                     fnct_search=_search_skype),
+        'skype_default': fields.related('skype_ids', 'name', type='char', size=128, string='Skype'),
+
+        'site_all': fields.function(_get_site, type="char", obj="res.partner.address", method=True, string="Сайты",
+                                    fnct_search=_search_site),
+        'site_default': fields.related('site_ids', 'name', type='char', size=128, string='Сайт'),
+        'email_all': fields.function(_get_email, type="char", obj="res.partner.address", method=True,
+                                     string="Эл. почта", fnct_search=_search_email),
+        'email_default': fields.related('email_ids', 'name', type='char', size=128, string='Эл. почта'),
+        'icq_all': fields.function(
+            _get_icq,
+            type="char",
+            obj="res.partner.address",
+            method=True,
+            string="ICQ",
+            fnct_search=_search_icq
+        ),
+        'icq_default': fields.related('icq_ids', 'name', type='char', size=128, string='ICQ'),
+    }
+    _constraints = [
+        (
+            _check_site_full,
+            'должен быть указан!',
+            [u'Сайт']
+        ),
+        (
+            _check_phone_full,
+            'должен быть указан!',
+            [u'Телефон']
+        ),
+    ]
+
+    def name_get(self, cr, user, ids, context=None):
+        if context is None:
+            context = {}
+        if not len(ids):
+            return []
+        res = []
+        for r in self.read(cr, user, ids, ['name','zip','country_id', 'city','partner_id', 'street']):
+            if context.get('contact_display', 'contact')=='partner' and r['partner_id']:
+                res.append((r['id'], r['partner_id'][1]))
+            else:
+                # make a comma-separated list with the following non-empty elements
+                elems = [r['country_id'] and r['country_id'][1], r['city'], r['street']]
+                addr = ', '.join(filter(bool, elems))
+                if (context.get('contact_display', 'contact')=='partner_address') and r['partner_id']:
+                    res.append((r['id'], "%s: %s" % (r['partner_id'][1], addr or '/')))
+                else:
+                    res.append((r['id'], addr or '/'))
+        return res
+res_partner_address()
+
+
+class res_provider_category(Model):
+    _description = u'Категория Поставщика'
+    _name = 'res.provider.category'
+    _order = 'name'
+    _columns = {
+        'name': fields.char('Категория поставщика', size=256, required=True),
+    }
+res_provider_category()
+
+
+class partner_added_services(Model):
+    _name = "partner.added.services"
+    _rec_name = 'comment'
+    _columns = {
+        'service_id': fields.many2one('brief.services.stage', 'Услуга'),
+        'comment': fields.text('Комментарий'),
+        'partner_id': fields.many2one('res.partner', 'Партнер', inbisible=True),
+        'check': fields.boolean('Подключенные услуги'),
+        'budget': fields.float('Бюджет, y.e.'),
+        'partner_base': fields.related('partner_id', 'partner_base', type='char', size=50),
+    }
+
+    _defaults = {
+        'partner_base': lambda s, cr, u, cnt: cnt.get('partner_base')
+    }
+partner_added_services()
+
+
+class bonus_reason(Model):
+    _description = u'List of reasons for bonus'
+    _name = 'partner.bonus.reason'
+
+    _columns = {
+        'name': fields.char('Причина бонуса', size=250),
+    }
+bonus_reason()
+
+
+class refusion_reason(Model):
+    _description = u'Reasons of refusion'
+    _name = 'partner.refusion.reason'
+
+    _columns = {
+        'name': fields.char('Название', size=250),
+    }
+refusion_reason()
+
+
+class operational_departments(Model):
+    _description = u'Operational directions'
+    _name = 'partner.operational.departments'
+    _rec_name = 'department'
+
+    _columns = {
+        'partner_id': fields.many2one('res.partner', 'Партнер'),
+        'department': fields.many2one('hr.department', 'Направление'),
+        'specialist': fields.many2one('hr.employee', 'Специалист', domain="[('department_id','=', department)]"),
+    }
+operational_departments()
+
+
+class partner_dealer_discount(Model):
+    _description = u'Dealer discount for partners'
+    _name = 'partner.dealer.discount'
+
+    _columns = {
+        'partner_id': fields.many2one('res.partner', 'Партнер', invisible=True),
+        'amount': fields.float('Размер скидки'),
+        'date': fields.datetime('Дата'),
+    }
+partner_dealer_discount()
+
+
+class order_type(Model):
+    _description = u'Types of orders for History of partners orders'
+    _name = 'partner.order.type'
+
+    _columns = {
+        'name': fields.char('Название', size=250),
+    }
+order_type()
+
+
+class shipment_type(Model):
+    _description = u'Shipment types for History of partners orders'
+    _name = 'partner.shipment.type'
+
+    _columns = {
+        'name': fields.char('Название', size=250),
+    }
+shipment_type()
+
+
+class payment_state(Model):
+    _description = u'Payment states for History of partners orders'
+    _name = 'partner.payment.state'
+
+    _columns = {
+        'name': fields.char('Название', size=250),
+    }
+payment_state()
+
+
+class partner_currency(Model):
+    _description = u'List of currencies for History of partners orders'
+    _name = 'partner.currency'
+
+    _columns = {
+        'name': fields.char('Название', size=20),
+    }
+partner_currency()
+
+
+class partner_order_history(Model):
+    """
+        Объект История заказов.
+        Используется в res.partner
+            Связь one2many
+    """
+
+    _description = u'History of partner orders'
+    _name = 'partner.order.history'
+
+    _columns = {
+        'partner_id': fields.many2one('res.partner', 'Партнер'),
+        'type': fields.many2one('partner.order.type', 'Тип'),
+        'create_date': fields.datetime('Дата', readonly=True),
+        'number': fields.char('Номер', size=50),
+        'shipment_type': fields.many2one('partner.shipment.type', 'Тип отгрузки'),
+        'sum': fields.float('Сумма'),
+        'currency': fields.many2one('partner.currency', 'Валюта'),
+        'payment_state': fields.many2one('partner.payment.state', 'Статус оплаты'),
+        'user_id': fields.many2one('res.users', 'Автор', readonly=True),
+        'commentary': fields.text('Комментарий'),
+    }
+
+    _defaults = {
+        'user_id': lambda self, cr, uid, context: uid,
+    }
+partner_order_history()
+
+
+class PartnerReferencesTemplate(Model):
+    _name = 'partner.template.references'
+    _description = u'Template for similar references for partner'
+    _auto = False
+
+    _columns = {
+        'name': fields.char('Название', size=250, select=True),
+    }
+PartnerReferencesTemplate()
+
+
+class PayType(Model):
+    _name = 'partner.pay.type'
+    _inherit = 'partner.template.references'
+    _auto = True
+    _description = u'Способы оплаты'
+PayType()
+
+
+class PartnerState(Model):
+    _name = 'partner.partner.state'
+    _inherit = 'partner.template.references'
+    _auto = True
+    _description = u'Статус партнера'
+PartnerState()
+
+
+class DeliveryType(Model):
+    _name = 'partner.delivery.type'
+    _inherit = 'partner.template.references'
+    _auto = True
+    _description = u'Способ доставки'
+DeliveryType()
+
+
+class DeliveryFrom(Model):
+    _name = 'partner.delivery.from'
+    _inherit = 'partner.template.references'
+    _auto = True
+    _description = u'Откуда делается доставка'
+DeliveryFrom()
+
+
+class res_partner_circulation(Model):
+    _name = "res.partner.circulation"
+    _order = "date_id desc"
+
+    _columns = {
+        'partner_id': fields.many2one('res.partner', 'Partner', invisible=True),
+        'date_id': fields.many2one('sla.interval.date', 'Период', select=True),
+        'type': fields.selection(
+            [
+                ('fact', 'Факт'),
+                ('plan', 'План'),
+            ], 'Тип'
+        ),
+        'total': fields.float("Общий оборот", digits=(12, 2)),
+        'printers': fields.float("Оборот по принтерам", digits=(12, 2)),
+        'inksystem': fields.float("Оборот по продукции INKSYSTEM", digits=(12, 2)),
+    }
+
+    _rec_name = "inksystem"
+res_partner_circulation()
+
+
+class res_partner_access(Model):
+    _name = 'res.partner.access'
+    _columns = {
+        'partner_id': fields.many2one('res.partner', 'Партнер', invisible=True),
+        'type': fields.selection(
+            [
+                ('ftp', 'ftp'),
+                ('db', 'База данных'),
+                ('admin', 'Система администрирования'),
+                ('hosting', 'Хостинг'),
+                ('upSale', 'Доступ в ЛК UpSale'),
+                ('googleAnalytics', 'Доступ в GoogleAnalytics'),
+                ('yandexMetrica', 'Доступ в YandexMetrica'),
+                ('googleAdWords', 'Доступ в GoogleAdWords'),
+                ('yandexDirect', 'Доступ в ЯндексДирект'),
+            ], 'Доступы партнера'),
+        'link': fields.char('Ссылка', size=250),
+        'login': fields.char('Логин', size=250),
+        'pswd': fields.char('Пароль', size=250),
+    }
+res_partner_access()
+
+
+class res_partner_address_site(Model):
+    _name = "res.partner.address.site"
+    _description = u'Сайты'
+    _columns = {
+        'address_id': fields.many2one('res.partner.address', 'Address', invisible=True),
+        'name': fields.char('Сайт', size=250, select=True, required=True),
+    }
+res_partner_address_site()
+
+
+class res_partner_address_skype(Model):
+    _name = "res.partner.address.skype"
+
+    _columns = {
+        'address_id': fields.many2one('res.partner.address', 'Address', invisible=True),
+        'name': fields.char('Skype', size=250, select=True, required=True),
+    }
+res_partner_address_skype()
+
+
+class res_partner_address_icq(Model):
+    _name = "res.partner.address.icq"
+
+    _columns = {
+        'address_id': fields.many2one('res.partner.address', 'Address', invisible=True),
+        'name': fields.char('ICQ', size=250, select=True, required=True),
+    }
+res_partner_address_icq()
+
+
+class res_partner_address_email(Model):
+    _name = "res.partner.address.email"
+
+    _columns = {
+        'address_id': fields.many2one('res.partner.address', 'Address', invisible=True),
+        'name': fields.char('Email', size=250, select=True, required=True),
+    }
+res_partner_address_email()
+
+
+class res_partner_bank(Model):
+    _name = "res.partner.bank"
+    _inherit = "res.partner.bank"
+    _description = u"Реквизиты партнера"
+
+    def _get_bankname(self, cr, uid, ids, field_name, arg, context=None):
+        res = {}
+        data = self.browse(cr, uid, ids, context)
+        for field in data:
+            n = ''
+            if field.name:
+                n = field.name
+            elif field.fullname:
+                n = field.fullname
+            else:
+                n = "Empty"
+            res[field.id] = field.name or field.fullname or "Реквизиты"
+        return res
+
+    def name_get(self, cr, uid, ids, context=None):
+        return [(r['id'], tools.ustr(r['fullname'])) for r in
+                self.read(cr, uid, ids, ['fullname'], context, load='_classic_write')]
+
+    def name_search(self, cr, user, name='', args=None, operator='ilike', context=None, limit=100):
+        if args is None:
+            args = []
+        if context is None:
+            context = {}
+        args = args[:]
+        # optimize out the default criterion of ``ilike ''`` that matches everything
+        #if not (name == '' and operator == 'ilike'):
+        args += [('fullname', operator, name)]
+        ids = self._search(cr, user, args, limit=limit, context=context, access_rights_uid=user)
+        res = self.name_get(cr, user, ids, context)
+        return res
+
+    _columns = {
+        'name': fields.char(u'Сокращённое наименование партнёра', size=250, required=False),
+        'state': fields.char(u'State', size=1, required=False),
+        'bank': fields.char(u'Банк', size=250, required=False),
+        'partner_id': fields.many2one('res.partner', u'Партнер', required=False),
+
+        'acc_number': fields.function(_get_bankname, type="text", method=True, string=u"Название счета"),
+
+        'type': fields.selection(
+            [
+                ('ur', 'Юридического лицо'),
+                ('ch', 'Частное лицо'),
+                ('ip', 'Индивидуальный предприниматель')
+            ], u'Тип'),
+        'fullname': fields.char(u"Полное наименование партнёра", size=250),
+        'address_ids': fields.one2many('res.partner.bank.address', 'bank_id', u'Адресс'),
+        'email': fields.char(u'Электронная почта', size=250),
+        'phone': fields.char(u'Телефон (при наличии)', size=64),
+        'fax': fields.char(u'Факс (при наличии)', size=64),
+        'site': fields.char(u'Сайт (при наличии)', size=250),
+        'ogrn': fields.char(u"ОГРН", size=13),
+        'inn': fields.char(u"ИНН", size=10),
+        'kpp': fields.char(u"КПП", size=9),
+        'okpo': fields.char(u"ЭДРПОУ (ОКПО)", size=8),
+        'mfo': fields.char(u"МФО", size=6),
+        'current_account': fields.char(u"Расчетный счет", size=20),
+        'correspondent_account': fields.char(u"Корреспондентский счёт", size=20),
+        'bik': fields.char(u"БИК (Банковский идентификационный код)", size=9),
+        'ogrnip': fields.char(u"ОГРНИП", size=15),
+
+        'passport': fields.text(u"Паспорт", help=u"Серия, номер паспорта, кем и когда выдан"),
+        'address_registration': fields.text(u"Адрес регистрации"),
+
+    }
+
+    _defaults = {
+        'state': lambda *a: '1',
+        'partner_id': lambda self, cr, uid, context: context.get('partner_id', False)
+    }
+res_partner_bank()
+
+
+class ResPartnerBankAddress(Model):
+    _name = "res.partner.bank.address"
+    _description = u"Реквизиты партнера - Адрес"
+    _columns = {
+        'name': fields.selection(
+            [
+                ('ua', 'Юридический адрес'),
+                ('fa', 'Фактический адрес'),
+                ('mk', 'Адрес для почтовой корреспонденции')
+            ], 'Тип'),
+        'index': fields.char("Почтовый индекс", size=6),
+        'city': fields.char("Город", size=250),
+        'street': fields.char("Улица", size=250),
+        'house': fields.char("№ дома", size=50),
+        'housing': fields.char("№ корпуса", size=50),
+        'building': fields.char("№ строения", size=50),
+        'flat_type': fields.selection(
+            [
+                ('flat', 'Квартира'),
+                ('room', 'Комната'),
+                ('cabinet', 'Кабинет'),
+                ('office', 'Офис'),
+                ('aya', 'а/я'),
+                ('sota', 'Ячейка'),
+                ('etc', 'Иное')
+            ], 'Тип помещения'),
+        'flat': fields.char("№ помещения", size=50),
+        'bank_id': fields.many2one('res.partner.bank', 'Bank', invisible=True),
+    }
+
+    _defaults = {
+        'name': lambda *a: 'ua',
+        'flat_type': lambda *a: 'flat'
+    }
+ResPartnerBankAddress()
+
+
+class SkkNotes(Model):
+    _name = 'skk.notes'
+    _inherit = 'crm.lead.notes'
+    _description = u"Заметки кандидатов"
+SkkNotes()
+
+
+class res_partner(Model):
+    _description = u'Partner'
+    _name = "res.partner"
+    _inherit = "res.partner"
+    _order = "priority, create_date desc"
+
+    def change_name(self, cr, uid, ids, ur_name='', site='', context=None):
+        return {'value': {'name': self._get_name(ur_name, site)}}
+
+    @staticmethod
+    def _get_name(ur_name='', site=''):
+        if ur_name:
+            name = ur_name.encode('utf-8')
+        else:
+            name = ''
+        if site and ur_name:
+            name += ' ({0})'.format(site.encode('utf-8'))
+        elif site and not ur_name:
+            name += '{0}'.format(site.encode('utf-8'))
+        return name
+
+    def _last_circulation(self, cr, uid, ids, field, arg, context):
+        res = {}
+        for record in self.browse(cr, uid, ids):
+            if len(record.circulation):
+                circulation = record.circulation[0].inksystem or 0.0
+            else:
+                circulation = 0.0
+            res[record.id] = circulation
+        return res
+
+    def _check_access(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.browse(cr, uid, ids):
+            if uid in (14, 284):
+                res[record.id] = True
+            else:
+                res[record.id] = False
+        return res
+
+    def _get_service(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.browse(cr, uid, ids):
+            if record.brief_ids:
+                res[record.id] = record.brief_ids[0].services_ids.id
+            else:
+                res[record.id] = False
+        return res
+
+    def _get_date(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.perm_read(cr, uid, ids):
+            res[record.id] = record['create_date']
+        return res
+
+    def _search_cr_date(self, cr, uid, obj, name, args, context):
+        site_ids = self.pool.get('res.partner.address.site').search(cr, uid, [('name', args[0][1], args[0][2])],
+                                                                    context=context)
+        address_ids = self.pool.get('res.partner.address').search(cr, uid, [('site_ids', 'in', site_ids)],
+                                                                  context=context)
+        partner_ids = self.pool.get('res.partner').search(cr, uid,
+                                                          [('address', 'in', address_ids), '|', ('active', '=', False),
+                                                           ('active', '!=', False)], context=context)
+
+        if partner_ids:
+            return [('id', 'in', partner_ids)]
+        return [('id', '=', '0')]
+
+    def _search_site(self, cr, uid, obj, name, args, context):
+        site_ids = self.pool.get('res.partner.address.site').search(cr, uid, [('name', args[0][1], args[0][2])],
+                                                                    context=context)
+        address_ids = self.pool.get('res.partner.address').search(cr, uid, [('site_ids', 'in', site_ids)],
+                                                                  context=context)
+        partner_ids = self.pool.get('res.partner').search(cr, uid,
+                                                          [('address', 'in', address_ids), '|', ('active', '=', False),
+                                                           ('active', '!=', False)], context=context)
+
+        if partner_ids:
+            return [('id', 'in', partner_ids)]
+        return [('id', '=', '0')]
+
+    def _search_phone(self, cr, uid, obj, name, args, context):
+        site_ids = self.pool.get('tel.reference').search(
+            cr,
+            uid,
+            [
+                '|', ('phone', args[0][1], args[0][2]),
+                ('phone_for_search', args[0][1], args[0][2])
+            ],
+            context=context)
+        address_ids = self.pool.get('res.partner.address').search(cr, uid, [('phone_ids', 'in', site_ids)],
+                                                                  context=context)
+        partner_ids = self.pool.get('res.partner').search(cr, uid,
+                                                          [('address', 'in', address_ids), '|', ('active', '=', False),
+                                                           ('active', '!=', False)], context=context)
+
+        if partner_ids:
+            return [('id', 'in', partner_ids)]
+        return [('id', '=', '0')]
+
+    def _search_email(self, cr, uid, obj, name, args, context):
+        site_ids = self.pool.get('res.partner.address.email').search(cr, uid, [('name', args[0][1], args[0][2])],
+                                                                     context=context)
+        address_ids = self.pool.get('res.partner.address').search(cr, uid, [('email_ids', 'in', site_ids)],
+                                                                  context=context)
+        partner_ids = self.pool.get('res.partner').search(cr, uid,
+                                                          [('address', 'in', address_ids), '|', ('active', '=', False),
+                                                           ('active', '!=', False)], context=context)
+
+        if partner_ids:
+            return [('id', 'in', partner_ids)]
+        return [('id', '=', '0')]
+
+    def name_get(self, cr, user, ids, context=None):
+        if not ids:
+            return []
+        if isinstance(ids, (int, long)):
+            ids = [ids]
+
+        return [(r['id'], tools.ustr(self._get_name(r['ur_name'], r['name']))) for r in
+                self.read(cr, user, ids, ['ur_name', 'name'], context, load='_classic_write')]
+
+    def name_search(self, cr, user, name='', args=None, operator='ilike', context=None, limit=100):
+        if args is None:
+            args = []
+        if context is None:
+            context = {}
+        args = args[:]
+        # optimize out the default criterion of ``ilike ''`` that matches everything
+        if not (name == '' and operator == 'ilike'):
+            args += ['|', (self._rec_name, operator, name), ('ur_name', operator, name)]
+        ids = self._search(cr, user, args, limit=limit, context=context, access_rights_uid=user)
+        res = self.name_get(cr, user, ids, context)
+        return res
+
+    _columns = {
+        'name': fields.char('Партнер (основной сайт)', size=250),
+        'ur_name': fields.char('Юридическое название компании', size=250, help='Юридическое название компании'),
+        'partner_base': fields.selection(
+            (
+                ('hot', 'Теплая БД'),
+                ('cold', 'Холодная БД'),
+            ), 'Тип БД'
+        ),
+
+        'provider_category': fields.many2one(
+            'res.provider.category',
+            'Категория поставщка',
+            select=True,
+            help='Категория - выпадающий список. Поле заполняется менеджером'
+        ),
+        'section_id': fields.many2one(
+            'crm.case.section',
+            'Отдел продаж',
+            help='Направление, которому принадлежит Партнер'
+        ),
+        'reference': fields.char('Ссылка на сайт', size=64),
+        'partner_type': fields.selection(
+            [
+                ('inksystem', 'INKSYSTEM'),
+                ('contact', 'Контакт-центр'),
+                ('upsale', 'UpSale'),
+                ('eu', 'ЕС')
+            ], 'Кандидат компании'),
+        'phone_ids': fields.one2many('tel.reference', 'partner_address_id', 'Номера телефонов'),
+        'orders_history': fields.one2many('partner.order.history', 'partner_id', 'История заказов'),
+        'section_id_sales': fields.many2one('crm.case.section', 'Отдел продаж'),
+        'dealer_discount': fields.one2many('partner.dealer.discount', 'partner_id', 'Дилерская скидка'),
+        'confirm_status': fields.selection([('yes', 'Да'), ('no', 'Нет')], 'Наличие статус'),
+        'login': fields.char('Логин', size=250),
+        'password': fields.char('Пароль', size=250),
+        'forward_to': fields.char('Переадресация на', size=250),
+        'main_partner': fields.many2one('res.partner', 'Головной партнер'),
+        'admin_panel_login': fields.char('Логин админпанели', size=250),
+        'admin_panel_password': fields.char('Пароль админпанели', size=250),
+        'corporate_site_url': fields.char('Адрес сайта', size=250),
+
+        'corporate_admin_panel': fields.char('Админпанель сайта', size=250),
+        'corporate_admin_password': fields.char('Пароль админпанели сайта', size=250),
+        'next_call': fields.datetime('Следующий звонок', help='Дата следующего контакта.'),
+        'partner_status': fields.selection(
+            [
+                ('new', 'Новый'),
+                ('existing', 'Существующий'),
+                ('stoped', 'Приостановлен'),
+                ('refusion', 'Отказ')
+            ],
+            'Статус партнера',
+            help='Этап работы с партнером. Поле заполняется менеджером'),
+        'services_ids': fields.one2many(
+            'crm.services.rel.stage',
+            'partner_id',
+            'Услуги',
+            help='Таблица заполняется менеджером продаж'
+        ),
+
+        'invoice_ids': fields.one2many(
+            'account.invoice',
+            'partner_id',
+            'Счета',
+            domain=[('type', '=', 'out_invoice')]
+        ),
+        'zds_ids': fields.one2many(
+            'account.invoice',
+            'partner_id',
+            'ЗДС',
+            domain=[('type', '=', 'in_invoice')]
+        ),
+
+        'added_services_ids': fields.one2many(
+            'partner.added.services',
+            'partner_id',
+            'Подключенные услуги',
+            help='Таблица подключенных услуг.'
+        ),
+        'operation_deps': fields.one2many('partner.operational.departments', 'partner_id', 'Операционные направления'),
+        'bonus_amount': fields.float('Сумма бонуса', help='Сумма бонуса'),
+        'bonus_reason': fields.many2one('partner.bonus.reason', 'Причина бонуса', help='Причина бонуса'),
+        'rebate_system': fields.selection(
+            [
+                ('yes', 'Да'),
+                ('no', 'Нет')
+            ], 'Наличие системы Rebate'
+        ),
+        'bonus_friend': fields.selection(
+            [
+                ('yes', 'Да'),
+                ('no', 'Нет')
+            ],
+            'Бонусная программа "Приведи друга"',
+            help='Заполняется в случае участия Партнера в Бонусной программе'),
+        'refusion_reason': fields.many2one('partner.refusion.reason', 'Причина отказа'),
+        'refusion_description': fields.text(
+            'Причина отказа',
+            help='Причина по которой Партнер отказался.',
+        ),
+        #'emails': fields.one2many('mailgate.message', 'partner_id', 'Emails', readonly=True),
+        'note_ids': fields.one2many(
+            'crm.lead.notes',
+            'partner_id',
+            'Заметки',
+            domain=[('type', '!=', 'skk')],
+            help='Поле для внесения комментариев',
+        ),
+        'skk_note_ids': fields.one2many(
+            'crm.lead.notes',
+            'partner_id',
+            'Заметки для СКК',
+            domain=[('type', '=', 'skk')],
+            help='Поле для внесения комментариев'
+        ),
+        'activity': fields.char('Сфера деятельности', size=250),
+        'cand_type': fields.selection([('pers', 'Частное лицо'), ('firm', 'Фирма')], 'Тип партнера'),
+        'sale_type': fields.selection([('w', 'Опт'), ('r', 'Розница')], 'Тип продаж'),
+        'comm_ids': fields.one2many('crm.communication.history', 'partner_id', string="История общения"),
+        'source': fields.many2one('crm.source.stage', 'Источник'),
+        'author_id': fields.many2one('res.users', 'Автор', readonly=True),
+        'price_type': fields.selection(
+            [
+                ('retail', 'Розница'),
+                ('c_eur', 'C-EUR'),
+                ('d_eur', 'D-EUR'),
+                ('c_usd', 'C-USD'),
+                ('d_usd', 'D-USD'),
+                ('percent', '%')
+            ], 'Тип цены'),
+        'pay_notes': fields.text('Примечания об оплате'),
+        'partner_state': fields.many2one('partner.partner.state', 'Статус партнера'),
+        'pay_type': fields.many2one('partner.pay.type', 'Способ оплаты'),
+        'delivery_type': fields.many2one('partner.delivery.type', 'Способ доставки'),
+        'pay_type_ec': fields.many2many(
+            'partner.pay.type',
+            'partner_pay_type_rel',
+            'part_id',
+            'pay_id',
+            'Способ оплаты'),
+        'delivery_type_ec': fields.many2many(
+            'partner.delivery.type',
+            'partner_delivery_type_rel',
+            'part_id',
+            'delivery_id',
+            'Способ доставки'),
+        'id_vat': fields.char('ID_VAT', size=128),
+        'delivery_from': fields.many2one('partner.delivery.from', 'Откуда делается доставка'),
+        'budget': fields.float('Бюджет'),
+        'product_id': fields.one2many('crm.patner.product', 'res_partner', string="Товары"),
+        'write_date': fields.datetime('Последняя дата контакта', readonly=True),
+
+        'partner_site': fields.related('address', 'partner_site', type='char', string='Сайт партнера'),
+        'partner_site_two': fields.related('address', 'partner_site', type='char', string='Сайт партнера(2)'),
+
+        'partner_name': fields.related('address', 'name', type='char', string='Имя контакта'),
+        'circulation': fields.one2many('res.partner.circulation', 'partner_id', 'Оборот партнера в $'),
+        'has_eshop': fields.selection(
+            [
+                ('yes', 'Есть'),
+                ('no', 'Нет')
+            ], 'Интернет-магазин'),
+        'what_done': fields.text('Что сделано для продвижения магазина'),
+
+
+        'partner_site_default': fields.related('address', 'site_ids', 'name', type='char', string='Сайт партнера'),
+        'phone_default': fields.related('address', 'phone_ids', 'phone', type='char', size=128, string='Телефон'),
+        'email_default': fields.related('address', 'email_ids', 'name', type='char', size=128, string='Эл. почта'),
+
+
+        'last_circulation': fields.function(_last_circulation, type="float", method=True),
+        'fin_dog': fields.selection(
+            [
+                ('iys', 'Исключительные условия сотрудничества'),
+                ('sssppvsyad', 'Сохранение существующей скидки потенциального партнера в системе Яндекс.Директ'),
+                ('sr', 'Система Rebate'),
+                ('bdyw', 'Бонус для участников вебинара'),
+                ('cc', 'Клубная карта')
+            ], 'Финансовые договоренности', help='Финансовые договоренности с Партнером'),
+        'categ_id': fields.many2one(
+            'crm.case.categ',
+            'Тематика',
+            domain="['|',('section_id','=',section_id),('section_id','=',False),('object_id.model', '=', 'crm.lead')]",
+            help='Категория, которой принадлежит данный Партнер'
+        ),
+        'description': fields.text('Дополнительная информация о контактном лице'),
+        'access_ids': fields.one2many(
+            'res.partner.access',
+            'partner_id',
+            'Доступы, предоставляемые партнером',
+            help='Таблица заполняется менеджером продаж. Вносятся доступы к админпанеле, серверу и т.д.'
+        ),
+        'transfer_ids': fields.one2many('transfer.history', 'partner_id', 'История переприсвоения'),
+
+        #  Критерии
+        'terms_of_service': fields.char('Сроки предоставления услуги', size=10),
+        'conformity': fields.char('Соответствие услуги всем входным требованиям, указанным в ТЗ', size=10),
+        'quality_feedback': fields.char(
+            'Качество обратной связи с представителем Компании , скорость и полнота ответов менеджера', size=10),
+        'completeness_of_reporting': fields.char(
+            'Полнота отчетов о результатах рекламной кампании и соблюдение сроков их предоставления', size=10),
+
+        'client_type': fields.selection(
+            [
+                ('agent', 'агент'),
+                ('diler', 'дилер'),
+                ('distributor', 'дистрибутор'),
+                ('retail', 'retail'),
+                ('vip-r', 'VIP-R (VIP-retail)'),
+                ('nks', 'НКС (нетрадиционные каналы сбыта)'),
+            ], 'Категория клиента'
+        ),
+
+        'check': fields.function(_check_access, type="boolean", method=True),
+        'service': fields.function(
+            _get_service,
+            type="many2one",
+            relation='brief.services.stage',
+            string='Услуга',
+            method=True
+        ),
+        'site_s': fields.function(
+            lambda *a: [],
+            method=True,
+            string='Сайт',
+            type='char',
+            fnct_search=_search_site
+        ),
+
+        'next_call_comment': fields.char(
+            'Комментарий к следующему звонку',
+            size=250,
+            help='Комментарий к следующему звонку'),
+        'stage_id': fields.many2one(
+            'crm.case.stage',
+            'Этап',
+            domain="[('section_ids', '=', section_id)]",
+            help='Этап Кандидата'),
+        'priority': fields.selection(AVAILABLE_PRIORITIES, 'Приоритет', select=True, help='Приоритет Кандидата'),
+        'lead': fields.boolean('Кандидат'),
+        'last_comment': fields.related('note_ids', 'title', type='char', size=128, string=u'Комментарий'),
+
+        'phone_s': fields.function(
+            lambda *a: [],
+            method=True,
+            string='Телефон',
+            type='char',
+            fnct_search=_search_phone
+        ),
+
+        'email_s': fields.function(
+            lambda *a: [],
+            method=True,
+            string='Эл. почта',
+            type='char',
+            fnct_search=_search_email
+        ),
+
+        'create_date': fields.datetime(
+            'Дата создания',
+            select=True,
+            readonly=True,
+            help='Дата создания кандидата.'),
+
+        'status_history_ids': fields.one2many('res.partner.status.history', 'partner_id', 'История смены статусов'),
+        'attachment_ids': fields.one2many(
+            'ir.attachment',
+            'res_id',
+            'Вложения',
+            domain=[('res_model', '=', 'res.partner')],
+            context={'res_model': 'res.partner'}
+        ),
+
+        'process_ids': fields.one2many('process.launch', 'partner_id', 'Процессы'),
+    }
+
+    def _get_type(self, cr, uid, context=None):
+        if context is None:
+            context = {}
+        lead = context.get('lead', True)
+        return lead
+
+    _defaults = {
+        'user_id': lambda self, cr, uid, context: uid,
+        'section_id': lambda self, cr, uid, context: self.pool.get('res.users').browse(cr, uid, uid,
+                                                                                       context).context_section_id.id,
+        'partner_status': 'new',
+        'author_id': lambda self, cr, uid, context: uid,
+        'lead': _get_type,
+        'partner_base': 'cold',
+    }
+
+    def default_get(self, cr, uid, fields_list, context=None):
+        pass
+        return super(res_partner, self).default_get(cr, uid, fields_list, context)
+
+    def add_note(self, cr, uid, ids, context=None):
+        view_id = self.pool.get('ir.ui.view').search(cr, uid,
+                                                     [('name', 'like', 'CRM Note'), ('model', '=', self._name)])
+
+        return {
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'crm.lead.notes',
+            'name': 'Добавление заметки',
+            'view_id': view_id,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'partner_id': ids[0],
+            },
+            'target': 'new',
+            'nodestroy': True,
+        }
+
+    def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=None):
+        obj_tel = self.pool.get('tel.reference')
+        i = 0
+        get_id = False
+        for item in args:
+            if 'phone_ids' in item:
+                args.pop(i)
+                search_ids = obj_tel.search(
+                    cr,
+                    uid,
+                    [
+                        ('phone_for_search', 'ilike', item[2]),
+                        ('res_partner_id', '!=', False)
+                    ])
+                res = obj_tel.read(cr, uid, search_ids, ['res_partner_id'])
+                it_d = [item['res_partner_id'][0] for item in res]
+                args.append(('id', 'in', it_d))
+            if item[0] == 'id':
+                get_id = True
+            i += 1
+        if not get_id:
+            lead_pool = self.pool.get('crm.lead')
+            lead_ids = lead_pool.search(cr, uid, [('user_id', '=', uid), ('partner_id', '!=', False)])
+            partner_ids = lead_pool.read(cr, uid, lead_ids, ['partner_id'])
+        return super(res_partner, self).search(cr, uid, args, offset, limit, order, context, count)
+
+    def write(self, cr, user, ids, vals, context=None):
+        next_partner_status = vals.get('partner_status', False)
+        for record in self.read(cr, user, ids, ['partner_status', 'address', 'name']):
+            partner_status = record['partner_status']
+            address = record['address']
+            if address:
+                res_partner_address_site = self.pool.get('res.partner.address.site')
+                if not res_partner_address_site.search(cr, user, [('name', '=', record['name'])]):
+                    res_partner_address_site.create(cr, user, {'address_id': address[0], 'name': record['name']})
+
+            if partner_status and next_partner_status and partner_status != next_partner_status:
+                vals.update({'status_history_ids': [(0, 0, {'name': next_partner_status})]})
+
+        if vals.get('stage_id', False) and vals['stage_id'] == 41 and not vals.get('refusion_description', False):
+            raise osv.except_osv('Кандидат', 'Необходимо заполнить "Причину отказа"')
+
+        for attachment in vals.get('attachment_ids', []):
+            if attachment[0] == 0:
+                attachment[2]['res_model'] = 'res.partner'
+
+        return super(res_partner, self).write(cr, user, ids, vals, context)
+
+    def _check_unique_insesitive(self, cr, uid, ids, context=None):
+        for self_obj in self.browse(cr, 1, ids, context):
+            if self.search(cr, 1, [('name', '=', self_obj.name), ('id', '!=', self_obj.id)], context):
+                return False
+            return True
+
+    def _check_unique_lead(self, cr, uid, ids, context=None):
+        sr_ids = self.pool.get('crm.lead').search(cr, 1, [], context)
+        lst = [
+            x.name.lower()
+            for x in self.pool.get('crm.lead').browse(cr, 1, sr_ids, context=context)
+            if x.name
+        ]
+        for self_obj in self.browse(cr, 1, ids, context=context):
+            list_sites = [x.name.lower() for address in self_obj.address for x in address.site_ids]
+            if [x for site_p in list_sites if site_p in lst] and not self_obj.opportunity_ids:
+                return False
+            return True
+
+    def _check_criteries(self, cr, uid, ids, context=None):
+        for record in self.browse(cr, uid, ids):
+            terms_of_service = record.terms_of_service or 0
+            conformity = record.conformity or 0
+            quality_feedback = record.quality_feedback or 0
+            completeness_of_reporting = record.completeness_of_reporting or 0
+            if (record.partner_type in ('upsale', False) and terms_of_service \
+                    and conformity and quality_feedback and completeness_of_reporting):
+
+                sum_criteries = int(terms_of_service) + int(conformity) + \
+                                int(quality_feedback) + int(completeness_of_reporting)
+
+                if sum_criteries != 100:
+                    return False
+        return True
+
+    def _check_unique_phone(self, cr, uid, ids, context=None):
+        for self_obj in self.browse(cr, 1, ids, context):
+            address_ids = [item.id for item in self_obj.address]
+            for addr in self_obj.address:
+                for phone in addr.phone_ids:
+                    domain = [
+                        ('partner_address_id', 'not in', address_ids),
+                        'partner_id', '!=', False,
+                        '|', ('phone', '=', phone.phone),
+                        '|', ('phone', '=', phone.phone_for_search),
+                        '|', ('phone_for_search', '=', phone.phone),
+                        ('phone_for_search', '=', phone.phone_for_search)
+                    ]
+                    if self.pool.get('tel.reference').search(cr, 1, domain, context):
+                        return False
+            return True
+
+    def _check_contact_full(self, cr, uid, ids, context=None):
+        for record in self.read(cr, uid, ids, ['address', 'partner_base']):
+            if record['partner_base'] == 'hot':
+                if not record['address']:
+                    return False
+        return True
+
+    def _check_service_full(self, cr, uid, ids, context=None):
+        for record in self.read(cr, uid, ids, ['added_services_ids', 'partner_base']):
+            if record['partner_base'] == 'hot':
+                if not record['added_services_ids']:
+                    return False
+        return True
+
+    def _check_note_full(self, cr, uid, ids, context=None):
+        for record in self.read(cr, uid, ids, ['note_ids', 'partner_base']):
+            if record['partner_base'] == 'hot' and not record['note_ids']:
+                return False
+        return True
+
+    def to_partner(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
+
+        for obj in self.browse(cr, uid, ids, context=context):
+            if not obj.ur_name:
+                raise osv.except_osv("Кандидат", "Заполните 'Юридическое название компании'")
+            self.write(cr, uid, [obj.id], {'lead': False, 'partner_status': 'new'})
+
+        view_id = self.pool.get('ir.ui.view').search(
+            cr,
+            uid,
+            [
+                ('name', 'like', 'res.partner.form upsale'),
+                ('model', '=', self._name)
+            ])
+        return {
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': self._name,
+            'views': [(view_id[0], 'form')],
+            'type': 'ir.actions.act_window',
+            'target': 'current',
+            'context': context,
+            'res_id': ids[0],
+        }
+
+    _constraints = [
+        (
+            _check_unique_insesitive,
+            'должен быть уникальным!',
+            [u'Основной сайт']
+        ),
+        (
+            _check_contact_full,
+            'Контакт должен быть указан!',
+            [u'Контакт']
+        ),
+        #(
+        #    _check_note_full,
+        #    'Журнал должен быть заполнен!',
+        #    [u'Журнал']
+        #),
+        (
+            _check_service_full,
+            'Услуга должена быть указана!',
+            [u'Услуга']
+        ),
+        (
+            _check_criteries,
+            'Сумма критериев должна равняться 100',
+            []
+        ),
+        #(
+        #    _check_unique_phone,
+        #    'Уже создан Кандидат/Партнер с таким номером телефона',
+        #    []
+        #),
+    ]
+res_partner()
+
+
+class TransferHistory(Model):
+    _inherit = 'transfer.history'
+
+    _columns = {
+        'partner_id': fields.many2one('res.partner', 'Партнер', invisible=True),
+    }
+TransferHistory()
+
+
+class PartnerStatusHistory(Model):
+    _name = 'res.partner.status.history'
+    _description = u'Partner - История изменения статуса партнера'
+    _log_create = True
+    _order = "create_date desc"
+
+    _columns = {
+        'create_uid': fields.many2one('res.users', 'Перевел', readonly=True),
+        'name': fields.selection(
+            [
+                ('new', 'Новый'),
+                ('existing', 'Существующий'),
+                ('stoped', 'Приостановлен'),
+                ('refusion', 'Отказ')
+            ], 'На какой статус'),
+        'create_date': fields.datetime('Дата', readonly=True),
+        'partner_id': fields.many2one('res.partner', 'Партнер', invisible=True),
+    }
+TransferHistory()

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_process_site_makeup">
+            <field name="name">wkf.process.site.makeup</field>
+            <field name="osv">process.site.makeup</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- none -->
+        <record model="workflow.activity" id="act_makeup_none">
+            <field name="wkf_id" ref="wkf_process_site_makeup"/>
+            <field name="flow_start">True</field>
+            <field name="name">Отсутствует</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'none'})</field>
+        </record>
+        <!-- draft -->
+        <record model="workflow.activity" id="act_makeup_draft">
+            <field name="wkf_id" ref="wkf_process_site_makeup"/>
+            <field name="name">Не начат</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'draft'})</field>
+        </record>
+        <!-- work -->
+        <record model="workflow.activity" id="act_makeup_work">
+            <field name="wkf_id" ref="wkf_process_site_makeup"/>
+            <field name="name">В процессе</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'work'})</field>
+        </record>
+        <!-- finish -->
+        <record model="workflow.activity" id="act_makeup_finish">
+            <field name="wkf_id" ref="wkf_process_site_makeup"/>
+            <field name="name">Этап окончен</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'finish'})</field>
+        </record>
+
+
+        <!-- none -> draft -->
+        <record model="workflow.transition" id="makeup_n_d">
+            <field name="act_from" ref="act_makeup_none"/>
+            <field name="act_to" ref="act_makeup_draft"/>
+            <field name="signal">draft</field>
+        </record>
+        <!-- draft -> none -->
+        <record model="workflow.transition" id="makeup_d_n">
+            <field name="act_from" ref="act_makeup_draft"/>
+            <field name="act_to" ref="act_makeup_none"/>
+            <field name="signal">none</field>
+        </record>
+        <!-- draft -> work -->
+        <record model="workflow.transition" id="makeup_d_w">
+            <field name="act_from" ref="act_makeup_draft"/>
+            <field name="act_to" ref="act_makeup_work"/>
+            <field name="signal">work</field>
+        </record>
+        <!-- work -> finish -->
+        <record model="workflow.transition" id="makeup_w_f">
+            <field name="act_from" ref="act_makeup_work"/>
+            <field name="act_to" ref="act_makeup_finish"/>
+            <field name="signal">finish</field>
+        </record>
+    </data>
+</openerp>

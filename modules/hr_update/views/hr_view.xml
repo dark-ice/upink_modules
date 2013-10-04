@@ -1,0 +1,405 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <delete model="ir.ui.view_sc" search="[('name','=','Customers')]"/>
+        <delete model="ir.ui.view_sc" search="[('name','=','Meetings')]"/>
+        <delete model="ir.ui.view_sc" search="[('name','=','Employees')]"/>
+
+        <record id="view_employee_filter_inherit" model="ir.ui.view">
+            <field name="name">view.employee.filter.inherit</field>
+            <field name="model">hr.employee</field>
+            <field name="type">search</field>
+            <field name="inherit_id" ref="hr.view_employee_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="before">
+                    <filter icon="terp-personal+" domain="['|', ('active','=', False), ('active','=', True)]"
+                            name="inactive" string="+ неактивные" groups="base.group_extended,base.group_hr_manager"/>
+                </xpath>
+                <xpath expr="//field[@name='parent_id']" position="replace">
+                    <field name="parent_id">
+                        <filter icon="terp-personal+" domain="[('parent_id.user_id','=',uid)]"/>
+                    </field>
+                    <field name="account_id" />
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="view_employee_kanban_inherit" model="ir.ui.view">
+            <field name="name">view.employee.kanban.inherit</field>
+            <field name="model">hr.employee</field>
+            <field name="type">kanban</field>
+            <field name="inherit_id" ref="hr_holidays.hr_kanban_view_employees_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//templates" position="before">
+                    <field name="maternity"/>
+                </xpath>
+                <xpath expr="//div[@class='oe_employee_details']/ul/li" position="before">
+                    <li t-if="record.maternity.value">
+                        <span class="oe_kanban_button pink_bg" style="font-size: 100%%">Декретный отпуск</span>
+                    </li>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_employee_tree_inherit" model="ir.ui.view">
+            <field name="name">view.employee.tree.inherit</field>
+            <field name="model">hr.employee</field>
+            <field name="type">tree</field>
+            <field name="inherit_id" ref="hr.view_employee_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='parent_id']" position="after">
+                    <field name="account_id" />
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_employee_form_inherit" model="ir.ui.view">
+            <field name="name">hr.employee.form.inherit</field>
+            <field name="model">hr.employee</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='parent_id']" position="after">
+                    <field name="instate_date" />
+                </xpath>
+                <xpath expr="//field[@name='work_email']" position="after">
+                    <field name="work_skype"/>
+                </xpath>
+                <xpath expr="//page[@string='Notes']" position="replace">
+                    <page string='Дополнительно' groups="base.group_hr_user">
+                        <field name="attachment_ids" nolabel="1" colspan="4" widget="one2many_list">
+                            <tree string="Вложения" colors="blue:type in ('url',)">
+                                <field name="datas_fname"/>
+                                <field name="create_date"/>
+                                <field name="user_id"/>
+                                <field name="type" groups="base.group_extended"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page string="Доступы">
+                        <separator/>
+                    </page>
+                </xpath>
+                <xpath expr="//page[@string='Categories']" position="replace">
+                    <page string="Categories" groups="base.group_hr_user">
+                        <field name="category" nolabel="1"/>
+                        <field name="history_job_ids" colspan="4" nolabel="1">
+                            <tree string="История должностей">
+                                <field name="prev_value" string="С"/>
+                                <field name="name" string="На"/>
+                                <field name="create_date"/>
+                                <field name="create_eid" string="Перевел"/>
+                            </tree>
+                            <form>
+                                <field name="prev_value" string="С"/>
+                                <field name="name" string="На"/>
+                                <field name="create_date"/>
+                                <field name="create_eid" string="Перевел"/>
+                            </form>
+                        </field>
+                        <field name="certification_ids" colspan="2" nolabel="1">
+                            <tree string="Аттестации">
+                                <field name="certification_date"/>
+                                <field name="name" string="На"/>
+                            </tree>
+                            <form>
+                                <field name="certification_date"/>
+                                <field name="name" string="На"/>
+                            </form>
+                        </field>
+                        <field name="training_ids" colspan="2" nolabel="1">
+                            <tree string="Участие во внешнем обучении">
+                                <field name="name"/>
+                                <field name="when"/>
+                                <field name="where"/>
+                            </tree>
+                            <form>
+                                <field name="name"/>
+                                <field name="when"/>
+                                <field name="where"/>
+                            </form>
+                        </field>
+                        <field name="kpi_ids" colspan="4" nolabel="1">
+                            <tree string="KPI">
+                                <field name="period_id"/>
+                                <field name="total_mbo"/>
+                                <field name="total_pay"/>
+                            </tree>
+                        </field>
+                        <field colspan="4" name="expert_assessment_ids" nolabel="1" mode="tree">
+                            <tree string="Экспертная оценка">
+                                <field name="expert_id"/>
+                                <field name="period_id" />
+
+                                <field name="client"/>
+                                <field name="client_comments"/>
+
+                                <field name="standards"/>
+                                <field name="standards_comments" />
+
+                                <field name="quality"/>
+                                <field name="quality_comments"/>
+
+                                <field name="mean"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+
+                <xpath expr="//page[@string='Categories']" position="before">
+                    <page string="Разное" groups="base.group_hr_user">
+                        <group colspan="2" col="2">
+                            <separator string="Личные данные"/>
+                            <field name="account_number" />
+                            <field name="children" />
+                            <field name="babies_ids" colspan="2" nolabel="1">
+                                <tree string="Дети">
+                                    <field name="name"/>
+                                    <field name="gender"/>
+                                </tree>
+                                <form>
+                                    <field name="name"/>
+                                    <field name="gender"/>
+                                </form>
+                            </field>
+                        </group>
+                        <group colspan="2" col="2">
+                            <separator string="Информация о должности"/>
+                            <field name="manager"/>
+                            <field name="vehicle"/>
+                        </group>
+                    </page>
+                </xpath>
+
+                <xpath expr="//field[@name='work_location']" position="after">
+                    <separator string="Образование" colspan="2"/>
+                    <field name="university_id" colspan="2"/>
+                    <field name="specialty" colspan="2"/>
+                    <field name="language_ids" colspan="4" nolabel="1">
+                        <tree string="Знание языков">
+                            <field name="name"/>
+                            <field name="value"/>
+                        </tree>
+                        <form>
+                            <field name="name"/>
+                            <field name="value"/>
+                        </form>
+                    </field>
+
+                </xpath>
+
+                <xpath expr="//field[@name='address_home_id']" position="replace">
+                    <field name="address_home_id" colspan="2" string="Адрес прописки"/>
+                    <field name="address_residence_id" colspan="2"/>
+                </xpath>
+
+                <xpath expr="//field[@name='country_id']" position="replace"/>
+                <xpath expr="//field[@name='otherid']" position="replace"/>
+                <xpath expr="//field[@name='ssnid']" position="replace"/>
+            </field>
+        </record>
+
+
+        <record id="view_employee_form1" model="ir.ui.view">
+            <field name="name">hr.employee.form.new</field>
+            <field name="model">hr.employee</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Сотрудник">
+                    <group colspan="4">
+                        <field name='id' invisible='1' />
+                        <field name="check_l" />
+                        <field name="check_t" />
+                    </group>
+                    <group colspan="4" col="8">
+                        <group colspan="6" col="6">
+                            <field colspan="4" name="name" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                            <field name="user_id" on_change="onchange_user(user_id)" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+
+                            <field name="company_id" widget="selection" on_change="onchange_company(company_id)" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                            <field name="parent_id" attrs="{'readonly': [('check_t', '=', False)]}" />
+                            <field name="start_date" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                            <newline/>
+                            <field name="department_id" on_change="onchange_department_id(department_id)" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                            <field name="account_id"  attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                            <field name="instate_date"  attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                            <newline/>
+                            <field name="active" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                            <field name="maternity" attrs="{'invisible': [('check_l', '=', False), ], 'readonly': [('check_t', '=', False)]}"/>
+                            <field name="formalized" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                        </group>
+                        <group colspan="2" col="1">
+                          <field name="photo" widget='image' nolabel="1" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                        </group>
+                    </group>
+                    <notebook colspan="6">
+                        <page string="Личные данные" attrs="{'readonly': [('check_t', '=', False)], 'readonly': [('check_t', '=', False)]}">
+                            <group col="2" colspan="2" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}">
+                                <separator colspan="2" string="Паспортные данные"/>
+                                <field name="passport_id"  attrs="{'readonly': [('check_t', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                                <field name="inn" attrs="{'readonly': [('check_t', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                            </group>
+                            <group col="2" colspan="2" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}">
+                                <separator string="Status" colspan="2"/>
+                                <field name="gender" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                                <field name="marital" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                                <field name="birthday" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                            </group>
+                            <group col="2" colspan="2">
+                                <separator string="Contact Information" colspan="2"/>
+                                <field name="address_home_id" colspan="2" string="Адрес прописки" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                                <field name="address_residence_id" colspan="2" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+
+                                <field name="partner_id" invisible="1" />
+                                <field name="address_id" colspan="2" on_change="onchange_address_id(address_id)" domain="[('partner_id', '=', partner_id)]" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                                <field name="work_phone" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                                <field name="mobile_phone" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                                <field name="work_email" widget="email" attrs="{'readonly': [('check_t', '=', False)]}" />
+                                <field name="work_skype" attrs="{'readonly': [('check_t', '=', False)]}" />
+                                <field name="work_location" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                            </group>
+                            <group col="2" colspan="2">
+                                <separator string="Job Information" colspan="2"/>
+                                <field name="job_id" domain="[('state','!=','old')]" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                                <field name="coach_id"  attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                                <group col="2" colspan="2" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}">
+                                    <separator string="Образование" colspan="2"/>
+                                    <field name="university_id" colspan="2" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                                    <field name="specialty" colspan="2" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                                    <field name="language_ids" colspan="4"  attrs="{'readonly': [('check_t', '=', False)]}" nolabel="1">
+                                        <tree string="Знание языков" editable="top">
+                                            <field name="name"/>
+                                            <field name="value"/>
+                                        </tree>
+                                    </field>
+                                </group>
+
+                            </group>
+                        </page>
+                        <page string="Разное" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}">
+                            <group colspan="2" col="2">
+                                <separator colspan="2" string="Личные данные"/>
+                                <field name="account_number" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                                <field name="children"  attrs="{'readonly': [('check_t', '=', False)]}"/>
+                                <field name="babies_ids" colspan="2" nolabel="1" attrs="{'readonly': [('check_t', '=', False)]}">
+                                    <tree string="Дети" editable="top">
+                                        <field name="name"/>
+                                        <field name="gender"/>
+                                    </tree>
+                                </field>
+                            </group>
+                            <group colspan="2" col="2">
+                                <separator colspan="2" string="Информация о должности"/>
+                                <field name="manager" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                                <field name="vehicle" string="Личный транспорт" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                            </group>
+                        </page>
+                        <page string="Categories" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}">
+                            <group colspan="4" col="4">
+                                <field name="category" colspan="2" nolabel="1" attrs="{'readonly': [('check_t', '=', False)]}"/> <newline/>
+                                <group colspan="4" col="6">
+                                    <field name="grade_id" colspan="2" />
+                                    <field name="dy_cash" colspan="2" attrs="{'invisible': [('grade_id', '!=', 46)]}"/>
+                                    <button
+                                        string="Изменить грейд"
+                                        name="%(action_grade_wizard)d"
+                                        type="action"
+                                        icon="STOCK_EDIT"
+                                        context="{
+                                            'employee_id': id,
+                                            'grade_id': grade_id,
+                                            'dy_cash': dy_cash
+                                        }"
+                                        attrs="{'invisible': [('check_t', '=', False)]}"
+                                        />
+                                </group>
+                                <newline />
+                                <field name="grade_history_ids" colspan="4" nolabel="1" readonly="True" />
+                                <field name="retention_ids" colspan="2" nolabel="1" readonly="True" />
+                                <field name="award_ids" colspan="2" nolabel="1" readonly="True" />
+                                <field name="history_job_ids" colspan="4" attrs="{'readonly': [('check_t', '=', False)]}" nolabel="1">
+                                    <tree string="История должностей">
+                                        <field name="prev_value" string="С"/>
+                                        <field name="name" string="На"/>
+                                        <field name="create_date"/>
+                                        <field name="create_eid" string="Перевел"/>
+                                    </tree>
+                                    <form>
+                                        <field name="prev_value" string="С"/>
+                                        <field name="name" string="На"/>
+                                        <field name="create_date"/>
+                                        <field name="create_eid" string="Перевел"/>
+                                    </form>
+                                </field>
+                                <field name="certification_ids" colspan="2" attrs="{'readonly': [('check_t', '=', False)]}" nolabel="1">
+                                    <tree string="Аттестации" editable="top">
+                                        <field name="certification_date"/>
+                                        <field name="name"/>
+                                        <field name="state"/>
+                                    </tree>
+                                </field>
+                                <field name="training_ids" colspan="2" attrs="{'readonly': [('check_t', '=', False)]}" nolabel="1">
+                                    <tree string="Участие во внешнем обучении" editable="top">
+                                        <field name="name"/>
+                                        <field name="when"/>
+                                        <field name="where"/>
+                                        <field name="how_much"/>
+                                    </tree>
+                                </field>
+                                <field name="kpi_ids" readonly="1" colspan="4" nolabel="1">
+                                    <tree string="KPI">
+                                        <field name="period_id"/>
+                                        <field name="total_mbo"/>
+                                        <field name="total_pay"/>
+                                    </tree>
+                                </field>
+                                <field readonly="1" colspan="4" name="expert_assessment_ids" nolabel="1" mode="tree">
+                                    <tree string="Экспертная оценка">
+                                        <field name="expert_id"/>
+                                        <field name="period_id" />
+
+                                        <field name="client"/>
+                                        <field name="client_comments"/>
+
+                                        <field name="standards"/>
+                                        <field name="standards_comments" />
+
+                                        <field name="quality"/>
+                                        <field name="quality_comments"/>
+
+                                        <field name="mean"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Доступы" attrs="{'invisible': [('check_l', '=', False)]}">
+                            <field name="identification_id" colspan="2" attrs="{'readonly': [('check_t', '=', False)]}" string="Внутренний номер"/>
+                            <newline/>
+                            <field name="access_ids" colspan="4" nolabel="1">
+                                <tree string="Доступы" editable="top">
+                                    <field name="name"/>
+                                    <field name="login"/>
+                                    <field name="password"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string='Вложения' attrs="{'invisible': [('check_t', '=', False)]}">
+                            <field name="attachment_ids" nolabel="1" colspan="4" widget="one2many_list">
+                                <tree string="Вложения" colors="blue:type in ('url',)">
+                                    <field name="datas_fname"/>
+                                    <field name="create_date"/>
+                                    <field name="user_id"/>
+                                    <field name="type" groups="base.group_extended"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                    </notebook>
+                </form>
+            </field>
+        </record>
+
+
+    </data>
+</openerp>

@@ -1,0 +1,292 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="view_partner_form_eu" model="ir.ui.view">
+            <field name="name">res.partner.form eu</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Партнеры СНГ ЕС">
+                    <group col="4" colspan="4">
+                        <group colspan="4" col="8">
+                            <field name="name" string="Партнер"/>
+                            <field name="author_id"/>
+                            <field name="cand_type"/>
+                            <field name="sale_type"/>
+                            <field name="activity"/>
+                            <field name="source" domain="[('section_id','=',section_id)]"/>
+                            <field name="customer"/>
+                            <field name="supplier"/>
+                            <field name="partner_type" invisible="1"/>
+                        </group>
+                        <notebook colspan="4">
+                            <page string="Общее">
+                                <field colspan="4" mode="form" name="address" nolabel="1" height="260">
+                                    <form string="Контакт Партнера">
+                                        <group colspan="4" col="6">
+                                            <field name="name" required="1" string="Контактное лицо"/>
+                                            <field name="function" string="Должность"/>
+                                        </group>
+                                        <group colspan="2" col="4">
+                                            <separator string="Postal Address" colspan="4"/>
+                                            <field name="type" string="Type" colspan="4"/>
+                                            <field name="country_ec" required="1"/>
+                                            <field name="state_ec" string="Область"/>
+                                            <field name="zip" string="Индекс"/>
+                                            <field name="city"/>
+                                            <field name="street" colspan="4"/>
+                                            <field name="street2" string="№ дома,офиса" colspan="4"/>
+                                            <group colspan="2"></group>
+                                            <group colspan="2" col="2">
+                                                <field name="skype"/>
+                                                <field name="msn"/>
+                                                <field name="yahoo"/>
+                                                <field name="icq"/>
+                                                <field name="gg"/>
+                                            </group>
+                                        </group>
+                                        <group colspan="2" col="2">
+                                            <separator string="Communication" colspan="2"/>
+                                            <field name="email" widget="email"/>
+                                            <field name="email_two" widget="email"/>
+                                            <button name="email_to_partner"
+                                                    icon="terp-mail-message-new"
+                                                    string="Отправить партнеру"
+                                                    type="object" colspan="2"/>
+                                            <field name="partner_site"/>
+                                            <field name="partner_site_two"/>
+                                            <field name="phone_ids" mode="tree" nolabel="1" colspan="2">
+                                                <tree string="Номера телефонов" editable="top">
+                                                    <field name="phone"/>
+                                                    <field name="phone_type"/>
+                                                </tree>
+                                            </field>
+                                        </group>
+                                    </form>
+                                </field>
+                            </page>
+                            <page string="Данные по сотрудничеству">
+                                <group colspan="4" col="4">
+                                    <separator string="Корпоративная почта" colspan="4"/>
+                                    <group colspan="2" col="2">
+                                        <field name="login"/>
+                                        <field name="password"/>
+                                        <field name="forward_to"/>
+                                    </group>
+                                    <group colspan="2" col="2">
+                                        <field name="section_id"/>
+                                        <field name="main_partner"/>
+                                    </group>
+                                    <newline/>
+                                    <group colspan="2" col="2">
+                                        <separator string="Условия сотрудничества" colspan="2"/>
+                                        <field name="partner_state"/>
+                                        <field name="price_type"/>
+                                        <separator string="Способ оплаты" colspan="2"/>
+                                        <field name="pay_type_ec" nolabel="1" colspan="2"/>
+                                        <field name="id_vat"/>
+                                        <separator string="Примечания по оплате"/>
+                                        <field name="pay_notes" nolabel="1" colspan="2"/>
+                                    </group>
+                                    <group colspan="2" col="2">
+                                        <separator string="Корпоративный сайт" colspan="2"/>
+                                        <field name="corporate_site_url" widget="url"/>
+                                        <field name="corporate_admin_panel"/>
+                                        <field name="corporate_admin_password"/>
+                                        <field name="dealer_discount" model="tree" nolabel="1" colspan="2">
+                                            <tree editable="top">
+                                                <field name="amount"/>
+                                                <field name="date"/>
+                                            </tree>
+                                        </field>
+                                        <separator string="Способ доставки" colspan="2"/>
+                                        <field name="delivery_type_ec" nolabel="1" colspan="2"/>
+                                        <field name="delivery_from"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Продажи и закупки">
+                                <group colspan="4" col="4">
+                                    <separator string="Общая информация"/>
+                                    <field name="user_id"/>
+                                    <field name="active"/>
+                                    <field name="date"/>
+                                    <field name="company_id" widget="selection"/>
+                                </group>
+                            </page>
+                            <page string="Учёт">
+                                <field name="orders_history" colspan="4" nolabel="1" mode="tree">
+                                    <tree string="История заказов" editable="top">
+                                        <field name="type"/>
+                                        <field name="create_date"/>
+                                        <field name="number"/>
+                                        <field name="shipment_type"/>
+                                        <field name="sum"/>
+                                        <field name="currency"/>
+                                        <field name="payment_state"/>
+                                        <field name="user_id"/>
+                                        <field name="commentary"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Журнал">
+                                <field name="opportunity_ids" colspan="4" nolabel="1"
+                                       context="{'default_partner_id': active_id}">
+                                    <tree string="Leads and Opportunities"
+                                          colors="blue:state=='pending';gray:state=='cancel'">
+                                        <field name="create_date"/>
+                                        <field name="name"/>
+                                        <field name="type"/>
+                                        <field name="stage_id"/>
+                                        <button name="stage_previous" string="Previous"
+                                                states="open,pending" type="object" icon="gtk-go-back"/>
+                                        <button name="stage_next" string="Next"
+                                                states="open,pending" type="object"
+                                                icon="gtk-go-forward"/>
+                                        <field name="user_id"/>
+                                        <field name="state"/>
+                                        <button name="case_cancel" string="Cancel"
+                                                states="draft,open,pending" type="object"
+                                                icon="gtk-cancel"/>
+                                        <button name="case_open" string="Open"
+                                                states="draft,pending" type="object"
+                                                icon="gtk-go-forward"/>
+                                        <button name="case_close" string="Close"
+                                                states="open,draft,pending" type="object"
+                                                icon="gtk-close"/>
+                                        <button string="Convert to Opportunity"
+                                                name="convert_opportunity"
+                                                states="draft,open,pending" icon="gtk-index"
+                                                type="object" attrs="{'invisible':[('type','=','opportunity')]}"/>
+                                        <button name="case_escalate" string="Escalate"
+                                                states="open,draft,pending" type="object"
+                                                icon="gtk-go-up"/>
+                                    </tree>
+                                </field>
+                                <field name="meeting_ids" colspan="4" nolabel="1"
+                                       context="{'default_partner_id': active_id}">
+                                    <tree string="Meetings" colors="gray:state in ('draft', 'cancel','done','pending')">
+                                        <field name="user_id" string="Responsible"/>
+                                        <field name="name" string="Subject"/>
+                                        <field name="date" string="Start Date"/>
+                                        <field name="date_deadline" string="End Date"/>
+                                    </tree>
+                                </field>
+                                <field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">
+                                    <tree string="Phone Calls">
+                                        <field name="date"/>
+                                        <field name="name" string="Отчет звонка"/>
+                                        <field name="partner_phone"/>
+                                        <field name="time_of_coll"/>
+                                        <field name="duration"/>
+                                        <field name="user_id"/>
+                                        <field name="id_sphone"/>
+                                        <field name="categ_id" string="Тип звонка"/>
+                                        <field name="id_ast_coll"/>
+                                    </tree>
+                                </field>
+                                <field name="comm_ids" colspan="4" nolabel="1" mode="tree">
+                                    <tree string="История общения" editable="top">
+                                        <field name="create_date"/>
+                                        <field name="type"/>
+                                        <field name="length"/>
+                                        <field name="point"/>
+                                        <field name="documents"/>
+                                        <field name="result"/>
+                                        <field name="note"/>
+                                        <field name="user_id"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_partners_eu">
+            <field name="name">Партнеры ЕС INK</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">['|', ('user_id.context_section_id.id', '=', 11), ('section_id.id', '=', 11)]</field>
+            <field name="view_id" ref="view_partner_form_eu"/>
+            <field name="search_view_id" ref="base.view_res_partner_filter"/>
+            <field name="context">{'default_company_type': 'eu', 'default_section_id': 11}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_partners_form_eu">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="base.view_partner_tree"/>
+            <field name="act_window_id" ref="act_partners_eu"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_partners_tree_eu">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_partner_form_eu"/>
+            <field name="act_window_id" ref="act_partners_eu"/>
+        </record>
+
+        <menuitem
+                action="act_partners_eu"
+                id="menu_partner_form_eu"
+                parent="base.menu_address_book"
+                sequence="2"/>
+
+        <record model="ir.actions.act_window" id="act_partner_pay_type">
+            <field name="name">Справочник способов оплаты</field>
+            <field name="res_model">partner.pay.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+                action="act_partner_pay_type"
+                id="menu_partner_pay_type"
+                parent="base.menu_config_address_book"
+                sequence="2"/>
+
+        <record model="ir.actions.act_window" id="act_partner_partner_state">
+            <field name="name">Справочник статусов партнеров</field>
+            <field name="res_model">partner.partner.state</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+                action="act_partner_partner_state"
+                id="menu_partner_partner_state"
+                parent="base.menu_config_address_book"
+                sequence="2"/>
+
+        <record model="ir.actions.act_window" id="act_partner_delivery_type">
+            <field name="name">Справочник способов доставки</field>
+            <field name="res_model">partner.delivery.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+                action="act_partner_delivery_type"
+                id="menu_partner_delivery_type"
+                parent="base.menu_config_address_book"
+                sequence="2"/>
+
+        <record model="ir.actions.act_window" id="act_partner_delivery_from">
+            <field name="name">Справочник мест доставки</field>
+            <field name="res_model">partner.delivery.from</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+                action="act_partner_delivery_from"
+                id="menu_partner_delivery_from"
+                parent="base.menu_config_address_book"
+                sequence="2"/>
+
+    </data>
+</openerp>

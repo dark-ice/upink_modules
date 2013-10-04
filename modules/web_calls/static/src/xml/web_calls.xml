@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- vim:fdl=1:
+-->
+<templates id="template" xml:space="preserve">
+    <t t-name="Header-CallReport">
+        <div class="block logout feedback"></div>
+    </t>
+
+    <t t-name="CallReportView">
+        <div class="call-form">
+            <div>
+                <p>
+                    <label class="calls-label" for="region">Город:</label>
+                    <input type="text" name="region" id="region" disabled="disabled" />
+                    <input type="hidden" name="city" id="city" disabled="disabled" />
+                </p>
+                <p><label class="calls-label" for="phone">Номер:</label><input type="text" name="phone" id="phone" disabled="disabled"/></p>
+                <p><label class="calls-label" for="time">Время:</label><input type="text" name="time" id="time" disabled="disabled"/></p>
+                <p><label class="calls-label" for="date">Дата:</label><input type="text" name="date" id="date" disabled="disabled"/></p>
+                <p>
+                    <label class="calls-label" for="responsible">Менеджер:</label>
+                    <input type="text" name="responsible" id="responsible" disabled="disabled"/>
+                    <input type="hidden" name="responsible_id" id="responsible_id"/>
+                </p>
+                <hr/>
+                <table class="call-table" width="100%">
+                    <thead>
+                        <tr>
+                            <td colspan="3">Целевой</td>
+                            <td colspan="3">Нецелевой</td>
+                        </tr>
+                        <tr>
+                            <td>Продажа</td>
+                            <td>Консультация</td>
+                            <td>Запрос на отсутствующий товар</td>
+                            <td>Тех.поддержка</td>
+                            <td>Уточнения по оформленному заказу</td>
+                            <td>Проблема с АТС / ошиблись номером</td>
+                        </tr>
+                    </thead>
+                    <tr>
+                        <td>
+                            <input type="radio" class="call_type" name="call_type" value="sale" />
+                        </td>
+                        <td>
+                            <input type="radio" class="call_type" name="call_type" value="consultation" />
+                        </td>
+                        <td>
+                            <input type="radio" class="call_type" name="call_type" value="no_product" />
+                        </td>
+                        <td>
+                            <input type="radio" class="call_type" name="call_type" value="qa" />
+                        </td>
+                        <td>
+                            <input type="radio" class="call_type" name="call_type" value="order" />
+                        </td>
+                        <td>
+                            <input type="radio" class="call_type" name="call_type" value="atc" />
+                        </td>
+                    </tr>
+                </table>
+                <div id="sale" class="dop">
+                    <p><label class="calls-label" for="account">Счет:</label><input type="text" name="account" id="account"/></p>
+                    <p><label class="calls-label" for="po">ПО:</label><input type="text" name="po" id="po"/></p>
+                    <p><label class="calls-label" for="invoice">Товарный чек:</label><input type="text" name="invoice" id="invoice"/></p>
+
+                    <p><label class="calls-label" for="sale_type">Тип продажи:</label>
+                        <select id="sale_type">
+                            <option value="-" selected="selected">-</option>
+                            <option value="py">ПУ</option>
+                            <option value="snpch">СНПЧ или ПЗК</option>
+                            <option value="ink">Чернила</option>
+                            <option value="another">Прочие</option>
+                        </select>
+                    </p>
+                </div>
+                <div id="consultation" class="dop">
+                    <p><label class="calls-label" for="consultation-val">Консультация:</label><input type="text" name="consultation" id="consultation-val"/></p>
+                </div>
+                <div id="no_product" class="dop">
+                    <p><label class="calls-label" for="no_product-val">Запрос на отсутствующий товар:</label><input type="text" name="no_product" id="no_product-val"/></p>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

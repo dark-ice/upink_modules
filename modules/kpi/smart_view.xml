@@ -1,0 +1,358 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <!-- SMART -->
+        <record model="ir.ui.view" id="view_kpi_smart_form">
+            <field name="name">kpi.smart.form</field>
+            <field name="model">kpi.smart</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="SMART-задачи" >
+                    <group colspan="4">
+                        <field name="check_a"/>
+                        <field name="check_i"/>
+                        <field name="check_r"/>
+                        <field name="check_m"/>
+                        <field name="check_e"/>
+                    </group>
+                    <group colspan="4" col="6">
+                        <field name="author_id" readonly="1"/>
+                        <field name="create_date"/>
+                        <field name="deadline_date"
+                               on_change="onchange_deadline(deadline_date, calendar)"
+                               required="1"
+                                />
+
+                        <field name="initiator_id"/>
+                        <field name="responsible_id" domain="[('id', '!=', parent_responsible_id)]" on_change="onchange_responsible(responsible_id, author_id)"/>
+                        <field name="responsible_head_id" readonly="1"/>
+
+                        <field name="period_id" domain="[('calendar', '=', calendar)]"/>
+                        <field name="calendar" readonly="1" on_change="onchange_calendar(calendar, period_id)" invisible="1"/>
+                    </group>
+                    <group colspan="4">
+                        <separator string="Задача" colspan="4"/>
+                        <field name="name" colspan="4" nolabel="1" widget="text"/>
+                        <separator string="Критерий выполнения" colspan="4"/>
+                        <field name="note" colspan="4" nolabel="1" />
+                    </group>
+                    <group colspan="4">
+                        <group colspan="4" attrs="{'invisible': [('transfer_id', '=', False)]}">
+                            <separator string="Перенесенная задача"/>
+                            <field name="transfer_id" attrs="{'invisible': [('transfer_id', '=', False)]}"  colspan="4" nolabel="1" readonly="1" />
+                        </group>
+                        <group colspan="4" attrs="{'invisible': [('delegate_ids', '=', False)]}">
+                            <separator string="Делегированные задачи"/>
+                            <field name="delegate_ids" attrs="{'invisible': [('delegate_ids', '=', False)]}"  colspan="4" nolabel="1" readonly="1" />
+                            <button name="delegate" string="Делегировать" type="object" attrs="{'invisible': [('delegate_ids', '=', False)]}" icon="terp-personal+"/>
+                        </group>
+                        <field name="parent_id" invisible="1" colspan="4" />
+                        <field name="parent_responsible_id" invisible="1" colspan="4" />
+                    </group>
+                    <group colspan="4" col="6">
+                        <field name="state"
+                               widget="statusbar"
+                               statusbar_visible="draft,agreement,inwork,done"
+                               statusbar_colors='{"accepted":"orange","not_accepted":"red","cancel":"gray","removed":"gray","transfer":"yellow","delegated":"blue"}'
+                               colspan="6"
+                                />
+                        <newline />
+                        <!-- draft, agreement, revision -> cancel -->
+                        <button string="Отмена"
+                                name="action_cancel"
+                                type="workflow"
+                                icon="gtk-cancel"
+                                attrs="{'invisible': [
+                                '&amp;', '|', ('state', 'not in', ('draft', 'revision')), ('check_a', '=', False),
+                                '|', ('state', '!=', 'agreement'), ('check_m', '=', False)
+                                ]
+                                }"
+                                />
+
+                        <!-- cancel -> draft -->
+                        <button string="Черновик"
+                                name="action_draft"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'cancel'), ('check_a', '=', False)]}"
+                                />
+
+                        <!-- draft,revision -> agreement -->
+                        <button string="На согласование"
+                                name="action_agreement"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['&amp;',
+                                 '|', ('state', '!=', 'revision'), ('check_a', '=', False),
+                                 '|', ('state', '!=', 'draft'), '|', ('check_e', '=', True), ('check_a', '=', False)
+                                 ]}"
+                                />
+
+                        <!-- agreement -> draft -->
+                        <!--button string="В черновик"
+                                name="action_draft"
+                                type="workflow"
+                                icon="gtk-go-back"
+                                states="agreement"
+                                /-->
+
+                        <!-- agreement -> revision -->
+                        <button string="На доработку"
+                                name="action_revision"
+                                type="workflow"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'agreement'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- draft, agreement -> inwork -->
+                        <button string="Задача поставлена"
+                                name="action_inwork"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['&amp;',
+                                 '|', ('state', '!=', 'agreement'), ('check_m', '=', False),
+                                 '|', ('state', '!=', 'draft'), '|', ('check_e', '=', False), ('check_a', '=', False)
+                                 ]}"
+                                />
+
+                        <!-- inwork -> removed -->
+                        <button string="Задача снята"
+                                name="action_removed"
+                                type="workflow"
+                                icon="gtk-cancel"
+                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_i', '=', False)]}"
+                                />
+
+                        <!-- inwork -> transfer -->
+                        <button string="Задача перенесена"
+                                name="action_transfer"
+                                type="workflow"
+                                icon="terp-stock_effects-object-colorize"
+                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_i', '=', False)]}"
+                                />
+
+                        <!-- inwork -> delegated -->
+                        <button string="Задача делегирована"
+                                name="action_delegated"
+                                type="workflow"
+                                icon="terp-personal+"
+                                context="{'delegate': True}"
+                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_r', '=', False)]}"
+                                />
+
+                        <!-- inwork,delegated -> done -->
+                        <button string="Задача выполнена"
+                                name="action_done"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', 'not in', ('inwork', 'delegated')), ('check_r', '=', False)]}"
+                                />
+
+                        <!-- done -> accepted -->
+                        <button string="Задача принята"
+                                name="action_accepted"
+                                type="workflow"
+                                icon="gtk-yes"
+                                attrs="{'invisible': ['|', ('state', '!=', 'done'), ('check_i', '=', False)]}"
+                                />
+
+                        <!-- done -> not_accepted -->
+                        <button string="Задача не принята"
+                                name="action_not_accepted"
+                                type="workflow"
+                                icon="gtk-no"
+                                attrs="{'invisible': ['|', ('state', '!=', 'done'), ('check_i', '=', False)]}"
+                                />
+                    </group>
+                    <group colspan="4">
+                        <separator string="История переходов" colspan="4" />
+                        <field name="history_ids" nolabel="1" colspan="4" readonly="1">
+                            <tree string="История переходов">
+                                <field name="state"/>
+                                <field name="usr_id" />
+                                <field name="create_date" />
+                            </tree>
+                        </field>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_smart_tree">
+            <field name="name">kpi.smart.tree</field>
+            <field name="model">kpi.smart</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="SMART-задачи" colors="red:color=='red';orange:color=='yellow';green:color=='green';gray:color=='gray'">
+                    <field name="color" invisible="1" />
+                    <field name="check_a" invisible="1" />
+                    <field name="check_i" invisible="1" />
+                    <field name="check_r" invisible="1" />
+                    <field name="check_m" invisible="1" />
+                    <field name="check_e" invisible="1" />
+
+                    <field name="name" />
+                    <field name="author_id"/>
+
+                    <field name="initiator_id"/>
+                    <field name="responsible_id"/>
+                    <field name="responsible_head_id"/>
+
+                    <field name="period_id"/>
+                    <field name="deadline_date"/>
+                    <field name="state"/>
+                    <!-- draft, agreement, revision -> cancel -->
+                    <button string="Отмена"
+                            name="action_cancel"
+                            type="workflow"
+                            icon="gtk-cancel"
+                            attrs="{'invisible': [
+                                '&amp;', '|', ('state', 'not in', ('draft', 'revision')), ('check_a', '=', False),
+                                '|', ('state', '!=', 'agreement'), ('check_m', '=', False)
+                                ]
+                                }"
+                            />
+
+                    <!-- cancel -> draft -->
+                    <button string="Черновик"
+                            name="action_draft"
+                            type="workflow"
+                            icon="gtk-go-forward"
+                            attrs="{'invisible': ['|', ('state', '!=', 'cancel'), ('check_a', '=', False)]}"
+                            />
+
+                    <!-- draft,revision -> agreement -->
+                    <button string="На согласование"
+                            name="action_agreement"
+                            type="workflow"
+                            icon="gtk-go-forward"
+                            attrs="{'invisible': ['&amp;',
+                                 '|', ('state', '!=', 'revision'), ('check_a', '=', False),
+                                 '|', ('state', '!=', 'draft'), '|', ('check_e', '=', True), ('check_a', '=', False)
+                                 ]}"
+                            />
+
+                    <!-- agreement -> revision -->
+                    <button string="На доработку"
+                            name="action_revision"
+                            type="workflow"
+                            icon="gtk-go-back"
+                            attrs="{'invisible': ['|', ('state', '!=', 'agreement'), ('check_m', '=', False)]}"
+                            />
+
+                    <!-- draft, agreement -> inwork -->
+                    <button string="Задача поставлена"
+                            name="action_inwork"
+                            type="workflow"
+                            icon="gtk-go-forward"
+                            attrs="{'invisible': ['&amp;',
+                                 '|', ('state', '!=', 'agreement'), ('check_m', '=', False),
+                                 '|', ('state', '!=', 'draft'), '|', ('check_e', '=', False), ('check_a', '=', False)
+                                 ]}"
+                            />
+
+                    <!-- inwork -> removed -->
+                    <button string="Задача снята"
+                            name="action_removed"
+                            type="workflow"
+                            icon="gtk-cancel"
+                            attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_i', '=', False)]}"
+                            />
+
+                    <!-- inwork -> transfer -->
+                    <button string="Задача перенесена"
+                            name="action_transfer"
+                            type="workflow"
+                            icon="terp-stock_effects-object-colorize"
+                            attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_i', '=', False)]}"
+                            />
+
+                    <!-- inwork -> delegated -->
+                    <button string="Задача делегирована"
+                            name="action_delegated"
+                            type="workflow"
+                            icon="terp-personal+"
+                            context="{'delegate': True}"
+                            attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_r', '=', False)]}"
+                            />
+
+                    <!-- inwork,delegated -> done -->
+                    <button string="Задача выполнена"
+                            name="action_done"
+                            type="workflow"
+                            icon="gtk-go-forward"
+                            attrs="{'invisible': ['|', ('state', 'not in', ('inwork', 'delegated')), ('check_r', '=', False)]}"
+                            />
+
+                    <!-- done -> accepted -->
+                    <button string="Задача принята"
+                            name="action_accepted"
+                            type="workflow"
+                            icon="gtk-yes"
+                            attrs="{'invisible': ['|', ('state', '!=', 'done'), ('check_i', '=', False)]}"
+                            />
+
+                    <!-- done -> not_accepted -->
+                    <button string="Задача не принята"
+                            name="action_not_accepted"
+                            type="workflow"
+                            icon="gtk-no"
+                            attrs="{'invisible': ['|', ('state', '!=', 'done'), ('check_i', '=', False)]}"
+                            />
+
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_kpi_smart_search">
+            <field name="name">kpi.smart.search</field>
+            <field name="model">kpi.smart</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" />
+                    <field name="period_id" domain="[('calendar', '=', 'rus')]" />
+                    <field name="author_id" >
+                        <filter icon="terp-personal"
+                                string="Мои"
+                                help="Заявки в которых я автор"
+                                domain="[('author_id.user_id','=',uid)]"/>
+                    </field>
+                    <field name="initiator_id" >
+                        <filter icon="terp-personal"
+                                string="Мои"
+                                help="Заявки в которых я инициатор"
+                                domain="[('initiator_id.user_id','=',uid)]"/>
+                    </field>
+                    <field name="responsible_id" >
+                        <filter icon="terp-personal"
+                                string="Мои"
+                                help="Заявки в которых я ответственный"
+                                domain="[('responsible_id.user_id','=',uid)]"/>
+                    </field>
+                    <field name="state" />
+                    <newline />
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Период" icon="terp-calendar" context="{'group_by': 'period_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Автор" icon="terp-personal" context="{'group_by': 'author_id'}"/>
+                        <filter string="Инициатор" icon="terp-personal" context="{'group_by': 'initiator_id'}"/>
+                        <filter string="Ответственный" icon="terp-personal" context="{'group_by': 'responsible_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_kpi_smart">
+            <field name="name">SMART-задачи</field>
+            <field name="res_model">kpi.smart</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="auto_refresh">1</field>
+            <field name="view_id" ref="view_kpi_smart_tree"/>
+            <field name="search_view_id" ref="view_kpi_smart_search"/>
+        </record>
+
+    </data>
+</openerp>

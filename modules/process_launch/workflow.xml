@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_process_launch">
+            <field name="name">wkf.process.launch</field>
+            <field name="osv">process.launch</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- draft -->
+        <record model="workflow.activity" id="act_draft">
+            <field name="wkf_id" ref="wkf_process_launch"/>
+            <field name="flow_start">True</field>
+            <field name="name">draft</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'draft'})
+process_add()</field>
+        </record>
+
+        <!-- cancel -->
+        <record model="workflow.activity" id="act_cancel">
+            <field name="wkf_id" ref="wkf_process_launch"/>
+            <field name="name">cancel</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'cancel'})</field>
+        </record>
+
+        <!-- revision -->
+        <record model="workflow.activity" id="act_revision">
+            <field name="wkf_id" ref="wkf_process_launch"/>
+            <field name="name">revision</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'revision'})</field>
+        </record>
+
+        <!-- agreement -->
+        <record model="workflow.activity" id="act_agreement">
+            <field name="wkf_id" ref="wkf_process_launch"/>
+            <field name="name">agreement</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'agreement'})</field>
+        </record>
+
+        <!-- in_process -->
+        <record model="workflow.activity" id="act_in_process">
+            <field name="wkf_id" ref="wkf_process_launch"/>
+            <field name="name">in_process</field>
+            <field name="kind">function</field>
+            <field name="action">process_start()</field>
+        </record>
+
+        <!-- finish -->
+        <record model="workflow.activity" id="act_finish">
+            <field name="wkf_id" ref="wkf_process_launch"/>
+            <field name="flow_stop">True</field>
+            <field name="name">finish</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'finish'})</field>
+        </record>
+
+
+        <!-- draft -> cancel -->
+        <record model="workflow.transition" id="d_c">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">cancel</field>
+        </record>
+
+        <!-- revision -> cancel -->
+        <record model="workflow.transition" id="r_c">
+            <field name="act_from" ref="act_revision"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">cancel</field>
+        </record>
+
+        <!-- agreement -> cancel -->
+        <record model="workflow.transition" id="a_c">
+            <field name="act_from" ref="act_agreement"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">cancel</field>
+        </record>
+
+        <!-- cancel -> draft -->
+        <record model="workflow.transition" id="c_d">
+            <field name="act_from" ref="act_cancel"/>
+            <field name="act_to" ref="act_draft"/>
+            <field name="signal">draft</field>
+        </record>
+
+        <!-- draft -> agreement -->
+        <record model="workflow.transition" id="d_a">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_agreement"/>
+            <field name="signal">agreement</field>
+        </record>
+
+        <!-- revision -> agreement -->
+        <record model="workflow.transition" id="r_a">
+            <field name="act_from" ref="act_revision"/>
+            <field name="act_to" ref="act_agreement"/>
+            <field name="signal">agreement</field>
+        </record>
+
+        <!-- agreement -> revision -->
+        <record model="workflow.transition" id="a_r">
+            <field name="act_from" ref="act_agreement"/>
+            <field name="act_to" ref="act_revision"/>
+            <field name="signal">revision</field>
+        </record>
+
+        <!-- agreement -> in_process -->
+        <record model="workflow.transition" id="a_p">
+            <field name="act_from" ref="act_agreement"/>
+            <field name="act_to" ref="act_in_process"/>
+            <field name="signal">in_process</field>
+        </record>
+
+        <!-- in_process -> finish -->
+        <record model="workflow.transition" id="p_f">
+            <field name="act_from" ref="act_in_process"/>
+            <field name="act_to" ref="act_finish"/>
+            <field name="signal">finish</field>
+        </record>
+
+        <!-- in_process -> cancel -->
+        <record model="workflow.transition" id="p_c">
+            <field name="act_from" ref="act_in_process"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">cancel</field>
+        </record>
+    </data>
+</openerp>

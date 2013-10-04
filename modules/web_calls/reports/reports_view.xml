@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="view_targeted_calls_tree" model="ir.ui.view">
+            <field eval="1" name="priority"/>
+            <field name="name">web.calls.targeted.tree</field>
+            <field name="model">web.calls.targeted.report</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="date_start" invisible="1" />
+                    <field name="date_end" invisible="1" />
+                    <field name="call_date" invisible="1"/>
+                    <field name="responsible_id" invisible="1"/>
+                    <field name="sale" />
+                    <field name="consultation" />
+                    <field name="no_product" />
+                    <field name="no_product_str" />
+                </tree>
+            </field>
+        </record>
+        <record id="view_targeted_calls_search" model="ir.ui.view">
+            <field name="name">web.calls.targeted.search</field>
+            <field name="model">web.calls.targeted.report</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <group>
+                        <field name="responsible_id"/>
+                        <field name="date_start"/>
+                        <field name="date_end" nolabel="1"/>
+                        <field name="no_product_str"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_targeted_calls_all" model="ir.actions.act_window">
+            <field name="name">Отчет по целевым звонкам</field>
+            <field name="res_model">web.calls.targeted.report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="search_view_id" ref="view_targeted_calls_search"/>
+            <field name="view_id" ref="view_targeted_calls_tree"/>
+            <field name="context">{'group_by': ['call_date', 'responsible_id']}</field>
+        </record>
+
+
+        <record id="view_non_targeted_calls_tree" model="ir.ui.view">
+            <field eval="1" name="priority"/>
+            <field name="name">web.calls.non.targeted.tree</field>
+            <field name="model">web.calls.non.targeted.report</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="date_start" invisible="1" />
+                    <field name="date_end" invisible="1" />
+                    <field name="call_date" invisible="1"/>
+                    <field name="responsible_id" invisible="1"/>
+                    <field name="qa" />
+                    <field name="ordr" />
+                    <field name="atc" />
+                    <field name="total" />
+                </tree>
+            </field>
+        </record>
+        <record id="view_non_targeted_calls_search" model="ir.ui.view">
+            <field name="name">web.calls.non.targeted.search</field>
+            <field name="model">web.calls.non.targeted.report</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <group>
+                        <field name="responsible_id"/>
+                        <field name="date_start"/>
+                        <field name="date_end" nolabel="1"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_non_targeted_calls_all" model="ir.actions.act_window">
+            <field name="name">Отчет по нецелевым звонкам</field>
+            <field name="res_model">web.calls.non.targeted.report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="search_view_id" ref="view_non_targeted_calls_search"/>
+            <field name="view_id" ref="view_non_targeted_calls_tree"/>
+            <field name="context">{'group_by': ['call_date', 'responsible_id'], }</field>
+        </record>
+
+        <record id="view_calls_region_tree" model="ir.ui.view">
+            <field eval="1" name="priority"/>
+            <field name="name">web.calls.region.tree</field>
+            <field name="model">web.calls</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="region" />
+                    <field name="call_date" />
+                    <field name="responsible_id" />
+                    <field name="name" />
+                    <field name="account" />
+                    <field name="po" />
+                    <field name="invoice" />
+                </tree>
+            </field>
+        </record>
+        <record id="view_calls_region_search" model="ir.ui.view">
+            <field name="name">web.calls.region.search</field>
+            <field name="model">web.calls</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <group>
+                        <field name="region"/>
+                        <field name="date_start"/>
+                        <field name="date_end"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_calls_region_all" model="ir.actions.act_window">
+            <field name="name">Продажи по региону</field>
+            <field name="res_model">web.calls</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_calls_region_search"/>
+            <field name="view_id" ref="view_calls_region_tree"/>
+            <field name="domain">[('call_type', '=', 'sale')]</field>
+            <field name="context">{'group_by': 'region'}</field>
+        </record>
+
+        <record id="view_responsible_calls_tree" model="ir.ui.view">
+            <field eval="1" name="priority"/>
+            <field name="name">web.calls.responsible.tree</field>
+            <field name="model">web.calls.responsible.report</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="date_start" invisible="1" />
+                    <field name="date_end" invisible="1" />
+                    <field name="call_date"/>
+                    <field name="responsible_id" invisible="1" />
+                    <field name="kiev" sum="Сумма"/>
+                    <field name="kharkov" sum="Сумма"/>
+                    <field name="lvov" sum="Сумма"/>
+                    <field name="moscow" sum="Сумма"/>
+                    <field name="volgograd" sum="Сумма"/>
+                    <field name="novosibirsk" sum="Сумма"/>
+                    <field name="saintpetersburg" sum="Сумма"/>
+                    <field name="ekaterinburg" sum="Сумма"/>
+                    <field name="almaty" sum="Сумма"/>
+                    <field name="rostovondon" sum="Сумма"/>
+                    <field name="kazan" sum="Сумма"/>
+                    <field name="chelyabinsk" sum="Сумма"/>
+                    <field name="nizhnynovgorod" sum="Сумма"/>
+                    <field name="samara" sum="Сумма"/>
+                    <field name="irkutsk" sum="Сумма"/>
+                    <field name="voronezh" sum="Сумма"/>
+                    <field name="perm" sum="Сумма"/>
+                    <field name="saratov" sum="Сумма"/>
+                    <field name="krasnodar" sum="Сумма"/>
+                    <field name="warsaw" sum="Сумма"/>
+                    <field name="omsk" sum="Сумма"/>
+                    <field name="odessa" sum="Сумма"/>
+                    <field name="dnepropetrovsk" sum="Сумма"/>
+                    <field name="donetsk" sum="Сумма"/>
+                    <field name="minsk" sum="Сумма"/>
+                    <field name="total" sum="Сумма"/>
+                    <field name="livesite" sum="Сумма"/>
+                    <field name="adminpanel" sum="Сумма"/>
+                    <field name="shara" sum="Сумма"/>
+
+                </tree>
+            </field>
+        </record>
+        <record id="view_responsible_calls_search" model="ir.ui.view">
+            <field name="name">web.calls.responsible.search</field>
+            <field name="model">web.calls.responsible.report</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <group>
+                        <field name="date_start"/>
+                        <field name="date_end" nolabel="1"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_responsible_calls_all" model="ir.actions.act_window">
+            <field name="name">Отчет по менеджерам</field>
+            <field name="res_model">web.calls.responsible.report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="search_view_id" ref="view_responsible_calls_search"/>
+            <field name="view_id" ref="view_responsible_calls_tree"/>
+            <field name="context">{'group_by': 'responsible_id'}</field>
+        </record>
+
+        <menuitem id="menu_calls_reports" parent="menu_calls_root" sequence="10" name="Отчеты"/>
+        <menuitem action="action_targeted_calls_all" id="menu_targeted_calls_all" parent="menu_calls_reports" sequence="1"/>
+
+        <menuitem action="action_non_targeted_calls_all" id="menu_non_targeted_calls_all" parent="menu_calls_reports" sequence="1"/>
+        <menuitem action="action_responsible_calls_all" id="menu_responsible_calls_all" parent="menu_calls_reports" sequence="5"/>
+        <menuitem action="action_calls_region_all" id="menu_calls_region_all" parent="menu_calls_reports" sequence="10"/>
+    </data>
+</openerp>

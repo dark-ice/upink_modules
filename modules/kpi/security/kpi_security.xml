@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+
+        <record id="kpi.hr_kpi" model="res.groups">
+            <field name="name">HR / KPI</field>
+        </record>
+
+        <!-- Правила доступа для групп -->
+        <record id="kpi_smart_rule" model="ir.rule">
+            <field name="name">KPI SMART: Видят там где являются: автором, инициатором, ответственным, руководителем ответственного</field>
+            <field ref="model_kpi_smart" name="model_id"/>
+            <field name="domain_force">['|', '|', '|', ('author_id.user_id.id', '=', user.id), ('initiator_id.user_id.id', '=', user.id), ('responsible_id.user_id.id', '=', user.id), ('responsible_head_id.user_id.id', '=', user.id)]</field>
+            <field name="perm_read" eval="True" />
+            <field name="perm_create" eval="True" />
+            <field name="perm_write" eval="True" />
+            <field name="perm_unlink" eval="False" />
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="kpi_kpi_rule" model="ir.rule">
+            <field name="name">KPI: Видят там где являются: сотрудником, руководителем</field>
+            <field ref="model_kpi_kpi" name="model_id"/>
+            <field name="domain_force">['|', ('employee_id.user_id.id', '=', user.id), ('parent_id.user_id.id', '=', user.id)]</field>
+            <field name="perm_read" eval="True" />
+            <field name="perm_create" eval="True" />
+            <field name="perm_write" eval="True" />
+            <field name="perm_unlink" eval="False" />
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="kpi_kpi_unlink_rule" model="ir.rule">
+            <field name="name">KPI: Удалять только свои и только на Черновике</field>
+            <field ref="model_kpi_kpi" name="model_id"/>
+            <field name="domain_force">[('employee_id.user_id.id', '=', user.id), ('state', '=', 'draft')]</field>
+            <field name="perm_read" eval="False" />
+            <field name="perm_create" eval="False" />
+            <field name="perm_write" eval="False" />
+            <field name="perm_unlink" eval="True" />
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="kpi_expert_assesment_rule" model="ir.rule">
+            <field name="name">KPI: ЭО</field>
+            <field ref="model_kpi_expert_assesment" name="model_id"/>
+            <field name="domain_force">['|', ('expert_id.user_id.id','=',user.id), ('employee_id.user_id.id','=',user.id)]</field>
+            <field name="perm_read" eval="True" />
+            <field name="perm_create" eval="True" />
+            <field name="perm_write" eval="True" />
+            <field name="perm_unlink" eval="False" />
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+    </data>
+</openerp>

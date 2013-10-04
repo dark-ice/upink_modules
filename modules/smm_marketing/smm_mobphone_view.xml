@@ -1,0 +1,124 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+  #---- Tree MobPhone
+    <record model="ir.ui.view" id="view_smm_mobphone_tree">
+        <field name="name">SMM - mobphone</field>
+        <field name="model">smm.mobphone</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Мобильные телефоны">
+               <field name="name_person"/>
+               <field name="number"/>
+               <field name="balance"/>
+               <field name="date_activ"/>
+               <field name="date_valid_for"/>
+               <field name="date_last_check"/>
+               <field name="url" widget="url"/>
+               <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form mobphone
+    <record model="ir.ui.view" id="view_smm_mobphone_form">
+        <field name="name">SMM - mobphone</field>
+        <field name="model">smm.mobphone</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Мобильные телефоны">
+                <group colspan="4" col="11">
+                        <field name="name_person" required="1"/>
+                        <field name="number" required="1"/>
+                        <field name="balance"/>
+                        <field name="date_activ" required="1"/>
+                        <field name="date_valid_for" required="1"/>
+                        <field name="date_last_check" required="1"/>
+                        <separator colspan="11"/>
+                        <field name="function_person" widget="selection" required="1"/>
+                        <field name="url" widget="url" required="1"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="responsible_users" groups="base.smm_admin_manager" colspan="10"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+  #---- Tree mobphone func stage
+    <record model="ir.ui.view" id="view_smm_mobphone_stage_tree">
+        <field name="name">SMM - mobphone stage</field>
+        <field name="model">smm.mobphone.func.stage</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Функции персонажа">
+               <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form mobphone func stage
+<record model="ir.ui.view" id="view_smm_mobphone_stage_form">
+        <field name="name">SMM - mobphone stage</field>
+        <field name="model">smm.mobphone.func.stage</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Функции персонажа">
+                <group colspan="4" col="8">
+                        <field name="name" required="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+        <record model="ir.actions.act_window" id="window_case_smm_mobphone">
+            <field name="name">SMM - Моб. телефоны</field>
+            <field name="res_model">smm.mobphone</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_mobphone_tree"/>
+            <field name="help">Моб. телефоны</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_mobphone_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_mobphone_tree"/>
+            <field name="act_window_id" ref="window_case_smm_mobphone"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_mobphone_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_mobphone_form"/>
+            <field name="act_window_id" ref="window_case_smm_mobphone"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_case_smm_mobphone_stage">
+            <field name="name">SMM - Функции персонажа</field>
+            <field name="res_model">smm.mobphone.func.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_mobphone_stage_tree"/>
+            <field name="help">Функции персонажа</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_mobphone_stage_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_mobphone_stage_tree"/>
+            <field name="act_window_id" ref="window_case_smm_mobphone_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_mobphone_stage_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_mobphone_stage_form"/>
+            <field name="act_window_id" ref="window_case_smm_mobphone_stage"/>
+        </record>
+
+     <menuitem name="Моб. телефоны" id="menu_smm_mobphone" action="window_case_smm_mobphone"
+           parent="menu_smm_base" sequence="7" groups="base.smm_manager,base.smm_admin_manager"/>
+     <menuitem name="Функции персонажа" id="menu_smm_mobphone_stage" action="window_case_smm_mobphone_stage"
+           parent="menu_smm_config" sequence="8" groups="base.smm_admin_manager"/>
+
+
+     </data>
+</openerp>

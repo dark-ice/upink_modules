@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_res_partner_filter_add_phone_ids" model="ir.ui.view">
+            <field name="name">res.partner.add_phone_ids</field>
+            <field name="model">res.partner</field>
+            <field name="type">search</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter" />
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="phone_ids"/>
+                    <field name="email"/>
+                </field>
+                <xpath expr="//search/group/filter[@name='customer']" position="before" >
+                    <filter string="Неактивные" name="inactive" icon="terp-personal" domain="[('active','=',False)]" help="Показать неактивных партнеров"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_partner_tree_add_phone_ids" model="ir.ui.view">
+            <field name="name">res.partner.tree_add_phone_ids</field>
+            <field name="model">res.partner</field>
+            <field name="type">tree</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+                <field name="phone" position="replace">
+                </field>
+            </field>
+        </record>
+
+        <record id="view_partner_form_inherit" model="ir.ui.view">
+            <field name="name">res.partner.form inherit</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field eval="5" name="priority"/>
+            <field name="arch" type="xml">
+                <field name="ref" position="replace">
+                </field>
+                <field name="lang" position="after">
+                    <field name="provider_category" widget="selection" />
+                </field>
+                <field name="email" position="after">
+                    <button name="email_to_partner" icon="terp-mail-message-new" string="Отправить партнеру" type="object" colspan="2" />
+                    <field name="partner_site" />
+                    <field name="partner_site_two" />
+                </field>
+                <field name="phone" position="replace">
+                </field>
+            </field>
+        </record>
+
+        <record id="view_provider_category_form" model="ir.ui.view">
+            <field name="name">res.provider.category form</field>
+            <field name="model">res.provider.category</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Добавить поставщика">
+                    <field name="name" />
+                </form>
+            </field>
+        </record>
+
+        <record id="view_provider_category_tree" model="ir.ui.view">
+            <field name="name">res.provider.category tree</field>
+            <field name="model">res.provider.category</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Список поставщиков">
+                    <field name="name" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_provider_category">
+            <field name="name">Поставщики</field>
+            <field name="res_model">res.provider.category</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_provider_category_tree" />
+        </record>
+
+        <menuitem id="provider_category_reference" name="Поставщики" sequence="1" action="window_provider_category" parent="base.menu_config_address_book" />
+
+
+        <record model="ir.ui.view" id="res_partner_frequency_contacts_tree">
+            <field name="name">res.partner.frequency.contacts</field>
+            <field name="model">res.partner</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Частота контактов (партнера)">
+                    <field name="name" string="Партнер"/>
+                    <field name="partner_site" />
+                    <field name="partner_site_two" />
+                    <field name="budget"/>
+                    <field name="partner_status" />
+                    <field name="write_date" />
+                    <field name="user_id" />
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_res_partner_filter_vv2" model="ir.ui.view">
+        <field name="name">Partner Search - frequency contacts</field>
+        <field name="model">res.partner</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Поиск">
+                <field name="write_date" />
+                <field name="name" string="Партнер"/>
+                <field name="partner_site" />
+                <field name="partner_site_two" />
+                <field name="partner_status" />
+                <field name="user_id" />
+                <newline />
+               <group expand="0" string="Group By...">
+                   <filter string="статус" context="{'group_by' : 'partner_status'}" />
+                   <filter string="менеджер" icon="terp-personal" context="{'group_by' : 'user_id'}" />
+               </group>
+           </search>
+        </field>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="window_res_partner_frequency_action">
+            <field name="name">Частота контактов (партнера)</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="res_partner_frequency_contacts_tree" />
+            <field name="search_view_id" ref="view_res_partner_filter_vv2"/>
+
+        </record>
+
+        <record id="action_partner_tree_view_freq" model="ir.actions.act_window.view">
+            <field eval="10" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="res_partner_frequency_contacts_tree"/>
+            <field name="act_window_id" ref="window_res_partner_frequency_action"/>
+        </record>
+
+        <menuitem name="Отчет по частоте контактов (партнера)" id="res_partner_frequency_contacts" sequence="1" action="window_res_partner_frequency_action"
+           parent="base.next_id_64"/>
+
+        <record model="ir.ui.view" id="view_notes_tree">
+            <field name="name">Заметки - Tree</field>
+            <field name="model">crm.lead.notes</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="История переписки">
+                    <field name="create_date"/>
+                    <field name="name"/>
+                    <field name="create_uid"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="window_lead">
+            <field name="name">История переписки</field>
+            <field name="res_model">crm.lead.notes</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_notes_tree" />
+            <field name="limit">5</field>
+        </record>
+    </data>
+</openerp>

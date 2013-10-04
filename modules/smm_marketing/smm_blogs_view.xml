@@ -1,0 +1,125 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+  #---- Tree Blogs
+    <record model="ir.ui.view" id="view_smm_blogs_tree">
+        <field name="name">Blogs</field>
+        <field name="model">smm.blogs</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Блоги">
+               <field name="name_id" widget="selection"/>
+               <field name="login"/>
+               <field name="account"/>
+               <field name="partner_id"/>
+               <field name="cr_date"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form Blogs
+<record model="ir.ui.view" id="view_smm_blogs_form">
+        <field name="name">SMM - Blogs</field>
+        <field name="model">smm.blogs</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Блоги">
+                <group colspan="4" col="10">
+                        <field name="name_id" required="1" widget="selection"/>
+                        <field name="partner_id"/>
+                        <field name="account" required="1"/>
+                        <field name="rights" required="1"/>
+                        <field name="tema" required="1"/>
+                        <field name="cr_date" required="1" groups="base.smm_admin_manager"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="responsible_users" groups="base.smm_admin_manager" colspan="10"/>
+                        <separator colspan="12"/>
+                        <field name="login" required="1"/>
+                        <field name="password" required="1"/>
+                        <field name="url" widget="url" required="1"/>
+                        <field name="email" widget="email" required="1"/>
+                        <separator colspan="12"/>
+                        <field name="comments" colspan="12"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+  #---- Tree Blogs stage
+    <record model="ir.ui.view" id="view_smm_blogs_stage_tree">
+        <field name="name">SMM - Blogs stage</field>
+        <field name="model">smm.blogs.stage</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Справочник блоги">
+               <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form blogs network stage
+<record model="ir.ui.view" id="view_smm_blogs_stage_form">
+        <field name="name">SMM - Blogs stage</field>
+        <field name="model">smm.blogs.stage</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Справочник блоги">
+                <group colspan="4" col="8">
+                        <field name="name" required="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+#-----
+
+        <record model="ir.actions.act_window" id="window_case_smm_blogs">
+            <field name="name">SMM - Блоги</field>
+            <field name="res_model">smm.blogs</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_blogs_tree"/>
+            <field name="help">Блоги</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_blogs_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_blogs_tree"/>
+            <field name="act_window_id" ref="window_case_smm_blogs"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_blogs_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_blogs_form"/>
+            <field name="act_window_id" ref="window_case_smm_blogs"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_case_smm_blogs_stage">
+            <field name="name">SMM - Справочник блоги</field>
+            <field name="res_model">smm.blogs.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_blogs_stage_tree"/>
+            <field name="help">Справочник блоги</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_blogs_stage_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_blogs_stage_tree"/>
+            <field name="act_window_id" ref="window_case_smm_blogs_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_blogs_stage_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_blogs_stage_form"/>
+            <field name="act_window_id" ref="window_case_smm_blogs_stage"/>
+        </record>
+
+     <menuitem name="Блоги" id="menu_smm_blogs" action="window_case_smm_blogs"
+           parent="menu_smm_base" sequence="4" groups="base.smm_manager,base.smm_admin_manager"/>
+     <menuitem name="Справочник блоги" id="menu_smm_blogs_stage" action="window_case_smm_blogs_stage"
+           parent="menu_smm_config" sequence="5" groups="base.smm_admin_manager"/>
+     </data>
+</openerp>

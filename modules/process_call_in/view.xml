@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_process_call_in_tree">
+            <field name="name">Разработка и реализация исходящей кампании</field>
+            <field name="model">process.call.in</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="partner_id" />
+                    <field name="create_date" />
+                    <field name="responsible_id" />
+                    <field name="user_id" />
+                    <field name="state" />
+                    <field name="service_id" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_process_call_in_search">
+            <field name="name">view.process.call.in.search</field>
+            <field name="model">process.call.in</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="partner_id" />
+                    <field name="create_date" />
+                    <field name="responsible_id" />
+                    <field name="user_id" />
+                    <field name="state" />
+                    <field name="service_id" />
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_process_call_in_form">
+            <field name="name">Разработка и реализация исходящей кампании</field>
+            <field name="model">process.call.in</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="check_a"/>
+                        <field name="check_m"/>
+                    </group>
+                    <group colspan="4" col="4">
+                        <field name="partner_id" readonly="1"/>
+                        <field name="service_id" readonly="1"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="responsible_id" readonly="1"/>
+                        <field name="specialist_id"/> <newline/>
+                        <field name="pay_date"/>
+                        <field name="prep_days"/>
+                        <field name="start_line"/>
+                        <field name="report_type"/>
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Данные по запуску процесса">
+                            <field name="direction" readonly="1"/>
+                            <field name="service_head_id" readonly="1"/>
+                            <separator colspan="4"/>
+
+                            <field name="contract_id" readonly="1"/>
+                            <field name="contract_file" readonly="1"/>
+
+                            <field name="invoice_line_id" invisible="True"/>
+                            <group col="6" colspan="4">
+                                <field name="account_id" readonly="1"/>
+                                <field name="account_file_id"/>
+                                <newline/>
+                                <field name="price" readonly="1"/>
+                                <field name="price_ye" readonly="1"/>
+                                <field name="paid" readonly="1"/><newline/>
+                                <field name="invoice_pay_ids" mode="tree" nolabel="1" colspan="6" domain="[('service_id', '=', service_id)]">
+                                    <tree>
+                                        <field name="pay_date" />
+                                        <field name="name" />
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Организационные данные">
+                            <group colspan="2" col="4">
+                                <separator string="Тех. Настройки" colspan="4"/>
+                                <field name="aoh" nolabel="1" colspan="4" mode="tree">
+                                    <tree string="Настройки номера" editable="top">
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                                <field name="inner_phone_ids" nolabel="1" colspan="4" mode="tree">
+                                    <tree string="Внутренние номера проекта" editable="top">
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                                <separator string="Настройки электронной почты" colspan="4"/>
+                                <field name="settings_email" nolabel="1" colspan="4" />
+                            </group>
+                            <group colspan="2" col="4">
+                                <separator string="Организационные данные" colspan="4"/>
+                                <field name="template_report_id" colspan="4"/>
+                                <field name="schedule_ids" nolabel="1" colspan="4" mode="tree">
+                                    <tree string="Расписание" editable="top">
+                                        <field name="name"/>
+                                        <field name="comment"/>
+                                    </tree>
+                                </field>
+                                <separator string="Алгоритм распределения звонков в очереди" colspan="4" />
+                                <field name="logic_cols" nolabel="1" colspan="4"/>
+                                <separator string="Очереди по проекту" colspan="4"/>
+                                <field name="turn_proj" nolabel="1" colspan="4"/>
+                            </group>
+                        </page>
+                        <page string="ТЗ">
+                            <group colspan="4" col="2">
+                                <separator string="ТЗ" colspan="2"/>
+                                <field name="tz_filled_file_id" />
+                                <field name="file_ids" nolabel="1" colspan="2">
+                                    <tree string="Дополнения к ТЗ" colors="blue:type in ('url',)">
+                                        <field name="datas_fname"/>
+                                        <field name="create_date"/>
+                                        <field name="user_id"/>
+                                        <field name="type"/>
+                                    </tree>
+                                </field>
+                                <separator string="Комментарий по доработке" colspan="2"/>
+                                <field name="re_tz_commentary" colspan="2" nolabel="1"/>
+                            </group>
+                        </page>
+                        <page string="Обучение и сценарий">
+                            <separator string="Обучение" colspan="4"/>
+                            <group colspan="2">
+                                <separator string="Список сотрудников для обучения" colspan="4"/>
+                                <field name="employees_for_training_ids" nolabel="1" colspan="4">
+                                    <tree string="Список сотрудников для обучения">
+                                        <field name="name" />
+                                    </tree>
+                                </field>
+                            </group>
+                            <group colspan="2">
+                                <separator string="Список утвержденных партнером сотрудников" colspan="4"/>
+                                <field name="employees_aprov_partner_ids" nolabel="1" colspan="4">
+                                    <tree string="Список утвержденных партнером сотрудников">
+                                        <field name="name" />
+                                    </tree>
+                                </field>
+                            </group>
+                            <separator string="Сценарий" colspan="4"/>
+                            <field colspan="4" name="prior_scenario_file_id"/>
+                            <field name="scenario_file_ids" nolabel="1" colspan="2">
+                                    <tree string="Дополнения к сценарию" colors="blue:type in ('url',)">
+                                        <field name="datas_fname"/>
+                                        <field name="create_date"/>
+                                        <field name="user_id"/>
+                                        <field name="type"/>
+                                    </tree>
+                                </field>
+                            <separator string="Комментарии по доработке сценария" colspan="4"/>
+                            <field name="scenario_comment" nolabel='1' colspan="4"/>
+                        </page>
+                        <page string="Доплаты">
+                            <field name="surcharge_ids" colspan="4" nolabel="1">
+                                <tree string="Доплаты" editable="top">
+                                    <field name="period_id" />
+                                    <field name="pay_date" />
+                                    <field name="name" />
+                                    <field name="get" />
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="SLA">
+                            <button type="action"
+                                name="%(process_launch.action_process_sla)d"
+                                string="Создать"
+                                context="{'process_id': id, 'process_model': 'process.call.in', 'type': direction}"
+                                icon="gtk-ok"/>
+                            <field name="sla_ids" nolabel="1" colspan="4" readonly="1">
+                                <tree string="SLA">
+                                    <field name="id" invisible="1"/>
+                                    <field name="period_id" domain="[('calendar', '=', 'rus')]"/>
+                                    <field name="avg_mbo" sum="Сумма"/>
+                                    <button type="object"
+                                        name="change_sla"
+                                        string="Изменить"
+                                        context="{'sla_id': id}"
+                                        icon="gtk-ok"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Переписка по проекту">
+                            <field name="message_ids" nolabel="1" colspan="4" mode="tree">
+                                <tree string="Переписка по проекту" editable="top">
+                                    <field name="name" required="1" colspan="2"/>
+                                    <field name="create_uid" string="Автор" readonly="1"/>
+                                    <field name="create_date" readonly="1"/>
+                                    <field name="attachment_id"/>
+                                </tree>
+                            </field>
+                            <field name="history_ids" nolabel="1" colspan="4" mode="tree" readonly="1">
+                                <tree string="История">
+                                    <field name="create_uid"/>
+                                    <field name="create_date"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Отчеты">
+                            <separator string="Ежемесячные отчеты" colspan="4"/>
+                            <field name="report_ids" nolabel="1">
+                                <tree string="Отчеты" editable="top">
+                                    <field name="attachment_id"/>
+                                    <field name="create_date"/>
+                                    <field name="create_uid"/>
+                                    <field name="name"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <group colspan="4" col="6">
+                        <field name="state"
+                               widget="statusbar"
+                               statusbar_visible="coordination,filling_TK,filling_scenario,training_agents,development,finish"
+                               statusbar_colors='{"finish":"orange","revision_TK":"red","pause":"gray"}'
+                               colspan="6"
+                                />
+                        <newline/>
+                        <!-- coordination -> filling_TK -->
+                        <button string="На заполнение ТЗ"
+                                name="filling_TK"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'coordination'), ('check_m', '=', False)]}"
+                                />
+                        <!-- filling_TK -> approval_TK -->
+                        <button string="На согласование ТЗ"
+                                name="approval_TK"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'filling_TK'), ('check_a', '=', False)]}"
+                                />
+                        <!-- approval_TK -> revision_TK -->
+                        <button string="На доработку ТЗ"
+                                name="revision_TK"
+                                type="workflow"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval_TK'), ('check_m', '=', False)]}"
+                                />
+                        <!-- revision_TK -> approval_TK -->
+                        <button string="Вернуть на согласование"
+                                name="approval_TK"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'revision_TK'), ('check_a', '=', False)]}"
+                                />
+                        <!-- approval_TK -> filling_scenario -->
+                        <button string="На подготовку сценария"
+                                name="filling_scenario"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval_TK'), ('check_m', '=', False)]}"
+                                />
+                        <!-- filling_scenario -> approval_scenario -->
+                        <button string="На утверждение сценария"
+                                name="approval_scenario"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'filling_scenario'), ('check_m', '=', False)]}"
+                                />
+                        <!-- approval_scenario -> revision_scenario -->
+                        <button string="На доработку сценария"
+                                name="revision_scenario"
+                                type="workflow"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval_scenario'), ('check_a', '=', False)]}"
+                                />
+                        <!-- revision_scenario -> approval_scenario -->
+                        <button string="Вернуть на согласование"
+                                name="approval_scenario"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'revision_scenario'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- approval_scenario -> training_agents -->
+                        <button string="На обучение агентов"
+                                name="training_agents"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval_scenario'), ('check_a', '=', False)]}"
+                                />
+                        <!-- training_agents -> testing_agents -->
+                        <button string="На тестирование агентов партнером"
+                                name="testing_agents"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'training_agents'), ('check_m', '=', False)]}"
+                                />
+                        <!-- testing_agents -> training_agents -->
+                        <button string="Вернуть на обучение агентов"
+                                name="training_agents"
+                                type="workflow"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'testing_agents'), ('check_m', '=', False)]}"
+                                />
+                        <!-- testing_agents -> tech_setup -->
+                        <button string="На тех. настройку проекта"
+                                name="tech_setup"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'testing_agents'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- tech_setup -> filling_template -->
+                        <button string="На подготовку формы отчета"
+                                name="filling_template"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'tech_setup'), ('check_m', '=', False)]}"
+                                />
+                        <!-- filling_template -> approval_template -->
+                        <button string="На согласование формы отчета"
+                                name="approval_template"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'filling_template'), ('check_m', '=', False)]}"
+                                />
+                        <!-- approval_template -> revision_template -->
+                        <button string="На доработку формы отчета"
+                                name="revision_template"
+                                type="workflow"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval_template'), ('check_a', '=', False)]}"
+                                />
+                        <!-- revision_template -> approval_template -->
+                        <button string="Вернуть на согласование"
+                                name="approval_template"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'revision_template'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- approval_template -> development -->
+                        <button string="На реализацию проекта"
+                                name="development"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval_template'), ('check_a', '=', False)]}"
+                                />
+                        <!-- development -> coordination_reporting -->
+                        <button string="На согласование отчетности"
+                                name="coordination_reporting"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'development'), ('check_m', '=', False)]}"
+                                />
+                        <!-- coordination_reporting -> pause -->
+                        <button string="Приостановление проекта"
+                                name="pause"
+                                type="workflow"
+                                icon="gtk-pause"
+                                attrs="{'invisible': ['|', ('state', '!=', 'coordination_reporting'), ('check_a', '=', False)]}"
+                                />
+                        <!-- pause -> coordination_reporting -->
+                        <button string="На согласование отчетности"
+                                name="coordination_reporting"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                states="pause"
+                                />
+                        <!-- coordination_reporting -> billing_surcharge -->
+                        <button string="На выставление счета на доплату"
+                                name="billing_surcharge"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'coordination_reporting'), ('check_a', '=', False)]}"
+                                />
+                        <!-- billing_surcharge -> finish -->
+                        <button string="Проект завершен"
+                                name="finish"
+                                type="workflow"
+                                icon="gtk-yes"
+                                attrs="{'invisible': ['|', ('state', '!=', 'billing_surcharge'), ('check_a', '=', False)]}"
+                                />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+
+        <record id="window_process_call_in" model="ir.actions.act_window">
+            <field name="name">Входящая кампания</field>
+            <field name="res_model">process.call.in</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_process_call_in_tree"/>
+            <field name="search_view_id" ref="view_process_call_in_search"/>
+        </record>
+
+        <menuitem action="window_process_call_in" id="menu_process_call_in_dev" parent="process_call.menu_process_call"/>
+
+    </data>
+</openerp>

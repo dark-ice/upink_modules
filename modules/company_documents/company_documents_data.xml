@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<openerp>
+<data noupdate="1">
+    <record id="hd_new_employee" model="helpd.category.stage">
+        <field name="name">Выход нового сотрудника</field>
+        <field name="user_res_id">443</field>
+    </record>
+</data>
+</openerp>

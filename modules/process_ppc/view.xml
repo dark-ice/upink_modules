@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_process_ppc_tree">
+            <field name="name">PPC - запуск и реализация кампании</field>
+            <field name="model">process.ppc</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="partner_id" />
+                    <field name="create_date" />
+                    <field name="responsible_id" />
+                    <field name="specialist_id" />
+                    <field name="advertising_id" />
+                    <field name="user_id" />
+                    <field name="state" />
+                    <field name="service_id" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_process_ppc_search">
+            <field name="name">view.process.ppc.search</field>
+            <field name="model">process.ppc</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="partner_id" />
+                    <field name="create_date" />
+                    <field name="responsible_id" />
+                    <field name="specialist_id" />
+                    <field name="advertising_id" />
+                    <field name="user_id" />
+                    <field name="state" />
+                    <field name="service_id" />
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_process_ppc_form">
+            <field name="name">PPC - запуск и реализация кампании</field>
+            <field name="model">process.ppc</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="check_a"/>
+                        <field name="check_m"/>
+                        <field name="check_s"/>
+                        <field name="check_k"/>
+                    </group>
+                    <group colspan="4" col="4">
+                        <field name="partner_id" readonly="1"/>
+                        <field name="service_id" readonly="1"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="responsible_id" readonly="1"/>
+                        <field name="advertising_id"/>
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Данные по запуску процесса">
+                            <field name="direction" readonly="1"/>
+                            <field name="service_head_id" readonly="1"/>
+                            <separator colspan="4"/>
+
+                            <field name="contract_id" readonly="1"/>
+                            <field name="contract_file" readonly="1"/>
+
+                            <field name="invoice_line_id" invisible="True"/>
+                            <group col="6" colspan="4">
+                                <field name="account_id" readonly="1"/>
+                                <field name="account_file_id"/>
+                                <newline/>
+                                <field name="price" readonly="1"/>
+                                <field name="price_ye" readonly="1"/>
+                                <field name="paid" readonly="1"/><newline/>
+                                <field name="invoice_pay_ids" mode="tree" nolabel="1" colspan="6" domain="[('service_id', '=', service_id)]">
+                                    <tree>
+                                        <field name="pay_date" />
+                                        <field name="name" />
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Данные по кампании">
+                            <group colspan="4" col="2">
+                                <group colspan="4" col="2">
+                                    <separator string="Аккаунт менеджер" colspan="4"/>
+                                    <field name="specialist_id" nolabel="1"/>
+                                </group>
+                                <group colspan="4" col="2">
+                                    <separator string="Доступы" colspan="4"/>
+                                    <field name="access_ids" nolabel="1" colspan="4" mode="tree">
+                                        <tree string="Данные по доступам" editable="top">
+                                            <field name="advertising_id" required="1" widget="selection"/>
+                                            <field name="login" required="1"/>
+                                            <field name="password" required="1"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                                <separator string="Дополнительные данные по кампании:" colspan="4"/>
+                                <field name="additional_data_company" nolabel="1"/>
+                                <group colspan="4">
+                                    <separator string="Причина остановки кампании:" colspan="4"/>
+                                    <field name="reason_stop_company" nolabel="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Переписка по проекту">
+                            <field name="message_ids" nolabel="1" colspan="4" mode="tree">
+                                <tree string="Переписка по проекту" editable="top">
+                                    <field name="name" required="1" colspan="2"/>
+                                    <field name="create_uid" string="Автор" readonly="1"/>
+                                    <field name="create_date" readonly="1"/>
+                                    <field name="attachment_id"/>
+                                </tree>
+                            </field>
+                            <field name="history_ids" nolabel="1" colspan="4" mode="tree" readonly="1">
+                                <tree string="История">
+                                    <field name="create_uid"/>
+                                    <field name="create_date"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Отчеты">
+                            <separator string="Ежемесячные отчеты" colspan="4"/>
+                            <field name="report_ids" nolabel="1">
+                                <tree string="Отчеты" editable="top">
+                                    <field name="attachment_id"/>
+                                    <field name="create_date"/>
+                                    <field name="create_uid"/>
+                                    <field name="name"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <group colspan="4" col="6">
+                        <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="coordination,drafting,approval,implementation,finish"
+                           statusbar_colors='{"finish":"orange","revision":"red"}'
+                           colspan="6"
+                            />
+                        <newline/>
+                        <!-- coordination -> drafting -->
+                        <button string="Составление стратегии"
+                                name="drafting"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'coordination'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- drafting, revision -> approval -->
+                        <button string="На утверждение стратегии"
+                                name="approval"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', 'not in', ('revision', 'drafting')), ('check_s', '=', False)]}"
+                                />
+
+                        <!-- approval -> revision -->
+                        <button string="На доработку стратегии"
+                                name="revision"
+                                type="workflow"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_k', '=', False)]}"
+                                />
+
+                        <!-- approval -> implementation -->
+                        <button string="На реализацию стратегии"
+                                name="implementation"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_k', '=', False)]}"
+                                />
+
+                        <!-- implementation -> finish -->
+                        <button string="Работы закончены"
+                                name="finish"
+                                type="workflow"
+                                icon="gtk-yes"
+                                attrs="{'invisible': ['|', ('state', '!=', 'implementation'), ('check_s', '=', False)]}"
+                                />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+
+        <record id="window_process_ppc" model="ir.actions.act_window">
+            <field name="name">PPC - запуск и реализация кампании</field>
+            <field name="res_model">process.ppc</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_process_ppc_tree"/>
+            <field name="search_view_id" ref="view_process_ppc_search"/>
+        </record>
+
+        <menuitem action="window_process_ppc" id="menu_process_ppc" sequence="1" parent="process_launch.menu_process" name="PPC кампания"/>
+        <menuitem action="window_process_ppc" id="menu_process_ppc_dev" parent="menu_process_ppc"/>
+
+    </data>
+</openerp>

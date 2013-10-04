@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- vim:fdl=1:
+-->
+<templates id="template" xml:space="preserve">
+    <t t-name="Header-Asterisk-Incoming">
+        <div class="incoming block logout"></div>
+    </t>
+    <t t-name="AsteriskIncomingView">
+        <div class="oe-asterisk-incoming">
+            <p style="text-align: center;">Нет звонков.</p>
+        </div>
+    </t>
+</templates>

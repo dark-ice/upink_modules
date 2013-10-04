@@ -1,0 +1,185 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- Для СНГ INKSYSTEM -->
+
+        <record model="ir.ui.view" id="crm_leads_form_eu">
+            <field name="name">CRM - Leads ЕС INKSYSTEM</field>
+            <field name="model">crm.lead</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Leads Form ЕС INKSYSTEM">
+                    <field name="permissions" invisible="1"/>
+                    <field name="type" invisible="1"/>
+                    <field name="company_type" invisible="1"/>
+                    <group colspan="4" col="4">
+                        <field name="name" required="1" string="Кандидат"/>
+                        <field name="activity"/>
+                        <field name="user_id"/>
+                        <field name="responsible_user" string="Автор"
+                               attrs="{'readonly':[('permissions','!=','Director')]}"/>
+                        <field name="section_id" widget="selection"/>
+                        <field name="partner_type" required="1"/>
+                        <field name="cand_type" required="1"/>
+                        <field name="sale_type" required="1"/>
+                        <field name="source" domain="[('section_id','=',section_id)]" required="1"/>
+                        <group col="4" colspan="2">
+                            <button name="%(crm.action_crm_lead2partner)d"
+                                    icon="terp-partner" type="action"
+                                    string="Создать партнера"
+                                    attrs="{'invisible':[('partner_id','!=',False)]}" colspan="4"/>
+
+                        </group>
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Lead">
+                            <group colspan="4" col="2">
+                                <field name="partner_name" string="Юридическое название компании"/>
+                            </group>
+                            <group colspan="2" col="4">
+                                <separator string="Contact" colspan="4" col="4"/>
+                                <field name="contact_name" required="1" string="Контактное лицо" colspan="4"/>
+                                <field name="function" string="Должность" colspan="4"/>
+                                <field name="country_ec" required="1"/>
+                                <field name="state_ec" string="Область"/>
+                                <field name="zip"/>
+                                <field name="city"/>
+                                <field name="street" colspan="4"/>
+                                <field name="street2" string="№ дома, офиса" colspan="4"/>
+                                <group colspan="2" col="2">
+                                    <field name="skype"/>
+                                    <field name="msn"/>
+                                    <field name="yahoo"/>
+                                    <field name="icq"/>
+                                    <field name="gg"/>
+                                </group>
+                            </group>
+                            <group colspan="2" col="3">
+                                <separator string="Communication  History" colspan="4" col="4"/>
+                                <field name="email_from" widget="email" colspan="4"/>
+                                <field name="email_2" widget="email" colspan="4"/>
+                                <field name="site_url_1" widget="url" colspan="4"/>
+                                <field name="site_url_2" widget="url" colspan="4"/>
+                                <field name="phone_ids" mode="tree" nolabel="1" colspan="2">
+                                    <tree string="Номера телефонов" editable="bottom">
+                                        <field name="phone"/>
+                                        <field name="phone_type"/>
+                                    </tree>
+                                </field>
+                                <separator string="Links" colspan="4" col="4"/>
+                                <field name="partner_id" on_change="onchange_partner_id(partner_id, email_from)"
+                                       string="Партнер" colspan="4"/>
+                            </group>
+                            <separator colspan="4" string="Заметки о кандидате"/>
+                            <field name="description" nolabel="1" colspan="4"/>
+                        </page>
+                        <page string="Communication &amp; History">
+                            <field name="comm_ids" colspan="4" nolabel="1" mode="tree">
+                                <tree string="История общения" editable="top">
+                                    <field name="create_date"/>
+                                    <field name="type"/>
+                                    <field name="length"/>
+                                    <field name="point"/>
+                                    <field name="documents"/>
+                                    <field name="result"/>
+                                    <field name="note"/>
+                                    <field name="user_id"/>
+                                </tree>
+                            </field>
+                            <field name="calles" colspan="4" nolabel="1" mode="tree" readonly="1">
+                                <tree string="История звонков">
+                                    <field name="date"/>
+                                    <field name="name" string="Отчет звонка"/>
+                                    <field name="partner_phone"/>
+                                    <field name="time_of_coll"/>
+                                    <field name="duration"/>
+                                    <field name="user_id"/>
+                                    <field name="id_sphone"/>
+                                    <field name="categ_id" string="Тип звонка"/>
+                                    <field name="id_ast_coll"/>
+                                </tree>
+                            </field>
+                            <field name="note_ids" colspan="4" nolabel="1">
+                                <tree string="История переписки">
+                                    <field name="name"/>
+                                    <field name="create_date"/>
+                                    <field name="user_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="crm_case_category_act_leads_eu">
+            <field name="name">Кандидаты ЕС INK</field>
+            <field name="res_model">crm.lead</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('company_type','=','eu')]</field>
+            <field name="view_id" ref="crm_leads_form_eu"/>
+            <field name="search_view_id" ref="crm.view_crm_case_leads_filter"/>
+            <field name="context">{'search_default_my_candidates':1 , 'default_company_type': 'eu', 'search_default_section_id': section_id, 'stage_type': 'lead'}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_crm_tag_tree_view_leads_eu">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="crm.crm_case_tree_view_leads"/>
+            <field name="act_window_id" ref="crm_case_category_act_leads_eu"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_crm_tag_form_view_leads_eu">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="crm_leads_form_eu"/>
+            <field name="act_window_id" ref="crm_case_category_act_leads_eu"/>
+        </record>
+
+        <menuitem parent="base.menu_sales"
+                  id="menu_crm_act_leads_eu"
+                  action="crm_case_category_act_leads_eu" sequence="2"/>
+
+        <record model="ir.actions.act_window" id="act_crm_communication_type">
+            <field name="name">Справочник способов общения</field>
+            <field name="res_model">crm.communication.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+                action="act_crm_communication_type"
+                id="menu_crm_communication_type"
+                parent="base.menu_crm_config_lead"
+                sequence="2"/>
+
+        <record model="ir.actions.act_window" id="act_crm_communication_documents">
+            <field name="name">Справочник отправленных документов</field>
+            <field name="res_model">crm.communication.documents</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+                action="act_crm_communication_documents"
+                id="menu_crm_communication_documents"
+                parent="base.menu_crm_config_lead"
+                sequence="2"/>
+
+        <record model="ir.actions.act_window" id="act_crm_lead_failure_cause">
+            <field name="name">Причины отказа</field>
+            <field name="res_model">crm.lead.failure.cause</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+                action="act_crm_lead_failure_cause"
+                id="menu_crm_lead_failure_cause"
+                parent="base.menu_crm_config_lead"
+                sequence="0"
+                />
+
+
+    </data>
+</openerp>

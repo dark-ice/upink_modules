@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<openerp>
+<data>
+ <!-- Case Categories Form View -->
+
+        <record id="crm.crm_case_categ-view_update" model="ir.ui.view">
+            <field name="name">crm.case.categ.form.inherit</field>
+            <field name="model">crm.case.categ</field>
+            <field name="inherit_id" ref="crm.crm_case_categ-view"/>
+            <field name="arch" type="xml">
+                <data>
+                    <field name="name" position="after">
+                    <group colspan="6" col="4">
+                    <field name="responsible_users"/>
+                    </group>
+                    </field>
+                </data>
+            </field>
+        </record>
+</data>
+</openerp>
+

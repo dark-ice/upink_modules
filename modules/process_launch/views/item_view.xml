@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_indicators_form">
+            <field name="name">Ключевые показатели</field>
+            <field name="model">process.sla.indicators</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Ключевые показатели" >
+                    <group colspan="4" col="8">
+                        <field name="name" />
+                        <field name="units" />
+                        <field name="type" />
+                        <field name="active" />
+                        <field name="index_type" />
+                        <field name="formula" colspan="8" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_indicators_tree">
+            <field name="name">process.sla.indicators.tree</field>
+            <field name="model">process.sla.indicators</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Список ключевых показателей" >
+                    <field name="name" />
+                    <field name="units" />
+                    <field name="type" />
+                    <field name="active" />
+                    <field name="index_type" />
+                    <field name="formula"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_indicators_search">
+            <field name="name">process.sla.indicators.search</field>
+            <field name="model">process.sla.indicators</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <group>
+                        <filter icon="terp-check"
+                                domain="['|', ('active','=', True), ('active','=', False)]"
+                                name="active"
+                                string="+ не активные"
+                                />
+                        <separator orientation="vertical"/>
+                        <filter icon="terp-tools"
+                                domain="[('index_type','=', True)]"
+                                name="index_type"
+                                string="Перевыполняемый"
+                                />
+                    </group>
+
+                    <newline />
+                    <field name="name" />
+                    <field name="units" />
+                    <field name="type" />
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_indicators">
+            <field name="name">Ключевые показатели</field>
+            <field name="res_model">process.sla.indicators</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_indicators_tree"/>
+            <field name="search_view_id" ref="view_indicators_search"/>
+            <field name="context">{}</field>
+        </record>
+
+
+        <record model="ir.ui.view" id="view_sla_form">
+            <field name="name">SLA</field>
+            <field name="model">process.sla</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="SLA" >
+                    <field name="process_model" invisible="1"/>
+                    <field name="process_id" invisible="1"/>
+                    <field name="type" invisible="1"/>
+                    <field name="period_id" readonly="1"/>
+                    <field name="line_ids" nolabel="1" colspan="4" context="{'type': type}">
+                        <tree editable="top" string="SLA">
+                            <field name="type" invisible="1"/>
+                            <field name="name" domain="[('type', '=', type)]"/>
+                            <field name="units" string="Е.И."/>
+                            <field name="weight" sum="Сумма"/>
+                            <field name="previous_period"/>
+                            <field name="plan"/>
+                            <field name="fact"/>
+                            <field name="percentage"/>
+                            <field name="mbo" sum="Сумма"/>
+                        </tree>
+                    </field>
+                    <separator colspan="4"/>
+                    <group colspan="6" col="4" >
+                        <button string="Отмена" icon="gtk-close" special="cancel" />
+                        <button name="save" type="object" string="Изменить" icon="gtk-ok" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="action_sla">
+            <field name="name">Ключевые показатели</field>
+            <field name="res_model">process.sla</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_sla_form"/>
+            <field name="context">{}</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_process_settings" sequence="99" parent="menu_process" name="Настройки"/>
+        <menuitem action="action_indicators" id="menu_process_indicators" parent="menu_process_settings"/>
+    </data>
+</openerp>

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <!-- Add New Note view -->
+
+        <record model="ir.ui.view" id="crm_add_new_note_view1">
+            <field name="name">crm.new.add.note.form1</field>
+            <field name="model">crm.lead.notes</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Добавление заметки">
+                    <separator string="Заметка" colspan="4" />
+                    <field name="name" nolabel="1" colspan="4" default_focus="1"/>
+                    <separator string="" colspan="6"/>
+                    <group colspan="6" col="4" >
+                        <button string="Отмена" icon="gtk-close" special="cancel" />
+                        <button name="action_add" type="object" string="Добавить" icon="gtk-ok" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- Add New Note action -->
+
+        <record model="ir.actions.act_window" id="action_crm_add_note">
+            <field name="name">Добавление заметки</field>
+            <field name="res_model">crm.lead.notes</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="crm_add_new_note_view1"/>
+            <field name="target">inline</field>
+            <field name="auto_refresh">1</field>
+        </record>
+
+    </data>
+</openerp>

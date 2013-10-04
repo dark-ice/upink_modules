@@ -1,0 +1,76 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+
+    <record model="ir.ui.view" id="view_indicators_sla_stage_form">
+        <field name="name">Справочник SLA показателей - form</field>
+        <field name="model">indicators.sla.stage</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="SLA показателей">
+               <field name="name"/>
+               <field name="type"/>
+               <field name="compan_type" attrs="{'invisible':[('model','!=','outsourcing_contact_centr')], 'required':[('model','==','outsourcing_contact_centr')]}"/>
+               <field name="strategy_type" attrs="{'invisible':[('model','!=','smm_strategy')], 'required':[('model','==','smm_strategy')]}"/>
+               <field name="model"/>
+               <field name="formula" required="1" colspan="8"/>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_indicators_sla_stage_tree">
+        <field name="name">Справочник SLA показателей - tree</field>
+        <field name="model">indicators.sla.stage</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="SLA показателей">
+               <field name="name"/>
+               <field name="type"/>
+               <field name="model"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="window_indicators_sla_stage">
+        <field name="name">Справочник SLA показателей</field>
+        <field name="res_model">indicators.sla.stage</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_indicators_sla_stage_tree"/>
+    </record>
+
+
+    <record model="ir.ui.view" id="view_interval_sla_stage_form">
+        <field name="name">Справочник SLA периодов - form</field>
+        <field name="model">sla.interval.date</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="SLA периоды (месяц/год)">
+               <field name="name" required="1"/>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_interval_sla_stage_tree">
+        <field name="name">Справочник SLA периодов - tree</field>
+        <field name="model">sla.interval.date</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="SLA периоды (месяц/год)" editable="bottom">
+               <field name="name" required="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="window_interval_sla_stage">
+        <field name="name">Справочник SLA периодов (годы)</field>
+        <field name="res_model">sla.interval.date</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_interval_sla_stage_tree"/>
+    </record>
+
+    <menuitem name="SLA показатели" id="menu_indicators_sla_stage" action="window_indicators_sla_stage"
+           parent="menu_process_all_config" sequence="3"/>
+    <menuitem name="SLA периоды (месяц/год)" id="menu_interval_sla_stage" action="window_interval_sla_stage"
+           parent="menu_process_all_config" sequence="4"/>
+     </data>
+</openerp>

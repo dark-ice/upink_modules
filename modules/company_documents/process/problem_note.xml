@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+    <!-- Бизнес-процесс для проблемной записки -->
+   <record model="workflow" id="wkf_problem_note">
+        <field name="name">Бизнес-процесс Проблемные записки</field>
+        <field name="osv">company.problem.note</field>
+        <field name="on_create">True</field>
+    </record>
+    <!-- Workflow activities -->
+    
+    <record model="workflow.activity" id="act_problem_draft">
+        <field name="wkf_id" ref="wkf_problem_note" />
+        <field name="flow_start">True</field>
+        <field name="name">Черновик</field>
+        <field name="kind">function</field>
+        <field name="action">action_draft()</field>
+    </record>
+
+    <record model="workflow.activity" id="act_problem_waiting">
+        <field name="wkf_id" ref="wkf_problem_note" />
+        <field name="name">На согласовании</field>
+        <field name="kind">function</field>
+        <field name="action">action_waiting()</field>
+    </record>
+    
+    <record model="workflow.activity" id="act_problem_rework">
+        <field name="wkf_id" ref="wkf_problem_note" />
+        <field name="name">На доработке</field>
+        <field name="kind">function</field>
+        <field name="action">action_rework()</field>
+    </record>
+    
+    <record model="workflow.activity" id="act_problem_decision">
+        <field name="wkf_id" ref="wkf_problem_note" />
+        <field name="name">Принятие решения</field>
+        <field name="kind">function</field>
+        <field name="action">action_decision()</field>
+    </record>
+    
+    <record model="workflow.activity" id="act_problem_cancel">
+        <field name="wkf_id" ref="wkf_problem_note" />
+        <field name="name">Отменено</field>
+        <field name="kind">function</field>
+        <field name="action">action_cancel()</field>
+    </record>
+    
+    <record model="workflow.activity" id="act_problem_closed">
+        <field name="wkf_id" ref="wkf_problem_note" />
+        <field name="name">Закрыто принимающим решение</field>
+        <field name="kind">function</field>
+        <field name="action">action_closed()</field>
+    </record>
+    
+    <record model="workflow.activity" id="act_problem_inwork">
+        <field name="wkf_id" ref="wkf_problem_note" />
+        <field name="name">Исполнение</field>
+        <field name="kind">function</field>
+        <field name="action">action_inwork()</field>
+    </record>
+    
+    <record model="workflow.activity" id="act_problem_approval">
+        <field name="wkf_id" ref="wkf_problem_note" />
+        <field name="name">Сдано на утверждение</field>
+        <field name="kind">function</field>
+        <field name="action">action_approval()</field>
+    </record>
+    
+    <record model="workflow.activity" id="act_problem_failed">
+        <field name="wkf_id" ref="wkf_problem_note" />
+        <field name="name">Не выполнено</field>
+        <field name="kind">function</field>
+        <field name="action">action_failed()</field>
+    </record>
+    
+    <record model="workflow.activity" id="act_problem_init_accepted">
+        <field name="wkf_id" ref="wkf_problem_note" />
+        <field name="name">Принято инициатором</field>
+        <field name="kind">function</field>
+        <field name="action">action_init_accepted()</field>
+    </record>
+    
+    <record model="workflow.activity" id="act_problem_init_failed">
+        <field name="wkf_id" ref="wkf_problem_note" />
+        <field name="name">Не принято инициатором</field>
+        <field name="kind">function</field>
+        <field name="action">action_init_failed()</field>
+    </record>
+    
+    <!-- Workflow transition -->
+    
+    <record model="workflow.transition" id="problem1_problem2">
+        <field name="act_from" ref="act_problem_draft" />
+        <field name="act_to" ref="act_problem_waiting" />
+        <field name="signal">action_decision</field>
+        <field name="condition">not check_manager()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem1_problem4">
+        <field name="act_from" ref="act_problem_draft" />
+        <field name="act_to" ref="act_problem_decision" />
+        <field name="signal">action_decision</field>
+        <field name="condition">check_manager()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem2_problem1">
+        <field name="act_from" ref="act_problem_waiting" />
+        <field name="act_to" ref="act_problem_draft" />
+        <field name="signal">action_draft</field>
+        <field name="condition">check_author()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem2_problem4">
+        <field name="act_from" ref="act_problem_waiting" />
+        <field name="act_to" ref="act_problem_decision" />
+        <field name="signal">action_decision</field>
+        <field name="condition">check_manager()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem4_problem2">
+        <field name="act_from" ref="act_problem_decision" />
+        <field name="act_to" ref="act_problem_waiting" />
+        <field name="signal">action_waiting</field>
+        <field name="condition">check_manager()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem2_problem3">
+        <field name="act_from" ref="act_problem_waiting" />
+        <field name="act_to" ref="act_problem_rework" />
+        <field name="signal">action_rework</field>
+        <field name="condition">check_manager()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem3_problem2">
+        <field name="act_from" ref="act_problem_rework" />
+        <field name="act_to" ref="act_problem_waiting" />
+        <field name="signal">action_waiting</field>
+        <field name="condition">check_author()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem1_problem5">
+        <field name="act_from" ref="act_problem_draft" />
+        <field name="act_to" ref="act_problem_cancel" />
+        <field name="signal">action_cancel</field>
+        <field name="condition">check_author()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem4_problem6">
+        <field name="act_from" ref="act_problem_decision" />
+        <field name="act_to" ref="act_problem_closed" />
+        <field name="signal">action_closed</field>
+        <field name="condition">check_decision()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem6_problem4">
+        <field name="act_from" ref="act_problem_closed" />
+        <field name="act_to" ref="act_problem_decision" />
+        <field name="signal">action_decision</field>
+        <field name="condition">check_decision()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem4_problem7">
+        <field name="act_from" ref="act_problem_decision" />
+        <field name="act_to" ref="act_problem_inwork" />
+        <field name="signal">action_inwork</field>
+        <field name="condition">check_decision()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem7_problem4">
+        <field name="act_from" ref="act_problem_inwork" />
+        <field name="act_to" ref="act_problem_decision" />
+        <field name="signal">action_decision</field>
+        <field name="condition">check_decision()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem7_problem8">
+        <field name="act_from" ref="act_problem_inwork" />
+        <field name="act_to" ref="act_problem_failed" />
+        <field name="signal">action_failed</field>
+        <field name="condition">check_responsible()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem8_problem7">
+        <field name="act_from" ref="act_problem_failed" />
+        <field name="act_to" ref="act_problem_inwork" />
+        <field name="signal">action_inwrok</field>
+        <field name="condition">check_responsible()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem7_problem9">
+        <field name="act_from" ref="act_problem_inwork" />
+        <field name="act_to" ref="act_problem_approval" />
+        <field name="signal">action_approval</field>
+        <field name="condition">check_responsible()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem9_problem7">
+        <field name="act_from" ref="act_problem_approval" />
+        <field name="act_to" ref="act_problem_inwork" />
+        <field name="signal">action_inwork</field>
+        <field name="condition">check_responsible()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem9_problem10">
+        <field name="act_from" ref="act_problem_approval" />
+        <field name="act_to" ref="act_problem_init_failed" />
+        <field name="signal">action_init_failed</field>
+        <field name="condition">check_author()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem10_problem9">
+        <field name="act_from" ref="act_problem_init_failed" />
+        <field name="act_to" ref="act_problem_approval" />
+        <field name="signal">action_approval</field>
+        <field name="condition">check_author()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem9_problem11">
+        <field name="act_from" ref="act_problem_approval" />
+        <field name="act_to" ref="act_problem_init_accepted" />
+        <field name="signal">action_init_accepted</field>
+        <field name="condition">check_author()</field>
+    </record>
+    
+    <record model="workflow.transition" id="problem11_problem9">
+        <field name="act_from" ref="act_problem_init_accepted" />
+        <field name="act_to" ref="act_problem_approval" />
+        <field name="signal">action_approval</field>
+        <field name="condition">check_author()</field>
+    </record>
+    
+    
+    </data>
+</openerp>

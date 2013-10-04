@@ -1,0 +1,19 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_support_inksystem_supp_sale_manager","supp.sale supp_manager","model_supp_sale","support_inksystem.supp_manager",1,0,0,0
+"access_support_inksystem_supp_services_stage_manager","supp.services.stage supp_manager","model_supp_services_stage","support_inksystem.supp_manager",1,0,0,0
+"access_support_inksystem_supp_city_stage_manager","supp.city.stage supp_manager","model_supp_city_stage","support_inksystem.supp_manager",1,0,0,0
+"access_support_inksystem_supp_components_stage_manager","supp.components.stage supp_manager","model_supp_components_stage","support_inksystem.supp_manager",1,0,0,0
+"access_support_inksystem_supp_sale_admin","supp.sale supp_admin","model_supp_sale","support_inksystem.supp_admin_manager",1,0,0,1
+"access_support_inksystem_supp_services_stage_admin","supp.services.stage supp_admin","model_supp_services_stage","support_inksystem.supp_admin_manager",1,1,1,1
+"access_support_inksystem_supp_city_stage_admin","supp.city.stage supp_admin","model_supp_city_stage","support_inksystem.supp_admin_manager",1,1,1,1
+"access_support_inksystem_supp_components_stage_admin","supp.components.stage supp_admin","model_supp_components_stage","support_inksystem.supp_admin_manager",1,0,0,1
+"access_support_inksystem_supp_sale_user","supp.sale supp_user","model_supp_sale","support_inksystem.supp_users",1,1,1,0
+"access_support_inksystem_supp_services_stage_user","supp.services.stage supp_user","model_supp_services_stage","support_inksystem.supp_users",1,0,0,0
+"access_support_inksystem_supp_city_stage_user","supp.city.stage supp_user","model_supp_city_stage","support_inksystem.supp_users",1,0,0,0
+"access_support_inksystem_supp_components_stage_user","supp.components.stage supp_user","model_supp_components_stage","support_inksystem.supp_users",1,1,1,1
+"access_support_inksystem_supp_notes_manager","supp.notes supp_manager","model_supp_sale_notes","support_inksystem.supp_manager",1,0,0,0
+"access_support_inksystem_supp_notes_admin","supp.notes supp_admin","model_supp_sale_notes","support_inksystem.supp_admin_manager",1,0,0,1
+"access_support_inksystem_supp_notes_user","supp.notes supp_user","model_supp_sale_notes","support_inksystem.supp_users",1,1,1,1
+"access_support_inksystem_supp_treatment_manager","supp.treatment supp_manager","model_supp_treatment","support_inksystem.supp_manager",1,1,1,1
+"access_support_inksystem_supp_treatment_admin","supp.treatment supp_admin","model_supp_treatment","support_inksystem.supp_admin_manager",1,1,1,1
+"access_support_inksystem_supp_treatment_user","supp.notes supp_user","model_supp_treatment","support_inksystem.supp_users",1,1,1,1

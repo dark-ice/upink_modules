@@ -1,0 +1,1891 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- Контакты -->
+        <record model="ir.ui.view" id="view_partner_address_form1">
+            <field name="name">res.partner.address.form1</field>
+            <field name="model">res.partner.address</field>
+            <field name="priority" eval="1"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+
+                <form>
+                    <group colspan="4" col="4">
+                        <!--<field name="default_site" invisible="1"/>-->
+                        <field name="partner_id" invisible="1"/>
+                        <field name="name" required="1" string="ФИО" on_change='insert_site_name(context)'/>
+                        <field name="function" required="1" string="Должность"/>
+                    </group>
+                    <group colspan="4" col="4">
+                        <separator string="Почтовый адрес" colspan="4"/>
+                        <group colspan="2">
+                            <field name="type" string="Type" colspan="4"/>
+                            <field name="country_id" completion="1"/>
+                            <field name="state_id"/>
+                            <field name="zip" string="Индекс"/>
+                        </group>
+                        <group colspan="2">
+                            <field name="city"/>
+                            <field name="street" colspan="4"/>
+                            <field name="street2" string="№ дома,офиса" colspan="4"/>
+                        </group>
+                    </group>
+                    <group colspan="4" col="4">
+                        <separator string="Общение" colspan="4"/>
+                        <field name="phone_ids" mode="tree" nolabel="1" colspan="2">
+                            <tree string="Номера телефонов" editable="top" >
+                                <field name="phone"/>
+                                <field name="phone_type"/>
+                            </tree>
+                        </field>
+                        <field name="email_ids" mode="tree" nolabel="1" colspan="2">
+                            <tree string="Эл. почта" editable="top" >
+                                <field name="name"/>
+                            </tree>
+                        </field>
+                        <field name="site_ids" mode="tree" nolabel="1" colspan="2">
+                            <tree string="Сайты" editable="top" >
+                                <field name="name"/>
+                            </tree>
+                        </field>
+                        <field name="skype_ids" mode="tree" nolabel="1" colspan="2">
+                            <tree string="Skype" editable="top">
+                                <field name="name"/>
+                            </tree>
+                        </field>
+
+                        <field name="icq_ids" mode="tree" nolabel="1" colspan="2">
+                            <tree string="ICQ" editable="top">
+                                <field name="name"/>
+                            </tree>
+                        </field>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_partner_address_tree1">
+            <field name="name">res.partner.address.tree1</field>
+            <field name="model">res.partner.address</field>
+            <field name="priority" eval="1"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" required="1" string="ФИО"/>
+                    <field name="function" required="1" string="Должность"/>
+                    <field name="phones_all"/>
+                    <field name="email_all" />
+                    <field name="site_all" />
+                    <field name="skype_all" />
+                    <field name="icq_all" />
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_partner_address_filter1">
+            <field name="name">res.partner.address.filter1</field>
+            <field name="model">res.partner.address</field>
+            <field name="priority" eval="1"/>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="partner_id"/>
+                    <field name="name" string="ФИО"/>
+                    <field name="function" string="Должность"/>
+                    <field name="phones_all"/>
+                    <field name="email_all" />
+                    <field name="site_all" />
+                    <field name="skype_all" />
+                    <field name="icq_all" />
+                </search>
+            </field>
+        </record>
+
+        <record  model="ir.actions.act_window" id="action_partner_address_form">
+            <field name="name">Контакты</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner.address</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_customer":1}</field>
+            <field name="search_view_id" ref="view_partner_address_filter1"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_partner_address_form_view1">
+            <field eval="10" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_partner_address_tree1"/>
+            <field name="act_window_id" ref="action_partner_address_form"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_partner_address_form_view2">
+            <field eval="10" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_partner_address_form1"/>
+            <field name="act_window_id" ref="action_partner_address_form"/>
+        </record>
+
+        <menuitem action="action_partner_address_form" id="base.menu_partner_address_form"
+            groups="base.group_extended" name="Контакты"
+            parent="base.menu_address_book" sequence="30"/>
+
+        <!-- Партнеры КЦ -->
+        <record model="ir.ui.view" id="view_partner_form_contacts">
+            <field name="name">res.partner.form contact</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Партнеры Контакт-центр">
+                    <group col="4" colspan="4">
+                        <group colspan="4" col="6">
+                            <field name="name" string="Партнер"/>
+                            <field name="customer"/>
+                            <field name="supplier"/>
+                            <field name="user_id"/>
+                            <field name="section_id"/>
+                            <field name="partner_type" invisible="1"/>
+                        </group>
+                        <separator string="Информация о партнере" colspan="4"/>
+                        <field colspan="4" mode="form" name="address" nolabel="1" height="260"/>
+                        <field name="product_id" colspan="4" nolabel="1" mode="tree">
+                            <tree string="Типы продукции" editable="bottom">
+                                <field name="name" required="1" widget="selection"/>
+                                <field name="description" required="1"/>
+                                <field name="comment"/>
+                            </tree>
+                        </field>
+                        <field name="orders_history" colspan="4" nolabel="1" mode="tree">
+                            <tree string="История заказов" editable="top">
+                                <field name="type"/>
+                                <field name="create_date"/>
+                                <field name="number"/>
+                                <field name="shipment_type"/>
+                                <field name="sum"/>
+                                <field name="currency"/>
+                                <field name="payment_state"/>
+                                <field name="user_id"/>
+                                <field name="commentary"/>
+                            </tree>
+                        </field>
+                        <field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">
+                            <tree string="Phone Calls">
+                                <field name="date"/>
+                                <field name="name" string="Отчет звонка"/>
+                                <field name="partner_phone"/>
+                                <field name="time_of_coll"/>
+                                <field name="duration"/>
+                                <field name="user_id"/>
+                                <field name="id_sphone"/>
+                                <field name="categ_id" string="Тип звонка"/>
+                                <field name="id_ast_coll"/>
+                            </tree>
+                        </field>
+                        <field name="note_ids" colspan="4" nolabel="1" readonly="1">
+                            <tree string="История переписки">
+                                <field name="title"/>
+                            </tree>
+                        </field>
+                        <button name="add_note" string="Добавить заметку" type="object" default_focus="1" icon="terp-document-new"  colspan="4"/>
+
+                    </group>
+                    <button name="action_cancel" string="Отменить"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_partners_contact_centr">
+            <field name="name">Партнеры КЦ INK</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">['|', ('user_id.context_section_id.id', '=', 5), ('section_id.id', '=', 5)]</field>
+            <field name="view_id" ref="view_partner_form_contacts"/>
+            <!--<field name="search_view_id" ref="base.view_res_partner_filter"/>-->
+            <field name="context">{'default_partner_type': 'contact', 'default_section_id': 5}</field>
+        </record>
+        <record model="ir.actions.act_window" id="act_partners_contact_centr_ast">
+            <field name="name">Партнеры КЦ INK форма для Asterisk</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="domain">['|', ('user_id.context_section_id.id', '=', 5), ('section_id.id', '=', 5)]</field>
+            <field name="view_id" ref="view_partner_form_contacts"/>
+            <field name="context">{'default_partner_type': 'contact'}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_partners_form_contact">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="base.view_partner_tree"/>
+            <field name="act_window_id" ref="act_partners_contact_centr"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_partners_tree_contact">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_partner_form_contacts"/>
+            <field name="act_window_id" ref="act_partners_contact_centr"/>
+        </record>
+
+        <menuitem
+                action="act_partners_contact_centr"
+                id="menu_partner_form_contact"
+                parent="base.menu_address_book"
+                sequence="2"/>
+
+        <!-- Партнеры Inksystem -->
+        <record model="ir.ui.view" id="view_partner_form_inksystem">
+            <field name="name">res.partner.form inksystem</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Партнеры СНГ INKSYSTEM">
+                    <group col="4" colspan="4">
+                        <group colspan="4" col="8">
+                            <field name="name" string="Партнер"/>
+                            <field name="customer"/>
+                            <field name="supplier"/>
+                            <field name="partner_type" invisible="1"/>
+                            <field name="client_type"/>
+                        </group>
+                        <notebook colspan="4">
+                            <page string="Общее">
+                                <group colspan="4" col="4">
+                                    <separator string="Общая информация"/>
+                                    <field name="user_id"/>
+                                    <field name="active"/>
+                                    <field name="date"/>
+                                    <field name="company_id" widget="selection"/>
+                                </group>
+                                <group colspan="4">
+                                    <field colspan="4" mode="form" name="address" nolabel="1" height="260"/>
+                                    <field name="has_eshop" colspan="4"/>
+                                    <field name="what_done" colspan="4"
+                                           attrs="{'invisible': [('has_eshop', '!=', 'yes')]}"/>
+                                </group>
+                            </page>
+                            <page string="Данные по сотрудничеству">
+                                <group colspan="4" col="4">
+                                    <separator string="Корпоративная почта" colspan="4"/>
+                                    <group colspan="2" col="2">
+                                        <field name="login"/>
+                                        <field name="password"/>
+                                        <field name="forward_to"/>
+                                    </group>
+                                    <group colspan="2" col="2">
+                                        <field name="section_id"/>
+                                        <field name="main_partner"/>
+                                    </group>
+                                    <newline/>
+                                    <group colspan="2" col="2">
+                                        <separator string="Золотой статус" colspan="2"/>
+                                        <field name="confirm_status" required="1"/>
+                                        <field name="admin_panel_login"
+                                               attrs="{'required': [('confirm_status', '=', 'yes')]}"/>
+                                        <field name="admin_panel_password"
+                                               attrs="{'required': [('confirm_status', '=', 'yes')]}"/>
+                                        <field name="dealer_discount" model="tree" nolabel="1" colspan="2">
+                                            <tree editable="top">
+                                                <field name="amount"/>
+                                                <field name="date"/>
+                                            </tree>
+                                        </field>
+                                    </group>
+                                    <group colspan="2" col="2">
+                                        <separator string="Корпоративный сайт" colspan="2"/>
+                                        <field name="corporate_site_url" widget="url"/>
+                                        <field name="corporate_admin_panel"/>
+                                        <field name="corporate_admin_password"/>
+                                    </group>
+                                </group>
+                                <group colspan="4">
+                                    <field name="circulation" nolabel="1">
+                                        <tree string="Оборот партнера в $" editable="top">
+                                            <field name="date_id" widget="selection"/>
+                                            <field name="type" />
+                                            <field name="total"/>
+                                            <field name="printers"/>
+                                            <field name="inksystem"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </page>
+                            <page string="Журнал">
+                                <field name="opportunity_ids" colspan="4" nolabel="1"
+                                       context="{'default_partner_id': active_id}">
+                                    <tree string="Leads and Opportunities"
+                                          colors="blue:state=='pending';gray:state=='cancel'">
+                                        <field name="create_date"/>
+                                        <field name="name"/>
+                                        <field name="type"/>
+                                        <field name="stage_id"/>
+                                        <button name="stage_previous" string="Previous"
+                                                states="open,pending" type="object" icon="gtk-go-back"/>
+                                        <button name="stage_next" string="Next"
+                                                states="open,pending" type="object"
+                                                icon="gtk-go-forward"/>
+                                        <field name="user_id"/>
+                                        <field name="state"/>
+                                        <button name="case_cancel" string="Cancel"
+                                                states="draft,open,pending" type="object"
+                                                icon="gtk-cancel"/>
+                                        <button name="case_open" string="Open"
+                                                states="draft,pending" type="object"
+                                                icon="gtk-go-forward"/>
+                                        <button name="case_close" string="Close"
+                                                states="open,draft,pending" type="object"
+                                                icon="gtk-close"/>
+                                        <button string="Convert to Opportunity"
+                                                name="convert_opportunity"
+                                                states="draft,open,pending" icon="gtk-index"
+                                                type="object" attrs="{'invisible':[('type','=','opportunity')]}"/>
+                                        <button name="case_escalate" string="Escalate"
+                                                states="open,draft,pending" type="object"
+                                                icon="gtk-go-up"/>
+                                    </tree>
+                                </field>
+                                <field name="meeting_ids" colspan="4" nolabel="1"
+                                       context="{'default_partner_id': active_id}">
+                                    <tree string="Meetings" colors="gray:state in ('draft', 'cancel','done','pending')">
+                                        <field name="user_id" string="Responsible"/>
+                                        <field name="name" string="Subject"/>
+                                        <field name="date" string="Start Date"/>
+                                        <field name="date_deadline" string="End Date"/>
+                                    </tree>
+                                </field>
+                                <field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">
+                                    <tree string="Phone Calls">
+                                        <field name="date"/>
+                                        <field name="name" string="Отчет звонка"/>
+                                        <field name="partner_phone"/>
+                                        <field name="time_of_coll"/>
+                                        <field name="duration"/>
+                                        <field name="user_id"/>
+                                        <field name="id_sphone"/>
+                                        <field name="categ_id" string="Тип звонка"/>
+                                        <field name="id_ast_coll"/>
+                                    </tree>
+                                </field>
+                                <field name="note_ids" colspan="4" nolabel="1" readonly="1">
+                                    <tree string="История переписки">
+                                        <field name="title"/>
+                                    </tree>
+                                </field>
+                                <button name="add_note" string="Добавить заметку" type="object" default_focus="1" icon="terp-document-new"  colspan="4"/>
+                                <separator string="История смены статусов" colspan="4"/>
+                                <field name="status_history_ids" nolabel="1" colspan="4" readonly="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="create_uid" />
+                                        <field name="create_date" />
+                                    </tree>
+                                </field>
+                                <field name="orders_history" colspan="4" nolabel="1" mode="tree">
+                                    <tree string="История заказов" editable="top">
+                                        <field name="type"/>
+                                        <field name="create_date"/>
+                                        <field name="number"/>
+                                        <field name="shipment_type"/>
+                                        <field name="sum"/>
+                                        <field name="currency"/>
+                                        <field name="payment_state"/>
+                                        <field name="user_id"/>
+                                        <field name="commentary"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_base_form">
+            <field name="name">res.partner.form base</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group colspan="4">
+                        <!-- Доступы к карточке -->
+                        <field name="id" invisible="1"/>
+                        <field name="check" invisible="1"/>
+                    </group>
+                    <group colspan="4" col="6">
+                        <field name="name" string="Партнер"/>
+                        <field name="ur_name"/>
+                        <field name="main_site"/>
+                        <newline />
+                        <field name="partner_status" attrs="{'readonly': [('check', '=', False)]}"/>
+                        <field name="next_call"/>
+
+                        <field name="user_id"/>
+                        <field name="categ_id" string="Тематика" />
+                        <field name="partner_type" invisible="1"/>
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Контакты">
+                            <field colspan="4" mode="tree,form" name="address" nolabel="1" height="260"/>
+                            <separator string="Дополнительная информация о контактном лице" colspan="4"/>
+                            <field name="description" nolabel="1" colspan="4"/>
+                        </page>
+                        <page string="Услуги">
+                            <field name="added_services_ids" colspan="4" nolabel="1" mode="tree">
+                                <tree string="Услуги" editable="top">
+                                    <field name="service_id" required="1"/>
+                                    <field name="comment"/>
+                                </tree>
+                            </field>
+                            <field
+                                    name="access_ids"
+                                    nolabel="1"
+                                    colspan="4"
+                                    mode="tree"
+                                    >
+                                <tree string="Доступы, предоставляемые партнером" editable='top'>
+                                    <field name="type"/>
+                                    <field name="link"/>
+                                    <field name="login"/>
+                                    <field name="pswd"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Финансы">
+                            <group colspan="4" col="4">
+                                <separator string="Финансовые договоренности" colspan="4"/>
+                                <group colspan="2" col="2">
+                                    <field name="bonus_amount"/>
+                                    <field name="bonus_reason"/>
+                                    <field name="bonus_friend"/>
+                                    <field name="budget"/>
+                                </group>
+                                <group colspan="2" col="2">
+                                    <field name="section_id"/>
+                                    <field name="main_partner"/>
+                                    <field name="fin_dog" />
+                                </group>
+                                <group colspan="2" col="2">
+                                    <separator string="Отказ" colspan="2"/>
+                                    <field name="refusion_reason"/>
+                                    <separator string="Описание ситуации" colspan="2"/>
+                                    <field name="refusion_description" nolabel="1" colspan="2"/>
+                                </group>
+
+                            </group>
+                            <group colspan="4">
+                                <field colspan="4" mode="tree" name="bank_ids" nolabel="1" context="{'partner_id': id}"/>
+                            </group>
+                        </page>
+                        <page string="Журнал">
+                            <field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">
+                                <tree string="Звонки" >
+                                    <field name="date"/>
+                                    <field name="name" string="Отчет звонка"/>
+                                    <field name="partner_phone"/>
+                                    <field name="time_of_coll"/>
+                                    <field name="duration"/>
+                                    <field name="user_id"/>
+                                    <field name="id_sphone"/>
+                                    <field name="categ_id" string="Тип звонка"/>
+                                    <field name="id_ast_coll"/>
+                                </tree>
+                            </field>
+                            <field name="note_ids" colspan="4" nolabel="1" readonly="1">
+                                <tree string="История переписки">
+                                    <field name="title"/>
+                                </tree>
+                            </field>
+                            <button name="add_note" string="Добавить заметку" type="object" default_focus="1" icon="terp-document-new"  colspan="4"/>
+                            <group col="4" colspan="4">
+                                <separator string="История переприсвоений" colspan="4"/>
+                                <field name="transfer_ids" nolabel="1" colspan="4" readonly="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="create_uid" />
+                                        <field name="create_date" />
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Значимость критериев">
+                            <field name="terms_of_service" colspan="4"/>
+                            <field name="conformity" colspan="4"/>
+                            <field name="quality_feedback" colspan="4"/>
+                            <field name="completeness_of_reporting" colspan="4"/>
+                        </page>
+                    </notebook>
+
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_partner_tree_inksystem">
+            <field name="name">res.partner.form inksystem</field>
+            <field name="model">res.partner</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Партнеры СНГ INKSYSTEM">
+                    <field name="name" string="Название"/>
+                    <field name="phone_default" string="Контактный телефон"/>
+                    <field name="email" string="Эл.почта"/>
+                    <field name="city" string="Город"/>
+                    <field name="country" string="Страна"/>
+                    <field name="client_type"/>
+                    <field name="last_circulation" string="Оборот по продукции INKSYSTEM"/>
+                    <field name="user_id" string="Менеджер"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_partners_inksystem">
+            <field name="name">Партнеры СНГ INK</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">['|', ('user_id.context_section_id.id', '=', 10), ('section_id.id', '=', 10)]</field>
+            <field name="view_id" ref="view_partner_form_inksystem"/>
+            <field name="search_view_id" ref="base.view_res_partner_filter"/>
+            <field name="context">{'default_partner_type': 'inksystem', 'default_section_id': 10}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_partners_form_inksystem">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_partner_tree_inksystem"/>
+            <field name="act_window_id" ref="act_partners_inksystem"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_partners_tree_inksystem">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_partner_form_inksystem"/>
+            <field name="act_window_id" ref="act_partners_inksystem"/>
+        </record>
+
+        <menuitem
+                action="act_partners_inksystem"
+                id="menu_partner_form_inksystem"
+                parent="base.menu_address_book"
+                sequence="2"/>
+
+
+        <!-- Партнеры UpSale -->
+        <record model="ir.ui.view" id="view_res_partner_filter_upsale">
+            <field name="name">res.partner.select.upsale</field>
+            <field name="model">res.partner</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <group col='10' colspan='4'>
+                        <filter string="Неактивные" name="inactive" icon="terp-personal" domain="[('active','=',False)]"
+                                help="Показать неактивных партнеров"/>
+                        <separator orientation="vertical"/>
+                        <field name="name" string="Основной сайт партнера"/>
+                        <field name="ur_name"/>
+
+                        <field name="phone_s"/>
+                        <field name="site_s"/>
+                        <field name="email_s"/>
+
+                        <field name="country"/>
+                        <field name="user_id">
+                            <filter string="My Partners" icon="terp-personal+" domain="[('user_id','=',uid)]"/>
+                        </field>
+                    </group>
+                    <newline/>
+                    <group expand="0" string="Group By...">
+                        <filter string="Salesman" icon="terp-personal" domain="[]" context="{'group_by' : 'user_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_partner_tree_upsale">
+            <field name="name">res.partner.tree</field>
+            <field name="model">res.partner</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" string="Основной сайт партнера"/>
+                    <field name="ur_name" />
+
+                    <field name="email_default"/>
+                    <field name="phone_default"/>
+
+                    <field name="partner_status"/>
+                    <field name="partner_name" />
+                    <field name="next_call"/>
+                    <field name="user_id"/>
+                    <field name="categ_id" string="Тематика" />
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_partner_form_upsale">
+            <field name="name">res.partner.form upsale</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="priority">2</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group col="4" colspan="4">
+                        <field name="check" invisible="1"/>
+                        <field name="id" invisible="1"/>
+
+                        <group colspan="4" col="8">
+                            <field name="name" string="Основной сайт"/>
+                            <field name="ur_name"/>
+                            <field name="lead" groups="base.partner_extended" />
+                            <newline/>
+
+                            <field name="partner_status" />
+                            <field name="next_call"/>
+                            <field name="user_id"/>
+                            <field name="categ_id" string="Тематика" />
+                            <field name="partner_type" invisible="1"/>
+                            <field name="active" attrs="{'invisible': [('check', '=', False)]}" />
+
+                        </group>
+                        <notebook colspan="4">
+                            <page string="Контакты">
+                                <field colspan="4" mode="tree" name="address" nolabel="1" context="{'site_ids' : name}"/>
+                                <separator string="Дополнительная информация о контактном лице" colspan="4"/>
+                                <field name="description" nolabel="1" colspan="4"/>
+                            </page>
+                            <page string="Услуги">
+                                <group colspan="4" col="4">
+                                    <field name="added_services_ids" colspan="4" nolabel="1" mode="tree">
+                                        <tree string="Услуги" editable="top">
+                                            <field name="service_id" required="1"/>
+                                            <field name="comment" />
+                                            <field name="check"/>
+                                            <field name="budget" />
+                                        </tree>
+                                    </field>
+                                    <field name="operation_deps" colspan="4" nolabel="1" mode="tree">
+                                        <tree string="Операционные направления" editable="top">
+                                            <field name="department"/>
+                                            <field name="specialist"/>
+                                        </tree>
+                                    </field>
+                                    <field
+                                            name="access_ids"
+                                            nolabel="1"
+                                            colspan="4"
+                                            mode="tree"
+                                            >
+                                        <tree string="Доступы партнера" editable='top'>
+                                            <field name="type"/>
+                                            <field name="link"/>
+                                            <field name="login"/>
+                                            <field name="pswd"/>
+                                        </tree>
+                                    </field>
+                                    <separator string="Процессы" colspan="4"/>
+                                    <button type="action"
+                                        name="%(process_launch.window_process_launch_partner)d"
+                                        string="Создать процесс"
+                                        context="{'partner_id': id}"
+                                        icon="gtk-ok"/>
+                                    <field name="process_ids" nolabel="1" colspan="4" />
+                                </group>
+
+                            </page>
+                            <page string="Финансы">
+
+                                <group colspan="4">
+                                    <field colspan="4" mode="tree" name="bank_ids" nolabel="1" context="{'partner_id': id}"/>
+                                    <separator string="Счета" colspan="4"/>
+                                    <field colspan="4" mode="tree" name="invoice_ids" nolabel="1" context="{'partner_id': id}">
+                                        <tree string="Счета" colors="orange:state=='proforma';#00C322:state=='paid';gray:state=='cancel'">
+                                            <field name="reference" invisible="1"/>
+                                            <field name="name" invisible="1"/>
+                                            <field name="id" invisible="1"/>
+                                            <field name="check_f" invisible="1"/>
+
+                                            <field name="number"/>
+                                            <field name="date_invoice" string="Дата счета"/>
+                                            <field name="partner_id" string="Партнер"/>
+                                            <field name="full_name"/>
+                                            <field name="user_id" string="Автор"/>
+                                            <field name="currency_id"/>
+                                            <field name="a_total" sum=""/>
+                                            <field name="a_subtotal" sum=""/>
+                                            <field name="type_account"/>
+                                            <field name="notes"/>
+
+                                            <field name="state"/>
+                                            <button type="action"
+                                                    name="%(account_update.action_account_invoice_pay)d"
+                                                    string="Провести платеж"
+                                                    attrs="{'invisible': ['|', ('check_f', '=', False), ('state', 'in', ('paid', 'draft'))]}"
+                                                    icon="gtk-ok"/>
+                                            <field name="paid_date"/>
+                                            <field name="close_doc_create"/>
+                                            <field name="state_document"/>
+                                        </tree>
+                                        <form string="Счет">
+                                            <group colspan="4">
+                                                <field name="check_a"/>
+                                                <field name="check_f"/>
+                                                <field name="check_r"/>
+                                                <field name="id" invisible="1"/>
+                                            </group>
+                                            <group colspan="4" col="8">
+
+                                                <field name="user_id" string="Автор" attrs="{'readonly': [('check_r', '=', False)]}"/>
+                                                <field name="date_invoice" on_change="onchange_currency(date_invoice, currency_id)"/>
+                                                <field name="number" attrs="{'readonly': [('check_a', '=', False), ('check_f', '=', False)]}"/>
+                                                <field name="type_account"/>
+                                                <newline/>
+                                                <field string="Партнер" name="partner_id" on_change="onchange_bank(partner_id, lead_id)"
+                                                       options='{"quick_create": false}' attrs="{'readonly': [('lead_id', '!=', False)]}"/>
+                                                <field name="lead_id" on_change="onchange_bank(partner_id, lead_id)"
+                                                       attrs="{'readonly': [('partner_id', '!=', False)]}" invisible="True"/>
+                                                <field name="full_name" readonly="True"/>
+                                                <field name="plan_paid_date" />
+                                                <field name="paid_type" />
+                                                <newline/>
+                                                <field name="bank_id" required="1" on_change="change_bank(bank_id)"/>
+                                                <field name="currency_id" width="50"
+                                                       on_change="onchange_currency(date_invoice, currency_id)"/>
+                                                <field name="rate" width="50"/>
+                                                <newline/>
+                                                <field name="account_id" string="Фирма" widget="selection" required="1" on_change="onchange_account(account_id)"/>
+                                                <field name="tax" invisible="1"/>
+                                                <field name="reconciled" invisible="1"/>
+                                            </group>
+                                            <notebook colspan="4">
+                                                <page string="Счет">
+                                                    <field colspan="4" name="invoice_line" nolabel="1" widget="one2many_list"
+                                                           context="{'type': type, 'account_id': account_id, 'description': number}" />
+
+                                                    <group col="6" colspan="2">
+                                                        <field name="untaxed"/>
+                                                        <field name="a_tax"/>
+                                                        <field name="a_total"/>
+                                                    </group>
+                                                    <group col="4" colspan="2">
+                                                        <field name="state" widget="statusbar" statusbar_visible="draft,open,paid"
+                                                               statusbar_colors='{"proforma":"blue","cancel":"red"}'/>
+                                                        <group col="8" colspan="4" groups="base.group_user">
+
+                                                            <!-- cancel -> draft -->
+                                                            <button name="draft"
+                                                                    icon="gtk-go-back"
+                                                                    string="В черновик"
+                                                                    colspan="1"
+                                                                    attrs="{'invisible': [
+                                                                        '|', ('state', '!=', 'cancel'), ('check_a', '=', False)
+                                                                    ]}"
+                                                                    />
+
+                                                            <!-- draft -> cancel -->
+                                                            <button name="cancel"
+                                                                    icon="gtk-cancel"
+                                                                    string="Отмена"
+                                                                    colspan="1"
+                                                                    attrs="{'invisible': [
+                                                                        '|', ('state', '!=', 'draft'), ('check_a', '=', False)
+                                                                    ]}"
+                                                                    />
+
+                                                            <!-- draft -> open -->
+                                                            <button name="invoice_open"
+                                                                    icon="gtk-go-forward"
+                                                                    string="Выставить счет"
+                                                                    colspan="1"
+                                                                    attrs="{'invisible': [
+                                                                        '|', ('state', '!=', 'draft'), ('check_a', '=', False)
+                                                                    ]}"
+                                                                    />
+
+                                                            <!-- open -> proforma -->
+                                                            <button name="invoice_proforma"
+                                                                    icon="gtk-go-forward"
+                                                                    string="Частично оплачен"
+                                                                    colspan="1"
+                                                                    attrs="{'invisible': [
+                                                                        '|', ('state', '!=', 'open'), ('check_f', '=', False)
+                                                                    ]}"
+                                                                    />
+
+                                                            <!-- open, proforma -> paid -->
+                                                            <button name="invoice_paid"
+                                                                    icon="gtk-ok"
+                                                                    string="Оплачен полностью"
+                                                                    colspan="1"
+                                                                    attrs="{'invisible': [
+                                                                        '|', ('state', 'not in', ('proforma', 'open')), ('check_f', '=', False)
+                                                                    ]}"
+                                                                    />
+                                                            <newline/>
+                                                            <!-- attrs="{'invisible': [('lang', '=', 'ru')]}"  -->
+                                                            <button name="%(account_update.account_update_payment_ru)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Распечатать счет на оплату" type="action" icon="gtk-print" context="{'print': 'yes'}"/>
+
+                                                            <button name="%(account_update.account_update_payment_ua)d" attrs="{'invisible': [('lang', '!=', 'ua')]}" string="Распечатать счет на оплату" type="action" icon="gtk-print"/>
+                                                            <button name="%(account_update.account_update_post_pdf)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Распечатать конверт" type="action" icon="gtk-print"/>
+                                                        </group>
+                                                    </group>
+                                                    <separator string="Комментарий" colspan="4"/>
+                                                    <field name="notes" colspan="4" nolabel="1"/>
+                                                </page>
+                                                <page string="Платеж">
+                                                    <button type="action"
+                                                            name="%(account_update.action_account_invoice_pay)d"
+                                                            string="Провести платеж"
+                                                            context="{'invoice_id': id, 'type_account': type_account}"
+                                                            attrs="{'invisible': [('check_f', '=', False)]}"
+                                                            icon="gtk-ok"/>
+                                                    <field colspan="4" name="pay_ids" nolabel="1" widget="one2many_list" readonly="1">
+                                                        <tree string="Платежи">
+                                                            <field name="id"/>
+                                                            <field name="date_pay"/>
+                                                            <field name="total"/>
+                                                        </tree>
+                                                    </field>
+                                                </page>
+                                                <page string="Закрывающие документы">
+                                                    <group col="10" colspan="4">
+                                                        <field name="lang" invisible="1" />
+                                                        <button type="action"
+                                                            name="%(account_update.action_account_invoice_document)d"
+                                                            string="Сформировать закрывающий документ"
+                                                            context="{'invoice_id': id, 'name': 'completion_ru'}"
+                                                            attrs="{'invisible': [('check_f', '=', False)]}"
+                                                            icon="gtk-ok"
+                                                            />
+                                                    </group>
+
+                                                    <field name="document_ids" nolabel="1" colspan="4" attrs="{'readonly': [('check_f', '=', False)]}">
+                                                        <tree string="Закрывающие документы">
+                                                            <!--field name="name"/-->
+                                                            <field name="lang" invisible="1"/>
+                                                            <field name="document_date"/>
+                                                            <field name="document_cash"/>
+                                                            <!-- attrs="{'invisible': [('name', '!=', 'completion_ru')]}"
+                                                            attrs="{'invisible': [('name', '!=', 'completion_ua')]}"
+                                                            attrs="{'invisible': [('name', '!=', 'payment_ru')]}" -->
+                                                            <button name="%(account_update.account_update_completion_ru)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Акт выполненных работ" type="action" icon="gtk-print"/>
+                                                            <button name="%(account_update.account_update_completion_ua)d" attrs="{'invisible': [('lang', '!=', 'ua')]}" string="Акт выполненных работ" type="action" icon="gtk-print"/>
+                                                            <button name="%(account_update.account_update_invoice)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Счет-фактура" type="action" icon="gtk-print"/>
+                                                        </tree>
+                                                        <form  string="Закрывающие документы">
+                                                            <field name="invoice_id" invisible="1" />
+                                                            <field name="name" invisible="1" />
+                                                            <field name="document_date"/>
+                                                            <field name="document_cash"/>
+                                                            <field name="document_line_id" nolabel="1" colspan="4"  widget="one2many_list">
+                                                                <tree string="Платеж" editable="top">
+                                                                    <field name="service_id" readonly="1"/>
+                                                                    <field name="name" sum="Сумма платежа"/>
+                                                                </tree>
+                                                            </field>
+                                                        </form>
+                                                    </field>
+                                                    <button name="%(account_update.account_update_payment_ru)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Распечатать счет на оплату (без печати)" type="action" icon="gtk-print" context="{'print': 'no'}"/>
+
+                                                    <button name="%(account_update.account_update_payment_ua)d" attrs="{'invisible': [('lang', '!=', 'ua')]}" string="Распечатать счет на оплату (без печати)" type="action" icon="gtk-print" context="{'print': 'no'}"/>
+                                                    <button name="%(account_update.ir_actions_report_xml_all_list)d" string="Распечатать все документы в Excel"  attrs="{'invisible': ['|', ('lang', '!=', 'ru'), ('check_f', '=', False)]}" type="action" icon="gtk-print" />
+                                                </page>
+                                                <page string="История">
+                                                    <separator string="История переходов" colspan="4"/>
+                                                    <field name="history_ids" nolabel="1" colspan="4" readonly="1">
+                                                        <tree>
+                                                            <field name="state"/>
+                                                            <field name="create_uid"/>
+                                                            <field name="create_date"/>
+                                                        </tree>
+                                                    </field>
+                                                </page>
+                                            </notebook>
+                                        </form>
+                                    </field>
+                                    <separator string="ЗДС" colspan="4"/>
+                                    <field colspan="4" mode="tree" name="zds_ids" nolabel="1" context="{'partner_id': id}">
+                                        <tree string="ЗДС" colors="orange:state=='confirm';green:state=='close';gray:state=='cancel';red:state=='proforma2'">
+                                            <field name="id" string="№ ЗДС"/>
+                                            <field name="division_id"/>
+                                            <field name="categ_id"/>
+                                            <field name="card_id"/>
+                                            <field name="cash_mr" string="Сумма ЗДС" sum="Сумма ЗДС"/>
+                                            <field name="currency_id"/>
+                                            <field name="payment_details" width="100"/>
+                                            <field name="date_invoice" string="Дата выставления ЗДС"/>
+                                            <field name="date_mr"/>
+                                            <field name="companies_distribution" string="Up/INK"/>
+                                            <field name="user_id" string="Автор"/>
+                                            <field name="state"/>
+                                        </tree>
+                                        <form string="ЗДС">
+                                            <group colspan="4">
+                                                <field name="check_a"/>
+                                                <field name="check_f"/>
+                                                <field name="check_p"/>
+                                                <field name="id" invisible="1"/>
+                                            </group>
+                                            <group colspan="4" col="6">
+                                                <group colspan="2" col="2">
+                                                    <field name="id" string="№ ЗДС" />
+                                                    <field name="user_id" string="Автор" readonly="1"/>
+                                                    <field name="division_id" string="Направление" required="1" widget="selection" on_change="change_division(division_id)"/>
+                                                    <field name="type_getter" required="1" on_change="change_getter(type_getter)"/>
+                                                    <field name="lead_id" invisible="True"/>
+                                                    <field name="get_division" invisible="True" />
+                                                    <field name="partner_id" string="Партнер"
+                                                       attrs="{
+                                                       'invisible': [('type_getter', '=', 'employee')],
+                                                       'required': [('type_getter', '!=', 'employee'), ('division', '=', False)],
+                                                       'readonly': [('division', '=', True)]}"/>
+                                                    <field name='division'  attrs="{'invisible': ['|', ('type_getter', '=', 'employee'), ('get_division', '=', False)], 'required': [('type_getter', '!=', 'employee'), ('partner_id', '=', False)]}"/>
+                                                    <field name="employee_id"
+                                                       attrs="{'invisible': [('type_getter', '!=', 'employee')], 'required': [('type_getter', '=', 'employee')]}"/>
+                                                    <field name="categ_id" required="1" widget="selection"/>
+                                                    <field name="payment_details" required="1"/>
+                                                </group>
+                                                <group colspan="2" col="2">
+                                                    <field name="date_invoice" string="Дата выставления ЗДС" required="True"/>
+                                                    <field name="date_mr" attrs="{'readonly': [('check_f', '=', False)]}"/>
+                                                    <field name="type_account" required="1" on_change="change_type(type_account)"/>
+                                                    <field name="card_id" required="1" domain="[('type_account', '=', type_account)]"
+                                                       on_change="change_card(card_id)"/>
+                                                    <field name="companies_distribution" required="True"/>
+                                                </group>
+                                                <group colspan="2" col="2">
+                                                    <field name="total_mr" required="1" on_change="change_cash(total_mr, change_mr, overrun_mr)"/>
+                                                    <field name="currency_id" readonly="1"/>
+                                                    <field name="change_mr" on_change="change_cash(total_mr, change_mr, overrun_mr)"/>
+                                                    <field name="overrun_mr" on_change="change_cash(total_mr, change_mr, overrun_mr)" attrs="{'readonly': [('check_f', '=', False)]}"/>
+                                                    <field name="commission_mr" attrs="{'readonly': [('check_f', '=', False)]}"/>
+                                                    <field name="cash_mr" attrs="{'readonly': [('check_f', '=', False)]}"/>
+                                                </group>
+                                            </group>
+                                            <group col="4" colspan="4">
+                                                <field name="attachment_ids" nolabel="1" colspan="4" widget="one2many_list">
+                                                    <tree string="Вложения" colors="blue:type in ('url',)">
+                                                        <field name="datas_fname"/>
+                                                        <field name="create_date"/>
+                                                        <field name="user_id"/>
+                                                        <field name="type" groups="base.group_extended"/>
+                                                    </tree>
+                                                </field>
+                                                <separator string="Комментарий" colspan="4"/>
+                                                <field name="comment" colspan="4" nolabel="1"/>
+                                                <field name="state" widget="statusbar" statusbar_visible="draft,confirm,proforma2,close"
+                                                       statusbar_colors='{"proforma2":"blue","cancel":"red"}'/>
+                                                <group col="8" colspan="4" groups="base.group_user">
+                                                    <!-- cancel -> draft -->
+                                                    <button name="draft"
+                                                            icon="gtk-go-back"
+                                                            string="В черновик"
+                                                            colspan="1"
+                                                            attrs="{'invisible': [
+                                                                '|', ('state', '!=', 'cancel'), ('check_a', '=', False)
+                                                            ]}"
+                                                            />
+                                                    <!-- draft -> cancel -->
+                                                    <button name="cancel"
+                                                            icon="gtk-cancel"
+                                                            string="Отмена"
+                                                            colspan="1"
+                                                            attrs="{'invisible': ['&amp;',
+                                                                '|', ('state', '!=', 'draft'), ('check_a', '=', False),
+                                                                '|', ('state', '!=', 'confirm'), '&amp;', ('check_p', '=', False), ('check_f', '=', False)
+                                                            ]}"
+                                                            />
+
+                                                    <!-- draft -> confirm -->
+                                                    <button name="out_confirm"
+                                                            icon="gtk-go-forward"
+                                                            string="На утверждение"
+                                                            colspan="1"
+                                                            attrs="{'invisible': [
+                                                                        '|', ('state', '!=', 'draft'), ('check_a', '=', False)
+                                                                    ]}"
+                                                            />
+
+                                                    <!-- confirm -> proforma2 -->
+                                                    <button name="out_proforma"
+                                                            icon="gtk-go-forward"
+                                                            string="Проведение оплаты"
+                                                            colspan="1"
+                                                            attrs="{'invisible': [
+                                                                        '|', ('state', '!=', 'confirm'), '&amp;', ('check_p', '=', False), ('check_f', '=', False)
+                                                                    ]}"
+                                                            />
+
+                                                    <!-- proforma2 -> close -->
+                                                    <button name="out_close"
+                                                            icon="gtk-ok"
+                                                            string="Закрытие ЗДС"
+                                                            colspan="1"
+                                                            attrs="{'invisible': [
+                                                                        '|', ('state', '!=', 'proforma2'), ('check_f', '=', False)
+                                                                    ]}"
+                                                            />
+                                                </group>
+                                                <separator string="История переходов" colspan="4"/>
+                                                <field name="history_ids" nolabel="1" colspan="4" readonly="1">
+                                                    <tree>
+                                                        <field name="state"/>
+                                                        <field name="create_uid"/>
+                                                        <field name="create_date"/>
+                                                    </tree>
+                                                </field>
+                                            </group>
+                                        </form>
+                                    </field>
+                                </group>
+                                <group colspan="4" col="4">
+                                    <separator string="Финансовые договоренности" colspan="4"/>
+                                    <group colspan="2" col="2">
+                                        <field name="bonus_amount"/>
+                                        <field name="bonus_reason"/>
+                                        <field name="bonus_friend"/>
+                                        <field name="budget"/>
+                                    </group>
+                                    <group colspan="2" col="2">
+                                        <field name="section_id"/>
+                                        <field name="main_partner"/>
+                                        <field name="fin_dog" />
+                                    </group>
+                                    <group colspan="2" col="2">
+                                        <separator string="Отказ" colspan="2"/>
+                                        <field name="refusion_reason"/>
+                                        <separator string="Описание ситуации" colspan="2"/>
+                                        <field name="refusion_description" nolabel="1" colspan="2"/>
+                                    </group>
+
+                                </group>
+                            </page>
+                            <page string="Журнал">
+                                <button name="add_note" string="Добавить заметку" type="object" default_focus="1" icon="terp-document-new"  colspan="4" context="{'type': 'message'}"/>
+                                <field name="note_ids" colspan="4" nolabel="1" readonly="1">
+                                    <tree string="История переписки">
+                                        <field name="create_date"/>
+                                        <field name="name"/>
+                                        <field name="create_uid"/>
+                                    </tree>
+                                </field>
+                                <field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">
+                                    <tree string="Звонки" >
+                                        <field name="date"/>
+                                        <field name="name" string="Отчет звонка"/>
+                                        <field name="partner_phone"/>
+                                        <field name="time_of_coll"/>
+                                        <field name="duration"/>
+                                        <field name="user_id"/>
+                                        <field name="id_sphone"/>
+                                        <field name="categ_id" string="Тип звонка"/>
+                                        <field name="id_ast_coll"/>
+                                    </tree>
+                                </field>
+
+                                <group col="4" colspan="4">
+                                    <separator string="История переприсвоений" colspan="4"/>
+                                    <field name="transfer_ids" nolabel="1" colspan="4" readonly="1">
+                                        <tree>
+                                            <field name="name"/>
+                                            <field name="create_uid" />
+                                            <field name="create_date" />
+                                        </tree>
+                                    </field>
+                                    <separator string="История смены статусов" colspan="4"/>
+                                    <field name="status_history_ids" nolabel="1" colspan="4" readonly="1">
+                                        <tree>
+                                            <field name="name"/>
+                                            <field name="create_uid" />
+                                            <field name="create_date" />
+                                        </tree>
+                                    </field>
+                                </group>
+                            </page>
+                            <page string="Значимость критериев">
+                                <field name="terms_of_service" colspan="4"/>
+                                <field name="conformity" colspan="4"/>
+                                <field name="quality_feedback" colspan="4"/>
+                                <field name="completeness_of_reporting" colspan="4"/>
+                                <button name="add_note" string="Добавить заметку" type="object" icon="terp-document-new" colspan="4" context="{'type': 'skk'}"/>
+                                <field name="skk_note_ids" colspan="4" nolabel="1" readonly="1">
+                                    <tree string="Заметки СКК">
+                                        <field name="create_date"/>
+                                        <field name="name"/>
+                                        <field name="create_uid"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Вложения">
+                                <field name="attachment_ids" nolabel="1" colspan="4" widget="one2many_list">
+                                    <tree string="Вложения" colors="blue:type in ('url',)">
+                                        <field name="datas_fname"/>
+                                        <field name="create_date"/>
+                                        <field name="user_id"/>
+                                        <field name="type" groups="base.group_extended"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_partner_calendar_upsale">
+            <field name="name">Партнеры UpSale</field>
+            <field name="model">res.partner</field>
+            <field name="type">calendar</field>
+            <field name="priority" eval="4"/>
+            <field name="arch" type="xml">
+                <calendar date_start="next_call" mode="week" color="user_id">
+                    <field name="name"/>
+                </calendar>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_partners_upsale">
+            <field name="name">Партнеры UpSale</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,calendar</field>
+            <field name="domain">[('lead', '=', False), ('customer', '=', True), ('section_id', 'in', (6, 7, 8, 9))]</field>
+            <field name="view_id" ref="view_partner_tree_upsale"/>
+            <field name="search_view_id" ref="view_res_partner_filter_upsale"/>
+            <field name="context">{'default_partner_type': 'upsale', 'default_lead': False}</field>
+        </record>
+        <record model="ir.actions.act_window" id="act_partners_upsale_aster">
+            <field name="name">Партнеры UpSale Asterisk</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="domain">[]</field>
+            <field name="view_id" ref="view_partner_form_upsale"/>
+            <field name="search_view_id" ref="base.view_res_partner_filter"/>
+            <field name="context">{'default_partner_type': 'upsale'}</field>
+        </record>
+
+
+        <record model="ir.actions.act_window.view" id="action_partners_form_upsale">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_partner_tree_upsale"/>
+            <field name="act_window_id" ref="act_partners_upsale"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_partners_tree_upsale">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_partner_form_upsale"/>
+            <field name="act_window_id" ref="act_partners_upsale"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_partners_calendar_upsale">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">calendar</field>
+            <field name="view_id" ref="view_partner_calendar_upsale"/>
+            <field name="act_window_id" ref="act_partners_upsale"/>
+        </record>
+
+        <menuitem
+                action="act_partners_upsale"
+                id="menu_partner_form_upsale"
+                parent="base.menu_address_book"
+                sequence="2"/>
+
+        <!-- Кандидаты UpSale -->
+        <record model="ir.ui.view" id="view_lead_upsale_form">
+            <field name="name">Кандидаты Upsale</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group col="4" colspan="4">
+                        <field name="section_id" invisible="1"/>
+                        <field name="check" invisible="1"/>
+                        <field name="id" invisible="1"/>
+                        <group colspan="4" col="8">
+                            <field name="name" string="Кандидат (основной сайт)"/>
+
+                            <field name="next_call"/>
+                            <field name="next_call_comment"/>
+
+                            <field name="user_id"/>
+                            <field name="priority"/>
+
+                            <field name="categ_id" string="Тематика" />
+                            <field name="stage_id"/>
+                            <field name="source"/>
+
+                            <field name="partner_base"/>
+                            <field name="refusion_description" widget="char" attrs="{'invisible': [('stage_id', '!=', 41)]}"/>
+
+                            <field name="partner_type" invisible="1"/>
+                            <field name="lead" invisible="1" />
+                            <newline />
+                            <field name="ur_name" colspan="8"/>
+                            <button name="to_partner" type="object" string="Создать партнера" icon="gtk-ok" />
+                            <newline />
+                            <field name="active" attrs="{'invisible': [('check', '=', False)]}" />
+                        </group>
+                        <notebook colspan="4">
+                            <page string="Контакты">
+                                <field colspan="4" mode="tree" name="address" nolabel="1" context="{'site_ids': name}"/>
+                                <separator string="Дополнительная информация о контактном лице" colspan="4"/>
+                                <field name="description" nolabel="1" colspan="4"/>
+                            </page>
+                            <page string="Услуги">
+                                <group colspan="4" col="4">
+                                    <field name="added_services_ids" colspan="4" nolabel="1" mode="tree" context="{'partner_base': partner_base}">
+                                        <tree string="Услуги" editable="top">
+                                            <field name='partner_base' invisible="1"/>
+                                            <field name="service_id" required="1"/>
+                                            <field name="comment"/>
+                                            <field name="check"/>
+                                            <field name="budget" attrs="{'required': [('partner_base', '=', 'hot')]}"/>
+                                        </tree>
+                                    </field>
+                                    <field
+                                            name="access_ids"
+                                            nolabel="1"
+                                            colspan="4"
+                                            mode="tree"
+                                            >
+                                        <tree string="Доступы партнера" editable='top'>
+                                            <field name="type"/>
+                                            <field name="link"/>
+                                            <field name="login"/>
+                                            <field name="pswd"/>
+                                        </tree>
+                                    </field>
+                                    <separator string="Процессы" colspan="4"/>
+                                    <button type="action"
+                                        name="%(process_launch.window_process_launch_partner)d"
+                                        string="Создать процесс"
+                                        context="{'partner_id': id}"
+                                        icon="gtk-ok"/>
+                                    <field name="process_ids" nolabel="1" colspan="4" />
+                                </group>
+
+                            </page>
+                            <page string="Финансы">
+                                <group colspan="4">
+                                    <field colspan="4" mode="tree" name="bank_ids" nolabel="1" context="{'partner_id': id}"/>
+                                </group>
+                                <group colspan="4">
+                                    <separator string="Счета" colspan="4"/>
+                                    <field colspan="4" mode="tree" name="invoice_ids" nolabel="1" context="{'partner_id': id}">
+                                        <tree string="Счета" colors="orange:state=='proforma';#00C322:state=='paid';gray:state=='cancel'">
+                                            <field name="reference" invisible="1"/>
+                                            <field name="name" invisible="1"/>
+                                            <field name="id" invisible="1"/>
+                                            <field name="check_f" invisible="1"/>
+
+                                            <field name="number"/>
+                                            <field name="date_invoice" string="Дата счета"/>
+                                            <field name="partner_id" string="Партнер"/>
+                                            <field name="full_name"/>
+                                            <field name="user_id" string="Автор"/>
+                                            <field name="currency_id"/>
+                                            <field name="a_total" sum=""/>
+                                            <field name="a_subtotal" sum=""/>
+                                            <field name="type_account"/>
+                                            <field name="notes"/>
+
+                                            <field name="state"/>
+                                            <button type="action"
+                                                    name="%(account_update.action_account_invoice_pay)d"
+                                                    string="Провести платеж"
+                                                    attrs="{'invisible': ['|', ('check_f', '=', False), ('state', 'in', ('paid', 'draft'))]}"
+                                                    icon="gtk-ok"/>
+                                            <field name="paid_date"/>
+                                            <field name="close_doc_create"/>
+                                            <field name="state_document"/>
+                                        </tree>
+                                        <form string="Счет">
+                                            <group colspan="4">
+                                                <field name="check_a"/>
+                                                <field name="check_f"/>
+                                                <field name="check_r"/>
+                                                <field name="id" invisible="1"/>
+                                            </group>
+                                            <group colspan="4" col="8">
+
+                                                <field name="user_id" string="Автор" attrs="{'readonly': [('check_r', '=', False)]}"/>
+                                                <field name="date_invoice" on_change="onchange_currency(date_invoice, currency_id)"/>
+                                                <field name="number" attrs="{'readonly': [('check_a', '=', False), ('check_f', '=', False)]}"/>
+                                                <field name="type_account"/>
+                                                <newline/>
+                                                <field string="Партнер" name="partner_id" on_change="onchange_bank(partner_id, lead_id)"
+                                                       options='{"quick_create": false}' attrs="{'readonly': [('lead_id', '!=', False)]}"/>
+                                                <field name="lead_id" on_change="onchange_bank(partner_id, lead_id)"
+                                                       attrs="{'readonly': [('partner_id', '!=', False)]}" invisible="True"/>
+                                                <field name="full_name" readonly="True"/>
+                                                <field name="plan_paid_date" />
+                                                <field name="paid_type" />
+                                                <newline/>
+                                                <field name="bank_id" required="1" on_change="change_bank(bank_id)"/>
+                                                <field name="currency_id" width="50"
+                                                       on_change="onchange_currency(date_invoice, currency_id)"/>
+                                                <field name="rate" width="50"/>
+                                                <newline/>
+                                                <field name="account_id" string="Фирма" widget="selection" required="1" on_change="onchange_account(account_id)"/>
+                                                <field name="tax" invisible="1"/>
+                                                <field name="reconciled" invisible="1"/>
+                                            </group>
+                                            <notebook colspan="4">
+                                                <page string="Счет">
+                                                    <field colspan="4" name="invoice_line" nolabel="1" widget="one2many_list"
+                                                           context="{'type': type, 'account_id': account_id, 'description': number}" />
+
+                                                    <group col="6" colspan="2">
+                                                        <field name="untaxed"/>
+                                                        <field name="a_tax"/>
+                                                        <field name="a_total"/>
+                                                    </group>
+                                                    <group col="4" colspan="2">
+                                                        <field name="state" widget="statusbar" statusbar_visible="draft,open,paid"
+                                                               statusbar_colors='{"proforma":"blue","cancel":"red"}'/>
+                                                        <group col="8" colspan="4" groups="base.group_user">
+
+                                                            <!-- cancel -> draft -->
+                                                            <button name="draft"
+                                                                    icon="gtk-go-back"
+                                                                    string="В черновик"
+                                                                    colspan="1"
+                                                                    attrs="{'invisible': [
+                                                                        '|', ('state', '!=', 'cancel'), ('check_a', '=', False)
+                                                                    ]}"
+                                                                    />
+
+                                                            <!-- draft -> cancel -->
+                                                            <button name="cancel"
+                                                                    icon="gtk-cancel"
+                                                                    string="Отмена"
+                                                                    colspan="1"
+                                                                    attrs="{'invisible': [
+                                                                        '|', ('state', '!=', 'draft'), ('check_a', '=', False)
+                                                                    ]}"
+                                                                    />
+
+                                                            <!-- draft -> open -->
+                                                            <button name="invoice_open"
+                                                                    icon="gtk-go-forward"
+                                                                    string="Выставить счет"
+                                                                    colspan="1"
+                                                                    attrs="{'invisible': [
+                                                                        '|', ('state', '!=', 'draft'), ('check_a', '=', False)
+                                                                    ]}"
+                                                                    />
+
+                                                            <!-- open -> proforma -->
+                                                            <button name="invoice_proforma"
+                                                                    icon="gtk-go-forward"
+                                                                    string="Частично оплачен"
+                                                                    colspan="1"
+                                                                    attrs="{'invisible': [
+                                                                        '|', ('state', '!=', 'open'), ('check_f', '=', False)
+                                                                    ]}"
+                                                                    />
+
+                                                            <!-- open, proforma -> paid -->
+                                                            <button name="invoice_paid"
+                                                                    icon="gtk-ok"
+                                                                    string="Оплачен полностью"
+                                                                    colspan="1"
+                                                                    attrs="{'invisible': [
+                                                                        '|', ('state', 'not in', ('proforma', 'open')), ('check_f', '=', False)
+                                                                    ]}"
+                                                                    />
+                                                            <newline/>
+                                                            <!-- attrs="{'invisible': [('lang', '=', 'ru')]}"  -->
+                                                            <button name="%(account_update.account_update_payment_ru)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Распечатать счет на оплату" type="action" icon="gtk-print" context="{'print': 'yes'}"/>
+
+                                                            <button name="%(account_update.account_update_payment_ua)d" attrs="{'invisible': [('lang', '!=', 'ua')]}" string="Распечатать счет на оплату" type="action" icon="gtk-print"/>
+                                                            <button name="%(account_update.account_update_post_pdf)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Распечатать конверт" type="action" icon="gtk-print"/>
+                                                        </group>
+                                                    </group>
+                                                    <separator string="Комментарий" colspan="4"/>
+                                                    <field name="notes" colspan="4" nolabel="1"/>
+                                                </page>
+                                                <page string="Платеж">
+                                                    <button type="action"
+                                                            name="%(account_update.action_account_invoice_pay)d"
+                                                            string="Провести платеж"
+                                                            context="{'invoice_id': id, 'type_account': type_account}"
+                                                            attrs="{'invisible': [('check_f', '=', False)]}"
+                                                            icon="gtk-ok"/>
+                                                    <field colspan="4" name="pay_ids" nolabel="1" widget="one2many_list" readonly="1">
+                                                        <tree string="Платежи">
+                                                            <field name="id"/>
+                                                            <field name="date_pay"/>
+                                                            <field name="total"/>
+                                                        </tree>
+                                                    </field>
+                                                </page>
+                                                <page string="Закрывающие документы">
+                                                    <group col="10" colspan="4">
+                                                        <field name="lang" invisible="1" />
+                                                        <button type="action"
+                                                            name="%(account_update.action_account_invoice_document)d"
+                                                            string="Сформировать закрывающий документ"
+                                                            context="{'invoice_id': id, 'name': 'completion_ru'}"
+                                                            attrs="{'invisible': [('check_f', '=', False)]}"
+                                                            icon="gtk-ok"
+                                                            />
+                                                    </group>
+
+                                                    <field name="document_ids" nolabel="1" colspan="4" attrs="{'readonly': [('check_f', '=', False)]}">
+                                                        <tree string="Закрывающие документы">
+                                                            <!--field name="name"/-->
+                                                            <field name="lang" invisible="1"/>
+                                                            <field name="document_date"/>
+                                                            <field name="document_cash"/>
+                                                            <!-- attrs="{'invisible': [('name', '!=', 'completion_ru')]}"
+                                                            attrs="{'invisible': [('name', '!=', 'completion_ua')]}"
+                                                            attrs="{'invisible': [('name', '!=', 'payment_ru')]}" -->
+                                                            <button name="%(account_update.account_update_completion_ru)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Акт выполненных работ" type="action" icon="gtk-print"/>
+                                                            <button name="%(account_update.account_update_completion_ua)d" attrs="{'invisible': [('lang', '!=', 'ua')]}" string="Акт выполненных работ" type="action" icon="gtk-print"/>
+                                                            <button name="%(account_update.account_update_invoice)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Счет-фактура" type="action" icon="gtk-print"/>
+                                                        </tree>
+                                                        <form  string="Закрывающие документы">
+                                                            <field name="invoice_id" invisible="1" />
+                                                            <field name="name" invisible="1" />
+                                                            <field name="document_date"/>
+                                                            <field name="document_cash"/>
+                                                            <field name="document_line_id" nolabel="1" colspan="4"  widget="one2many_list">
+                                                                <tree string="Платеж" editable="top">
+                                                                    <field name="service_id" readonly="1"/>
+                                                                    <field name="name" sum="Сумма платежа"/>
+                                                                </tree>
+                                                            </field>
+                                                        </form>
+                                                    </field>
+                                                    <button name="%(account_update.account_update_payment_ru)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Распечатать счет на оплату (без печати)" type="action" icon="gtk-print" context="{'print': 'no'}"/>
+
+                                                    <button name="%(account_update.account_update_payment_ua)d" attrs="{'invisible': [('lang', '!=', 'ua')]}" string="Распечатать счет на оплату (без печати)" type="action" icon="gtk-print" context="{'print': 'no'}"/>
+                                                    <button name="%(account_update.ir_actions_report_xml_all_list)d" string="Распечатать все документы в Excel"  attrs="{'invisible': ['|', ('lang', '!=', 'ru'), ('check_f', '=', False)]}" type="action" icon="gtk-print" />
+                                                </page>
+                                                <page string="История">
+                                                    <separator string="История переходов" colspan="4"/>
+                                                    <field name="history_ids" nolabel="1" colspan="4" readonly="1">
+                                                        <tree>
+                                                            <field name="state"/>
+                                                            <field name="create_uid"/>
+                                                            <field name="create_date"/>
+                                                        </tree>
+                                                    </field>
+                                                </page>
+                                            </notebook>
+                                        </form>
+                                    </field>
+                                    <separator string="ЗДС" colspan="4"/>
+                                    <field colspan="4" mode="tree" name="zds_ids" nolabel="1" context="{'partner_id': id}">
+                                        <tree string="ЗДС" colors="orange:state=='confirm';green:state=='close';gray:state=='cancel';red:state=='proforma2'">
+                                            <field name="id" string="№ ЗДС"/>
+                                            <field name="division_id"/>
+                                            <field name="categ_id"/>
+                                            <field name="card_id"/>
+                                            <field name="cash_mr" string="Сумма ЗДС" sum="Сумма ЗДС"/>
+                                            <field name="currency_id"/>
+                                            <field name="payment_details" width="100"/>
+                                            <field name="date_invoice" string="Дата выставления ЗДС"/>
+                                            <field name="date_mr"/>
+                                            <field name="companies_distribution" string="Up/INK"/>
+                                            <field name="user_id" string="Автор"/>
+                                            <field name="state"/>
+                                        </tree>
+                                        <form string="ЗДС">
+                                        <group colspan="4">
+                                            <field name="check_a"/>
+                                            <field name="check_f"/>
+                                            <field name="check_p"/>
+                                            <field name="id" invisible="1"/>
+                                        </group>
+                                        <group colspan="4" col="6">
+                                            <group colspan="2" col="2">
+                                                <field name="id" string="№ ЗДС" />
+                                                <field name="user_id" string="Автор" readonly="1"/>
+                                                <field name="division_id" string="Направление" required="1" widget="selection" on_change="change_division(division_id)"/>
+                                                <field name="type_getter" required="1" on_change="change_getter(type_getter)"/>
+                                                <field name="lead_id" invisible="True"/>
+                                                <field name="get_division" invisible="True" />
+                                                <field name="partner_id" string="Партнер"
+                                                   attrs="{
+                                                   'invisible': [('type_getter', '=', 'employee')],
+                                                   'required': [('type_getter', '!=', 'employee'), ('division', '=', False)],
+                                                   'readonly': [('division', '=', True)]}"/>
+                                                <field name='division'  attrs="{'invisible': ['|', ('type_getter', '=', 'employee'), ('get_division', '=', False)], 'required': [('type_getter', '!=', 'employee'), ('partner_id', '=', False)]}"/>
+                                                <field name="employee_id"
+                                                   attrs="{'invisible': [('type_getter', '!=', 'employee')], 'required': [('type_getter', '=', 'employee')]}"/>
+                                                <field name="categ_id" required="1" widget="selection"/>
+                                                <field name="payment_details" required="1"/>
+                                            </group>
+                                            <group colspan="2" col="2">
+                                                <field name="date_invoice" string="Дата выставления ЗДС" required="True"/>
+                                                <field name="date_mr" attrs="{'readonly': [('check_f', '=', False)]}"/>
+                                                <field name="type_account" required="1" on_change="change_type(type_account)"/>
+                                                <field name="card_id" required="1" domain="[('type_account', '=', type_account)]"
+                                                   on_change="change_card(card_id)"/>
+                                                <field name="companies_distribution" required="True"/>
+                                            </group>
+                                            <group colspan="2" col="2">
+                                                <field name="total_mr" required="1" on_change="change_cash(total_mr, change_mr, overrun_mr)"/>
+                                                <field name="currency_id" readonly="1"/>
+                                                <field name="change_mr" on_change="change_cash(total_mr, change_mr, overrun_mr)"/>
+                                                <field name="overrun_mr" on_change="change_cash(total_mr, change_mr, overrun_mr)" attrs="{'readonly': [('check_f', '=', False)]}"/>
+                                                <field name="commission_mr" attrs="{'readonly': [('check_f', '=', False)]}"/>
+                                                <field name="cash_mr" attrs="{'readonly': [('check_f', '=', False)]}"/>
+                                            </group>
+                                        </group>
+                                        <group col="4" colspan="4">
+                                            <field name="attachment_ids" nolabel="1" colspan="4" widget="one2many_list">
+                                                <tree string="Вложения" colors="blue:type in ('url',)">
+                                                    <field name="datas_fname"/>
+                                                    <field name="create_date"/>
+                                                    <field name="user_id"/>
+                                                    <field name="type" groups="base.group_extended"/>
+                                                </tree>
+                                            </field>
+                                            <separator string="Комментарий" colspan="4"/>
+                                            <field name="comment" colspan="4" nolabel="1"/>
+                                            <field name="state" widget="statusbar" statusbar_visible="draft,confirm,proforma2,close"
+                                                   statusbar_colors='{"proforma2":"blue","cancel":"red"}'/>
+                                            <group col="8" colspan="4" groups="base.group_user">
+                                                <!-- cancel -> draft -->
+                                                <button name="draft"
+                                                        icon="gtk-go-back"
+                                                        string="В черновик"
+                                                        colspan="1"
+                                                        attrs="{'invisible': [
+                                                            '|', ('state', '!=', 'cancel'), ('check_a', '=', False)
+                                                        ]}"
+                                                        />
+                                                <!-- draft -> cancel -->
+                                                <button name="cancel"
+                                                        icon="gtk-cancel"
+                                                        string="Отмена"
+                                                        colspan="1"
+                                                        attrs="{'invisible': ['&amp;',
+                                                            '|', ('state', '!=', 'draft'), ('check_a', '=', False),
+                                                            '|', ('state', '!=', 'confirm'), '&amp;', ('check_p', '=', False), ('check_f', '=', False)
+                                                        ]}"
+                                                        />
+
+                                                <!-- draft -> confirm -->
+                                                <button name="out_confirm"
+                                                        icon="gtk-go-forward"
+                                                        string="На утверждение"
+                                                        colspan="1"
+                                                        attrs="{'invisible': [
+                                                                    '|', ('state', '!=', 'draft'), ('check_a', '=', False)
+                                                                ]}"
+                                                        />
+
+                                                <!-- confirm -> proforma2 -->
+                                                <button name="out_proforma"
+                                                        icon="gtk-go-forward"
+                                                        string="Проведение оплаты"
+                                                        colspan="1"
+                                                        attrs="{'invisible': [
+                                                                    '|', ('state', '!=', 'confirm'), '&amp;', ('check_p', '=', False), ('check_f', '=', False)
+                                                                ]}"
+                                                        />
+
+                                                <!-- proforma2 -> close -->
+                                                <button name="out_close"
+                                                        icon="gtk-ok"
+                                                        string="Закрытие ЗДС"
+                                                        colspan="1"
+                                                        attrs="{'invisible': [
+                                                                    '|', ('state', '!=', 'proforma2'), ('check_f', '=', False)
+                                                                ]}"
+                                                        />
+                                            </group>
+                                            <separator string="История переходов" colspan="4"/>
+                                            <field name="history_ids" nolabel="1" colspan="4" readonly="1">
+                                                <tree>
+                                                    <field name="state"/>
+                                                    <field name="create_uid"/>
+                                                    <field name="create_date"/>
+                                                </tree>
+                                            </field>
+                                        </group>
+                                    </form>
+                                    </field>
+                                </group>
+                            </page>
+                            <page string="Журнал">
+                                <button name="add_note" string="Добавить заметку" type="object" default_focus="1" icon="terp-document-new"  colspan="4" context="{'button_point': True, 'type': 'message'}"/>
+                                <field name="note_ids" colspan="4" nolabel="1" readonly="1">
+                                    <tree string="История переписки">
+                                        <field name="create_date"/>
+                                        <field name="name"/>
+                                        <field name="create_uid"/>
+                                    </tree>
+                                </field>
+                                <field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">
+                                    <tree string="Phone Calls" >
+                                        <field name="date"/>
+                                        <field name="name" string="Отчет звонка"/>
+                                        <field name="partner_phone"/>
+                                        <field name="time_of_coll"/>
+                                        <field name="duration"/>
+                                        <field name="user_id"/>
+                                        <field name="id_sphone"/>
+                                        <field name="categ_id" string="Тип звонка"/>
+                                        <field name="id_ast_coll"/>
+                                    </tree>
+                                </field>
+
+                                <group col="4" colspan="4">
+                                    <separator string="История переприсвоений" colspan="4"/>
+                                    <field name="transfer_ids" nolabel="1" colspan="4" readonly="1">
+                                        <tree>
+                                            <field name="name"/>
+                                            <field name="create_uid" />
+                                            <field name="create_date" />
+                                        </tree>
+                                    </field>
+                                </group>
+                            </page>
+                            <page string="Значимость критериев">
+                                <field name="terms_of_service" colspan="4"/>
+                                <field name="conformity" colspan="4"/>
+                                <field name="quality_feedback" colspan="4"/>
+                                <field name="completeness_of_reporting" colspan="4"/>
+                                <button name="add_note" string="Добавить заметку" type="object" icon="terp-document-new" colspan="4" context="{'type': 'skk'}"/>
+                                <field name="skk_note_ids" colspan="4" nolabel="1" readonly="1">
+                                    <tree string="Заметки СКК">
+                                        <field name="create_date"/>
+                                        <field name="name"/>
+                                        <field name="create_uid"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Вложения">
+                                <field name="attachment_ids" nolabel="1" colspan="4" widget="one2many_list">
+                                    <tree string="Вложения" colors="blue:type in ('url',)">
+                                        <field name="datas_fname"/>
+                                        <field name="create_date"/>
+                                        <field name="user_id"/>
+                                        <field name="type" groups="base.group_extended"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_lead_upsale_tree">
+            <field name="name">Кандидаты Upsale</field>
+            <field name="model">res.partner</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Leads" colors="red:priority=='1';orange:priority=='2';green:priority=='3';violet:priority=='4';gray:priority=='5'">
+                    <field name="priority" invisible="1"/>
+                    <field name="name" string="Кандидат (основной сайт)"/>
+                    <field name="phone_default"/>
+                    <field name="next_call"/>
+                    <field name="stage_id"/>
+                    <field name="email_default"/>
+                    <field name="partner_name" />
+                    <field name="user_id"/>
+                    <field name="categ_id"/>
+                    <field name="create_date"/>
+                    <field name="service"/>
+                    <field name="last_comment" string="Комментарий"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_lead_upsale_filter">
+            <field name="name">Кандидаты Upsale</field>
+            <field name="model">res.partner</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <group col='10' colspan='4'>
+                        <filter icon="terp-go-today" string="Сегодня"
+                            domain="[('create_date','&lt;', time.strftime('%%Y-%%m-%%d 23:59:59')), ('create_date','&gt;=', time.strftime('%%Y-%%m-%%d 00:00:00'))]"
+                            help="Сегодняшние кандидаты"/>
+                        <filter icon="terp-go-week" string="7 дней"
+                            help="Кандидаты созданные за последнеи 7 дней"
+                            domain="[('create_date','&lt;', time.strftime('%%Y-%%m-%%d 23:59:59')), ('create_date','&gt;=',(datetime.date.today()-datetime.timedelta(days=7)).strftime('%%Y-%%m-%%d 00:00:00'))]"
+                            />
+                        <separator orientation="vertical"/>
+                        <filter icon="terp-folder-blue" string="Холодная БД"
+                            domain="[('partner_base','=', 'cold')]"
+                            help="Кандидаты по которым не создано ни одного брифа."/>
+                        <filter icon="terp-folder-orange" string="Теплая БД"
+                            help="Кандидаты по которым созданы брифы"
+                            domain="[('partner_base','=', 'hot')]"
+                            />
+                        <separator orientation="vertical"/>
+                        <field name="name" string="Кандидат (основной сайт)"/>
+                        <field name="ur_name"/>
+
+                        <field name="phone_s"/>
+                        <field name="site_s"/>
+                        <field name="email_s"/>
+
+                        <field name="user_id">
+                            <filter string="My Partners" icon="terp-personal+" domain="[('user_id','=',uid)]"/>
+                        </field>
+                    </group>
+                    <newline/>
+                    <group expand="0" string="Group By...">
+                        <filter string="Salesman" icon="terp-personal" domain="[]" context="{'group_by' : 'user_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_lead_upsale_calendar">
+            <field name="name">Партнеры UpSale</field>
+            <field name="model">res.partner</field>
+            <field name="type">calendar</field>
+            <field name="priority" eval="4"/>
+            <field name="arch" type="xml">
+                <calendar date_start="next_call" mode="week" color="user_id">
+                    <field name="name"/>
+                </calendar>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_lead_upsale1">
+            <field name="name">Кандидаты UpSale</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,calendar</field>
+            <field name="domain">[('lead', '=', True)]</field>
+            <field name="view_id" ref="view_lead_upsale_tree"/>
+            <field name="search_view_id" ref="view_lead_upsale_filter"/>
+            <field name="context">{'default_partner_type': 'upsale', 'default_lead': True, 'lead': True}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_lead_tree_upsale">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_lead_upsale_tree"/>
+            <field name="act_window_id" ref="act_lead_upsale1"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_lead_form_upsale1">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_lead_upsale_form"/>
+            <field name="act_window_id" ref="act_lead_upsale1"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_lead_calendar_upsale">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">calendar</field>
+            <field name="view_id" ref="view_lead_upsale_calendar"/>
+            <field name="act_window_id" ref="act_lead_upsale1"/>
+        </record>
+
+        <menuitem parent="base.menu_sales"
+                  name="Кандидаты UpSale"
+                  id="menu_res_act_leads_upsale"
+                  action="act_lead_upsale1" sequence="4"/>
+
+        <!-- Реквизиты -->
+        <record model="ir.ui.view" id="view_partner_bank_form">
+            <field name="name">res.partner.bank.form</field>
+            <field name="model">res.partner.bank</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Реквизиты партнера">
+                    <group colspan="4" col="4">
+                        <field name="type" required="1"/>
+                        <field name="partner_id"/>
+                        <separator colspan="4"/>
+                    </group>
+
+                    <group colspan="4" col="4">
+                        <!--  attrs="{'invisible': [('type', '=', 'ur')]}" -->
+                        <field name="fullname" colspan="4" required="1"/>
+                        <field name="name" colspan="4" string="ФИО" attrs="{'invisible': [('type', '!=', 'ur')]}"/>
+                        <field name="passport" colspan="4" widget="char" attrs="{'invisible': [('type', 'not in', ('ch', 'ip'))], 'required': [('type', 'in', ('ch', 'ip'))]}"/>
+                        <field name="address_registration" colspan="4" widget="char" attrs="{'invisible': [('type', 'not in', ('ch', 'ip'))]}"/>
+                        <group colspan="4" attrs="{'invisible': [('type', '!=', 'ur')]}">
+                            <separator colspan="4" string="Aдресa"/>
+                            <field name="address_ids" nolabel="1" colspan="4"/>
+                        </group>
+                        <field name="ogrn" attrs="{'invisible': [('type', '!=', 'ur')]}"/>
+                        <field name="inn" attrs="{'required': [('type', '=', 'ur')]}"/>
+                        <field name="ogrnip" attrs="{'invisible': [('type', '!=', 'ip')]}"/>
+                        <field name="kpp" attrs="{'invisible': [('type', '!=', 'ur')], 'required': [('type', '=', 'ur')]}"/>
+                        <field name="mfo" attrs="{'invisible': [('type', '!=', 'ur')]}"/>
+                        <field name="okpo" attrs="{'invisible': [('type', '!=', 'ur')]}"/>
+                        <field name="bank" attrs="{'invisible': [('type', '!=', 'ur')], 'required': [('type', '=', 'ur')]}"/>
+                        <field name="current_account" attrs="{'invisible': [('type', '!=', 'ur')], 'required': [('type', '=', 'ur')]}"/>
+                        <field name="correspondent_account" attrs="{'invisible': [('type', '!=', 'ur')], 'required': [('type', '=', 'ur')]}"/>
+                        <field name="bik" attrs="{'invisible': [('type', '!=', 'ur')], 'required': [('type', '=', 'ur')]}"/>
+                        <field name="phone" attrs="{'required': [('type', '=', 'ur')]}"/>
+                        <field name="fax" attrs="{'invisible': [('type', '!=', 'ur')]}"/>
+                        <field name="email"/>
+                        <field name="site" attrs="{'invisible': [('type', '!=', 'ur')]}"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_partner_bank_tree">
+            <field name="name">res.partner.bank.tree</field>
+            <field name="model">res.partner.bank</field>
+            <field name="type">tree</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <tree string="Реквизиты партнера">
+                    <field name="fullname" />
+                    <field name="type" />
+                    <field name="partner_id" string="Партнер"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_partner_bank_search">
+            <field name="name">res.partner.bank.search</field>
+            <field name="model">res.partner.bank</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search string="Реквизиты партнера">
+                    <field name="fullname" />
+                    <field name="type" />
+                    <field name="partner_id" string="Партнер"/>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_partner_bank_address_form">
+            <field name="name">res.partner.bank.address.form</field>
+            <field name="model">res.partner.bank.address</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group colspan="4" col="4">
+                        <field name="name"/>
+                        <field name="index"/>
+
+                        <field name="city"/>
+                        <field name="street"/>
+
+                        <field name="house"/>
+                        <field name="housing"/>
+                        <field name="building"/><newline/>
+                        <field name="flat_type"/>
+                        <field name="flat"/>
+
+                        <separator colspan="4"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_partner_bank_address_tree">
+            <field name="name">res.partner.bank.address.tree</field>
+            <field name="model">res.partner.bank.address</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Адрес" editable="top">
+                    <field name="name"/>
+                    <field name="index"/>
+
+                    <field name="city"/>
+                    <field name="street"/>
+
+                    <field name="house"/>
+                    <field name="housing"/>
+                    <field name="building"/>
+                    <field name="flat_type"/>
+                    <field name="flat"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</openerp>

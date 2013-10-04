@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+
+        <!-- Создаем группы -->
+        <record id="brief.group_manager_moscow" model="res.groups">
+            <field name="name">Бриф на встречу / Менеджер Москвы</field>
+        </record>
+
+        <!-- Правила доступа для групп -->
+        <record id="brief_meeting_manager_view" model="ir.rule">
+            <field name="name">Бриф на встречу: Менеджер Москвы Видит только свои</field>
+            <field ref="model_brief_meeting" name="model_id"/>
+            <field name="domain_force">[('responsible_id','=',user.id)]</field>
+            <field name="perm_read" eval="True" />
+            <field name="perm_create" eval="False" />
+            <field name="perm_write" eval="False" />
+            <field name="perm_unlink" eval="False" />
+            <field name="groups" eval="[(4, ref('brief.group_manager_moscow'))]"/>
+        </record>
+
+        <record id="brief_meeting_manager_edit" model="ir.rule">
+            <field name="name">Бриф на встречу: Менеджер Москвы Редактирует только на этапе Встреча назначена</field>
+            <field ref="model_brief_meeting" name="model_id"/>
+            <field name="domain_force">[('responsible_id','=',user.id), ('state', '=', 'scheduled')]</field>
+            <field name="perm_read" eval="False" />
+            <field name="perm_create" eval="False" />
+            <field name="perm_write" eval="True" />
+            <field name="perm_unlink" eval="False" />
+            <field name="groups" eval="[(4, ref('brief.group_manager_moscow'))]"/>
+        </record>
+    </data>
+</openerp>

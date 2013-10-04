@@ -1,0 +1,5 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_sup_group_hr_vacancy","hr.vacancy user","model_hr_vacancy","base.sup_group_hr_vacancy",1,1,1,0
+"access_hrsup_group_hr_vacancy","hr.vacancy manager","model_hr_vacancy","base.hrsup_group_hr_vacancy",1,1,1,1
+"access_valid_group_hr_vacancy","hr.vacancy user","model_hr_vacancy","base.valid_group_hr_vacancy",1,1,1,1
+"access_recruit_group","hr.vacancy manager","model_hr_vacancy","base.recruit_group",1,1,0,0

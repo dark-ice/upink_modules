@@ -1,0 +1,21 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_partner_bonus_reason","partner_bonus_reason user","model_partner_bonus_reason","base.group_user",1,0,0,0
+"access_partner_refusion_reason","partner_refusion_reason user","model_partner_refusion_reason","base.group_user",1,0,0,0
+"access_partner_operational_departments","partner_operational_departments user","model_partner_operational_departments","base.group_user",1,1,1,1
+"access_partner_dealer_discount","partner_dealer_discount user","model_partner_dealer_discount","base.group_user",1,0,0,0
+"access_order_type","partner_order_type user","model_partner_order_type","base.group_user",1,0,0,0
+"access_shipment_type","partner_shipment_type user","model_partner_shipment_type","base.group_user",1,0,0,0
+"access_payment_state","partner_payment_state user","model_partner_payment_state","base.group_user",1,0,0,0
+"access_partner_currency","partner_partner_currency user","model_partner_currency","base.group_user",1,0,0,0
+"access_partner_order_history","partner_partner_order_history user","model_partner_order_history","base.group_user",1,1,1,1
+"access_partner_added_services","partner_partner_added_services user","model_partner_added_services","base.group_user",1,1,1,1
+"access_partner_pay_type","partner_pay_type user","model_partner_pay_type","base.group_user",1,0,0,0
+"access_partner_partner_state","partner_partner_state user","model_partner_partner_state","base.group_user",1,0,0,0
+"access_partner_delivery_type","partner_delivery_type user","model_partner_delivery_type","base.group_user",1,0,0,0
+"access_partner_delivery_from","partner_delivery_from user","model_partner_delivery_from","base.group_user",1,0,0,0
+"access_partner_bank_address","partner_bank_address user","model_res_partner_bank_address","base.group_user",1,1,1,1
+"access_partner_bank","partner_bank user","model_res_partner_bank","base.group_user",1,1,1,1
+"access_partner_status_history","partner_status_history user","model_res_partner_status_history","base.group_user",1,1,1,0
+
+
+

@@ -1,0 +1,18 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_kpi_period","kpi_period user","model_kpi_period","base.group_user",1,0,0,0
+"access_kpi_grade","kpi_grade user","model_kpi_grade","base.group_user",1,0,0,0
+"access_kpi_indicators_reference","kpi_indicators_reference user","model_kpi_indicators_reference","base.group_user",1,0,0,0
+"access_kpi_enrollment_formal","kpi_enrollment_formal user","model_kpi_enrollment_formal","base.group_user",1,0,0,0
+"access_kpi_formal_tax","kpi_formal_tax user","model_kpi_formal_tax","base.group_user",1,0,0,0
+"access_kpi_advance","kpi_advance user","model_kpi_advance","base.group_user",1,0,0,0
+"access_kpi_retention","kpi_retention user","model_kpi_retention","base.group_user",1,0,0,0
+"access_kpi_award","kpi_award user","model_kpi_award","base.group_user",1,0,0,0
+"access_kpi_smart","kpi_smart user","model_kpi_smart","base.group_user",1,1,1,0
+"access_kpi_mbo","kpi_mbo user","model_kpi_mbo","base.group_user",1,1,1,1
+"access_kpi_sla","kpi_sla user","model_kpi_sla","base.group_user",1,1,1,1
+"access_kpi_sale","kpi_sale user","model_kpi_sla_sale","base.group_user",1,1,1,1
+"access_kpi_smart_history","kpi_smart_history user","model_kpi_smart_history","base.group_user",1,1,1,0
+"access_kpi_kpi","kpi_kpi user","model_kpi_kpi","base.group_user",1,1,1,1
+"access_kpi_history","kpi_history user","model_kpi_history","base.group_user",1,1,1,0
+"access_kpi_grade_history","kpi_grade_history user","model_kpi_grade_history","base.group_user",1,1,1,0
+"access_kpi_expert_assesment","kpi_expert_assesment user","model_kpi_expert_assesment","base.group_user",1,1,1,0

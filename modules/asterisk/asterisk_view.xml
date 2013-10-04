@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="asterisk_config_form" model="ir.ui.view">
+            <field name="name">asterisk.config.form</field>
+            <field name="model">asterisk.server</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Настройки подключения к Asterisk">
+                    <group col="4" colspan="4">
+                        <field name="ast_server" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="ast_s_db" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="table" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="limit_rows" required="1"/>
+                        <field name="port" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="n_groups" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="on_off"/>
+                        <field name="user_ip_host" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <separator colspan="4"/>
+                        <field name="ast_user_bd" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        <field name="ast_pass_bd" password="True"/>
+                    </group>
+                    <newline/>
+                    <group col="4" colspan="4">
+                        <!-- get_colls -->
+                        <group colspan="4">
+                            <field name="state" readonly="1" colspan="4"/>
+                        </group>
+                        <button name="check_connect" string="Test" type="object"/>
+                        <button name="set_script_sql" string="Утвердить настройки"
+                                confirm="Для этой операции необходим доступ суперпользователя к подключаемой базе"
+                                states="draft" type="object"/>
+                        <button name="cancel" string="Отменить настройки" states="active" type="object"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="asterisk_config_tree" model="ir.ui.view">
+            <field name="name">asterisk.config.tree</field>
+            <field name="model">asterisk.server</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Настройки Asterisk">
+                    <field name="ast_server"/>
+                    <field name="ast_s_db"/>
+                    <field name="table"/>
+                    <field name="on_off"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="asterisk_config_action" model="ir.actions.act_window">
+            <field name="name">Настройки подключения к Asterisk</field>
+            <field name="view_id" ref="asterisk_config_tree"/>
+            <field name="res_model">asterisk.server</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="view_res_users_inherit_internal_callerid" model="ir.ui.view">
+            <field name="name">res.users.inherit.internal.callerid</field>
+            <field name="model">res.users</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <field name="context_tz" position="after">
+                    <field name="callerid"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_crm_lead_inherit_internal_callerid" model="ir.ui.view">
+            <field name="name">crm.lead.inherit.internal.callerid</field>
+            <field name="model">crm.lead</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
+            <field name="arch" type="xml">
+                <field name="email_cc" position="after">
+                    <field name="calles" colspan="4" nolabel="1" mode="tree" readonly="1">
+                        <tree string="История звонков">
+                            <field name="date"/>
+                            <field name="name" string="Отчет звонка"/>
+                            <field name="partner_phone"/>
+                            <field name="time_of_coll"/>
+                            <field name="duration"/>
+                            <field name="user_id"/>
+                            <field name="id_sphone"/>
+                            <field name="categ_id" string="Тип звонка"/>
+                            <field name="id_ast_coll"/>
+                        </tree>
+                    </field>
+                </field>
+            </field>
+        </record>
+
+        <!--
+                <record id="view_crm_partner_colls_form1" model="ir.ui.view">
+                    <field name="name">res.partner.crm.colls.inherit5</field>
+                    <field name="model">res.partner</field>
+                    <field name="type">form</field>
+                    <field name="inherit_id" ref="crm.view_crm_partner_info_form1"/>
+                    <field name="arch" type="xml">
+                        <field name="phonecall_ids" position="replace">
+                           <field name="phonecall_ids" colspan="4" nolabel="1"  mode="tree" readonly="1">
+                                <tree string="Phone Calls">
+                                    <field name="date"/>
+                                    <field name="name" string="Отчет звонка"/>
+                                    <field name="partner_phone"/>
+                                    <field name="time_of_coll" />
+                                    <field name="duration" />
+                                    <field name="user_id"/>
+                                    <field name="id_sphone"/>
+                                    <field name="categ_id" string="Тип звонка"/>
+                                    <field name="id_ast_coll"/>
+                                </tree>
+                           </field>
+                        </field>
+                    </field>
+                </record>
+        -->
+
+        <record id="crm.crm_case_phone_form_view_inherit" model="ir.ui.view">
+            <field name="name">CRM - Phone Call Form</field>
+            <field name="model">crm.phonecall</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="crm.crm_case_phone_form_view"/>
+            <field name="arch" type="xml">
+                <field name="duration" position="replace">
+                    <group colspan="6" col="7">
+                        <field name="time_of_coll"/>
+                        <field name="duration"/>
+                        <field name="id_ast_coll"/>
+                    </group>
+                </field>
+            </field>
+        </record>
+
+        <menuitem action="asterisk_config_action" id="asterisk_config_menuitem" name="Настройки Asterisk"
+                  parent="base.menu_config"/>
+
+    </data>
+</openerp>

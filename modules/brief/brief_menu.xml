@@ -1,0 +1,336 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        # Main window
+
+        <record model="ir.actions.act_window" id="window_case_brief">
+            <field name="name">Брифы</field>
+            <field name="res_model">brief.main</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+            <field name="view_id" ref="view_brief_trees"/>
+            <field name="search_view_id" ref="view_brief_search"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_brief_form_view">
+            <field name="name">Создать бриф на просчет</field>
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_brief_form"/>
+            <field name="act_window_id" ref="window_case_brief"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_brief_trees_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_brief_trees"/>
+            <field name="act_window_id" ref="window_case_brief"/>
+        </record>
+
+        # Visible and required fields
+        <record model="ir.actions.act_window" id="window_case_rel_service_fields">
+            <field name="name">Связь услуг с полями</field>
+            <field name="res_model">brief.rel_services_fields</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_rel_service_fields_tree"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_rel_service_fields_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_rel_service_fields_form"/>
+            <field name="act_window_id" ref="window_case_rel_service_fields"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_rel_service_fields_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_rel_service_fields_tree"/>
+            <field name="act_window_id" ref="window_case_rel_service_fields"/>
+        </record>
+        # context_adv
+        <record model="ir.actions.act_window" id="window_case_context_adv">
+            <field name="name">Справочник систем размещения контекстной рекламы</field>
+            <field name="res_model">brief.context_adv</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_context_adv_tree"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_context_adv_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_context_adv_form"/>
+            <field name="act_window_id" ref="window_case_context_adv"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_context_adv_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_context_adv_tree"/>
+            <field name="act_window_id" ref="window_case_context_adv"/>
+        </record>
+        # out_services
+        <record model="ir.actions.act_window" id="window_case_out_services">
+            <field name="name">Справочник исходящих услуг call-центра UpSale</field>
+            <field name="res_model">brief.out_services</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_out_services_tree"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_out_services_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_out_services_form"/>
+            <field name="act_window_id" ref="window_case_out_services"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_out_services_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_out_services_tree"/>
+            <field name="act_window_id" ref="window_case_out_services"/>
+        </record>
+        # in_services
+        <record model="ir.actions.act_window" id="window_case_in_services">
+            <field name="name">Справочник входящих услуг call-центра UpSale</field>
+            <field name="res_model">brief.in_services</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_in_services_tree"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_in_services_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_in_services_form"/>
+            <field name="act_window_id" ref="window_case_in_services"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_in_services_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_in_services_tree"/>
+            <field name="act_window_id" ref="window_case_in_services"/>
+        </record>
+        # lang
+        <record model="ir.actions.act_window" id="window_case_lang">
+            <field name="name">Справочник иностранных языков</field>
+            <field name="res_model">brief.lang</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_lang_tree"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_lang_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_lang_form"/>
+            <field name="act_window_id" ref="window_case_lang"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_lang_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_lang_tree"/>
+            <field name="act_window_id" ref="window_case_lang"/>
+        </record>
+        # tel_type
+        <record model="ir.actions.act_window" id="window_case_tel_type">
+            <field name="name">Справочник типов номеров</field>
+            <field name="res_model">brief.tel_type</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_tel_type_tree"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_tel_type_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_tel_type_form"/>
+            <field name="act_window_id" ref="window_case_tel_type"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_tel_type_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_tel_type_tree"/>
+            <field name="act_window_id" ref="window_case_tel_type"/>
+        </record>
+        # database
+        <record model="ir.actions.act_window" id="window_case_database">
+            <field name="name">Справочник баз данных</field>
+            <field name="res_model">brief.database</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_database_tree"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_database_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_database_form"/>
+            <field name="act_window_id" ref="window_case_database"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_database_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_database_tree"/>
+            <field name="act_window_id" ref="window_case_database"/>
+        </record>
+        # target_age
+        <record model="ir.actions.act_window" id="window_case_target_age">
+            <field name="name">Справочник групп возраста</field>
+            <field name="res_model">brief.target_age</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_target_age_tree"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_target_age_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_target_age_form"/>
+            <field name="act_window_id" ref="window_case_target_age"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_target_age_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_target_age_tree"/>
+            <field name="act_window_id" ref="window_case_target_age"/>
+        </record>
+        # target_income
+        <record model="ir.actions.act_window" id="window_case_target_income">
+            <field name="name">Справочник групп по уровню дохода</field>
+            <field name="res_model">brief.target_income</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_target_income_tree"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_target_income_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_target_income_form"/>
+            <field name="act_window_id" ref="window_case_target_income"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_target_income_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_target_income_tree"/>
+            <field name="act_window_id" ref="window_case_target_income"/>
+        </record>
+        # target_region
+
+        <record model="ir.actions.act_window" id="window_case_target_region">
+            <field name="name">Справочник возможных целевых регионов</field>
+            <field name="res_model">brief.target_region</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_target_region_tree"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_target_region_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_target_region_form"/>
+            <field name="act_window_id" ref="window_case_target_region"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_target_region_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_target_region_tree"/>
+            <field name="act_window_id" ref="window_case_target_region"/>
+        </record>
+
+        # services
+
+        <record model="ir.actions.act_window" id="window_case_brief_services_stage">
+            <field name="name">Список услуг</field>
+            <field name="res_model">brief.services.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_brief_services_stage_tree"/>
+        </record>
+
+        # loyality
+
+        <record model="ir.actions.act_window" id="act_brief_loyality">
+            <field name="name">Программы лояльности</field>
+            <field name="res_model">brief.loyality</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_brief_manager_groups">
+            <field name="name">Рабочие команды менеджеров</field>
+            <field name="res_model">brief.manager.groups</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_brief_manager_groups_tree"/>
+        </record>
+
+        # MENU
+        <menuitem parent="base.menu_base_partner"
+                  name="Брифы"
+                  id="menu_brief"
+                  action="window_case_brief"
+                  sequence="1"
+                />
+        <menuitem parent="brief.menu_brief"
+                  name="Бриф на просчет"
+                  id="menu_crm_brief"
+                  action="window_case_brief"
+                  sequence="1"
+                />
+
+        <menuitem parent="brief.menu_brief"
+                  name="Настройки"
+                  id="menu_brief_settings"
+                  sequence="99"
+                />
+        <!--<menuitem parent="menu_briefs"
+                  name="Бриф на просчет"
+                  id="menu_crm_brief"
+                  action="window_case_brief"
+                  sequence="1"
+                />-->
+
+        <menuitem parent="base.menu_crm_config_lead" name="Связь услуг с полями" id="menu_crm_rel_service_fields"
+                  action="window_case_rel_service_fields" sequence="3"/>
+        # References
+        <menuitem parent="base.menu_crm_config_lead" name="Справочник систем контекстной рекламы"
+                  id="menu_crm_context_adv" action="window_case_context_adv" sequence="3"/>
+        <menuitem parent="base.menu_crm_config_lead" name="Справочник исходящих услуг КЦ" id="menu_crm_out_services"
+                  action="window_case_out_services" sequence="4"/>
+        <menuitem parent="base.menu_crm_config_lead" name="Справочник входящих услуг КЦ" id="menu_crm_in_services"
+                  action="window_case_in_services" sequence="5"/>
+        <menuitem parent="base.menu_crm_config_lead" name="Справочник иностранных языков" id="menu_crm_lang"
+                  action="window_case_lang" sequence="6"/>
+        <menuitem parent="base.menu_crm_config_lead" name="Справочник типов номера" id="menu_crm_tel_type"
+                  action="window_case_tel_type" sequence="7"/>
+        <menuitem parent="base.menu_crm_config_lead" name="Справочник баз данных" id="menu_crm_database"
+                  action="window_case_database" sequence="8"/>
+        <menuitem parent="base.menu_crm_config_lead" name="Справочник возрастных групп" id="menu_crm_target_age"
+                  action="window_case_target_age" sequence="9"/>
+        <menuitem parent="base.menu_crm_config_lead" name="Справочник групп по уровню дохода"
+                  id="menu_crm_target_income" action="window_case_target_income" sequence="10"/>
+        <menuitem parent="base.menu_crm_config_lead" name="Справочник целевых регионов" id="menu_crm_target_region"
+                  action="window_case_target_region" sequence="11"/>
+        <menuitem name="Справочник услуг кандидата" id="base.menu_brief_services_stage" sequence="15"
+                  action="window_case_brief_services_stage"
+                  parent="brief.menu_brief_settings"/>
+
+        <menuitem
+                action="act_brief_loyality"
+                name="Программы лояльноcти"
+                id="menu_brief_loyality"
+                parent="base.menu_crm_config_lead"
+                sequence="0"
+                />
+
+
+
+        <menuitem parent="brief.menu_brief_settings"
+                  name="Рабочие команды менеджеров"
+                  id="menu_brief_manager_group"
+                  action="act_brief_manager_groups"
+                  sequence="0"
+                />
+    </data>
+</openerp>

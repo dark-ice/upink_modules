@@ -1,0 +1,383 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+
+        # visible and required fields
+        <record model="ir.ui.view" id="view_rel_service_fields_form">
+            <field name="name">Выбор полей к определенной услуге</field>
+            <field name="model">brief.rel_services_fields</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Выбор полей">
+                    <field name="service_id"/>
+                    <newline/>
+                    <field name="fields_ids"/>
+                    <newline/>
+                    <field name="fields_req"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_rel_service_fields_tree">
+            <field name="name">Выбор полей к определенной услуге</field>
+            <field name="model">brief.rel_services_fields</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Список услуг для брифа">
+                    <field name="service_id"/>
+                </tree>
+            </field>
+        </record>
+
+        # context_adv
+        <record model="ir.ui.view" id="view_context_adv_form">
+            <field name="name">Создание систем размещения контекстной рекламы</field>
+            <field name="model">brief.context_adv</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Создание">
+                    <field name="name"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_context_adv_tree">
+            <field name="name">Справочник систем размещения контекстной рекламы</field>
+            <field name="model">brief.context_adv</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Справочник">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        # out_services
+        <record model="ir.ui.view" id="view_out_services_form">
+            <field name="name">Создание исходящих услуг call-центра UpSale</field>
+            <field name="model">brief.out_services</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Создание">
+                    <field name="name"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_out_services_tree">
+            <field name="name">Справочник исходящих услуг call-центра UpSale</field>
+            <field name="model">brief.out_services</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Справочник">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        # in_services
+        <record model="ir.ui.view" id="view_in_services_form">
+            <field name="name">Создание входящих услуг call-центра UpSale</field>
+            <field name="model">brief.in_services</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Создание">
+                    <field name="name"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_in_services_tree">
+            <field name="name">Справочник входящих услуг call-центра UpSale</field>
+            <field name="model">brief.in_services</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Справочник">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        # lang
+        <record model="ir.ui.view" id="view_lang_form">
+            <field name="name">Создание иностранных языков</field>
+            <field name="model">brief.lang</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Создание">
+                    <field name="name"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_lang_tree">
+            <field name="name">Справочник иностранных языков</field>
+            <field name="model">brief.lang</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Справочник">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        # tel_type
+        <record model="ir.ui.view" id="view_tel_type_form">
+            <field name="name">Создание типов номеров</field>
+            <field name="model">brief.tel_type</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Создание">
+                    <field name="name"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_tel_type_tree">
+            <field name="name">Справочник типов номеров</field>
+            <field name="model">brief.tel_type</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Справочник">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        # database
+        <record model="ir.ui.view" id="view_database_form">
+            <field name="name">Создание баз данных</field>
+            <field name="model">brief.database</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Создание">
+                    <field name="name"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_database_tree">
+            <field name="name">Справочник баз данных</field>
+            <field name="model">brief.database</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Справочник">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        # target_age
+        <record model="ir.ui.view" id="view_target_age_form">
+            <field name="name">Создание групп возраста</field>
+            <field name="model">brief.target_age</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Создание">
+                    <field name="name"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_target_age_tree">
+            <field name="name">Справочник групп возраста</field>
+            <field name="model">brief.target_age</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Справочник">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        # target_income
+        <record model="ir.ui.view" id="view_target_income_form">
+            <field name="name">Создание групп по уровню дохода</field>
+            <field name="model">brief.target_income</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Создание">
+                    <field name="name"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_target_income_tree">
+            <field name="name">Справочник групп по уровню дохода</field>
+            <field name="model">brief.target_income</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Справочник">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        # target_region
+        <record model="ir.ui.view" id="view_target_region_form">
+            <field name="name">Создание возможных целевых регионов</field>
+            <field name="model">brief.target_region</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Создание">
+                    <field name="name"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_target_region_tree">
+            <field name="name">Справочник возможных целевых регионов</field>
+            <field name="model">brief.target_region</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Справочник">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        # services
+
+        <record model="ir.ui.view" id="view_brief_services_stage_tree">
+            <field name="name">Брифы: Список услуг</field>
+            <field name="model">brief.services.stage</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Брифы: Список услуг">
+                    <field name="name" colspan="4"/>
+                    <field name="usergroup"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_brief_services_stage_form">
+            <field name="name">Брифы: Список услуг</field>
+            <field name="model">brief.services.stage</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Брифы: Список услуг">
+                    <field name="name" required="1" colspan="4"/>
+                    <field name="usergroup" colspan="4"/>
+                    <field name="leader_group_id" colspan="4"/>
+                    <field name="direction" colspan="4"/>
+                    <field name="check_leader"/>
+                    <field name="in_account"/>
+                </form>
+            </field>
+        </record>
+
+        <!-- -->
+        <record model="ir.ui.view" id="view_brief_manager_groups_form">
+            <field name="name">Брифы: Рабочие команды менеджеров</field>
+            <field name="model">brief.manager.groups</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Брифы: Рабочие команды менеджеров">
+                    <field name="name" required="1" colspan="4"/>
+                    <separator string="Менеджеры по привлечению партнеров" colspan="4"/>
+                    <field name="manager_first_lvl_ids" colspan="4" nolabel="1"/>
+                    <separator string="Менеджер по работе с партнером" colspan="4"/>
+                    <field name="manager_second_lvl_id" colspan="4" nolabel="1"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_brief_manager_groups_tree">
+            <field name="name">Брифы: Рабочие команды менеджеров</field>
+            <field name="model">brief.manager.groups</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <form string="Брифы: Рабочие команды менеджеров">
+                    <field name="name" />
+                    <field name="manager_second_lvl_id" />
+                </form>
+            </field>
+        </record>
+
+        <record id="action_brief_add" model="ir.actions.act_window">
+            <field name="name">Создать бриф на просчет</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">brief.main</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_brief_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <record model="ir.ui.view" id="view_partner_form_upsale_inherit">
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="res_partner_update.view_partner_form_upsale" />
+            <field name="arch" type="xml">
+                <field colspan="4" name="added_services_ids" position="after">
+                    <separator colspan="4" string="Брифы на просчет"/>
+                    <button name="create_brief" string="Создать бриф на просчет" type="object" default_focus="1" icon="terp-document-new" colspan="4"/>
+                    <field name="brief_ids"
+                           nolabel="1"
+                           colspan="4"
+                           context="{
+                               'partner_id': id,
+                               'partner_name': name,
+                           }"
+                            >
+                        <tree string="Список брифов">
+                            <field name="id"/>
+                            <field name="user_id"/>
+                            <field name="specialist_id"/>
+                            <field name="create_date"/>
+                            <field name="services_ids"/>
+                            <field name="state"/>
+                            <field name="usergroup"/>
+                            <field name="responsible_user"/>
+                            <field name="write_date"/>
+                            <field name="accept_date"/>
+                            <button string="Отправить бриф"
+                                    name="action_accept"
+                                    states="draft"
+                                    icon="terp-gtk-go-back-rtl"
+                                    />
+                        </tree>
+                    </field>
+
+
+                </field>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_lead_form_upsale_inherit">
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="res_partner_update.view_lead_upsale_form" />
+            <field name="arch" type="xml">
+                <field colspan="4" name="added_services_ids" position="after">
+                    <separator colspan="4" string="Брифы на просчет"/>
+                    <button name="create_brief" string="Создать бриф на просчет" type="object" default_focus="1" icon="terp-document-new" colspan="4"/>
+                    <field name="brief_ids"
+                           nolabel="1"
+                           colspan="4"
+                           context="{
+                               'partner_id': id,
+                               'partner_name': name,
+                           }"
+                            >
+                        <tree string="Список брифов">
+                            <field name="id"/>
+                            <field name="user_id"/>
+                            <field name="specialist_id"/>
+                            <field name="create_date"/>
+                            <field name="services_ids"/>
+                            <field name="state"/>
+                            <field name="usergroup"/>
+                            <field name="responsible_user"/>
+                            <field name="write_date"/>
+                            <field name="accept_date"/>
+                            <button string="Отправить бриф"
+                                    name="action_accept"
+                                    states="draft"
+                                    icon="terp-gtk-go-back-rtl"
+                                    />
+                        </tree>
+                    </field>
+
+
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>

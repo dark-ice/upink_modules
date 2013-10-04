@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="view_closing_transaction_tree" model="ir.ui.view">
+            <field eval="1" name="priority"/>
+            <field name="name">crm.lead.closing.transaction.report.tree</field>
+            <field name="model">crm.lead.closing.transaction.report</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Закрытие сделок">
+
+                    <field name="user_id" invisible="1"/>
+                    <field name="date_start" invisible="1" />
+                    <field name="date_end" invisible="1" />
+                    <field name="count_cancel" sum="Исключая отказ"/>
+                    <field name="count_talks" sum="Переговоры"/>
+                    <field name="count_dangling" sum="Зависшие переговоры"/>
+                    <field name="count_approval" sum="Утверждение договора"/>
+                    <field name="count_done" sum="Счет оплачен"/>
+                    <field name="partner_id" />
+                    <field name="manager_upwork_id"/>
+                    <field name="responsible_id"/>
+                    <field name="service" />
+                    <field name="ppc_sum" sum="Сумма по PPC"/>
+                    <field name="seo_sum" sum="Сумма по SEO"/>
+                    <field name="smm_sum" sum="Сумма по SMM"/>
+                    <field name="outc_sum" sum="Сумма по исходящей компании"/>
+                    <field name="inc_sum" sum="Сумма по входящей компании"/>
+                    <field name="total_sum" sum="Общая сумма"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_closing_transaction_search" model="ir.ui.view">
+            <field name="name">crm.lead.closing.transaction.report.search</field>
+            <field name="model">crm.lead.closing.transaction.report</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Закрытие сделок">
+                    <group>
+                        <field name="user_id">
+                            <filter icon="terp-personal"
+                                    string="Мои продажи"
+                                    help="Мои продажи"
+                                    domain="[('user_id','=',uid)]"/>
+                        </field>
+                        <field name="date_start"/>
+                        <field name="date_end" nolabel="1"/>
+                    </group>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Менеджеру продаж" icon="terp-personal" name="User" context="{'group_by':'user_id'}"/>
+                        <filter string="Партнеру" icon="terp-partner" name="Customer" context="{'group_by':'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_closing_transaction_report_all" model="ir.actions.act_window">
+            <field name="name">Закрытие сделок</field>
+            <field name="res_model">crm.lead.closing.transaction.report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="search_view_id" ref="view_closing_transaction_search"/>
+            <field name="view_id" ref="view_closing_transaction_tree"/>
+            <field name="context">{'search_default_User':1,'group_by':[]}</field>
+        </record>
+
+        <menuitem action="action_closing_transaction_report_all" id="menu_report_closing_transaction_all" parent="base.next_id_64" sequence="1"/>
+
+        <record id="view_incoming_tree" model="ir.ui.view">
+            <field eval="1" name="priority"/>
+            <field name="name">crm.lead.incoming.report.tree</field>
+            <field name="model">crm.lead.incoming.report</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Входящие заявки">
+                    <field name="site"/>
+                    <field name="date_start" invisible="1" />
+                    <field name="date_end" invisible="1" />
+                    <field name="user_id" invisible="1" />
+                    <field name="service_id" />
+                    <field name="budget" sum="Бюджет" />
+                    <field name="sum_rub" sum="Сумма медиапалнов руб"/>
+                    <field name="sum_dol" sum="Сумма медиапалнов $"/>
+                    <field name="sum_uah" sum="Сумма медиапалнов грн"/>
+                    <field name="source" />
+                    <field name="last_call" />
+                    <field name="categ_id" />
+                    <field name="stage_id" />
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_incoming_search" model="ir.ui.view">
+            <field name="name">crm.lead.incoming.report.search</field>
+            <field name="model">crm.lead.incoming.report</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Входящие заявки">
+                    <group>
+                        <field name="site"/>
+                        <field name="date_start" string="с"/>
+                        <field name="date_end" string="по"/>
+                    </group>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Менеджеру продаж" icon="terp-personal" name="User" context="{'group_by':'user_id'}"/>
+                        <filter string="Сайт кандидата" icon="terp-partner" name="Customer" context="{'group_by':'site'}"/>
+                        <separator orientation="vertical"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_incoming_report_all" model="ir.actions.act_window">
+            <field name="name">Входящие заявки</field>
+            <field name="res_model">crm.lead.incoming.report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="search_view_id" ref="view_incoming_search"/>
+            <field name="view_id" ref="view_incoming_tree"/>
+            <field name="context">{'search_default_User':1,'group_by':[]}</field>
+        </record>
+
+        <menuitem action="action_incoming_report_all" id="menu_report_incoming_all" parent="base.next_id_64" sequence="1"/>
+
+        <record id="view_atc_tree" model="ir.ui.view">
+            <field eval="1" name="priority"/>
+            <field name="name">crm.lead.atc.report.tree</field>
+            <field name="model">crm.lead.atc.report</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Отчет менеджера по привлечению партнеров">
+
+                    <field name="responsible_user" invisible="1"/>
+                    <field name="name_manager"/>
+                    <field name="callerid"/>
+                    <field name="time_of_coll"/>
+                    <field name="count_calls" sum="Количество звонков"/>
+                    <field name="call"/>
+                    <field name="budget" sum="Планируемый бюджет руб/мес"/>
+                    <field name="count_briefs" sum="Количество брифов"/>
+                    <field name="sum_rub" sum="Сумма медиапалнов руб"/>
+                    <field name="sum_dol" sum="Сумма медиапалнов $"/>
+                    <field name="sum_uah" sum="Сумма медиапалнов грн"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_atc_search" model="ir.ui.view">
+            <field name="name">crm.lead.atc.report.search</field>
+            <field name="model">crm.lead.atc.report</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Отчет менеджера по привлечению партнеров">
+                    <group>
+                        <field name="responsible_user">
+                            <filter icon="terp-personal"
+                                    string="Мои продажи"
+                                    help="Мои продажи"
+                                    domain="[('responsible_user','=',uid)]"/>
+                        </field>
+                        <field name="date_start"/>
+                        <field name="date_end" nolabel="1"/>
+                    </group>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Менеджеру продаж" icon="terp-personal" name="User" context="{'group_by':'responsible_user'}"/>
+                        <separator orientation="vertical"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_atc_report_all" model="ir.actions.act_window">
+            <field name="name">Отчет менеджера по привлечению партнеров</field>
+            <field name="res_model">crm.lead.atc.report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="search_view_id" ref="view_atc_search"/>
+            <field name="view_id" ref="view_atc_tree"/>
+            <field name="context">{'group_by':[]}</field>
+        </record>
+
+        <menuitem action="action_atc_report_all" id="menu_report_atc_all" parent="base.next_id_64" sequence="1"/>
+
+
+    </data>
+</openerp>

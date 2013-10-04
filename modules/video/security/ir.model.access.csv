@@ -1,0 +1,12 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_video_user","video user","model_video","base.group_sale_salesman",1,1,1,0
+"access_video_variants_user","video_variants user","model_video_variants","base.group_sale_salesman",1,1,1,0
+"access_video_params_user","video_params user","model_video_params","base.group_sale_salesman",1,1,1,0
+"access_video_applications_user","video_applications user","model_video_applications","base.group_sale_salesman",1,1,1,0
+"access_video_payment_user","video_payment user","model_video_payment","base.group_sale_salesman",1,1,1,0
+"access_video_history_user","video_history user","model_video_history","base.group_user",1,1,1,0
+"access_video_vuser","video vuser","model_video","video.group_video",1,1,1,0
+"access_video_variants_vuser","video_variants vuser","model_video_variants","video.group_video",1,1,1,0
+"access_video_params_vuser","video_params vuser","model_video_params","video.group_video",1,1,1,0
+"access_video_applications_vuser","video_applications vuser","model_video_applications","video.group_video",1,1,1,0
+"access_video_payment_vuser","video_payment vuser","model_video_payment","video.group_video",1,1,1,0

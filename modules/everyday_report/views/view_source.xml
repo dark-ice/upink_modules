@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_day_report_source_kanban">
+            <field name="name">Источники</field>
+            <field name="model">day.report.source</field>
+            <field name="type">kanban</field>
+            <field name="arch" type="xml">
+
+                <kanban>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="day_report_plan">
+                                <table class="report">
+                                    <thead>
+                                        <tr>
+                                            <td colspan="5">
+                                                <field name="date"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td width="120px">Поднаправление</td>
+                                            <td class="plan" width="110px">План</td>
+                                            <td class="fact" width="110px">Факт</td>
+                                            <td class="fact" width="60px">Доля в общем обороте</td>
+                                            <td class="fact" width="90px">%% выполнения плана</td>
+                                        </tr>
+                                    </thead>
+
+                                    <tfoot>
+                                        <tr>
+                                            <td>Итого:</td>
+                                            <td><field name="plan_total"/></td>
+                                            <td><field name="fact_total"/></td>
+                                            <td>100%%</td>
+                                            <td><field name="per_total"/>%%</td>
+                                        </tr>
+                                    </tfoot>
+
+                                    <tbody>
+                                        <tr>
+                                            <td>Развитие</td>
+                                            <td class="plan"><field name="plan_dev"/></td>
+                                            <td class="fact"><field name="fact_dev"/></td>
+                                            <td class="fact"><field name="part_dev"/>%%</td>
+                                            <td class="fact"><field name="per_dev"/>%%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Новые</td>
+                                            <td class="plan"><field name="plan_calling"/></td>
+                                            <td class="fact"><field name="fact_calling"/></td>
+                                            <td class="fact"><field name="part_calling"/>%%</td>
+                                            <td class="fact"><field name="per_calling"/>%%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Холодные звонки</td>
+                                            <td class="plan"><field name="plan_cold"/></td>
+                                            <td class="fact"><field name="fact_cold"/></td>
+                                            <td class="fact"><field name="part_cold"/>%%</td>
+                                            <td class="fact"><field name="per_cold"/>%%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Маркетинг</td>
+                                            <td class="plan"><field name="plan_marketing"/></td>
+                                            <td class="fact"><field name="fact_marketing"/></td>
+                                            <td class="fact"><field name="part_marketing"/>%%</td>
+                                            <td class="fact"><field name="per_marketing"/>%%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Москва</td>
+                                            <td class="plan"><field name="plan_moscow"/></td>
+                                            <td class="fact"><field name="fact_moscow"/></td>
+                                            <td class="fact"><field name="part_moscow"/>%%</td>
+                                            <td class="fact"><field name="per_moscow"/>%%</td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_day_report_source_search">
+            <field name="name">Источники</field>
+            <field name="model">day.report.source</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="date_start" />
+                    <field name="date_end"/>
+
+                </search>
+            </field>
+        </record>
+
+        <record id="window_day_report_source" model="ir.actions.act_window">
+            <field name="name">Источники</field>
+            <field name="res_model">day.report.source</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban</field>
+            <field name="view_id" ref="view_day_report_source_kanban"/>
+            <field name="search_view_id" ref="view_day_report_source_search"/>
+            <field name="context">{'search_default_date_start': time.strftime('%Y-%m-01'), 'search_default_date_end': time.strftime('%Y-%m-%d')}</field>
+        </record>
+
+        <menuitem action="window_day_report_source" id="menu_day_report_source" parent="menu_every_day_report" sequence="10"/>
+
+    </data>
+</openerp>

@@ -1,0 +1,9 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"process_launch_user","process_launch user","model_process_launch","base.group_user",1,1,1,0
+"process_base_staff_user","process_base_staff user","model_process_base_staff","base.group_user",1,1,1,0
+"process_history_user","process_process_history user","model_process_history","base.group_user",1,1,1,0
+"process_messages_user","process_process_messages user","model_process_messages","base.group_user",1,1,1,0
+"process_reports_user","process_process_reports user","model_process_reports","base.group_user",1,1,1,0
+"process_sla_indicators_user","process_process_sla_indicators user","model_process_sla_indicators","base.group_user",1,1,1,0
+"process_sla_user","process_process_sla user","model_process_sla","base.group_user",1,1,1,0
+"process_sla_line_user","process_process_sla_line user","model_process_sla_line","base.group_user",1,1,1,0

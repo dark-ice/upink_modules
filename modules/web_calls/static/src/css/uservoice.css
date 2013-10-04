@@ -1,0 +1,29 @@
+div.header_corner div.feedback {
+    position: absolute;
+    left: 50%;
+    margin-left: -50px;
+}
+div.header_corner div.feedback a {
+    color: #9a0404;
+    width: 100px;
+}
+div.header_corner div.feedback img {
+    vertical-align: middle;
+    margin-right: 0.5em;
+}
+
+label.calls-label {
+    width: 100px;
+    position: relative;
+    display: block;
+    float: left;
+    text-align: right;
+}
+
+table.call-table, table.call-table td {
+    border: 1px black solid;
+    text-align: center;
+    border-collapse: collapse;
+    padding: 0;
+    border-spacing: 0;
+}

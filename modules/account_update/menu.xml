@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <menuitem id="account.menu_finance_entries" name="Journal Entries" parent="account.menu_finance" sequence="1"/>
+        <!-- Hide menu -->
+        <menuitem action="account.action_account_moves_sale" sequence="16" id="account.menu_eaction_account_moves_sale"
+                  parent="account.menu_finance_receivables" icon="STOCK_JUSTIFY_FILL" groups="base.group_extended"/>
+        <menuitem action="account.action_view_bank_statement_tree" id="account.journal_cash_move_lines"
+                  parent="account.menu_finance_bank_and_cash" groups="base.group_extended"/>
+        <menuitem id="account.menu_account_customer" name="Customers" parent="account.menu_finance_receivables"
+                  action="base.action_partner_customer_form" sequence="100" groups="base.group_extended"/>
+        <menuitem id="account.menu_account_supplier" name="Suppliers" parent="account.menu_finance_payables"
+                  action="base.action_partner_supplier_form" sequence="100" groups="base.group_extended"/>
+        <menuitem action="account.action_invoice_tree3" id="account.menu_action_invoice_tree3"
+                  parent="account.menu_finance_receivables" groups="base.group_extended"/>
+        <menuitem action="account.action_account_moves_purchase" id="account.menu_eaction_account_moves_purchase"
+                  parent="account.menu_finance_payables" icon="STOCK_JUSTIFY_FILL" sequence="16"
+                  groups="base.group_extended"/>
+        <menuitem action="account.action_invoice_tree4" id="account.menu_action_invoice_tree4"
+                  parent="account.menu_finance_payables" groups="base.group_extended"/>
+        <menuitem action="account.action_account_moves_all_a" icon="STOCK_JUSTIFY_FILL"
+                  id="account.menu_action_account_moves_all" parent="account.menu_finance_entries" sequence="1"
+                  groups="base.group_extended"/>
+        <menuitem id="account.menu_finance_bank_and_cash" name="Bank and Cash" parent="account.menu_finance"
+                  sequence="4" groups="base.group_extended"/>
+        <menuitem id="menu_finance_periodical_processing" name="Periodical Processing" parent="account.menu_finance"
+                  sequence="9" groups="base.group_extended"/>
+        <menuitem id="account.menu_finance_charts" name="Charts" parent="account.menu_finance"
+                  groups="base.group_extended" sequence="6"/>
+        <menuitem id="account.menu_finance_entries" name="Journal Entries" parent="account.menu_finance" sequence="5"
+                  groups="base.group_extended"/>
+    </data>
+</openerp>

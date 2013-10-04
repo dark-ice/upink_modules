@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<openerp>
+<data>
+    <record model="workflow.activity" id="act_cancel">
+        <field name="wkf_id" ref="hr_holidays.wkf_holidays" />
+        <field name="name">Отмена</field>
+        <field name="kind">function</field>
+        <field name="action">workflow_setter('cancel')</field>
+    </record>
+
+    <record model="workflow.activity" id="act_revision">
+        <field name="wkf_id" ref="hr_holidays.wkf_holidays" />
+        <field name="name">Доработка</field>
+        <field name="kind">function</field>
+        <field name="action">workflow_setter('revision')</field>
+    </record>
+
+    <record model="workflow.activity" id="act_draft">
+        <field name="wkf_id" ref="hr_holidays.wkf_holidays" />
+        <field name="flow_start">True</field>
+        <field name="name">Черновик</field>
+        <field name="kind">function</field>
+        <field name="action">workflow_setter('draft')</field>
+    </record>
+
+    <record model="workflow.activity" id="act_confirm">
+        <field name="wkf_id" ref="hr_holidays.wkf_holidays" />
+        <field name="name">Утвердить</field>
+        <field name="kind">function</field>
+        <field name="action">workflow_setter('confirm')</field>
+        <field name="flow_stop">False</field>
+    </record>
+
+    <record model="workflow.activity" id="act_validate">
+        <field name="wkf_id" ref="hr_holidays.wkf_holidays" />
+        <field name="name">Визирование HR</field>
+        <field name="kind">function</field>
+        <field name="action">workflow_setter('validate')</field>
+    </record>
+
+    <record model="workflow.activity" id="act_validate1">
+        <field name="wkf_id" ref="hr_holidays.wkf_holidays" />
+        <field name="name">Утверждение у Руководителя</field>
+        <field name="kind">function</field>
+        <field name="action">workflow_setter('validate1')</field>
+    </record>
+
+    <!--
+        workflow transition
+    -->
+
+    <record model="workflow.transition" id="t1">
+        <field name="act_from" ref="act_draft" />
+        <field name="act_to" ref="act_validate1" />
+        <field name="signal">validate1</field>
+    </record>
+
+    <record model="workflow.transition" id="t2">
+        <field name="act_from" ref="act_draft" />
+        <field name="act_to" ref="act_cancel" />
+        <field name="signal">cancel</field>
+        <field name="condition">True</field>
+        <field name="group_id" ref="base.group_user"/>
+    </record>
+
+    <record model="workflow.transition" id="t3">
+        <field name="act_from" ref="act_validate1" />
+        <field name="act_to" ref="act_draft" />
+        <field name="signal">draft</field>
+        <field name="condition">True</field>
+        <field name="group_id" ref="base.group_user"/>
+    </record>
+
+    <record model="workflow.transition" id="t4">
+        <field name="act_from" ref="act_validate1" />
+        <field name="act_to" ref="act_revision" />
+        <field name="signal">revision</field>
+        <field name="condition">True</field>
+        <field name="group_id" ref="base.group_user"/>
+    </record>
+
+    <record model="workflow.transition" id="t5">
+        <field name="act_from" ref="act_revision" />
+        <field name="act_to" ref="act_validate1" />
+        <field name="signal">revalidate</field>
+        <field name="group_id" ref="base.group_user" />
+    </record>
+
+    <record model="workflow.transition" id="t6">
+        <field name="act_from" ref="act_validate1" />
+        <field name="act_to" ref="act_validate" />
+        <field name="signal">sight</field>
+        <field name="group_id" ref="base.group_user" />
+    </record>
+
+    <record model="workflow.transition" id="t7">
+        <field name="act_from" ref="act_validate" />
+        <field name="act_to" ref="act_validate1" />
+        <field name="signal">resight</field>
+        <field name="group_id" ref="base.group_user" />
+    </record>
+
+    <record model="workflow.transition" id="t8">
+        <field name="act_from" ref="act_validate1" />
+        <field name="act_to" ref="act_confirm" />
+        <field name="signal">confirm</field>
+        <field name="group_id" ref="base.group_hr_manager" />
+    </record>
+
+
+    <record model="workflow.transition" id="ta1">
+        <field name="act_from" ref="act_confirm" />
+        <field name="act_to" ref="act_draft" />
+        <field name="signal">draft</field>
+        <field name="condition">True</field>
+        <field name="group_id" ref="base.group_extended"/>
+    </record>
+
+    <record model="workflow.transition" id="ta2">
+        <field name="act_from" ref="act_validate" />
+        <field name="act_to" ref="act_draft" />
+        <field name="signal">draft</field>
+        <field name="condition">True</field>
+        <field name="group_id" ref="base.group_extended"/>
+    </record>
+
+    <record model="workflow.transition" id="ta3">
+        <field name="act_from" ref="act_revision" />
+        <field name="act_to" ref="act_draft" />
+        <field name="signal">draft</field>
+        <field name="condition">True</field>
+        <field name="group_id" ref="base.group_extended"/>
+    </record>
+</data>
+</openerp>

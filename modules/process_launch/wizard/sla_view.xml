@@ -1,0 +1,90 @@
+<openerp>
+    <data>
+        <record id="view_process_sla" model="ir.ui.view">
+            <field name="name">SLA</field>
+            <field name="model">process.sla.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="SLA">
+                    <field name="process_model"/>
+                    <field name="process_id"/>
+                    <field name="type"/>
+                    <field name="period_id" on_change="change_period(process_model, process_id, period_id)"/>
+                    <field name="line_ids" nolabel="1" colspan="4" context="{'type': type}">
+                        <tree editable="top" string="SLA">
+                            <field name="type" invisible="1"/>
+                            <field name="name" domain="[('type', '=', type)]"/>
+                            <field name="units" string="Е.И."/>
+                            <field name="weight" sum="Сумма"/>
+                            <field name="previous_period"/>
+                            <field name="plan"/>
+                            <field name="fact"/>
+                            <field name="percentage"/>
+                            <field name="mbo" sum="Сумма"/>
+                        </tree>
+                    </field>
+                    <separator colspan="4" />
+                    <group col="4" colspan="4">
+                        <button string="Отмена" icon="gtk-close" special="cancel" />
+                        <button name="set_sla" string="Сохранить" type="object" icon="gtk-ok"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_process_sla_write" model="ir.ui.view">
+            <field name="name">SLA</field>
+            <field name="model">process.sla.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="SLA">
+                    <field name="process_model"/>
+                    <field name="process_id"/>
+                    <field name="type"/>
+                    <field name="period_id" on_change="change_period(process_model, process_id, period_id)"/>
+                    <field name="line_ids" nolabel="1" colspan="4" context="{'type': type}">
+                        <tree editable="top" string="SLA">
+                            <field name="type" invisible="1"/>
+                            <field name="name" domain="[('type', '=', type)]"/>
+                            <field name="units" string="Е.И."/>
+                            <field name="weight" sum="Сумма"/>
+                            <field name="previous_period"/>
+                            <field name="plan"/>
+                            <field name="fact"/>
+                            <field name="percentage"/>
+                            <field name="mbo" sum="Сумма"/>
+                        </tree>
+                    </field>
+                    <separator colspan="4" />
+                    <group col="4" colspan="4">
+                        <button string="Отмена" icon="gtk-close" special="cancel" />
+                        <button name="write_sla" string="Сохранить" type="object" icon="gtk-ok"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+       <!-- Sla Wizard -->
+        <record id="action_process_sla" model="ir.actions.act_window">
+            <field name="name">SLA</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">process.sla.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_process_sla"/>
+            <field name="context">{}</field>
+            <field name="target">new</field>
+        </record>
+
+        <record id="action_process_sla_write" model="ir.actions.act_window">
+            <field name="name">SLA</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">process.sla.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_process_sla_write"/>
+            <field name="context">{}</field>
+            <field name="target">new</field>
+        </record>
+
+
+    </data>
+</openerp>

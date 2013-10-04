@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="view_asterisk_calls_config_tree" model="ir.ui.view">
+            <field name="name">Asterisk calls config Form</field>
+            <field name="model">asterisk.calls.config</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Настройки групп звонков" editable="bottom">
+                      <field name="group_id" required="1"/>
+                      <field name="act_window_lead_id" required="1"/>
+                      <field name="act_window_partner_id" required="1"/>
+                      <field name="type_lead_pertner" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_asterisk_group_config">
+            <field name="name">Настройки групп Asterisk</field>
+            <field name="res_model">asterisk.calls.config</field>
+            <field name="view_mode">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="view_id" ref="view_asterisk_calls_config_tree"/>
+            <field name="context">{}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_activ_asterisk_calls_config_tree">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_asterisk_calls_config_tree"/>
+            <field name="act_window_id" ref="act_asterisk_group_config"/>
+        </record>
+
+        <record id="view_asterisk_server_inherit" model="ir.ui.view">
+            <field name="name">asterisk.server.inherit</field>
+            <field name="model">asterisk.server</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="asterisk.asterisk_config_form"/>
+            <field name="arch" type="xml">
+                <field name="ast_pass_bd" position="after">
+                    <separator colspan="4"/>
+                    <field name="ami_login"/>
+                    <field name="ami_pass" password="True"/>
+                    <field name="ami_port"/>
+
+                </field>
+            </field>
+        </record>
+
+        <menuitem action="act_asterisk_group_config" id="asterisk_group_config_menuitem" name="Настройки групп Asterisk" parent="base.menu_config"/>
+
+    </data>
+</openerp>

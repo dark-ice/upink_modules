@@ -1,0 +1,261 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_kpi">
+            <field name="name">kpi.kpi.workflow</field>
+            <field name="osv">kpi.kpi</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- Workflow activities -->
+        <!-- draft -->
+        <record model="workflow.activity" id="act_kpi_draft">
+            <field name="wkf_id" ref="wkf_kpi" />
+            <field name="flow_start">True</field>
+            <field name="name">draft</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'draft'})</field>
+        </record>
+
+        <!-- waiting -->
+        <record model="workflow.activity" id="act_kpi_waiting">
+            <field name="wkf_id" ref="wkf_kpi" />
+            <field name="name">waiting</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'waiting'})</field>
+        </record>
+
+        <!-- waiting_revision -->
+        <record model="workflow.activity" id="act_kpi_waiting_revision">
+            <field name="wkf_id" ref="wkf_kpi" />
+            <field name="name">waiting_revision</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'waiting_revision'})</field>
+        </record>
+
+        <!-- planned -->
+        <record model="workflow.activity" id="act_kpi_planned">
+            <field name="wkf_id" ref="wkf_kpi" />
+            <field name="name">planned</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'planned'})</field>
+        </record>
+
+        <!-- planned_revision -->
+        <record model="workflow.activity" id="act_kpi_planned_revision">
+            <field name="wkf_id" ref="wkf_kpi" />
+            <field name="name">planned_revision</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'planned_revision'})</field>
+        </record>
+
+        <!-- passed -->
+        <record model="workflow.activity" id="act_kpi_passed">
+            <field name="wkf_id" ref="wkf_kpi" />
+            <field name="name">passed</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'passed'})</field>
+        </record>
+
+        <!-- passed_revision -->
+        <record model="workflow.activity" id="act_kpi_passed_revision">
+            <field name="wkf_id" ref="wkf_kpi" />
+            <field name="name">passed_revision</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'passed_revision'})</field>
+        </record>
+
+        <!-- agreed -->
+        <record model="workflow.activity" id="act_kpi_agreed">
+            <field name="wkf_id" ref="wkf_kpi" />
+            <field name="name">agreed</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'agreed'})</field>
+        </record>
+
+        <!-- agreed_revision -->
+        <record model="workflow.activity" id="act_kpi_agreed_revision">
+            <field name="wkf_id" ref="wkf_kpi" />
+            <field name="name">agreed_revision</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'agreed_revision'})</field>
+        </record>
+
+        <!-- saved -->
+        <record model="workflow.activity" id="act_kpi_saved">
+            <field name="wkf_id" ref="wkf_kpi" />
+            <field name="name">saved</field>
+            <field name="kind">function</field>
+            <field name="action">action_saved()</field>
+        </record>
+
+        <!-- cancel -->
+        <record model="workflow.activity" id="act_kpi_cancel">
+            <field name="wkf_id" ref="wkf_kpi" />
+            <field name="name">cancel</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'cancel'})</field>
+        </record>
+
+        <!-- Workflow transition -->
+        <!-- draft -> waiting -->
+        <record model="workflow.transition" id="kpi1_kpi2">
+            <field name="act_from" ref="act_kpi_draft" />
+            <field name="act_to" ref="act_kpi_waiting" />
+            <field name="signal">action_waiting</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- waiting -> draft -->
+        <record model="workflow.transition" id="kpi2_kpi1">
+            <field name="act_from" ref="act_kpi_waiting" />
+            <field name="act_to" ref="act_kpi_draft" />
+            <field name="signal">action_draft</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- draft -> cancel -->
+        <record model="workflow.transition" id="kpi1_kpi7">
+            <field name="act_from" ref="act_kpi_draft" />
+            <field name="act_to" ref="act_kpi_cancel" />
+            <field name="signal">action_cancel</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- cancel -> draft -->
+        <record model="workflow.transition" id="kpi7_kpi1">
+            <field name="act_from" ref="act_kpi_cancel" />
+            <field name="act_to" ref="act_kpi_draft" />
+            <field name="signal">action_draft</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- waiting -> planned -->
+        <record model="workflow.transition" id="kpi2_kpi3">
+            <field name="act_from" ref="act_kpi_waiting" />
+            <field name="act_to" ref="act_kpi_planned" />
+            <field name="signal">action_planned</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- planned -> waiting -->
+        <record model="workflow.transition" id="kpi3_2">
+            <field name="act_from" ref="act_kpi_planned" />
+            <field name="act_to" ref="act_kpi_waiting" />
+            <field name="signal">action_waiting</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- waiting -> waiting_revision -->
+        <record model="workflow.transition" id="kpi2_a8">
+            <field name="act_from" ref="act_kpi_waiting" />
+            <field name="act_to" ref="act_kpi_waiting_revision" />
+            <field name="signal">action_waiting_revision</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- waiting_revision -> waiting-->
+        <record model="workflow.transition" id="kpi8_kpi2">
+            <field name="act_from" ref="act_kpi_waiting_revision" />
+            <field name="act_to" ref="act_kpi_waiting" />
+            <field name="signal">action_waiting</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- planned -> planned_revision -->
+        <record model="workflow.transition" id="kpi3_kpi9">
+            <field name="act_from" ref="act_kpi_planned" />
+            <field name="act_to" ref="act_kpi_planned_revision" />
+            <field name="signal">action_planned_revision</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- planned_revision -> planned -->
+        <record model="workflow.transition" id="kpi9_kpi3">
+            <field name="act_from" ref="act_kpi_planned_revision" />
+            <field name="act_to" ref="act_kpi_planned" />
+            <field name="signal">action_planned</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- planned -> passed -->
+        <record model="workflow.transition" id="kpi3_kpi4">
+            <field name="act_from" ref="act_kpi_planned" />
+            <field name="act_to" ref="act_kpi_passed" />
+            <field name="signal">action_passed</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- passed -> planned -->
+        <record model="workflow.transition" id="kpi4_kpi3">
+            <field name="act_from" ref="act_kpi_passed" />
+            <field name="act_to" ref="act_kpi_planned" />
+            <field name="signal">action_planned</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- passed -> passed_revision -->
+        <record model="workflow.transition" id="kpi4_kpi10">
+            <field name="act_from" ref="act_kpi_passed" />
+            <field name="act_to" ref="act_kpi_passed_revision" />
+            <field name="signal">action_passed_revision</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- passed_revision -> passed -->
+        <record model="workflow.transition" id="kpi10_kpi4">
+            <field name="act_from" ref="act_kpi_passed_revision" />
+            <field name="act_to" ref="act_kpi_passed" />
+            <field name="signal">action_passed</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- passed -> agreed -->
+        <record model="workflow.transition" id="kpi4_kpi5">
+            <field name="act_from" ref="act_kpi_passed" />
+            <field name="act_to" ref="act_kpi_agreed" />
+            <field name="signal">action_agreed</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- agreed -> passed -->
+        <record model="workflow.transition" id="kpi5_kpi4">
+            <field name="act_from" ref="act_kpi_agreed" />
+            <field name="act_to" ref="act_kpi_passed" />
+            <field name="signal">action_passed</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- agreed -> agreed_revision -->
+        <record model="workflow.transition" id="kpi5_kpi11">
+            <field name="act_from" ref="act_kpi_agreed" />
+            <field name="act_to" ref="act_kpi_agreed_revision" />
+            <field name="signal">action_agreed_revision</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- agreed_revision -> agreed -->
+        <record model="workflow.transition" id="kpi11_kpi5">
+            <field name="act_from" ref="act_kpi_agreed_revision" />
+            <field name="act_to" ref="act_kpi_agreed" />
+            <field name="signal">action_agreed</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- agreed -> saved -->
+        <record model="workflow.transition" id="kpi5_kpi6">
+            <field name="act_from" ref="act_kpi_agreed" />
+            <field name="act_to" ref="act_kpi_saved" />
+            <field name="signal">action_saved</field>
+            <field name="condition">True</field>
+        </record>
+
+        <!-- saved -> agreed -->
+        <record model="workflow.transition" id="kpi6_kpi5">
+            <field name="act_from" ref="act_kpi_saved" />
+            <field name="act_to" ref="act_kpi_agreed" />
+            <field name="signal">action_agreed</field>
+            <field name="condition">True</field>
+        </record>
+    </data>
+</openerp>

@@ -1,0 +1,3 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_smm_editor_smm_copyrighting","smm.copyrighting smm_editor","model_smm_copyrighting","smm_copyrighting.smm_editor",0,1,1,0
+"access_smm_copyrighter_smm_copyrighting","smm.copyrighting smm_copyrighter","model_smm_copyrighting","smm_copyrighting.smm_copyrighter",0,1,1,0

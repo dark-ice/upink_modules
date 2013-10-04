@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_process_video">
+            <field name="name">wkf.process.video</field>
+            <field name="osv">process.video</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- coordination -->
+        <record model="workflow.activity" id="act_coordination">
+            <field name="wkf_id" ref="wkf_process_video"/>
+            <field name="flow_start">True</field>
+            <field name="name">Согласование заявки на запуск</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'coordination'})</field>
+        </record>
+
+        <!-- filling_TK -->
+        <record model="workflow.activity" id="act_filling_TK">
+            <field name="wkf_id" ref="wkf_process_video"/>
+            <field name="name">Заполнение ТЗ</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'filling_TK'})</field>
+        </record>
+
+        <!-- matching_script -->
+        <record model="workflow.activity" id="act_matching_script">
+            <field name="wkf_id" ref="wkf_process_video"/>
+            <field name="name">Согласование сценария</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'matching_script'})</field>
+        </record>
+
+        <!-- matching_TK -->
+        <record model="workflow.activity" id="act_matching_TK">
+            <field name="wkf_id" ref="wkf_process_video"/>
+            <field name="name">Согласование ТЗ</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'matching_TK'})</field>
+        </record>
+
+        <!-- development -->
+        <record model="workflow.activity" id="act_development">
+            <field name="wkf_id" ref="wkf_process_video"/>
+            <field name="name">Разработка идей</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'development'})</field>
+        </record>
+
+        <!-- selection -->
+        <record model="workflow.activity" id="act_selection">
+            <field name="wkf_id" ref="wkf_process_video"/>
+            <field name="name">Выбор идеи</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'selection'})</field>
+        </record>
+
+        <!-- drawing_up -->
+        <record model="workflow.activity" id="act_drawing_up">
+            <field name="wkf_id" ref="wkf_process_video"/>
+            <field name="name">Составление сценария</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'drawing_up'})</field>
+        </record>
+
+        <!-- signing_application -->
+        <record model="workflow.activity" id="act_signing_application">
+            <field name="wkf_id" ref="wkf_process_video"/>
+            <field name="name">Подписание приложения к договору</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'signing_application'})</field>
+        </record>
+
+        <!-- preparation -->
+        <record model="workflow.activity" id="act_preparation">
+            <field name="wkf_id" ref="wkf_process_video"/>
+            <field name="name">Подготовительные работы к разработке проекта</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'preparation'})</field>
+        </record>
+
+        <!-- approval -->
+        <record model="workflow.activity" id="act_approval">
+            <field name="wkf_id" ref="wkf_process_video"/>
+            <field name="name">Согласование вариантов</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'approval'})</field>
+        </record>
+
+        <!-- work -->
+        <record model="workflow.activity" id="act_work">
+            <field name="wkf_id" ref="wkf_process_video"/>
+            <field name="name">Работа над проектом</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'work'})</field>
+        </record>
+
+        <!-- assertion -->
+        <record model="workflow.activity" id="act_assertion">
+            <field name="wkf_id" ref="wkf_process_video"/>
+            <field name="name">Утверждение заказчиком</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'assertion'})</field>
+        </record>
+
+        <!-- transmission -->
+        <record model="workflow.activity" id="act_transmission">
+            <field name="wkf_id" ref="wkf_process_video"/>
+            <field name="name">Передача проекта</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'transmission'})</field>
+        </record>
+
+        <!-- finish -->
+        <record model="workflow.activity" id="act_finish">
+            <field name="wkf_id" ref="wkf_process_video"/>
+            <field name="flow_stop">True</field>
+            <field name="name">Проект передан</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'finish'})
+close_launch()</field>
+        </record>
+
+        <!-- cancel -->
+        <record model="workflow.activity" id="act_cancel">
+            <field name="wkf_id" ref="wkf_process_video"/>
+            <field name="flow_stop">True</field>
+            <field name="name">Отмена</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'cancel'})
+cancel_launch()</field>
+        </record>
+
+
+        <!-- coordination -> filling_TK -->
+        <record model="workflow.transition" id="c_f">
+            <field name="act_from" ref="act_coordination"/>
+            <field name="act_to" ref="act_filling_TK"/>
+            <field name="signal">filling_TK</field>
+        </record>
+
+        <!-- filling_TK -> matching_TK -->
+        <record model="workflow.transition" id="f_m_tk">
+            <field name="act_from" ref="act_filling_TK"/>
+            <field name="act_to" ref="act_matching_TK"/>
+            <field name="signal">matching_TK</field>
+        </record>
+
+        <!-- matching_TK -> filling_TK -->
+        <record model="workflow.transition" id="m_f_tk">
+            <field name="act_from" ref="act_matching_TK"/>
+            <field name="act_to" ref="act_filling_TK"/>
+            <field name="signal">filling_TK</field>
+        </record>
+
+        <!-- matching_TK -> development -->
+        <record model="workflow.transition" id="m_d">
+            <field name="act_from" ref="act_matching_TK"/>
+            <field name="act_to" ref="act_development"/>
+            <field name="signal">development</field>
+        </record>
+
+        <!-- development -> selection -->
+        <record model="workflow.transition" id="d_s">
+            <field name="act_from" ref="act_development"/>
+            <field name="act_to" ref="act_selection"/>
+            <field name="signal">selection</field>
+        </record>
+
+        <!-- selection -> development -->
+        <record model="workflow.transition" id="s_d">
+            <field name="act_from" ref="act_selection"/>
+            <field name="act_to" ref="act_development"/>
+            <field name="signal">development</field>
+        </record>
+
+        <!-- selection -> drawing_up -->
+        <record model="workflow.transition" id="s_du">
+            <field name="act_from" ref="act_selection"/>
+            <field name="act_to" ref="act_drawing_up"/>
+            <field name="signal">drawing_up</field>
+        </record>
+
+        <!-- drawing_up -> matching_script -->
+        <record model="workflow.transition" id="du_ms">
+            <field name="act_from" ref="act_drawing_up"/>
+            <field name="act_to" ref="act_matching_script"/>
+            <field name="signal">matching_script</field>
+        </record>
+
+        <!-- matching_script -> drawing_up -->
+        <record model="workflow.transition" id="ms_du">
+            <field name="act_from" ref="act_matching_script"/>
+            <field name="act_to" ref="act_drawing_up"/>
+            <field name="signal">drawing_up</field>
+        </record>
+
+        <!-- matching_script -> signing_application -->
+        <record model="workflow.transition" id="ms_sa">
+            <field name="act_from" ref="act_matching_script"/>
+            <field name="act_to" ref="act_signing_application"/>
+            <field name="signal">signing_application</field>
+        </record>
+
+        <!-- signing_application -> preparation -->
+        <record model="workflow.transition" id="sa_p">
+            <field name="act_from" ref="act_signing_application"/>
+            <field name="act_to" ref="act_preparation"/>
+            <field name="signal">preparation</field>
+        </record>
+
+        <!-- preparation -> approval -->
+        <record model="workflow.transition" id="p_a">
+            <field name="act_from" ref="act_preparation"/>
+            <field name="act_to" ref="act_approval"/>
+            <field name="signal">approval</field>
+        </record>
+
+        <!-- approval -> preparation -->
+        <record model="workflow.transition" id="a_p">
+            <field name="act_from" ref="act_approval"/>
+            <field name="act_to" ref="act_preparation"/>
+            <field name="signal">preparation</field>
+        </record>
+
+        <!-- approval -> work -->
+        <record model="workflow.transition" id="a_w">
+            <field name="act_from" ref="act_approval"/>
+            <field name="act_to" ref="act_work"/>
+            <field name="signal">work</field>
+        </record>
+
+        <!-- work -> assertion -->
+        <record model="workflow.transition" id="w_as">
+            <field name="act_from" ref="act_work"/>
+            <field name="act_to" ref="act_assertion"/>
+            <field name="signal">assertion</field>
+        </record>
+
+        <!-- assertion -> work -->
+        <record model="workflow.transition" id="as_w">
+            <field name="act_from" ref="act_assertion"/>
+            <field name="act_to" ref="act_work"/>
+            <field name="signal">work</field>
+        </record>
+
+        <!-- assertion -> cancel -->
+        <record model="workflow.transition" id="as_c">
+            <field name="act_from" ref="act_assertion"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">cancel</field>
+        </record>
+
+        <!-- assertion -> transmission -->
+        <record model="workflow.transition" id="as_t">
+            <field name="act_from" ref="act_assertion"/>
+            <field name="act_to" ref="act_transmission"/>
+            <field name="signal">transmission</field>
+        </record>
+
+        <!-- transmission -> finish -->
+        <record model="workflow.transition" id="t_f">
+            <field name="act_from" ref="act_transmission"/>
+            <field name="act_to" ref="act_finish"/>
+            <field name="signal">finish</field>
+        </record>
+    </data>
+</openerp>

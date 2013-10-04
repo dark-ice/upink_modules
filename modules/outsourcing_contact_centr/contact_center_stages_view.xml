@@ -1,0 +1,42 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+    <record model="ir.ui.view" id="view_template_report_type_stage_tree">
+        <field name="name">Справочник типов отчетов - tree</field>
+        <field name="model">campaign.report.type</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Справочник типов отчетов">
+               <field name="name"/>
+               <field name="compan_type"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_template_report_type_stage_form">
+        <field name="name">Справочник типов отчетов - form</field>
+        <field name="model">campaign.report.type</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Справочник типов отчетов">
+               <field name="name"/>
+               <field name="compan_type"/>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="window_template_report_type_stage">
+        <field name="name">Справочник типов отчетов</field>
+        <field name="res_model">campaign.report.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_template_report_type_stage_tree"/>
+    </record>
+
+     <menuitem name="Аутсорсинговый контакт-центр" id="menu_outsourcing_contact_center"
+           parent="process_base.menu_process_all"  sequence="7"/>
+     <menuitem name="Справочники - аутсор. конт. центра" id="menu_outsourcing_contact_center_stages"
+           parent="process_base.menu_process_all_config" sequence="3"/>
+    <menuitem name="Типы отчетов" id="menu_template_report_type_stage" action="window_template_report_type_stage"
+           parent="menu_outsourcing_contact_center_stages" sequence="1"/>
+     </data>
+</openerp>

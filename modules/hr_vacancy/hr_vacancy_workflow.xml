@@ -1,0 +1,212 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+# Workflow
+        <record model="workflow" id="wkf_hr_vacancy">
+            <field name="name">hr.vacancy.basic</field>
+            <field name="osv">hr.vacancy</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <record model="workflow.activity" id="act_draft">
+            <field name="wkf_id" ref="wkf_hr_vacancy" />
+            <field name="flow_start">True</field>
+            <field name="name">draft</field>
+            <field name="kind">function</field>
+            <field name="action">action_draft()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_agreement">
+            <field name="wkf_id" ref="wkf_hr_vacancy" />
+            <field name="name">agreement</field>
+            <field name="kind">function</field>
+            <field name="action">action_agreement()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_approval">
+            <field name="wkf_id" ref="wkf_hr_vacancy" />
+            <field name="name">approval</field>
+            <field name="kind">function</field>
+            <field name="action">action_approval()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_appointment">
+            <field name="wkf_id" ref="wkf_hr_vacancy" />
+            <field name="name">appointment</field>
+            <field name="kind">function</field>
+            <field name="action">action_appointment()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_adoption_of_the_work">
+            <field name="wkf_id" ref="wkf_hr_vacancy" />
+            <field name="name">adoption_of_the_work</field>
+            <field name="kind">function</field>
+            <field name="action">action_adoption_of_the_work()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_in_the_work">
+            <field name="wkf_id" ref="wkf_hr_vacancy" />
+            <field name="name">in_the_work</field>
+            <field name="kind">function</field>
+            <field name="action">action_in_the_work()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_for_completion_agr">
+            <field name="wkf_id" ref="wkf_hr_vacancy" />
+            <field name="name">for_completion_agr</field>
+            <field name="kind">function</field>
+            <field name="action">action_for_completion_agr()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_for_completion_app">
+            <field name="wkf_id" ref="wkf_hr_vacancy" />
+            <field name="name">for_completion_app</field>
+            <field name="kind">function</field>
+            <field name="action">action_for_completion_app()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_for_completion_adop">
+            <field name="wkf_id" ref="wkf_hr_vacancy" />
+            <field name="name">for_completion_adop</field>
+            <field name="kind">function</field>
+            <field name="action">action_for_completion_adop()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_closed">
+            <field name="wkf_id" ref="wkf_hr_vacancy" />
+            <field name="name">closed</field>
+            <field name="kind">function</field>
+            <field name="action">action_closed()</field>
+        </record>
+
+        <record model="workflow.activity" id="act_canceled">
+            <field name="wkf_id" ref="wkf_hr_vacancy" />
+            <field name="name">canceled</field>
+            <field name="kind">function</field>
+            <field name="action">action_canceled()</field>
+            <field name="flow_stop">True</field>
+        </record>
+
+        <record model="workflow.transition" id="t1">
+            <field name="act_from" ref="act_draft" />
+            <field name="act_to" ref="act_agreement" />
+            <field name="signal">action_agreement</field>
+            <field name="group_id" ref="base.sup_group_hr_vacancy"/>
+        </record>
+######## Согласование
+        <record model="workflow.transition" id="t2">
+            <field name="act_from" ref="act_agreement" />
+            <field name="act_to" ref="act_approval" />
+            <field name="signal">action_approval</field>
+            <field name="group_id" ref="base.hrsup_group_hr_vacancy"/>
+        </record>
+
+        <record model="workflow.transition" id="t2_t17">
+            <field name="act_from" ref="act_agreement" />
+            <field name="act_to" ref="act_canceled" />
+            <field name="signal">action_canceled</field>
+            <field name="group_id" ref="base.hrsup_group_hr_vacancy"/>
+        </record>
+
+        <record model="workflow.transition" id="t2_2">
+            <field name="act_from" ref="act_agreement" />
+            <field name="act_to" ref="act_for_completion_agr" />
+            <field name="signal">action_for_completion_agr</field>
+            <field name="group_id" ref="base.hrsup_group_hr_vacancy"/>
+        </record>
+
+        <record model="workflow.transition" id="t2_3">
+            <field name="act_from" ref="act_for_completion_agr" />
+            <field name="act_to" ref="act_agreement" />
+            <field name="signal">action_agreement</field>
+            <field name="group_id" ref="base.sup_group_hr_vacancy"/>
+        </record>
+######## Утверждение
+        <record model="workflow.transition" id="t3">
+            <field name="act_from" ref="act_approval" />
+            <field name="act_to" ref="act_appointment" />
+            <field name="signal">action_appointment</field>
+            <field name="group_id" ref="base.valid_group_hr_vacancy"/>
+        </record>
+
+        <record model="workflow.transition" id="t3_t17">
+            <field name="act_from" ref="act_approval" />
+            <field name="act_to" ref="act_canceled" />
+            <field name="signal">action_canceled</field>
+            <field name="group_id" ref="base.valid_group_hr_vacancy"/>
+        </record>
+
+        <record model="workflow.transition" id="t3_2">
+            <field name="act_from" ref="act_approval" />
+            <field name="act_to" ref="act_for_completion_app" />
+            <field name="signal">action_for_completion_app</field>
+            <field name="group_id" ref="base.valid_group_hr_vacancy"/>
+        </record>
+
+        <record model="workflow.transition" id="t3_3">
+            <field name="act_from" ref="act_for_completion_app" />
+            <field name="act_to" ref="act_approval" />
+            <field name="signal">action_approval</field>
+            <field name="group_id" ref="base.sup_group_hr_vacancy"/>
+        </record>
+######## Назначение ответственного
+        <record model="workflow.transition" id="t4">
+            <field name="act_from" ref="act_appointment" />
+            <field name="act_to" ref="act_adoption_of_the_work" />
+            <field name="signal">action_adoption_of_the_work</field>
+            <field name="group_id" ref="base.hrsup_group_hr_vacancy"/>
+        </record>
+######## Принятие в работу
+        <record model="workflow.transition" id="t5">
+            <field name="act_from" ref="act_adoption_of_the_work" />
+            <field name="act_to" ref="act_in_the_work" />
+            <field name="signal">action_in_the_work</field>
+            <field name="group_id" ref="base.recruit_group"/>
+        </record>
+
+        <record model="workflow.transition" id="t5_2">
+            <field name="act_from" ref="act_adoption_of_the_work" />
+            <field name="act_to" ref="act_for_completion_adop" />
+            <field name="signal">action_for_completion_adop</field>
+            <field name="group_id" ref="base.recruit_group"/>
+        </record>
+
+        <record model="workflow.transition" id="t5_3">
+            <field name="act_from" ref="act_for_completion_adop" />
+            <field name="act_to" ref="act_adoption_of_the_work" />
+            <field name="signal">action_adoption_of_the_work</field>
+            <field name="group_id" ref="base.sup_group_hr_vacancy"/>
+        </record>
+######## В работе / Закрытие
+        <record model="workflow.transition" id="t6">
+            <field name="act_from" ref="act_in_the_work" />
+            <field name="act_to" ref="act_closed" />
+            <field name="signal">action_closed</field>
+            <field name="group_id" ref="base.recruit_group"/>
+        </record>
+
+        <record model="workflow.transition" id="t6_t17">
+            <field name="act_from" ref="act_in_the_work" />
+            <field name="act_to" ref="act_canceled" />
+            <field name="signal">action_canceled</field>
+            <field name="group_id" ref="base.hrsup_group_hr_vacancy"/>
+        </record>
+
+######## Отмена
+
+        <record model="workflow.transition" id="t18">
+            <field name="act_from" ref="act_draft" />
+            <field name="act_to" ref="act_canceled" />
+            <field name="signal">action_canceled</field>
+            <field name="group_id" ref="base.sup_group_hr_vacancy"/>
+        </record>
+####### Из ЗАКРЫТИЯ в РАБОТУ
+        <record model="workflow.transition" id="t19">
+            <field name="act_from" ref="act_closed" />
+            <field name="act_to" ref="act_in_the_work" />
+            <field name="signal">action_in_the_work</field>
+        </record>
+
+
+    </data>
+</openerp>

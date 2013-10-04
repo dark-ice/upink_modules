@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_process_call_in">
+            <field name="name">wkf.process.call.in</field>
+            <field name="osv">process.call.in</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- coordination -->
+        <record model="workflow.activity" id="act_in_coordination">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="flow_start">True</field>
+            <field name="name">Согласование заявки на запуск</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'coordination'})</field>
+        </record>
+
+        <!-- filling_TK -->
+        <record model="workflow.activity" id="act_in_filling_TK">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="name">Заполнение ТЗ</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'filling_TK'})</field>
+        </record>
+
+        <!-- revision_TK -->
+        <record model="workflow.activity" id="act_in_revision_TK">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="name">ТЗ на доработке</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'revision_TK'})</field>
+        </record>
+
+        <!-- approval_TK -->
+        <record model="workflow.activity" id="act_in_approval_TK">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="name">Согласование ТЗ</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'approval_TK'})</field>
+        </record>
+
+        <!-- filling_scenario -->
+        <record model="workflow.activity" id="act_in_filling_scenario">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="name">Подготовка сценария</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'filling_scenario'})</field>
+        </record>
+
+        <!-- revision_scenario -->
+        <record model="workflow.activity" id="act_in_revision_scenario">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="name">Сценарий на доработке</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'revision_scenario'})</field>
+        </record>
+
+        <!-- approval_scenario -->
+        <record model="workflow.activity" id="act_in_approval_scenario">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="name">Утверждение сценария</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'approval_scenario'})</field>
+        </record>
+
+        <!-- filling_template -->
+        <record model="workflow.activity" id="act_in_filling_template">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="name">Подготовка формы отчета</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'filling_template'})</field>
+        </record>
+
+        <!-- revision_template -->
+        <record model="workflow.activity" id="act_in_revision_template">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="name">Форма отчета на доработке</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'revision_template'})</field>
+        </record>
+
+        <!-- approval_template -->
+        <record model="workflow.activity" id="act_in_approval_template">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="name">Согласование формы отчета</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'approval_template'})</field>
+        </record>
+
+        <!-- training_agents -->
+        <record model="workflow.activity" id="act_in_training_agents">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="name">Обучение агентов</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'training_agents'})</field>
+        </record>
+
+        <!-- testing_agents -->
+        <record model="workflow.activity" id="act_in_testing_agents">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="name">Тестирование агентов партнером</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'testing_agents'})</field>
+        </record>
+
+        <!-- tech_setup -->
+        <record model="workflow.activity" id="act_in_tech_setup">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="name">Тех. настройка проекта</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'tech_setup'})</field>
+        </record>
+
+        <!-- development -->
+        <record model="workflow.activity" id="act_in_development">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="name">Реализация проекта</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'development'})</field>
+        </record>
+
+        <!-- pause -->
+        <record model="workflow.activity" id="act_in_pause">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="name">Приостановление проекта</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'pause'})</field>
+        </record>
+
+        <!-- coordination_reporting -->
+        <record model="workflow.activity" id="act_in_coordination_reporting">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="name">Согласование отчетности</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'coordination_reporting'})</field>
+        </record>
+
+        <!-- finish -->
+        <record model="workflow.activity" id="act_in_finish">
+            <field name="wkf_id" ref="wkf_process_call_in"/>
+            <field name="flow_stop">True</field>
+            <field name="name">Проект завершен</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'finish'})</field>
+        </record>
+
+
+        <!-- coordination -> filling_TK -->
+        <record model="workflow.transition" id="in_c_ftk">
+            <field name="act_from" ref="act_in_coordination"/>
+            <field name="act_to" ref="act_in_filling_TK"/>
+            <field name="signal">filling_TK</field>
+        </record>
+
+        <!-- filling_TK -> approval_TK -->
+        <record model="workflow.transition" id="in_ftk_atk">
+            <field name="act_from" ref="act_in_filling_TK"/>
+            <field name="act_to" ref="act_in_approval_TK"/>
+            <field name="signal">approval_TK</field>
+        </record>
+
+        <!-- approval_TK -> revision_TK -->
+        <record model="workflow.transition" id="in_atk_rtk">
+            <field name="act_from" ref="act_in_approval_TK"/>
+            <field name="act_to" ref="act_in_revision_TK"/>
+            <field name="signal">revision_TK</field>
+        </record>
+
+        <!-- revision_TK -> approval_TK -->
+        <record model="workflow.transition" id="in_rtk_atk">
+            <field name="act_from" ref="act_in_revision_TK"/>
+            <field name="act_to" ref="act_in_approval_TK"/>
+            <field name="signal">approval_TK</field>
+        </record>
+
+        <!-- approval_TK -> filling_scenario -->
+        <record model="workflow.transition" id="in_atk_fs">
+            <field name="act_from" ref="act_in_approval_TK"/>
+            <field name="act_to" ref="act_in_filling_scenario"/>
+            <field name="signal">filling_scenario</field>
+        </record>
+
+        <!-- filling_scenario -> approval_scenario -->
+        <record model="workflow.transition" id="in_fs_as">
+            <field name="act_from" ref="act_in_filling_scenario"/>
+            <field name="act_to" ref="act_in_approval_scenario"/>
+            <field name="signal">approval_scenario</field>
+        </record>
+
+        <!-- approval_scenario -> revision_scenario -->
+        <record model="workflow.transition" id="in_as_rs">
+            <field name="act_from" ref="act_in_approval_scenario"/>
+            <field name="act_to" ref="act_in_revision_scenario"/>
+            <field name="signal">revision_scenario</field>
+        </record>
+
+        <!-- revision_scenario -> approval_scenario -->
+        <record model="workflow.transition" id="in_rs_as">
+            <field name="act_from" ref="act_in_revision_scenario"/>
+            <field name="act_to" ref="act_in_approval_scenario"/>
+            <field name="signal">approval_scenario</field>
+        </record>
+
+        <!-- approval_scenario -> training_agents -->
+        <record model="workflow.transition" id="in_as_ta">
+            <field name="act_from" ref="act_in_approval_scenario"/>
+            <field name="act_to" ref="act_in_training_agents"/>
+            <field name="signal">training_agents</field>
+        </record>
+
+        <!-- training_agents -> testing_agents -->
+        <record model="workflow.transition" id="in_ta_tsa">
+            <field name="act_from" ref="act_in_training_agents"/>
+            <field name="act_to" ref="act_in_testing_agents"/>
+            <field name="signal">testing_agents</field>
+        </record>
+
+        <!-- testing_agents -> training_agents -->
+        <record model="workflow.transition" id="in_tsa_ta">
+            <field name="act_from" ref="act_in_testing_agents"/>
+            <field name="act_to" ref="act_in_training_agents"/>
+            <field name="signal">training_agents</field>
+        </record>
+
+        <!-- testing_agents -> tech_setup -->
+        <record model="workflow.transition" id="in_tsa_tes">
+            <field name="act_from" ref="act_in_testing_agents"/>
+            <field name="act_to" ref="act_in_tech_setup"/>
+            <field name="signal">tech_setup</field>
+        </record>
+
+        <!-- tech_setup -> filling_template -->
+        <record model="workflow.transition" id="in_tes_ft">
+            <field name="act_from" ref="act_in_tech_setup"/>
+            <field name="act_to" ref="act_in_filling_template"/>
+            <field name="signal">filling_template</field>
+        </record>
+
+        <!-- filling_template -> approval_template -->
+        <record model="workflow.transition" id="in_ft_at">
+            <field name="act_from" ref="act_in_filling_template"/>
+            <field name="act_to" ref="act_in_approval_template"/>
+            <field name="signal">approval_template</field>
+        </record>
+
+        <!-- approval_template -> revision_template -->
+        <record model="workflow.transition" id="in_at_rt">
+            <field name="act_from" ref="act_in_approval_template"/>
+            <field name="act_to" ref="act_in_revision_template"/>
+            <field name="signal">revision_template</field>
+        </record>
+
+        <!-- revision_template -> approval_template -->
+        <record model="workflow.transition" id="in_rt_at">
+            <field name="act_from" ref="act_in_revision_template"/>
+            <field name="act_to" ref="act_in_approval_template"/>
+            <field name="signal">approval_template</field>
+        </record>
+
+        <!-- approval_template -> development -->
+        <record model="workflow.transition" id="in_at_d">
+            <field name="act_from" ref="act_in_approval_template"/>
+            <field name="act_to" ref="act_in_development"/>
+            <field name="signal">development</field>
+        </record>
+
+        <!-- development -> coordination_reporting -->
+        <record model="workflow.transition" id="in_d_cr">
+            <field name="act_from" ref="act_in_development"/>
+            <field name="act_to" ref="act_in_coordination_reporting"/>
+            <field name="signal">coordination_reporting</field>
+        </record>
+
+        <!-- coordination_reporting -> pause -->
+        <record model="workflow.transition" id="in_cr_p">
+            <field name="act_from" ref="act_in_coordination_reporting"/>
+            <field name="act_to" ref="act_in_pause"/>
+            <field name="signal">training_agents</field>
+        </record>
+
+        <!-- pause -> coordination_reporting -->
+        <record model="workflow.transition" id="in_p_cr">
+            <field name="act_from" ref="act_in_pause"/>
+            <field name="act_to" ref="act_in_coordination_reporting"/>
+            <field name="signal">coordination_reporting</field>
+        </record>
+
+        <!-- coordination_reporting -> finish -->
+        <record model="workflow.transition" id="in_cr_f">
+            <field name="act_from" ref="act_in_coordination_reporting"/>
+            <field name="act_to" ref="act_in_finish"/>
+            <field name="signal">finish</field>
+        </record>
+    </data>
+</openerp>

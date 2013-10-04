@@ -1,0 +1,273 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_tasks">
+            <field name="name">wkf.tasks</field>
+            <field name="osv">tasks</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- draft -->
+        <record model="workflow.activity" id="act_draft">
+            <field name="wkf_id" ref="wkf_tasks"/>
+            <field name="flow_start">True</field>
+            <field name="name">Черновик</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='draft')</field>
+        </record>
+
+        <!-- cancel -->
+        <record model="workflow.activity" id="act_cancel">
+            <field name="wkf_id" ref="wkf_tasks"/>
+            <field name="name">Отмена</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='cancel')</field>
+            <field name="flow_stop">True</field>
+        </record>
+
+        <!-- agr_responsible -->
+        <record model="workflow.activity" id="act_agr_responsible">
+            <field name="wkf_id" ref="wkf_tasks"/>
+            <field name="name">Согласование с ответственным</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='agr_responsible')</field>
+        </record>
+
+        <!-- rw_author -->
+        <record model="workflow.activity" id="act_rw_author">
+            <field name="wkf_id" ref="wkf_tasks"/>
+            <field name="name">На доработке автором</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='rw_author')</field>
+        </record>
+
+        <!-- agr_performer -->
+        <record model="workflow.activity" id="act_agr_performer">
+            <field name="wkf_id" ref="wkf_tasks"/>
+            <field name="name">Согласование с исполнителем</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='agr_performer')</field>
+        </record>
+
+        <!-- rw_responsible -->
+        <record model="workflow.activity" id="act_rw_responsible">
+            <field name="wkf_id" ref="wkf_tasks"/>
+            <field name="name">На доработке ответственным</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='rw_responsible')</field>
+        </record>
+
+        <!-- inwork -->
+        <record model="workflow.activity" id="act_inwork">
+            <field name="wkf_id" ref="wkf_tasks"/>
+            <field name="name">В работе</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='inwork')</field>
+        </record>
+
+        <!-- app_responsible -->
+        <record model="workflow.activity" id="act_app_responsible">
+            <field name="wkf_id" ref="wkf_tasks"/>
+            <field name="name">Утверждение ответственным</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='app_responsible')</field>
+        </record>
+
+        <!-- rw_app_responsible -->
+        <record model="workflow.activity" id="act_rw_app_responsible">
+            <field name="wkf_id" ref="wkf_tasks"/>
+            <field name="name">На доработку (утверждение остветсвенным)</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='rw_app_resp')</field>
+        </record>
+
+        <!-- app_author -->
+        <record model="workflow.activity" id="act_app_author">
+            <field name="wkf_id" ref="wkf_tasks"/>
+            <field name="name">Утверждение автором</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='app_author')</field>
+        </record>
+
+        <!-- rw_app_author -->
+        <record model="workflow.activity" id="act_rw_app_author">
+            <field name="wkf_id" ref="wkf_tasks"/>
+            <field name="name">На доработку (утверждение автором)</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='rw_app_author')</field>
+        </record>
+
+        <!-- done -->
+        <record model="workflow.activity" id="act_done">
+            <field name="wkf_id" ref="wkf_tasks"/>
+            <field name="name">Завершено</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='done')</field>
+            <field name="flow_stop">True</field>
+        </record>
+
+
+        <!-- Transition/Переходы -->
+
+        <!-- draft -> cancel -->
+        <record model="workflow.transition" id="draft_cancel">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">act_d_c</field>
+        </record>
+
+        <!-- draft -> agr_responsible -->
+        <record model="workflow.transition" id="draft_agr_responsible">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_agr_responsible"/>
+            <field name="signal">act_d_ar</field>
+        </record>
+
+        <!-- draft -> inwork -->
+        <record model="workflow.transition" id="draft_inwork">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_inwork"/>
+            <field name="signal">act_d_i</field>
+        </record>
+
+        <!-- inwork -> draft -->
+        <record model="workflow.transition" id="inwork_draft">
+            <field name="act_from" ref="act_inwork"/>
+            <field name="act_to" ref="act_draft"/>
+            <field name="signal">act_i_d</field>
+        </record>
+
+        <!-- agr_responsible -> rw_author -->
+        <record model="workflow.transition" id="agr_responsible_rw_author">
+            <field name="act_from" ref="act_agr_responsible"/>
+            <field name="act_to" ref="act_rw_author"/>
+            <field name="signal">act_ar_ra</field>
+        </record>
+
+        <!-- rw_author -> agr_responsible -->
+        <record model="workflow.transition" id="rw_author_agr_responsible">
+            <field name="act_from" ref="act_rw_author"/>
+            <field name="act_to" ref="act_agr_responsible"/>
+            <field name="signal">act_rwa_ra</field>
+        </record>
+
+        <!-- rw_author -> cancel -->
+        <record model="workflow.transition" id="rw_author_cancel">
+            <field name="act_from" ref="act_rw_author"/>
+            <field name="act_to" ref="act_cancel"/>
+            <field name="signal">act_rwa_c</field>
+        </record>
+
+        <!-- agr_responsible -> agr_performer -->
+        <record model="workflow.transition" id="agr_responsible_agr_performer">
+            <field name="act_from" ref="act_agr_responsible"/>
+            <field name="act_to" ref="act_agr_performer"/>
+            <field name="signal">act_ar_ap</field>
+        </record>
+
+        <!-- agr_performer -> agr_responsible -->
+        <record model="workflow.transition" id="agr_performer_agr_responsible">
+            <field name="act_from" ref="act_agr_performer"/>
+            <field name="act_to" ref="act_agr_responsible"/>
+            <field name="signal">act_ap_ar</field>
+        </record>
+
+        <!-- agr_responsible -> inwork -->
+        <record model="workflow.transition" id="agr_responsible_inwork">
+            <field name="act_from" ref="act_agr_responsible"/>
+            <field name="act_to" ref="act_inwork"/>
+            <field name="signal">act_ar_i</field>
+        </record>
+
+        <!-- inwork -> agr_responsible -->
+        <record model="workflow.transition" id="inwork_agr_responsible">
+            <field name="act_from" ref="act_inwork"/>
+            <field name="act_to" ref="act_agr_responsible"/>
+            <field name="signal">act_i_ar</field>
+        </record>
+
+        <!-- agr_performer -> inwork -->
+        <record model="workflow.transition" id="agr_performer_inwork">
+            <field name="act_from" ref="act_agr_performer"/>
+            <field name="act_to" ref="act_inwork"/>
+            <field name="signal">act_ap_i</field>
+        </record>
+
+        <!-- inwork -> agr_performer -->
+        <record model="workflow.transition" id="inwork_agr_performer">
+            <field name="act_from" ref="act_inwork"/>
+            <field name="act_to" ref="act_agr_performer"/>
+            <field name="signal">act_i_ap</field>
+        </record>
+
+        <!-- inwork -> app_responsible -->
+        <record model="workflow.transition" id="inwork_app_responsible">
+            <field name="act_from" ref="act_inwork"/>
+            <field name="act_to" ref="act_app_responsible"/>
+            <field name="signal">act_i_apr</field>
+        </record>
+
+        <!-- inwork -> app_author -->
+        <record model="workflow.transition" id="inwork_app_author">
+            <field name="act_from" ref="act_inwork"/>
+            <field name="act_to" ref="act_app_author"/>
+            <field name="signal">act_i_apa</field>
+        </record>
+
+        <!-- inwork -> done -->
+        <record model="workflow.transition" id="inwork_done">
+            <field name="act_from" ref="act_inwork"/>
+            <field name="act_to" ref="act_done"/>
+            <field name="signal">act_i_done</field>
+        </record>
+
+        <!-- app_responsible -> rw_app_responsible -->
+        <record model="workflow.transition" id="app_responsible_rw_app_responsible">
+            <field name="act_from" ref="act_app_responsible"/>
+            <field name="act_to" ref="act_rw_app_responsible"/>
+            <field name="signal">act_apr_rar</field>
+        </record>
+
+        <!-- rw_app_responsible -> app_responsible -->
+        <record model="workflow.transition" id="rw_app_responsible_app_responsible">
+            <field name="act_from" ref="act_rw_app_responsible"/>
+            <field name="act_to" ref="act_app_responsible"/>
+            <field name="signal">act_rar_apr</field>
+        </record>
+
+        <!-- app_responsible -> app_author -->
+        <record model="workflow.transition" id="app_responsible_app_author">
+            <field name="act_from" ref="act_app_responsible"/>
+            <field name="act_to" ref="act_app_author"/>
+            <field name="signal">act_apr_apa</field>
+        </record>
+
+        <!-- app_author -> app_responsible -->
+        <record model="workflow.transition" id="app_author_app_responsible">
+            <field name="act_from" ref="act_app_author"/>
+            <field name="act_to" ref="act_app_responsible"/>
+            <field name="signal">act_apa_apr</field>
+        </record>
+
+        <!-- app_author -> rw_app_author -->
+        <record model="workflow.transition" id="app_author_rw_app_author">
+            <field name="act_from" ref="act_app_author"/>
+            <field name="act_to" ref="act_rw_app_author"/>
+            <field name="signal">act_apa_raa</field>
+        </record>
+
+        <!-- rw_app_author -> app_author -->
+        <record model="workflow.transition" id="rw_app_author_app_author">
+            <field name="act_from" ref="act_rw_app_author"/>
+            <field name="act_to" ref="act_app_author"/>
+            <field name="signal">act_raa_apa</field>
+        </record>
+
+        <!-- app_author -> done -->
+        <record model="workflow.transition" id="app_author_done">
+            <field name="act_from" ref="act_app_author"/>
+            <field name="act_to" ref="act_done"/>
+            <field name="signal">act_apa_d</field>
+        </record>
+    </data>
+</openerp>

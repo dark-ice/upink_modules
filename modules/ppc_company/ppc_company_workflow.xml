@@ -1,0 +1,140 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="workflow" id="wkf_ppc_company_up">
+            <field name="name">ppc.company.ppc_company_wrk</field>
+            <field name="osv">ppc.company</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- draft -->
+        <record model="workflow.activity" id="act_in_draft">
+            <field name="wkf_id" ref="wkf_ppc_company_up" />
+            <field name="name">черновик</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='draft')</field>
+            <field name="flow_start">True</field>
+        </record>
+
+        <!-- approval_application -->
+        <record model="workflow.activity" id="act_approval_application">
+            <field name="wkf_id" ref="wkf_ppc_company_up" />
+            <field name="name">согласование заявки</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='approval_application')</field>
+        </record>
+
+        <!-- appointment_account_manager -->
+        <record model="workflow.activity" id="act_appointment_account_manager">
+            <field name="wkf_id" ref="wkf_ppc_company_up" />
+            <field name="name">назначение аккаунт менеджера</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='appointment_account_manager')</field>
+        </record>
+
+        <!-- preparation_startup_company -->
+        <record model="workflow.activity" id="act_preparation_startup_company">
+            <field name="wkf_id" ref="wkf_ppc_company_up" />
+            <field name="name">подготовка запуска кампании</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='preparation_startup_company')</field>
+        </record>
+
+        <!-- completion_company -->
+        <record model="workflow.activity" id="act_completion_company">
+            <field name="wkf_id" ref="wkf_ppc_company_up" />
+            <field name="name">доработка кампании</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='completion_company')</field>
+        </record>
+
+        <!-- adoption_company -->
+        <record model="workflow.activity" id="act_adoption_company">
+            <field name="wkf_id" ref="wkf_ppc_company_up" />
+            <field name="name">утверждение кампании</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='adoption_company')</field>
+        </record>
+
+        <!-- implementation_company -->
+        <record model="workflow.activity" id="act_implementation_company">
+            <field name="wkf_id" ref="wkf_ppc_company_up" />
+            <field name="name">реализация кампании</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='implementation_company')</field>
+        </record>
+
+        <!-- closed -->
+        <record model="workflow.activity" id="act_closed">
+            <field name="wkf_id" ref="wkf_ppc_company_up" />
+            <field name="name">кампания остановлена</field>
+            <field name="kind">function</field>
+            <field name="action">workflow_setter(state='closed')</field>
+        </record>
+
+
+        <!-- draft -> approval_application -->
+        <record model="workflow.transition" id="d_aa">
+            <field name="act_from" ref="act_in_draft"/>
+            <field name="act_to" ref="act_approval_application"/>
+            <field name="signal">action_d_aa</field>
+        </record>
+
+        <!-- approval_application -> appointment_account_manager -->
+        <record model="workflow.transition" id="aa_aam">
+            <field name="act_from" ref="act_approval_application" />
+            <field name="act_to" ref="act_appointment_account_manager" />
+            <field name="signal">action_aa_aam</field>
+        </record>
+
+        <!-- appointment_account_manager -> preparation_startup_company -->
+        <record model="workflow.transition" id="aam_psc">
+            <field name="act_from" ref="act_appointment_account_manager" />
+            <field name="act_to" ref="act_preparation_startup_company" />
+            <field name="signal">action_aam_psc</field>
+        </record>
+
+        <!-- preparation_startup_company -> adoption_company -->
+        <record model="workflow.transition" id="psc_ac">
+            <field name="act_from" ref="act_preparation_startup_company" />
+            <field name="act_to" ref="act_adoption_company" />
+            <field name="signal">action_psc_ac</field>
+        </record>
+
+        <!-- adoption_company -> completion_company -->
+        <record model="workflow.transition" id="ac_cc">
+            <field name="act_from" ref="act_adoption_company" />
+            <field name="act_to" ref="act_completion_company" />
+            <field name="signal">action_ac_cc</field>
+        </record>
+
+        <!-- completion_company -> preparation_startup_company -->
+        <record model="workflow.transition" id="cc_psc">
+            <field name="act_from" ref="act_completion_company" />
+            <field name="act_to" ref="act_preparation_startup_company" />
+            <field name="signal">action_cc_psc</field>
+        </record>
+
+        <!-- adoption_company -> implementation_company -->
+        <record model="workflow.transition" id="ac_ic">
+            <field name="act_from" ref="act_adoption_company" />
+            <field name="act_to" ref="act_implementation_company" />
+            <field name="signal">action_ac_ic</field>
+        </record>
+
+        <!-- implementation_company -> closed -->
+        <record model="workflow.transition" id="ic_c">
+            <field name="act_from" ref="act_implementation_company" />
+            <field name="act_to" ref="act_closed" />
+            <field name="signal">action_ic_c</field>
+        </record>
+
+        <!-- closed -> implementation_company -->
+        <record model="workflow.transition" id="c_ic">
+            <field name="act_from" ref="act_closed" />
+            <field name="act_to" ref="act_implementation_company" />
+            <field name="signal">action_c_ic</field>
+        </record>
+    </data>
+</openerp>

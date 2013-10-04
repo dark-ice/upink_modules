@@ -1,0 +1,285 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+  #---- Tree Forums
+    <record model="ir.ui.view" id="view_smm_forum_tree">
+        <field name="name">SMM - Forums</field>
+        <field name="model">smm.forum</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Форумы">
+               <field name="name"/>
+               <field name="partner_id"/>
+               <field name="rights_id"/>
+               <field name="url"/>
+               <field name="countrys_id"/>
+               <field name="states_id"/>
+               <field name="cr_date"/>
+               <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form Forums
+    <record model="ir.ui.view" id="view_smm_forum_form">
+        <field name="name">SMM - Forums</field>
+        <field name="model">smm.forum</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Форумы">
+                <group colspan="4" col="15">
+                        <field name="name" required="1" />
+                        <field name="partner_id"/>
+                        <field name="tema" required="1"/>
+                        <field name="rights_id" required="1" widget="selection"/>
+                        <field name="cr_date" required="1" groups="base.smm_admin_manager" />
+                        <field name="user_id" readonly="1" />					
+                        <field name="responsible_users" groups="base.smm_admin_manager" colspan="10"/>
+                        <separator colspan="15"/>
+                        <field name="login" required="1"/>
+                        <field name="password" required="1"/>
+                        <field name="account" required="1"/>
+                        <field name="url" widget="url" required="1"/>
+                        <field name="email" widget="email" required="1"/>
+                        <field name="countrys_id" required="1" widget="selection"/>
+                        <field name="states_id" widget="selection"/>
+                        <field name="comments" colspan="15"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+  #---- Tree Forums stage
+    <record model="ir.ui.view" id="view_smm_forum_stage_tree">
+        <field name="name">SMM - Forums stage</field>
+        <field name="model">smm.forum.stage</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Справочник форумы">
+               <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form Forums stage
+<record model="ir.ui.view" id="view_smm_forum_stage_form">
+        <field name="name">SMM - Forums stage</field>
+        <field name="model">smm.forum.stage</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Справочник форумы">
+                <group colspan="4" col="8">
+                        <field name="name" required="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+  #---- Tree Forums country stage
+    <record model="ir.ui.view" id="view_smm_forum_country_stage_tree">
+        <field name="name">SMM - Forums country stage</field>
+        <field name="model">smm.forum.country.stage</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Справочник стран">
+               <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form Forums country stage
+<record model="ir.ui.view" id="view_smm_forum_country_stage_form">
+        <field name="name">SMM - Forums country stage</field>
+        <field name="model">smm.forum.country.stage</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Справочник стран">
+                <group colspan="4" col="8">
+                        <field name="name" required="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+  #---- Tree Forums state stage
+    <record model="ir.ui.view" id="view_smm_forum_state_stage_tree">
+        <field name="name">SMM - Forums state stage</field>
+        <field name="model">smm.forum.state.stage</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Справочник регионов/областей">
+               <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form Forums state stage
+<record model="ir.ui.view" id="view_smm_forum_state_stage_form">
+        <field name="name">SMM - Forums state stage</field>
+        <field name="model">smm.forum.state.stage</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Справочник регионов/областей">
+                <group colspan="4" col="8">
+                        <field name="name" required="1"/>
+                        <field name="country_id" required="1" widget="selection"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+
+#---- Tree Forums rights stage
+    <record model="ir.ui.view" id="view_smm_forum_rights_stage_tree">
+        <field name="name">SMM - Forums rights stage</field>
+        <field name="model">smm.forum.rights.stage</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Справочник прав форумы">
+               <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+#----Form Forums rights stage
+<record model="ir.ui.view" id="view_smm_forum_stage_rights_form">
+        <field name="name">SMM - Forums rights stage</field>
+        <field name="model">smm.forum.rights.stage</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Справочник прав форумы">
+                <group colspan="4" col="8">
+                        <field name="name" required="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+
+        <record model="ir.actions.act_window" id="window_case_smm_forum">
+            <field name="name">SMM - Форумы</field>
+            <field name="res_model">smm.forum</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_forum_tree"/>
+            <field name="help">Форумы</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_forum_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_forum_tree"/>
+            <field name="act_window_id" ref="window_case_smm_forum"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_forum_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_forum_form"/>
+            <field name="act_window_id" ref="window_case_smm_forum"/>
+        </record>
+
+<!--
+        <record model="ir.actions.act_window" id="window_case_smm_forum_stage">
+            <field name="name">SMM - Справочник форумы</field>
+            <field name="res_model">smm.forum.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_forum_stage_tree"/>
+            <field name="help">Справочник форумы</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_forum_stage_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_forum_stage_tree"/>
+            <field name="act_window_id" ref="window_case_smm_forum_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_forum_stage_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_forum_stage_form"/>
+            <field name="act_window_id" ref="window_case_smm_forum_stage"/>
+        </record>
+-->
+
+        <record model="ir.actions.act_window" id="window_case_smm_country_stage">
+            <field name="name">SMM - Справочник стран</field>
+            <field name="res_model">smm.forum.country.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_forum_country_stage_tree"/>
+            <field name="help">Справочник стран</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_forum_country_stage_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_forum_country_stage_tree"/>
+            <field name="act_window_id" ref="window_case_smm_country_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_forum_country_stage_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_forum_country_stage_form"/>
+            <field name="act_window_id" ref="window_case_smm_country_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_case_smm_state_stage">
+            <field name="name">SMM - Справочник регионов/областей</field>
+            <field name="res_model">smm.forum.state.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_forum_state_stage_tree"/>
+            <field name="help">Справочник регионов/областей</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_forum_state_stage_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_forum_state_stage_tree"/>
+            <field name="act_window_id" ref="window_case_smm_state_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_forum_state_stage_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_forum_state_stage_form"/>
+            <field name="act_window_id" ref="window_case_smm_state_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_case_smm_forum_rights_stage">
+            <field name="name">SMM - Справочник прав форумы</field>
+            <field name="res_model">smm.forum.rights.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_smm_forum_rights_stage_tree"/>
+            <field name="help">Справочник прав форумы</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_rights_forum_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_smm_forum_rights_stage_tree"/>
+            <field name="act_window_id" ref="window_case_smm_forum_rights_stage"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_smm_forum_stage_rights_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_smm_forum_stage_rights_form"/>
+            <field name="act_window_id" ref="window_case_smm_forum_rights_stage"/>
+        </record>
+
+     <menuitem name="Форумы" id="menu_smm_forum" action="window_case_smm_forum"
+           parent="menu_smm_base" sequence="9" groups="base.smm_manager,base.smm_admin_manager"/>
+<!--
+     <menuitem name="Справочник форумы" id="menu_smm_forum_stage" action="window_case_smm_forum_stage"
+           parent="menu_smm_config" sequence="10" groups="base.smm_admin_manager"/>
+-->
+     <menuitem name="Справочник прав форумы" id="menu_smm_forum_rights_stage" action="window_case_smm_forum_rights_stage"
+           parent="menu_smm_config" sequence="10" groups="base.smm_admin_manager"/>
+     <menuitem name="Справочник стран" id="menu_smm_forum_country_stage" action="window_case_smm_country_stage"
+           parent="menu_smm_config" sequence="11" groups="base.smm_admin_manager"/>
+     <menuitem name="Справочник рег./обл." id="menu_smm_forum_state_stage" action="window_case_smm_state_stage"
+           parent="menu_smm_config" sequence="12" groups="base.smm_admin_manager"/>
+
+     </data>
+</openerp>

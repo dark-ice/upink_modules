@@ -1,0 +1,86 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+
+<!--
+        <record model="ir.ui.view" id="crm.crm_case_form_view_leads_inherit_tel">
+            <field name="name">crm.lead.form inherit.tel</field>
+            <field name="model">crm.lead</field>
+            <field name="type">form</field>
+            <field name="priority" eval="4"/>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
+            <field name="arch" type="xml">
+                <field name="phone" position="after">
+                     <field name="phone_ids" mode="tree" nolabel="1" colspan="2">
+                        <tree string="Номера телефонов" editable="bottom">
+                            <field name="phone" />
+                            <field name="phone_type"/>
+                        </tree>
+                     </field>
+                </field>
+                 <field name="phone" position="replace">
+                    <field name="phone" readonly="True" />
+                 </field>
+                 <field name="mobile" position="replace">
+                    <field name="mobile" readonly="True"/>
+                 </field>
+            </field>
+        </record>
+-->
+
+        <record id="view_partner_form_inherit_tel" model="ir.ui.view">
+            <field name="name">res.partner.form inherit.tel</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field eval="5" name="priority"/>
+            <field name="arch" type="xml">
+                <field name="phone" position="after">
+                     <field name="phone_ids" mode="tree" nolabel="1" colspan="2">
+                        <tree string="Номера телефонов" editable="bottom">
+                            <field name="phone" />
+                            <field name="phone_type"/>
+                        </tree>
+                     </field>
+                </field>
+                <field name="phone" position="replace">
+                    <field name="phone" invisible="True" />
+                </field>
+                <field name="mobile" position="replace">
+                    <field name="mobile" invisible="True"/>
+                </field>
+                <field name="fax" position="replace">
+                    <field name="fax" invisible="True"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_partner_address_form_inherit_tel" model="ir.ui.view">
+            <field name="name">res.partner.address.form inherit.tel</field>
+            <field name="model">res.partner.address</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_partner_address_form1" />
+            <field eval="5" name="priority"/>
+            <field name="arch" type="xml">
+                <field name="phone" position="after">
+                     <field name="phone_ids" mode="tree" nolabel="1" colspan="2">
+                        <tree string="Номера телефонов" editable="bottom">
+                            <field name="phone" />
+                            <field name="phone_type"/>
+                        </tree>
+                     </field>
+                </field>
+                <field name="phone" position="replace">
+                    <field name="phone" invisible="True" />
+                </field>
+                <field name="mobile" position="replace">
+                    <field name="mobile" invisible="True"/>
+                </field>
+                <field name="fax" position="replace">
+                    <field name="fax" invisible="True"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data noupdate="1">
+    <record id="smm_copyrighting.smm_editor" model="res.groups">
+        <field name="name">SMM / Editor</field>
+    </record>
+    <record id="smm_copyrighting.smm_copyrighter" model="res.groups">
+        <field name="name">SMM / Copyrighter</field>
+    </record>
+  </data>
+</openerp>

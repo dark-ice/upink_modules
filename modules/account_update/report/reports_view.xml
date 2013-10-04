@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <menuitem id="account.menu_finance_invoice_reports" parent="account.menu_finance_root"
+                  name="Отчеты" sequence="5" groups="account.group_account_user"/>
+
+        <record id="view_balance_manager_tree" model="ir.ui.view">
+            <field eval="1" name="priority"/>
+            <field name="name">account.balance.managers.tree</field>
+            <field name="model">account.balance.manager</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Отчет по оплатам">
+
+                    <field name="user_id"/>
+                    <field name="date_start" invisible="1" />
+                    <field name="date_end" invisible="1" />
+                    <field name="card_id" invisible="1" />
+
+                    <field name="partner_id" invisible="1"/>
+                    <field name="partner_name"/>
+                    <field name="partner_urname"/>
+                    <field name="section_id" invisible="1" />
+                    <field name="number" />
+                    <field name="date_invoice" />
+                    <field name="currency_rate"/>
+                    <field name="total_dol" sum="Сумма в $" groups="account.group_report_all"/>
+                    <field name="total" sum="Сумма счета в валюте счета" groups="account.group_report_all"/>
+                    <field name="pay_date"/>
+                    <field name="pay_line_name" sum=""/>
+                    <field name="pay_line_name_dol" sum=""/>
+                    <field name="service_id"/>
+                    <field name="division"/>
+                    <field name="leader_group_id" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_balance_manager_search" model="ir.ui.view">
+            <field name="name">account.balance.managers.search</field>
+            <field name="model">account.balance.manager</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Отчет по оплатам">
+                    <group>
+                        <field name="user_id">
+                            <filter icon="terp-personal"
+                                    string="Мои счета"
+                                    help="Мои счета"
+                                    domain="[('user_id','=',uid)]"/>
+                        </field>
+                        <field name="date_start"/>
+                        <field name="date_end" nolabel="1"/>
+                    </group>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Автору" icon="terp-partner" name="User" context="{'group_by':'user_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Счет" icon="terp-partner" name="Number" context="{'group_by':'number'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Партнеру" icon="terp-partner" context="{'group_by':'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Направление" icon="terp-partner" context="{'group_by':'division'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Касса/банк/кошелек" icon="terp-partner" context="{'group_by':'card_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_balance_manager_all" model="ir.actions.act_window">
+            <field name="name">Отчет по оплатам</field>
+            <field name="res_model">account.balance.manager</field>
+            <field name="view_mode">tree</field>
+            <field name="search_view_id" ref="view_balance_manager_search"/>
+            <field name="view_id" ref="view_balance_manager_tree"/>
+            <field name="context">{'group_by':[]}</field>
+        </record>
+
+        <menuitem action="action_balance_manager_all" id="menu_balance_manager_all" parent="account.menu_finance_invoice_reports" sequence="1"/>
+
+        <record id="view_frequency_payment_tree" model="ir.ui.view">
+            <field eval="1" name="priority"/>
+            <field name="name">account.frequency.payment.tree</field>
+            <field name="model">account.frequency.payment</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Отчет по частоте оплат" colors="orange:count_days  &gt; 30 and count_days &lt;= 60;red:count_days  &gt; 60">
+
+                    <field name="user_id" invisible="1"/>
+                    <field name="date_start" invisible="1" />
+                    <field name="date_end" invisible="1" />
+
+                    <field name="partner_id"/>
+                    <field name="number" />
+                    <field name="total_dol" sum="Сумма в $"/>
+                    <field name="pay_total" sum="Сумма платежа"/>
+                    <field name="pay_date"/>
+                    <field name="pay_number" invisible="1"/>
+                    <field name="service_id"/>
+                    <field name="division"/>
+                    <field name="count_days" group="0"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_frequency_payment_search" model="ir.ui.view">
+            <field name="name">account.frequency.payment.search</field>
+            <field name="model">account.frequency.payment</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Отчет по частоте оплат">
+                    <group>
+                        <field name="user_id">
+                            <filter icon="terp-personal"
+                                    string="Мои счета"
+                                    help="Мои счета"
+                                    domain="[('user_id','=',uid)]"/>
+                        </field>
+                        <field name="date_start"/>
+                        <field name="date_end" nolabel="1"/>
+                    </group>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Автору" icon="terp-partner" name="User" context="{'group_by':'user_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Счет" icon="terp-partner" name="Number" context="{'group_by':'number'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Партнеру" icon="terp-partner" context="{'group_by':'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_frequency_payment_all" model="ir.actions.act_window">
+            <field name="name">Отчет по частоте оплат</field>
+            <field name="res_model">account.frequency.payment</field>
+            <field name="view_mode">tree</field>
+            <field name="search_view_id" ref="view_frequency_payment_search"/>
+            <field name="view_id" ref="view_frequency_payment_tree"/>
+            <field name="context">{'search_default_User':1, 'group_by':[]}</field>
+        </record>
+
+        <menuitem action="action_frequency_payment_all" id="menu_frequency_payment_all" parent="account.menu_finance_invoice_reports" sequence="2"/>
+
+        <record id="view_balance_client_tree" model="ir.ui.view">
+            <field eval="1" name="priority"/>
+            <field name="name">account.balance.client.tree</field>
+            <field name="model">account.balance.client</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Баланс с партнером">
+
+                    <field name="date_start" invisible="1" />
+                    <field name="date_end" invisible="1" />
+                    <field name="invoice_id" invisible="1" />
+
+                    <field name="number"/>
+                    <field name="partner_id"/>
+
+                    <field name="date_invoice"/>
+                    <field name="total" sum="1"/>
+                    <field name="paid" sum="1"/>
+
+                    <field name="document_date" />
+                    <field name="document_cash" sum="1"/>
+
+                    <field name="pay_id" />
+                    <field name="pay_date" />
+                    <field name="pay_total" sum="1"/>
+
+                    <field name="saldo" sum="1"/>
+
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_balance_client_search" model="ir.ui.view">
+            <field name="name">account.balance.client.search</field>
+            <field name="model">account.balance.client</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Баланс с партнером">
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="lead_id"/>
+                        <field name="date_start"/>
+                        <field name="date_end" nolabel="1"/>
+                    </group>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Счет" icon="terp-partner" name="Invoice" context="{'group_by':'invoice_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Партнеру" icon="terp-partner" context="{'group_by':'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_balance_client_all" model="ir.actions.act_window">
+            <field name="name">Баланс с партнером</field>
+            <field name="res_model">account.balance.client</field>
+            <field name="view_mode">tree</field>
+            <field name="search_view_id" ref="view_balance_client_search"/>
+            <field name="view_id" ref="view_balance_client_tree"/>
+            <field name="context">{'group_by':[]}</field>
+        </record>
+
+        <menuitem action="action_balance_client_all" id="menu_balance_client_all" parent="account.menu_finance_invoice_reports" sequence="4"/>
+    </data>
+</openerp>

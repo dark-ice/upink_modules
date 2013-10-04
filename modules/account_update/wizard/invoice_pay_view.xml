@@ -1,0 +1,43 @@
+<openerp>
+    <data>
+        <record id="view_account_invoice_pay" model="ir.ui.view">
+            <field name="name">account.invoice.pay.wizard.view</field>
+            <field name="model">account.invoice.pay.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Провести платеж">
+                    <field name="invoice_id"/>
+                    <field name="type_account"/>
+                    <field name="date_pay"/>
+                    <field name="card_id" domain="[('type_account', '=', type_account)]" on_change="change_card(card_id)"/>
+                    <field name="getter" colspan="4" attrs="{'invisible': [('type_account', '!=', 'cashless')], 'required': [('type_account', '=', 'cashless')]}"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="pay_linew_ids" nolabel="1" colspan="4"  widget="one2many_list">
+                        <tree string="Платеж" editable="top">
+                            <field name="service_id" readonly="1"/>
+                            <field name="name" sum="Сумма платежа"/>
+                        </tree>
+                    </field>
+                    <separator string="" colspan="4" />
+                    <group col="4" colspan="4">
+                        <button string="Отмена" icon="gtk-close" special="cancel" />
+                        <button name="set_pay" string="Провести" type="object" icon="gtk-ok"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+       <!-- Invoice Pay Wizard -->
+        <record id="action_account_invoice_pay" model="ir.actions.act_window">
+            <field name="name">Платеж</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.invoice.pay.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_account_invoice_pay"/>
+            <field name="context">{}</field>
+            <field name="target">new</field>
+        </record>
+
+
+    </data>
+</openerp>

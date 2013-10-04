@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+<!-- Through search view -->
+    <record id="through_search_form" model="ir.ui.view">
+        <field name="name">Сквозной поиск</field>
+        <field name="model">through.search</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Сквозной поиск">
+                <field name="name" />
+                <button name="do_search" string="Искать" icon="gtk-ok" type="object"/>
+                <html>
+                    <script type="text/javascript" language="javascript">
+                        $('.action-buttons').hide();
+
+                        $("#name").keypress(function(e){
+                            if ( e.which == 13 ) {
+                                buttonClicked('do_search', 'object', 'through.search', '', getNodeAttribute(this, 'confirm'), '', getNodeAttribute(this, 'context'));
+                                return false;
+                            }
+                        });
+
+                        $('tr.grid-row').click(function(){
+                            var $obj = $(this),
+                                $parent = $obj.parents('table.grid'),
+                                model_grid = $parent.attr("id"),
+                                id = $obj.attr('record') ,
+                                model = '', prefix, view_ids, context;
+
+                            if (model_grid == 'lead_ids_grid') {
+                                model = 'crm.lead';
+                                prefix = 'lead_ids/';
+                                view_ids = '[1445]';
+                                context = "{'_terp_view_name': 'Кандидаты UpSale'}";
+                            }  
+
+                            if (model_grid == 'brief_ids_grid') {
+                                model = 'brief.main';
+                                prefix = 'brief_ids/';
+                                view_ids = '[1321]';
+                            } 
+
+                            if (model_grid == 'partner_ids_grid') {
+                                model = 'res.partner';
+                                prefix = 'partner_ids/';
+                                view_ids = '[1455]';
+                            } 
+
+                            if (model_grid == 'partner_address_ids_grid') {
+                                model = 'res.partner.address';
+                                prefix = 'partner_address_ids/';
+                                view_ids = '[130]';
+                            }
+
+                            if (id) {
+                                var src = '', readonly = true, target = null;
+                                
+                                var kind = getNodeAttribute(src + '_set', 'kind');
+
+                                if (kind == "one2many") {
+                                    new One2Many(src).edit(id, readonly);
+                                    return;
+                                }
+
+                                var args = {
+                                    'model': model,
+                                    'id': id || 'False',
+                                    'ids': openobject.dom.get(prefix + '_terp_ids').value,
+                                    'view_ids': view_ids || openobject.dom.get(prefix + '_terp_view_ids').value,
+                                    'view_mode': '[u"form"]',
+                                    'view_type': 'form',
+                                    'domain': [],
+                                    'context':  context,
+                                    'offset': openobject.dom.get(prefix + '_terp_offset').value,
+                                    'limit': openobject.dom.get(prefix + '_terp_limit').value,
+                                    'count': openobject.dom.get(prefix + '_terp_count').value,
+                                    'search_domain': jQuery('#_terp_search_domain').val() || null,
+                                    'search_data': jQuery('#_terp_search_data').val() || null,
+                                    'filter_domain': jQuery('#_terp_filter_domain').val() || [],
+                                    'notebook_tab': 0,
+                                    'action_id': jQuery('#_terp_action_id').val() || null
+                                };
+
+                                var action = readonly ? 'view' : 'edit', dialog = $('.ui-dialog ');
+                                if (dialog.length == 0) {
+                                    jQuery.frame_dialog({src:openobject.http.getURL(get_form_action(action, args))});
+                                    //window.open(get_form_action(action, args));
+                                }
+                                
+                            } 
+                        });
+
+                        $('body').ajaxComplete(function(e) {
+                            var val = $("#name").val();
+                            if (val != '') {
+                                $('#lead_ids_grid tbody, #brief_ids_grid tbody, #partner_ids_grid tbody, #partner_address_ids_grid tbody').highlight(val);
+                            }
+                        });
+                        
+                    </script>
+                </html>
+                <group colspan="4">
+                    <notebook colspan="4">
+                        <!-- Кандидаты -->
+                        <page string="Кандидаты" attrs="{'invisible':[('lead_ids','=',[])]}">
+                            <field name="lead_ids" mode="tree" nolabel="1" colspan="6">
+                                <tree string="Кандидаты">
+                                    <field name="name" />
+                                    <field name="contact_name"/>
+                                    <field name="all_phones" />
+                                    <field name="email_from"/>
+                                    <field name="email_2"/>
+                                    <field name="site_url_1"/>
+                                    <field name="site_url_2"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <!-- Брифы -->
+                        <page string="Брифы" attrs="{'invisible':[('brief_ids','=',[])]}">
+                            <field name="brief_ids" mode="tree" nolabel="1" colspan="6" >
+                                <tree string="Брифы">
+                                    <field name="name" />
+                                    <!--<field name="cand_id" />
+                                 <field name="user_id" />
+                                 <field name="specialist_id" /> -->
+                                    <field name="state" />
+                                    <field name="notes" />
+                                    <field name="comment_mp" />
+                                    <field name="web_sites" string="Веб-сайты" />
+                                </tree>
+                            </field>
+                        </page>
+
+                        <!-- Партнеры -->
+                        <page string="Партнеры" attrs="{'invisible':[('partner_ids','=',[])]}">
+                            <field name="partner_ids" mode="tree" nolabel="1" colspan="6">
+                                <tree string="Партнеры">
+                                    <field name="name" />
+                                </tree>
+                            </field>
+                        </page>
+
+                        <!--Контакты -->
+                        <page string="Контакты" attrs="{'invisible':[('partner_address_ids','=',[])]}">
+                            <field name="partner_address_ids" mode="tree" nolabel="1" colspan="6">
+                                <tree string="Контакты">
+                                    <field name="name"/>
+                                    <field name="email"/>
+                                    <field name="email_two"/>
+                                    <field name="partner_site"/>
+                                    <field name="partner_site_two"/>
+                                    <field name="all_phones" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </group>
+            </form>
+        </field>
+    </record>
+
+
+<!-- Through search Action -->
+    <record model="ir.actions.act_window" id="action_through_search">
+        <field name="name">Сквозной поиск</field>
+        <field name="res_model">through.search</field>
+        <field name="view_mode">form</field>
+        <field name="limit">20</field>
+        <field name="domain">[]</field>
+    </record>
+
+    <record model="ir.actions.act_window.view" id="action_through_views">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="through_search_form"/>
+        <field name="act_window_id" ref="action_through_search"/>
+    </record>
+
+    <menuitem parent="base.menu_base_partner" name="Сквозной поиск"
+            id="menu_through_search"
+            action="action_through_search" sequence="0" />
+
+    <menuitem parent="menu_through_search" name="Сквозной поиск"
+            id="menu_through_search_s"
+            action="action_through_search" sequence="0" />
+
+    </data>
+</openerp>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+    <!-- Бизнес-процесс для информационной записки -->
+   <record model="workflow" id="wkf_inform_note">
+        <field name="name">Бизнес-процесс Информационные записки</field>
+        <field name="osv">company.info.note</field>
+        <field name="on_create">True</field>
+    </record>
+        
+    <!-- Workflow activities -->
+    
+    <record model="workflow.activity" id="act_info_draft">
+        <field name="wkf_id" ref="wkf_inform_note" />
+        <field name="flow_start">True</field>
+        <field name="name">Черновик</field>
+        <field name="kind">function</field>
+        <field name="action">action_draft()</field>
+    </record>
+
+    <record model="workflow.activity" id="act_info_waiting">
+        <field name="wkf_id" ref="wkf_inform_note" />
+        <field name="name">На согласовании</field>
+        <field name="kind">function</field>
+        <field name="action">action_waiting()</field>
+    </record>
+    
+    <record model="workflow.activity" id="act_info_rework">
+        <field name="wkf_id" ref="wkf_inform_note" />
+        <field name="name">На доработке</field>
+        <field name="kind">function</field>
+        <field name="action">action_rework()</field>
+    </record>
+    
+    <record model="workflow.activity" id="act_info_published">
+        <field name="wkf_id" ref="wkf_inform_note" />
+        <field name="name">Опубликовано</field>
+        <field name="kind">function</field>
+        <field name="action">action_published()</field>
+    </record>
+    
+    <record model="workflow.activity" id="act_info_cancel">
+        <field name="wkf_id" ref="wkf_inform_note" />
+        <field name="name">Отменено</field>
+        <field name="kind">function</field>
+        <field name="action">action_cancel()</field>
+    </record>
+    
+    <!-- Workflow transition -->
+    
+    <record model="workflow.transition" id="t1_t2">
+        <field name="act_from" ref="act_info_draft" />
+        <field name="act_to" ref="act_info_waiting" />
+        <field name="signal">action_published</field>
+        <field name="condition">not check_manager()</field>
+    </record>
+    
+    <record model="workflow.transition" id="t2_t1">
+        <field name="act_from" ref="act_info_waiting" />
+        <field name="act_to" ref="act_info_draft" />
+        <field name="signal">action_draft</field>
+        <field name="condition">check_author()</field>
+    </record>
+    
+    <record model="workflow.transition" id="t1_t4">
+        <field name="act_from" ref="act_info_draft" />
+        <field name="act_to" ref="act_info_published" />
+        <field name="signal">action_published</field>
+        <field name="condition">check_manager()</field>
+    </record>
+    
+    <record model="workflow.transition" id="t2_t4">
+        <field name="act_from" ref="act_info_waiting" />
+        <field name="act_to" ref="act_info_published" />
+        <field name="signal">action_published</field>
+        <field name="condition">check_manager()</field>
+    </record>
+    
+    <record model="workflow.transition" id="t4_t2">
+        <field name="act_from" ref="act_info_published" />
+        <field name="act_to" ref="act_info_waiting" />
+        <field name="signal">action_waiting</field>
+        <field name="condition">check_manager()</field>
+    </record>
+    
+    <record model="workflow.transition" id="t2_t3">
+        <field name="act_from" ref="act_info_waiting" />
+        <field name="act_to" ref="act_info_rework" />
+        <field name="signal">action_rework</field>
+        <field name="condition">check_manager()</field>
+    </record>
+    
+    <record model="workflow.transition" id="t3_t2">
+        <field name="act_from" ref="act_info_rework" />
+        <field name="act_to" ref="act_info_waiting" />
+        <field name="signal">action_waiting</field>
+        <field name="condition">check_author()</field>
+    </record>
+    
+    <record model="workflow.transition" id="t1_t5">
+        <field name="act_from" ref="act_info_draft" />
+        <field name="act_to" ref="act_info_cancel" />
+        <field name="signal">action_cancel</field>
+        <field name="condition">check_author()</field>
+    </record>
+    
+    </data>
+</openerp>

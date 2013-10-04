@@ -1,0 +1,412 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_supp_sale_tree">
+            <field name="name">Список - Квитанции</field>
+            <field name="model">supp.sale</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Квитанции"
+                      colors="blue:state in ('draft');green:state in ('closed');red:state in ('repiar_end');black:state in ('repiar');">
+                    <field name="id" string="Номер квитанции"/>
+                    <field name="create_date"/>
+                    <field name="getup_date"/>
+                    <field name="day_on_repairs"/>
+                    <field name="ready_date"/>
+                    <field name="day_over_repairs"/>
+                    <field name="putup_date"/>
+                    <field name="trademark"/>
+                    <field name="model"/>
+                    <field name="defect"/>
+                    <field name="reason"/>
+                    <field name="state"/>
+                    <field name="city_id"/>
+                    <field name="sirial_number"/>
+                    <field name="employees_id"/>
+                    <field name="client_name"/>
+                    <field name="last_comment"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_supp_sale_form">
+            <field name="name">Форма - Квитанции</field>
+            <field name="model">supp.sale</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Квитанции">
+                    <group col="4" colspan="4" attrs="{'readonly': [('state', '=', 'closed')]}">
+                        <group colspan="4" col="6">
+                            <field name="city_id" on_change="onchange_city(city_id)" widget="selection"/>
+                            <field name="trademark"/>
+                            <field name="model"/>
+                            <field name="sirial_number"/>
+                            <field name="type_supp"/>
+                            <field name="type_client" />
+                            <field name="id" readonly="1" attrs="{'invisible': [('id', '=', 0)]}" string="Номер квитанции"/>
+                        </group>
+                        <notebook colspan="4">
+                            <page string="Описание">
+                                <group colspan="4" col="4">
+                                    <separator string="Заявленная неисправность" colspan="4"/>
+                                    <field name="defect" nolabel="1" colspan="4"/>
+                                    <separator string="Внешний вид продукции" colspan="4"/>
+                                    <field name="appearance" nolabel="1" colspan="4"/>
+                                    <separator string="Комплектность" colspan="4"/>
+                                    <field name="completion" nolabel="1" colspan="4"/>
+
+                                    <field name="client_name"/>
+                                    <field name="telephone"/>
+                                    <field name="getup_date"/>
+                                    <field name="putup_date" readonly="1"/>
+                                    <field name="ready_date" readonly="1"/>
+                                    <field name="comment" colspan="4"/>
+                                </group>
+                            </page>
+                            <page string="Обслуживание">
+                                <group col="4" colspan="4">
+                                    <field name="employees_id" colspan="2" attrs="{'invisible': [('city_id', '==', 0)]}"/>
+                                    <field name="rep_ids" mode="tree" nolabel="1" colspan="4">
+                                        <tree string="Замененные детали" editable="bottom">
+                                            <field name="name" required="1"/>
+                                            <field name="cost"/>
+                                            <field name="num"/>
+                                        </tree>
+                                    </field>
+                                    <separator string="Справочник сервисных услуг" colspan="4"/>
+                                    <field name="serv_ids" nolabel="1" colspan="4"/>
+                                    <separator string="Причина возникновения неисправности" colspan="4"/>
+                                    <field name="reason" nolabel="1" colspan="4"/>
+                                </group>
+                            </page>
+                        </notebook>
+                        <field name="note_ids" colspan="4" nolabel="1" readonly="1">
+                            <tree string="История обзвонов">
+                                <field name="title"/>
+                            </tree>
+                        </field>
+                        <button name="add_note" string="Обзвон" type="object" default_focus="1" icon="terp-document-new" colspan="4"/>
+                        <group colspan="4" col="6">
+                            <field name="state"
+                               widget="statusbar"
+                               statusbar_visible="draft,repiar,repiar_end,closed"
+                               statusbar_colors='{"repiar_end":"orange","draft":"gray","repiar":"blue","closed":"green"}'
+                                />
+
+                            <group colspan="4">
+                                <button name="action_repiar"
+                                        string="Принят в работу"
+                                        type="object"
+                                        states="draft"
+                                        icon="terp-gtk-go-back-rtl"
+                                        />
+                                <button name="action_repiar_end"
+                                        string="Ремонт окончен"
+                                        type="object"
+                                        states="repiar"
+                                        icon="terp-gtk-go-back-rtl"
+                                        />
+                                <button name="action_closed"
+                                        string="Выдан"
+                                        type="object"
+                                        states="repiar_end"
+                                        icon="gtk-jump-to"
+                                        />
+                            </group>
+                            <newline/>
+                            <field name="user_id"/>
+                            <field name="create_date"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_supp_sale_search" model="ir.ui.view">
+            <field name="name">Квитанция по тех. обс. - фильтр</field>
+            <field name="model">supp.sale</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Фильтр состояний">
+                    <filter icon="terp-check" string="В работе"
+                            domain="[('state','=','repiar')]"
+                            help="Принят в ремонт"
+                            />
+                    <filter icon="terp-document-new" string="Новые"
+                            domain="[('state','=','draft')]"
+                            help="Новые - только созданные квитанции"
+                            />
+                    <filter icon="terp-gtk-media-pause" string="Ремонт окончен"
+                            domain="[('state','=','repiar_end')]"
+                            help="Ремонт окончен и продукт готов к выдаче"
+                            />
+                    <filter icon="terp-camera_test" string="Выдан"
+                            domain="[('state','=','closed')]"
+                            help="Продукт выдан клиенту"
+                            />
+                    <field name="id" string="Номер квитанции"/>
+                    <field name="city_id" widget="selection"/>
+                    <field name="user_id"/>
+                    <field name="getup_date"/>
+                    <field name="putup_date"/>
+                    <newline/>
+                    <field name="create_date"/>
+                    <field name="trademark"/>
+                    <field name="type_supp"/>
+                    <field name="client_name"/>
+                    <field name="employees_id"/>
+                    <newline/>
+                    <group expand="0" string="Группировать по..." colspan="10" col="20">
+                        <filter string="Ответственный за ремонт" icon="terp-personal+" domain="[]"
+                                context="{'group_by':'employees_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Городу" icon="terp-gtk-select-all" domain="[]"
+                                context="{'group_by':'city_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_supp_ink">
+            <field name="name">Квитанции</field>
+            <field name="res_model">supp.sale</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_supp_sale_search"/>
+            <field name="view_id" ref="view_supp_sale_tree"/>
+        </record>
+
+        <record model="ir.ui.view" id="view_supp_city_stage_tree">
+            <field name="name">Справочник город - сотрудник список</field>
+            <field name="model">supp.city.stage</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Города">
+                    <field name="name"/>
+                    <field name="employees_ids"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_supp_city_stage_form">
+            <field name="name">Справочник город - сотрудник форма</field>
+            <field name="model">supp.city.stage</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Города">
+                    <field name="name"/>
+                    <newline/>
+                    <field name="address" colspan="4"/>
+                    <field name="phone" colspan="4"/>
+                    <field name="employees_ids"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_supp_city_stage">
+            <field name="name">Справочник городов</field>
+            <field name="res_model">supp.city.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_supp_city_stage_tree"/>
+        </record>
+
+        <record model="ir.ui.view" id="view_supp_services_stage_tree">
+            <field name="name">Справочник сервисных услуг список</field>
+            <field name="model">supp.services.stage</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Справочник сервисных услуг">
+                    <field name="name"/>
+                    <field name="cost"/>
+                    <field name="comment"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_supp_services_stage_form">
+            <field name="name">Справочник сервисных услуг форма</field>
+            <field name="model">supp.services.stage</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Справочник сервисных услуг">
+                    <field name="name"/>
+                    <field name="cost"/>
+                    <newline/>
+                    <field name="comment"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_supp_services_stage">
+            <field name="name">Справочник сервисных услуг</field>
+            <field name="res_model">supp.services.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_supp_services_stage_tree"/>
+        </record>
+
+        <!-- Add New Note view -->
+
+        <record model="ir.ui.view" id="supp_sale_add_new_note_view1">
+            <field name="name">supp.sale.add.note.form1</field>
+            <field name="model">supp.sale.notes</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Обзвон">
+                    <separator string="Заметка" colspan="4" />
+                    <field name="name" nolabel="1" colspan="4" default_focus="1"/>
+                    <separator string="" colspan="6"/>
+                    <group colspan="6" col="4" >
+                        <button string="Отмена" icon="gtk-close" special="cancel" />
+                        <button name="action_add" type="object" string="Добавить" icon="gtk-ok" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- Add New Note action -->
+
+        <record model="ir.actions.act_window" id="action_supp_sale_add_note">
+            <field name="name">Добавление заметки</field>
+            <field name="res_model">supp.sale.notes</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="supp_sale_add_new_note_view1"/>
+            <field name="target">inline</field>
+            <field name="auto_refresh">1</field>
+        </record>
+
+
+        <!-- Support Treatment -->
+        <record model="ir.ui.view" id="view_support_treatment_tree">
+            <field name="name">supp.treatment.tree</field>
+            <field name="model">supp.treatment</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Обращения">
+                    <field name="id" string='Номер обращения'/>
+                    <field name="create_date"/>
+                    <field name="author_id"/>
+                    <field name="fio"/>
+                    <field name="phone"/>
+                    <field name="city_id"/>
+                    <field name="note"/>
+
+                    <field name="category_list"/>
+                    <field name="model"/>
+                    <field name="type_list"/>
+                    <field name="description"/>
+                    <field name="solution"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_support_treatment_form">
+            <field name="name">supp.treatment.form</field>
+            <field name="model">supp.treatment</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Обращения">
+                    <field name="check_a" />
+                    <field name="check_u" />
+                    <group col="4" colspan="4">
+                        <field name="id" string='Номер обращения'/>
+                        <field name="create_date"/>
+                        <field name="author_id"/>
+                    </group>
+                    <group col="4" colspan="4">
+                        <group col="2" colspan="2">
+                            <separator string="Контактная информация" colspan="2" />
+                            <field name="fio"/>
+                            <field name="phone"/>
+                            <field name="city_id" widget="selection"/>
+                        </group>
+                        <group col="2" colspan="2">
+                            <separator string="Дополнительная информация" colspan="2" />
+                            <field name="note" nolabel="1"/>
+                        </group>
+
+                        <separator string="Информация о товаре" colspan="4" />
+
+                        <field name="category_list"/><newline />
+                        <field name="model"/><newline />
+                        <field name="type_list"/><newline />
+                        <separator string="Описание неисправности" colspan="4" />
+                        <field name="description" nolabel="1" colspan="4" />
+                        <separator string="Описание решения" colspan="4" />
+                        <field name="solution" nolabel="1" colspan="4" />
+                    </group>
+                    <group colspan="4">
+                        <field name="state"
+                               widget="statusbar"
+                               statusbar_visible="draft,set"
+                                />
+                        <newline />
+                        <!-- draft -> cancel -->
+                        <button name="action_set"
+                                icon="gtk-ok"
+                                string="Добавить обращение"
+                                attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_u', '=', False)]}"
+                                />
+                        <button name="action_draft"
+                                icon="gtk-go-back"
+                                string="Откатить в черновик"
+                                attrs="{'invisible': ['|', ('state', '!=', 'set'), ('check_a', '=', False)]}"
+                                />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_support_treatment_search" model="ir.ui.view">
+            <field name="name">supp.treatment.search</field>
+            <field name="model">supp.treatment</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Отчет по оплатам">
+                    <group>
+                        <field name="id" string='Номер обращения'/>
+                        <field name="author_id">
+                            <filter icon="terp-personal"
+                                    string="Мои обращения"
+                                    domain="[('author_id.user_id.id','=',uid)]"/>
+                        </field>
+                        <field name="category_list"/>
+                        <field name="type_list"/>
+                    </group>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Категория устройств" icon="terp-partner" name="User" context="{'group_by':'category_list'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Тип неисправности" icon="terp-partner" name="Number" context="{'group_by':'type_list'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_support_treatment">
+            <field name="name">Обращения</field>
+            <field name="res_model">supp.treatment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_support_treatment_tree"/>
+            <field name="search_view_id" ref="view_support_treatment_search"/>
+        </record>
+
+        <menuitem name="Сервисное обслуживание" id="menu_base_supp_ink"
+                  parent="base.menu_base_partner"
+                  groups="support_inksystem.supp_admin_manager,support_inksystem.supp_manager,support_inksystem.supp_users"
+                  sequence="6"/>
+        <menuitem name="Квитанции" id="menu_supp_ink" action="window_supp_ink"
+                  parent="menu_base_supp_ink"
+                  groups="support_inksystem.supp_admin_manager,support_inksystem.supp_manager,support_inksystem.supp_users"
+                  sequence="1"/>
+        <menuitem id="menu_supp_ink_treatment" action="window_support_treatment"
+                  parent="menu_base_supp_ink"
+                  groups="support_inksystem.supp_admin_manager,support_inksystem.supp_manager,support_inksystem.supp_users"
+                  sequence="2"/>
+        <menuitem name="Города" id="menu_supp_city_stage" action="window_supp_city_stage"
+                  parent="menu_base_supp_ink" sequence="3"
+                  groups="support_inksystem.supp_admin_manager,support_inksystem.supp_manager"/>
+        <menuitem name="Сервисные услуги" id="menu_supp_services_stage" action="window_supp_services_stage"
+                  parent="menu_base_supp_ink"
+                  groups="support_inksystem.supp_admin_manager,support_inksystem.supp_manager" sequence="4"/>
+    </data>
+</openerp>

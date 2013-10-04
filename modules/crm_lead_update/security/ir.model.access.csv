@@ -1,0 +1,15 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_crm_services_rel_stage","crm_services_rel_stage user","model_crm_services_rel_stage","base.group_user",1,1,1,1
+"access_crm_case_categ","crm_case_categ user","model_crm_case_categ","base.group_user",1,0,0,0
+"access_crm_source_stage","crm_source_stage user","model_crm_source_stage","base.group_user",1,0,0,0
+"access_crm_communication_history","crm_communication_history user","model_crm_communication_history","base.group_user",1,1,1,1
+"access_crm_communication_type","crm_communication_type user","model_crm_communication_type","base.group_user",1,0,0,0
+"access_crm_communication_documents","crm_communication_documents user","model_crm_communication_documents","base.group_user",1,0,0,0
+"access_transfer_history_sm","transfer_history","model_transfer_history","brief.group_sales_manager",1,1,1,0
+"access_transfer_history_sum","transfer_history","model_transfer_history","brief.group_support_manager",1,1,1,0
+"access_transfer_history_sd","transfer_history","model_transfer_history","brief.group_sales_director",1,1,1,0
+"access_transfer_history_sud","transfer_history","model_transfer_history","brief.group_support_director",1,1,1,0
+
+
+
+

@@ -1,0 +1,112 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+
+        <record id="view_partner_form_l10n_ru" model="ir.ui.view">
+            <field name="name">res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@string='Accounting']/group[1]" position="before">
+                    <group col="2" colspan="4">
+                        <separator string="Accounting details" colspan="2"/>
+                        <group col="4">
+                            <field name="name_official" colspan="4"/>
+                            <newline/>
+                            <field name="contract_num"/>
+                            <field name="contract_date"/>
+                        </group>
+                        <group col="4">
+                            <field name="inn"/>
+                            <field name="kpp"/>
+                            <field name="okpo"/>
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_res_bank_form_l10n_ru" model="ir.ui.view">
+            <field name="name">res.bank.form</field>
+            <field name="model">res.bank</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_res_bank_form"/>
+            <field name="arch" type="xml">
+                <field name="bic" position="after">
+                    <field name="acc_corr" select="1"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_res_bank_tree_l10n_ru" model="ir.ui.view">
+            <field name="name">res.bank.tree</field>
+            <field name="model">res.bank</field>
+            <field name="type">tree</field>
+            <field name="inherit_id" ref="base.view_res_bank_tree"/>
+            <field name="arch" type="xml">
+                <field name="bic" position="after">
+                    <field name="acc_corr"/>
+                    <field name="city"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_partner_bank_form_l10n_ru" model="ir.ui.view">
+            <field name="name">res.partner.bank.form</field>
+            <field name="model">res.partner.bank</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_partner_bank_form"/>
+            <field name="arch" type="xml">
+                <field name="bank_bic" position="after">
+                    <field name="bank_acc_corr"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_partner_property_form_l10n_ru" model="ir.ui.view">
+            <field name="name">res.partner.property.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="account.view_partner_property_form"/>
+            <field name="arch" type="xml">
+                <field name="bank_bic" position="after">
+                    <field name="bank_acc_corr"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_wizard_update_banks" model="ir.ui.view">
+            <field name="name">wizard.update.banks.form</field>
+            <field name="model">wizard.update.banks</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <group colspan="4" col="4">
+                    <field name="location_bnkseek" colspan="2"/>
+                    <field name="location_bnkdel" colspan="2"/>
+                    <newline/>
+                    <button icon="gtk-cancel" special="cancel" type="object" string="Cancel" colspan="2"/>
+                    <button icon="gtk-ok" name="update_banks" string="Update" type="object" colspan="2"
+                            context="{'location_bnkseek': location_bnkseek, 'location_bnkdel': location_bnkdel}"/>
+                </group>
+            </field>
+        </record>
+
+        <record id="action_wizard_update_banks" model="ir.actions.act_window">
+            <field name="name">Update Banks</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.update.banks</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+        </record>
+
+	<record id="account_configuration_update_banks_todo" model="ir.actions.todo">
+            <field name="action_id" ref="action_wizard_update_banks"/>
+            <field name="category_id" ref="account.category_accounting_configuration"/>
+        </record>
+
+        <menuitem sequence="1" action="action_wizard_update_banks"
+                  id="menu_update_banks" parent="account.account_account_menu"/>
+
+    </data>
+</openerp>

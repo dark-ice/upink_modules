@@ -1,0 +1,44 @@
+"for each=""o in objects""",,,,,,,
+"Внимание! Оплата данного счета означает согласие с условиями поставки товара. Уведомление об оплате
+обязательно, в противном случае не гарантируется наличие товара на складе. Товар отпускается по факту
+прихода денег на р/с Поставщика, самовывозом, при наличии доверенности и паспорта.",,,,,,,
+,,,,,,,
+,,,,,,,
+,,,,,,,
+Счет действителен в течение 3-х банковских дней,,,,,,,
+,,,,,,,
+o.account_id.bank,,,,,БИК,o.account_id.bik,
+,,,,,Сч. №,o.account_id.bank_number,
+Банк получателя,,,,,,,
+ИНН,o.account_id.inn,КПП,o.account_id.kpp,,Сч. №,o.account_id.account_number,
+o.account_id.full,,,,,,,
+Получатель,,,,,,,
+,,,,,,,
+Счет на оплату № o.number от get_date(o.date_invoice) г.,,,,,,,
+,,,,,,,
+,,,,,,,
+"Поставщик: o.account_id.full, ИНН o.account_id.inn, КПП o.account_id.kpp, o.account_id.address, тел.: o.account_id.phone",,,,,,,
+"Покупатель: o.bank_id.fullname, get_client_info(o.bank_id.id)",,,,,,,
+,,,,,,,
+№,"Товары (работы, услуги)",Кол-во  ,Ед.,Цена,"Сумма без
+скидки","Скидка
+(наценка)",Сумма
+"for each=""l in o.invoice_line""",,,,,,,
+l.nbr,l.service_id.name,1,шт.,l.price_currency,l.price_currency,"0,00",l.price_currency
+/for,,,,,,,
+,,,,,,,
+,,,,Итого: ,o.a_total,,o.a_total
+,,В том числе НДС:,,,,,o.a_tax
+,,Всего к оплате:  ,,,,,o.a_total
+,,,,,,,
+,,,,,,,
+Всего наименований,,get_len(o.invoice_line),на сумму,,,o.a_total,руб.
+get_word_cash(o.a_total)[0] get_word_cash(o.a_total)[1],,,,,,,
+,,,,,,,
+Руководитель          Генеральный директор,,o.account_id.responsible,,,,,
+,должность,,подпись,,,расшифровка подписи,
+,,,,,,,
+Главный (старший) бухгалтер,,o.account_id.responsible,,,,,
+,,,подпись,,,расшифровка подписи,
+,,,,,,,
+/for,,,,,,,

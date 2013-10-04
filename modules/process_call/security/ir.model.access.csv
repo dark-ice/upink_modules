@@ -1,0 +1,5 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"process_call_report_user","process_call_report user","model_process_call_report","base.group_user",1,1,1,0
+"process_call_inner_phone_user","process_call_inner_phone user","model_process_call_inner_phone","base.group_user",1,1,1,0
+"process_call_inner_aoh","process_call_aoh user","model_process_call_aoh","base.group_user",1,1,1,0
+"process_call_inner_surcharge","process_call_surcharge user","model_process_call_surcharge","base.group_user",1,1,1,0

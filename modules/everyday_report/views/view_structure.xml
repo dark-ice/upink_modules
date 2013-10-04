@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_day_report_structure_kanban">
+            <field name="name">Структура</field>
+            <field name="model">day.report.structure</field>
+            <field name="type">kanban</field>
+            <field name="arch" type="xml">
+
+                <kanban>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="day_report_plan">
+                                <table class="report">
+                                    <thead>
+                                        <tr>
+                                            <td colspan="6">
+                                                <field name="paid_date"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td rowspan="2" width="140px">Направление</td>
+                                            <td class="plan" colspan="2">План продаж</td>
+                                            <td class="fact" colspan="2">Факт</td>
+                                            <td rowspan="2" class="red">%% вып-я</td>
+                                        </tr>
+                                        <tr>
+                                            <td width="110px" class="plan">Сумма</td>
+                                            <td width="60px" class="plan">Доля </td>
+                                            <td width="110px" class="fact">Сумма</td>
+                                            <td width="60px" class="fact">Доля </td>
+                                        </tr>
+                                    </thead>
+
+                                    <tfoot>
+                                        <tr>
+                                            <td>Итого:</td>
+                                            <td><field name="total_plan"/></td>
+                                            <td>100%%</td>
+                                            <td><field name="total_fact"/></td>
+                                            <td></td>
+                                            <td><field name="total_per"/>%%</td>
+                                        </tr>
+                                    </tfoot>
+
+                                    <tbody>
+                                        <tr>
+                                            <td>PPC</td>
+                                            <td class="plan"><field name="ppc_plan"/></td>
+                                            <td class="plan"><field name="ppc_plan_part"/>%%</td>
+                                            <td class="fact"><field name="ppc_fact"/></td>
+                                            <td class="fact"><field name="ppc_fact_part"/>%%</td>
+                                            <td class="red"><field name="ppc_per"/>%%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>SMM</td>
+                                            <td class="plan"><field name="smm_plan"/></td>
+                                            <td class="plan"><field name="smm_plan_part"/>%%</td>
+                                            <td class="fact"><field name="smm_fact"/></td>
+                                            <td class="fact"><field name="smm_fact_part"/>%%</td>
+                                            <td class="red"><field name="smm_per"/>%%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>SEO</td>
+                                            <td class="plan"><field name="seo_plan"/></td>
+                                            <td class="plan"><field name="seo_plan_part"/>%%</td>
+                                            <td class="fact"><field name="seo_fact"/></td>
+                                            <td class="fact"><field name="seo_fact_part"/>%%</td>
+                                            <td class="red"><field name="seo_per"/>%%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>CALL</td>
+                                            <td class="plan"><field name="call_plan"/></td>
+                                            <td class="plan"><field name="call_plan_part"/>%%</td>
+                                            <td class="fact"><field name="call_fact"/></td>
+                                            <td class="fact"><field name="call_fact_part"/>%%</td>
+                                            <td class="red"><field name="call_per"/>%%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WEB</td>
+                                            <td class="plan"><field name="web_plan"/></td>
+                                            <td class="plan"><field name="web_plan_part"/>%%</td>
+                                            <td class="fact"><field name="web_fact"/></td>
+                                            <td class="fact"><field name="web_fact_part"/>%%</td>
+                                            <td class="red"><field name="web_per"/>%%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>VIDEO</td>
+                                            <td class="plan"><field name="video_plan"/></td>
+                                            <td class="plan"><field name="video_plan_part"/>%%</td>
+                                            <td class="fact"><field name="video_fact"/></td>
+                                            <td class="fact"><field name="video_fact_part"/>%%</td>
+                                            <td class="red"><field name="video_per"/>%%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Медиапланирование</td>
+                                            <td class="plan"><field name="mp_plan"/></td>
+                                            <td class="plan"><field name="mp_plan_part"/>%%</td>
+                                            <td class="fact"><field name="mp_fact"/></td>
+                                            <td class="fact"><field name="mp_fact_part"/>%%</td>
+                                            <td class="red"><field name="mp_per"/>%%</td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_day_report_structure_search">
+            <field name="name">Структура</field>
+            <field name="model">day.report.structure</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="date_start" />
+                    <field name="date_end"/>
+
+                </search>
+            </field>
+        </record>
+
+        <record id="window_day_report_structure" model="ir.actions.act_window">
+            <field name="name">Структура</field>
+            <field name="res_model">day.report.structure</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban</field>
+            <field name="view_id" ref="view_day_report_structure_kanban"/>
+            <field name="search_view_id" ref="view_day_report_structure_search"/>
+            <field name="context">{'search_default_date_start': time.strftime('%Y-%m-01'), 'search_default_date_end': time.strftime('%Y-%m-%d')}</field>
+        </record>
+
+        <menuitem action="window_day_report_structure" id="menu_day_report_structure" parent="menu_every_day_report" sequence="20"/>
+
+    </data>
+</openerp>

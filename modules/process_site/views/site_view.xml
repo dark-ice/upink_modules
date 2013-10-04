@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_process_site_tree">
+            <field name="name">view.process.site.tree</field>
+            <field name="model">process.site</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="partner_id" />
+                    <field name="service_id" />
+                    <field name="create_date" />
+                    <field name="responsible_id" />
+                    <field name="specialist_id" />
+                    <field name="user_id" />
+                    <field name="state" />
+                    <field name="sub_state" />
+
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_process_site_search">
+            <field name="name">view.process.site.search</field>
+            <field name="model">process.site</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="partner_id" />
+                    <field name="create_date" />
+                    <field name="responsible_id" />
+                    <field name="specialist_id" />
+                    <field name="user_id" />
+                    <field name="state" />
+                    <field name="service_id" />
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_process_site_form">
+            <field name="name">view.process.site.form</field>
+            <field name="model">process.site</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="planning" invisible="1"/>
+                        <field name="design"  invisible="1"/>
+                        <field name="makeup"  invisible="1"/>
+                        <field name="developing"  invisible="1"/>
+                        <field name="testing"  invisible="1"/>
+
+                        <field name="check_s" />
+                        <field name="check_p" />
+                    </group>
+                    <group colspan="4" col="4">
+                        <field name="partner_id" readonly="1"/>
+                        <field name="service_id" readonly="1"/>
+                        <field name="user_id" readonly="1"/>
+                        <field name="responsible_id" readonly="1"/>
+                        <field name="specialist_id" required="1"/>
+                        <separator string="Длительность проекта" colspan="4"/>
+                        <field name="date_start" string="с" required="1"/>
+                        <field name="date_end" string="по" required="1"/>
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Данные по запуску процесса">
+                            <field name="direction" readonly="1"/>
+                            <field name="service_head_id" readonly="1"/>
+                            <separator colspan="4"/>
+
+                            <field name="contract_id" readonly="1"/>
+                            <field name="contract_file" readonly="1"/>
+
+                            <field name="invoice_line_id" invisible="True"/>
+                            <group col="6" colspan="4">
+                                <field name="account_id" readonly="1"/>
+                                <field name="account_file_id"/>
+                                <newline/>
+                                <field name="price" readonly="1"/>
+                                <field name="price_ye" readonly="1"/>
+                                <field name="paid" readonly="1"/><newline/>
+                                <field name="invoice_pay_ids" mode="tree" nolabel="1" colspan="6" domain="[('service_id', '=', service_id)]">
+                                    <tree>
+                                        <field name="pay_date" />
+                                        <field name="name" />
+                                    </tree>
+                                </field>
+                            </group>
+
+                            <separator colspan="4" string="Подписанные файлы"/>
+                            <field name="signed_file_ids" nolabel="1" colspan="4">
+                                <tree string="Подписанные файлы"  >
+                                    <field name="datas_fname"/>
+                                    <field name="create_date"/>
+                                    <field name="user_id"/>
+                                    <field name="type" groups="base.group_extended"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Процесс">
+                            <field name="stage_ids" readonly="1" colspan="4" nolabel="1" on_change="onchange_stages(stage_ids)"/>
+                        </page>
+                        <page string="Проектирование" attrs="{'invisible': [('planning', '=', False)]}">
+                            <group col="4" colspan="4">
+                                <field name="planning_id" mode="form" nolabel="1">
+                                    <form>
+                                        <field name="check_s" />
+                                        <field name="check_r" />
+                                        <separator colspan="4" string="Файлы на утверждение"/>
+                                        <field name="approval_file_ids" nolabel="1" colspan="4">
+                                            <tree string="Файлы на утверждение"  >
+                                                <field name="datas_fname"/>
+                                                <field name="create_date"/>
+                                                <field name="user_id"/>
+                                                <field name="type" groups="base.group_extended"/>
+                                            </tree>
+                                        </field>
+                                        <separator colspan="4" string="Комментарии"/>
+                                        <field name="comment_ids" colspan="4" nolabel="1">
+                                            <tree string="Комментарии" editable="top">
+                                                <field name="name"/>
+                                                <field name="create_date"/>
+                                                <field name="create_uid" string="Автор"/>
+                                            </tree>
+                                        </field>
+                                        <separator colspan="4" string="Подписанные файлы"/>
+                                        <field name="signed_file_ids" nolabel="1" colspan="4">
+                                            <tree string="Подписанные файлы"  >
+                                                <field name="datas_fname"/>
+                                                <field name="create_date"/>
+                                                <field name="user_id"/>
+                                                <field name="type" groups="base.group_extended"/>
+                                            </tree>
+                                        </field>
+                                        <group colspan="4" col="6">
+                                            <field name="state"
+                                               widget="statusbar"
+                                               statusbar_visible="draft,work,in_approval,approved,finish"
+                                               statusbar_colors='{"finish":"orange","rectification":"red"}'
+                                               colspan="6"
+                                                />
+                                            <newline/>
+                                            <!-- draft -> work -->
+                                            <button string="Проектирование: в работу"
+                                                    name="work"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_s', '=', False)]}"
+                                                    />
+                                            <!-- work -> in_approval -->
+                                            <button string="Проектирование: на утверждение"
+                                                    name="in_approval"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'work'), ('check_s', '=', False)]}"
+                                                    />
+                                            <!-- rectification -> in_approval -->
+                                            <button string="Проектирование: на утверждение"
+                                                    name="in_approval"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'rectification'), ('check_s', '=', False)]}"
+                                                    />
+                                            <!-- in_approval -> rectification -->
+                                            <button string="Проектирование: на доработку"
+                                                    name="rectification"
+                                                    type="workflow"
+                                                    icon="gtk-go-back"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'in_approval'), '|', ('check_s', '=', False), ('check_r', '=', False)]}"
+                                                    />
+                                            <!-- in_approval -> approved -->
+                                            <button string="Проектирование: утверждено"
+                                                    name="approved"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'in_approval'), '|', ('check_s', '=', False), ('check_r', '=', False)]}"
+                                                    />
+                                            <!-- approved -> work -->
+                                            <button string="Проектирование: в работу"
+                                                    name="work"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'approved'), ('check_s', '=', False)]}"
+                                                    />
+                                            <!-- approved -> finish -->
+                                            <button string="Проектирование: этап окончен"
+                                                    name="finish"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'approved'), ('check_s', '=', False)]}"
+                                                    />
+                                        </group>
+                                    </form>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Дизайн" attrs="{'invisible': [('design', '=', False)]}">
+                            <group col="4" colspan="4">
+                                <field name="design_id" mode="form" nolabel="1">
+                                    <form>
+                                        <field name="check_s" />
+                                        <field name="check_r" />
+                                        <separator colspan="4" string="Файлы на утверждение"/>
+                                        <field name="approval_file_ids" nolabel="1" colspan="4">
+                                            <tree string="Файлы на утверждение"  >
+                                                <field name="datas_fname"/>
+                                                <field name="create_date"/>
+                                                <field name="user_id"/>
+                                                <field name="type" groups="base.group_extended"/>
+                                            </tree>
+                                        </field>
+                                        <separator colspan="4" string="Комментарии"/>
+                                        <field name="comment_ids" colspan="4" nolabel="1">
+                                            <tree string="Комментарии" editable="top">
+                                                <field name="name"/>
+                                                <field name="create_date"/>
+                                                <field name="create_uid" string="Автор"/>
+                                            </tree>
+                                        </field>
+                                        <separator colspan="4" string="Подписанные файлы"/>
+                                        <field name="signed_file_ids" nolabel="1" colspan="4">
+                                            <tree string="Подписанные файлы"  >
+                                                <field name="datas_fname"/>
+                                                <field name="create_date"/>
+                                                <field name="user_id"/>
+                                                <field name="type" groups="base.group_extended"/>
+                                            </tree>
+                                        </field>
+                                        <group colspan="4" col="6">
+                                            <field name="state"
+                                               widget="statusbar"
+                                               statusbar_visible="draft,work,in_approval,approved,finish"
+                                               statusbar_colors='{"finish":"orange","rectification":"red"}'
+                                               colspan="6"
+                                                />
+                                            <newline/>
+                                            <!-- draft -> work -->
+                                            <button string="Дизайн: в работу"
+                                                    name="work"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_s', '=', False)]}"
+                                                    />
+                                            <!-- work -> in_approval -->
+                                            <button string="Дизайн: на утверждение"
+                                                    name="in_approval"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'work'), ('check_s', '=', False)]}"
+                                                    />
+                                            <!-- rectification -> in_approval -->
+                                            <button string="Проектирование: на утверждение"
+                                                    name="in_approval"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'rectification'), ('check_s', '=', False)]}"
+                                                    />
+                                            <!-- in_approval -> rectification -->
+                                            <button string="Дизайн: на доработку"
+                                                    name="rectification"
+                                                    type="workflow"
+                                                    icon="gtk-go-back"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'in_approval'), '|', ('check_s', '=', False), ('check_r', '=', False)]}"
+                                                    />
+                                            <!-- in_approval -> approved -->
+                                            <button string="Дизайн: утверждено"
+                                                    name="approved"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'in_approval'), '|', ('check_s', '=', False), ('check_r', '=', False)]}"
+                                                    />
+                                            <!-- approved -> work -->
+                                            <button string="Дизайн: в работу"
+                                                    name="work"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'approved'), ('check_s', '=', False)]}"
+                                                    />
+                                            <!-- approved -> finish -->
+                                            <button string="Дизайн: этап окончен"
+                                                    name="finish"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'approved'), ('check_s', '=', False)]}"
+                                                    />
+                                        </group>
+                                    </form>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Верстка" attrs="{'invisible': [('makeup', '=', False)]}">
+                            <group col="4" colspan="4">
+                                <field name="makeup_id" mode="form" nolabel="1">
+                                    <form>
+                                        <field name="check_s" />
+                                        <field name="check_r" />
+                                        <separator colspan="4" string="Файлы на утверждение"/>
+                                        <field name="approval_file_ids" nolabel="1" colspan="4">
+                                            <tree string="Файлы на утверждение"  >
+                                                <field name="datas_fname"/>
+                                                <field name="create_date"/>
+                                                <field name="user_id"/>
+                                                <field name="type" groups="base.group_extended"/>
+                                            </tree>
+                                        </field>
+                                        <separator colspan="4" string="Комментарии"/>
+                                        <field name="comment_ids" colspan="4" nolabel="1">
+                                            <tree string="Комментарии" editable="top">
+                                                <field name="name"/>
+                                                <field name="create_date"/>
+                                                <field name="create_uid" string="Автор"/>
+                                            </tree>
+                                        </field>
+                                        <separator colspan="4" string="Подписанные файлы"/>
+                                        <field name="signed_file_ids" nolabel="1" colspan="4">
+                                            <tree string="Подписанные файлы"  >
+                                                <field name="datas_fname"/>
+                                                <field name="create_date"/>
+                                                <field name="user_id"/>
+                                                <field name="type" groups="base.group_extended"/>
+                                            </tree>
+                                        </field>
+                                        <group colspan="4" col="6">
+                                            <field name="state"
+                                               widget="statusbar"
+                                               statusbar_visible="draft,work,finish"
+                                               statusbar_colors='{"finish":"orange"}'
+                                               colspan="6"
+                                                />
+                                            <newline/>
+                                            <!-- draft -> work -->
+                                            <button string="Верстка: в работу"
+                                                    name="work"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_s', '=', False)]}"
+                                                    />
+                                            <!-- work -> finish -->
+                                            <button string="Верстка: этап окончен"
+                                                    name="finish"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'work'), ('check_s', '=', False)]}"
+                                                    />
+                                        </group>
+                                    </form>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Программирование" attrs="{'invisible': [('developing', '=', False)]}">
+                            <group col="4" colspan="4">
+                                <field name="developing_id" mode="form" nolabel="1">
+                                    <form>
+                                        <field name="check_s" />
+                                        <field name="check_r" />
+                                        <separator colspan="4" string="Файлы на утверждение"/>
+                                        <field name="approval_file_ids" nolabel="1" colspan="4">
+                                            <tree string="Файлы на утверждение"  >
+                                                <field name="datas_fname"/>
+                                                <field name="create_date"/>
+                                                <field name="user_id"/>
+                                                <field name="type" groups="base.group_extended"/>
+                                            </tree>
+                                        </field>
+                                        <separator colspan="4" string="Комментарии"/>
+                                        <field name="comment_ids" colspan="4" nolabel="1">
+                                            <tree string="Комментарии" editable="top">
+                                                <field name="name"/>
+                                                <field name="create_date"/>
+                                                <field name="create_uid" string="Автор"/>
+                                            </tree>
+                                        </field>
+                                        <separator colspan="4" string="Подписанные файлы"/>
+                                        <field name="signed_file_ids" nolabel="1" colspan="4">
+                                            <tree string="Подписанные файлы"  >
+                                                <field name="datas_fname"/>
+                                                <field name="create_date"/>
+                                                <field name="user_id"/>
+                                                <field name="type" groups="base.group_extended"/>
+                                            </tree>
+                                        </field>
+                                        <group colspan="4" col="6">
+                                            <field name="state"
+                                               widget="statusbar"
+                                               statusbar_visible="none,draft,work,finish"
+                                               statusbar_colors='{"finish":"orange"}'
+                                               colspan="6"
+                                                />
+                                            <newline/>
+                                            <!-- draft -> work -->
+                                            <button string="Программирование: в работу"
+                                                    name="work"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_s', '=', False)]}"
+                                                    />
+                                            <!-- work -> finish -->
+                                            <button string="Программирование: этап окончен"
+                                                    name="finish"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'work'), ('check_s', '=', False)]}"
+                                                    />
+                                        </group>
+                                    </form>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Тестирование" attrs="{'invisible': [('testing', '=', False)]}">
+                            <group col="4" colspan="4">
+                                <field name="testing_id" mode="form" nolabel="1">
+                                    <form>
+                                        <field name="check_s" />
+                                        <field name="check_r" />
+                                        <separator colspan="4" string="Файлы на утверждение"/>
+                                        <field name="approval_file_ids" nolabel="1" colspan="4">
+                                            <tree string="Файлы на утверждение"  >
+                                                <field name="datas_fname"/>
+                                                <field name="create_date"/>
+                                                <field name="user_id"/>
+                                                <field name="type" groups="base.group_extended"/>
+                                            </tree>
+                                        </field>
+                                        <separator colspan="4" string="Комментарии"/>
+                                        <field name="comment_ids" colspan="4" nolabel="1">
+                                            <tree string="Комментарии" editable="top">
+                                                <field name="name"/>
+                                                <field name="create_date"/>
+                                                <field name="create_uid" string="Автор"/>
+                                            </tree>
+                                        </field>
+                                        <separator colspan="4" string="Подписанные файлы"/>
+                                        <field name="signed_file_ids" nolabel="1" colspan="4">
+                                            <tree string="Подписанные файлы"  >
+                                                <field name="datas_fname"/>
+                                                <field name="create_date"/>
+                                                <field name="user_id"/>
+                                                <field name="type" groups="base.group_extended"/>
+                                            </tree>
+                                        </field>
+                                        <group colspan="4" col="6">
+                                            <field name="state"
+                                               widget="statusbar"
+                                               statusbar_visible="draft,work,in_approval,approved,finish"
+                                               statusbar_colors='{"finish":"orange","rectification":"red"}'
+                                               colspan="6"
+                                                />
+                                            <newline/>
+                                            <!-- draft -> work -->
+                                            <button string="Тестирование: в работу"
+                                                    name="work"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_s', '=', False)]}"
+                                                    />
+                                            <!-- work -> in_approval -->
+                                            <button string="Тестирование: на утверждение"
+                                                    name="in_approval"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'work'), ('check_s', '=', False)]}"
+                                                    />
+                                            <!-- rectification -> in_approval -->
+                                            <button string="Проектирование: на утверждение"
+                                                    name="in_approval"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'rectification'), ('check_s', '=', False)]}"
+                                                    />
+                                            <!-- in_approval -> rectification -->
+                                            <button string="Тестирование: на доработку"
+                                                    name="rectification"
+                                                    type="workflow"
+                                                    icon="gtk-go-back"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'in_approval'), '|', ('check_s', '=', False), ('check_r', '=', False)]}"
+                                                    />
+                                            <!-- in_approval -> approved -->
+                                            <button string="Тестирование: утверждено"
+                                                    name="approved"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'in_approval'), '|', ('check_s', '=', False), ('check_r', '=', False)]}"
+                                                    />
+                                            <!-- approved -> work -->
+                                            <button string="Тестирование: в работу"
+                                                    name="work"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'approved'), ('check_s', '=', False)]}"
+                                                    />
+                                            <!-- approved -> finish -->
+                                            <button string="Тестирование: этап окончен"
+                                                    name="finish"
+                                                    type="workflow"
+                                                    icon="gtk-go-forward"
+                                                    attrs="{'invisible': ['|', ('state', '!=', 'approved'), ('check_s', '=', False)]}"
+                                                    />
+                                        </group>
+                                    </form>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Переписка по проекту">
+                            <field name="message_ids" nolabel="1" colspan="4" mode="tree">
+                                <tree string="Переписка по проекту"  >
+                                    <field name="name" required="1" colspan="2"/>
+                                    <field name="create_uid" string="Автор" readonly="1"/>
+                                    <field name="create_date" readonly="1"/>
+                                    <field name="attachment_id"/>
+                                </tree>
+                            </field>
+                            <field name="history_ids" nolabel="1" colspan="4" mode="tree" readonly="1">
+                                <tree string="История">
+                                    <field name="create_uid"/>
+                                    <field name="create_date"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                    </notebook>
+                    <group colspan="4" col="6">
+                        <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="work,in_approval,approval,project_closure,approval,closed"
+                           statusbar_colors='{"closed":"orange","rectification":"red"}'
+                           colspan="6"
+                            />
+                        <newline/>
+                        <!-- draft -> work -->
+                        <button string="В работу"
+                            name="work"
+                            type="workflow"
+                            icon="gtk-go-forward"
+                            attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_s', '=', False)]}"
+                            />
+                        <!-- work -> in_approval -->
+                        <button string="На утверждении"
+                            name="in_approval"
+                            type="workflow"
+                            icon="gtk-go-forward"
+                            attrs="{'invisible': ['|', '|', ('state', '!=', 'work'), ('check_p', '=', False), ('check_s', '=', False)]}"
+                            />
+                        <!-- in_approval -> rectification -->
+                        <button string="Исправления"
+                            name="rectification"
+                            type="workflow"
+                            icon="gtk-go-back"
+                            attrs="{'invisible': ['|', ('state', '!=', 'in_approval'), ('check_s', '=', False)]}"
+                            />
+                        <!-- rectification -> in_approval -->
+                        <button string="Исправления"
+                            name="in_approval"
+                            type="workflow"
+                            icon="gtk-go-forward"
+                            attrs="{'invisible': ['|', ('state', '!=', 'rectification'), ('check_s', '=', False)]}"
+                            />
+                        <!-- in_approval -> project_closure -->
+                        <button string="Закрытие проекта"
+                            name="project_closure"
+                            type="workflow"
+                            icon="gtk-go-forward"
+                            attrs="{'invisible': ['|', ('state', '!=', 'in_approval'), ('check_s', '=', False)]}"
+                            />
+                        <!-- project_closure -> closed -->
+                        <button string="Утверждение"
+                            name="closed"
+                            type="workflow"
+                            icon="gtk-go-forward"
+                            attrs="{'invisible': ['|', ('state', '!=', 'project_closure'), ('check_s', '=', False)]}"
+                            />
+                    </group>
+                </form>
+            </field>
+        </record>
+        
+        <record id="window_process_site" model="ir.actions.act_window">
+            <field name="name">Разработка и реализация стратегии site</field>
+            <field name="res_model">process.site</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_process_site_tree"/>
+            <field name="search_view_id" ref="view_process_site_search"/>
+        </record>
+
+        <menuitem action="window_process_site" id="menu_process_site" sequence="50" parent="process_launch.menu_process" name="Site"/>
+        <menuitem action="window_process_site" id="menu_process_site_dev" parent="menu_process_site"/>
+    </data>
+</openerp>

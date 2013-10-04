@@ -1,0 +1,5 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_transfer_history_sm","transfer_history","model_transfer_history","brief.group_sales_manager",1,1,1,0
+"access_transfer_history_sum","transfer_history","model_transfer_history","brief.group_support_manager",1,1,1,0
+"access_transfer_history_sd","transfer_history","model_transfer_history","brief.group_sales_director",1,1,1,0
+"access_transfer_history_sud","transfer_history","model_transfer_history","brief.group_support_director",1,1,1,0

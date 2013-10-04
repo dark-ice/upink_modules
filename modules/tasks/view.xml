@@ -1,0 +1,424 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="view_tasks_tree">
+            <field name="name">tasks.tree</field>
+            <field name="model">tasks</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Список заданий">
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="state"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                    <field name="responsible_id"/>
+                    <field name="performer_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_tasks_form">
+            <field name="name">tasks.form</field>
+            <field name="model">tasks</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Создание задания" col="2">
+                    <group colspan="4">
+                        <field name="check_a"/>
+                        <field name="check_r"/>
+                        <field name="check_p"/>
+                        <field name="check_m"/>
+                        <field name="check_e"/>
+                        <newline />
+                        <field name="manager_id"  readonly="1"/>
+                        <field name="executive_id"  readonly="1"/>
+                    </group>
+                    <group colspan="2" col="4">
+                        <field
+                                name="name"
+                                colspan="4"
+                                attrs="{
+                                    'readonly': [('state', '!=' , 'draft')],
+                                    'required': [('state', '=' , 'draft')]
+                                }"
+                                />
+                        <group col="6" colspan="4">
+                            <field name="create_date"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                        </group>
+                        <group col="6" colspan="4">
+                            <field name="user_id" options="{'quick_create': false}"/>
+                            <field
+                                    name="responsible_id"
+                                    attrs="{
+                                        'readonly': ['|', ('state', '!=' , 'draft'), ('check_a', '!=', True)],
+                                        'required': [('state', '=' , 'draft'), ('check_a', '!=', True)]
+                                    }"
+                                    on_change="change_responsible(responsible_id, user_id)"
+                                    options="{'quick_create': false}"
+                                    />
+                            <field
+                                    name="performer_id"
+                                    attrs="{
+                                        'readonly': [('state', 'not in' , ('agr_responsible', 'rw_responsible'))],
+                                        'required': [('state', '=' , 'agr_responsible')]
+                                    }"
+                                    />
+                        </group>
+                        <group col="6" colspan="4">
+                            <field
+                                    name="start_term"
+                                    attrs="{'readonly': [('start_date', '=' , False)]}"
+                                    />
+                        </group>
+                        <separator string="Описание" colspan="4"/>
+                        <field
+                                name="description"
+                                widget="text_wysiwyg"
+                                nolabel="1"
+                                colspan="4"
+                                attrs="{
+                                    'readonly': [('state', 'not in' , ('draft',))],
+                                    'required': [('state', 'in' , ('draft',))]
+                                }"
+                                />
+                        <field name="attachment_ids" nolabel="1" colspan="4" widget="one2many_list">
+                            <tree string="Вложения" colors="blue:type in ('url',)">
+                                <field name="datas_fname"/>
+                                <field name="create_date"/>
+                                <field name="user_id"/>
+                                <field name="type" groups="base.group_extended"/>
+                            </tree>
+                        </field>
+                        <field
+                                name="comment_ids"
+                                nolabel="1"
+                                colspan="4"
+                                mode="tree"
+                                attrs="{
+                                    'invisible': [('state', 'in' , ('draft', 'cancel'))]
+                                }"
+                                >
+                            <tree string="Комментарии" editable="top">
+                                <field name="name"/>
+                                <field name="create_date"/>
+                                <field name="usr_id"/>
+                            </tree>
+                        </field>
+                    </group>
+
+                    <group col="20" colspan="4">
+                        <field name="state" nolabel="1" readonly="1" />
+
+                        <!-- draft -> cancel -->
+                        <button string="Отмена"
+                                name="act_d_c"
+                                type="workflow"
+                                icon="STOCK_CLOSE"
+                                attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_a', '=', False)]}"
+                                />
+
+                        <!-- draft -> agr_responsible -->
+                        <button name="act_d_ar"
+                                icon="STOCK_GO_FORWARD"
+                                string="Согласование с ответственным"
+                                colspan="1"
+                                attrs="{'invisible': [
+                                '|', ('state', '!=', 'draft'),
+                                '|', ('check_a', '=', False), ('check_r', '=', True)]}"
+                                />
+
+                        <!-- draft -> inwork  -->
+                        <button name="act_d_i"
+                                icon="STOCK_GO_FORWARD"
+                                string="В работу"
+                                colspan="1"
+                                attrs="{'invisible': [
+                                    '|', ('state', '!=', 'draft'),
+                                    '|', ('check_a', '=', False), ('check_r', '=', False)
+                                ]}"
+                                />
+
+                        <!-- inwork -> draft -->
+                        <button name="act_i_d"
+                                icon="STOCK_GO_BACK"
+                                string="В черновик"
+                                colspan="1"
+                                attrs="{'invisible': [
+                                    '|', ('state', '!=', 'inwork'),
+                                    '|', ('check_a', '=', False), ('check_r', '=', False)
+                                ]}"
+                                />
+
+                        <!-- agr_responsible -> rw_author -->
+                        <button name="act_ar_ra"
+                                icon="STOCK_GO_BACK"
+                                string="На доработку автору"
+                                colspan="1"
+                                attrs="{'invisible': ['|', ('state', '!=', 'agr_responsible'), ('check_r', '=', False)]}"
+                                />
+
+                        <!-- rw_author -> agr_responsible  -->
+                        <button name="act_rwa_ra"
+                                icon="STOCK_GO_FORWARD"
+                                string="Согласование с ответственным"
+                                colspan="1"
+                                attrs="{'invisible': ['|', ('state', '!=', 'rw_author'), ('check_a', '=', False)]}"
+                                />
+
+                        <!-- rw_author -> cancel -->
+                        <button name="act_rwa_c"
+                                string="Отмена"
+                                icon="STOCK_CLOSE"
+                                colspan="1"
+                                attrs="{'invisible': ['|', ('state', '!=', 'rw_author'), ('check_a', '=', False)]}"
+                                />
+
+                        <!-- agr_responsible -> agr_performer  -->
+                        <button name="act_ar_ap"
+                                icon="STOCK_GO_FORWARD"
+                                string="Согласование с исполнителем"
+                                colspan="1"
+                                attrs="{'invisible': ['|', ('state', '!=', 'agr_responsible'), '|', ('check_r', '=', False), '|', ('check_p', '=', True), ('performer_id', '=', '')]}"
+                                />
+
+                        <!-- agr_performer -> agr_responsible  -->
+                        <button name="act_ap_ar"
+                                icon="STOCK_GO_BACK"
+                                string="На доработку ответственным"
+                                colspan="1"
+                                attrs="{'invisible': ['|', ('state', '!=', 'agr_performer'), ('check_p', '=', False)]}"
+                                />
+
+                        <!-- agr_responsible -> inwork -->
+                        <button name="act_ar_i"
+                                icon="STOCK_GO_FORWARD"
+                                string="В работу"
+                                colspan="1"
+                                attrs="{'invisible': ['|', ('state', '!=', 'agr_responsible'), '|', ('check_r', '=', False), ('check_p', '=', False)]}"
+                                />
+
+                        <!-- inwork -> agr_responsible -->
+                        <button name="act_i_ar"
+                                icon="STOCK_GO_FORWARD"
+                                string="На доработку ответственным"
+                                colspan="1"
+                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), '|', ('check_r', '=', False), ('check_p', '=', True)]}"
+                                />
+
+                        <!-- agr_performer -> inwork -->
+                        <button name="act_ap_i"
+                                icon="STOCK_GO_FORWARD"
+                                string="В работу"
+                                colspan="1"
+                                attrs="{'invisible': ['|', ('state', '!=', 'agr_performer'), ('check_p', '=', False)]}"
+                                />
+
+                        <!-- inwork -> agr_performer -->
+                        <button name="act_i_ap"
+                                icon="STOCK_GO_BACK"
+                                string="На доработку исполнителю"
+                                colspan="1"
+                                attrs="{'invisible': [
+                                '|', ('state', '!=', 'inwork'),
+                                '|', ('check_r', '=', True), '|', ('check_a', '=', True), ('check_p', '=', False)]}"
+                                />
+
+                        <!-- inwork -> app_responsible -->
+                        <button name="act_i_apr"
+                                icon="STOCK_GO_FORWARD"
+                                string="На утверждение ответственному после выполнения"
+                                attrs="{'invisible': [
+                                '|', ('state', '!=', 'inwork'),
+                                '|', ('check_r', '=', True), '|', ('check_a', '=', True), ('check_p', '=', False)]}"
+                                />
+
+                        <!-- inwork -> app_author -->
+                        <button name="act_i_apa"
+                                icon="STOCK_GO_FORWARD"
+                                string="На утверждение автору после выполнения"
+                                colspan="1"
+                                attrs="{'invisible': [
+                                '|', ('state', '!=', 'inwork'),
+                                '|', ('check_a', '=', True), '|', ('check_r', '=', False), ('check_p', '=', False)]}"
+                                />
+
+                        <!-- inwork -> done  -->
+                        <button name="act_i_done"
+                                string="Завершить"
+                                icon="STOCK_APPLY"
+                                attrs="{'invisible': [
+                                '|', ('state', '!=', 'inwork'),
+                                '|', ('check_a', '=', False), '|', ('check_r', '=', False), ('check_p', '=', False)]}"
+                                />
+
+                        <!-- app_responsible -> rw_app_responsible -->
+                        <button name="act_apr_rar"
+                                icon="STOCK_GO_BACK"
+                                string="На доработку (утверждение ответственным)"
+                                colspan="1"
+                                attrs="{'invisible': ['|', ('state', '!=', 'app_responsible'), ('check_r', '=', False)]}"
+                                />
+
+                        <!-- rw_app_responsible -> app_responsible  -->
+                        <button name="act_rar_apr"
+                                icon="STOCK_GO_FORWARD"
+                                string="На утверждение ответственному после выполнения"
+                                colspan="1"
+                                attrs="{'invisible': ['|', ('state', '!=', 'rw_app_resp'), ('check_p', '=', False)]}"
+                                />
+
+                        <!-- app_responsible -> app_author  -->
+                        <button name="act_apr_apa"
+                                icon="STOCK_GO_FORWARD"
+                                string="На утверждение автору после выполнения"
+                                colspan="1"
+                                attrs="{'invisible': ['|', ('state', '!=', 'app_responsible'), ('check_r', '=', False)]}"
+                                />
+
+                        <!-- app_author -> app_responsible  -->
+                        <button name="act_apa_apr"
+                                icon="STOCK_GO_FORWARD"
+                                string="На утверждение ответственному после выполнения"
+                                colspan="1"
+                                attrs="{'invisible': ['|', ('state', '!=', 'app_author'), '|', ('check_r', '=', True), ('check_p', '=', False)]}"
+                                />
+
+                        <!-- app_author -> rw_app_author  -->
+                        <button name="act_apa_raa"
+                                icon="STOCK_GO_BACK"
+                                string="На доработку (утверждение автором)"
+                                colspan="1"
+                                attrs="{'invisible': ['|', ('state', '!=', 'app_author'), ('check_a', '=', False)]}"
+                                />
+
+                        <!-- rw_app_author -> app_author  -->
+                        <button name="act_raa_apa"
+                                icon="STOCK_GO_FORWARD"
+                                string="На утверждение автору после выполнения"
+                                colspan="1"
+                                attrs="{'invisible': ['|', ('state', '!=', 'rw_app_author'), ('check_r', '=', False)]}"
+                                />
+
+                        <!-- app_author -> done -->
+                        <button name="act_apa_d"
+                                string="Завершить"
+                                icon="STOCK_APPLY"
+                                colspan="1"
+                                attrs="{'invisible': ['|', ('state', '!=', 'app_author'), ('check_a', '=', False)]}"
+                                />
+                    </group>
+                    <group col="4" colspan="4">
+                        <separator string="История переходов" colspan="4"/>
+                        <field name="history_ids" nolabel="1" colspan="4" readonly="1">
+                            <tree>
+                                <field name="state"/>
+                                <field name="usr_id" />
+                                <field name="create_date" />
+                            </tree>
+                        </field>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_tasks_calendar">
+            <field name="name">tasks.calendar</field>
+            <field name="model">tasks</field>
+            <field name="type">calendar</field>
+            <field name="priority" eval="2"/>
+            <field name="arch" type="xml">
+                <calendar string="Задания"
+                          date_start="start_date"
+                          date_stop="end_date"
+                          mode="month"
+                          color="responsible_id"
+                          >
+                    <field name="name"/>
+                    <field name="description"/>
+                </calendar>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_tasks_search">
+            <field name="name">tasks.search</field>
+            <field name="model">tasks</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <filter icon="terp-personal+"
+                            domain="[('state','not in', ('cancel', 'done'))]"
+                            name="active"
+                            string="активные"
+                            />
+                    <field name="name" colspan="3"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                    <field name="state"/>
+                    <newline />
+                    <field name="user_id"/>
+                    <field name="responsible_id"/>
+                    <field name="performer_id"/>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_case_tasks">
+            <field name="name">Задания</field>
+            <field name="res_model">tasks</field>
+            <field name="view_mode">calendar,form,tree</field>
+            <field name="view_id" ref="view_tasks_calendar"/>
+            <field name="search_view_id" ref="view_tasks_search"/>
+            <field name="help">Список заданий</field>
+            <field name="context">{"search_default_active":eval('True')}</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_tasks_list">
+            <field name="name">Задания</field>
+            <field name="res_model">tasks</field>
+            <field name="view_mode">calendar,form,tree</field>
+            <field name="view_id" ref="view_tasks_tree"/>
+            <field name="search_view_id" ref="view_tasks_search"/>
+            <field name="help">Список заданий</field>
+            <field name="context">{"search_default_active":eval('True')}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_tasks_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_tasks_form"/>
+            <field name="act_window_id" ref="window_case_tasks"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_tasks_tree">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_tasks_tree"/>
+            <field name="act_window_id" ref="window_case_tasks"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_tasks_calendar">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">calendar</field>
+            <field name="view_id" ref="view_tasks_calendar"/>
+            <field name="act_window_id" ref="window_case_tasks"/>
+        </record>
+
+        <menuitem
+                id="base_tasks"
+                name="Задания"
+                sequence="1"
+                action="window_case_tasks"
+                web_icon="images/tasks_b.png"
+                web_icon_hover="images/tasks_a.png"
+                />
+
+        <menuitem id="main_tasks" name="Задания" parent="base_tasks" sequence="0"/>
+        <menuitem id="tasks" name="Календарь заданий" action="window_case_tasks" parent="main_tasks" sequence="0"/>
+        <menuitem id="task_list" name="Список заданий" action="window_tasks_list" parent="main_tasks" sequence="1"/>
+    </data>
+</openerp>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <!-- Header -->
+        <record id="ir_header_webkit_portrait" model="ir.header_webkit">
+            <field eval="&quot;&quot;&quot;Portrait&quot;&quot;&quot;" name="orientation"/>
+            <field eval="&quot;&quot;&quot;A4&quot;&quot;&quot;" name="format"/>
+            <field eval="0.0" name="margin_top"/>
+            <field name="footer_html"><![CDATA[<html>
+    <head>
+        <meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
+    </head>
+    <body style="border:0; margin: 0;">
+    </body>
+</html>]]></field>
+            <field name="css" ><![CDATA[
+body {
+font-family:helvetica;
+font-size:12;
+}]]> </field>
+            <field name="html"><![CDATA[<html>
+    <head>
+        <meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
+    </head>
+    <body style="border:0; margin: 0;">
+        ${_debug or ''|n} </body>
+</html>]]></field>
+            <field eval="&quot;&quot;&quot;Портретная&quot;&quot;&quot;" name="name"/>
+        </record>
+
+        <record id="ir_header_webkit_landscape" model="ir.header_webkit">
+            <field eval="&quot;&quot;&quot;Landscape&quot;&quot;&quot;" name="orientation"/>
+            <field eval="&quot;&quot;&quot;A4&quot;&quot;&quot;" name="format"/>
+            <field name="footer_html"><![CDATA[<html>
+    <head>
+        <meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
+    </head>
+    <body style="border:0; margin: 0;">
+    </body>
+</html>]]></field>
+            <field name="css" ><![CDATA[
+body {
+font-family:helvetica;
+font-size:12;
+}]]> </field>
+            <field name="html"><![CDATA[<html>
+    <head>
+        <meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
+    </head>
+    <body style="border:0; margin: 0;">
+        ${_debug or ''|n} </body>
+</html>]]></field>
+            <field eval="&quot;&quot;&quot;Альбомная&quot;&quot;&quot;" name="name"/>
+        </record>
+    </data>
+</openerp>

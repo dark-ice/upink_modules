@@ -1,0 +1,572 @@
+﻿<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_out_campaign_tree">
+            <field name="name">Список Запуск проекта (исходящие кампании)</field>
+            <field name="model">out.campaign</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Запуск проекта (исходящие кампании)">
+                    <field name="partner_id"/>
+                    <field name="url"/>
+                    <field name="supervisor"/>
+                    <field name="pay_sum"/>
+                    <field name="start_line"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_out_campaign_launch_form">
+            <field name="name">Запуск проекта (исходящие кампании)</field>
+            <field name="model">out.campaign</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Запуск проекта (исходящие кампании)">
+                    <group colspan="4">
+                        <field name="check_s"/>
+                        <field name="check_r"/>
+                        <field name="check_u"/>
+                    </group>
+                    <group colspan="4" col="4">
+                        <group colspan="2" col="2">
+                            <field
+                                    name="partner_id"
+                                    required="1"
+                                    on_change="onchange_partner(partner_id)"
+                                    />
+                            <field name="url" required="1"/>
+                            <field name="supervisor" required="1"/>
+                            <field name="pay_day" required="1"/>
+                            <field name="pay_sum" required="1"/>
+                            <field name="pay_currency" required="1" widget="selection"/>
+                        </group>
+                        <group colspan="2" col="2">
+                            <field name="prep_days" required="1"/>
+                            <field name="start_line" />
+                            <field name="report_type" attrs="{'required':[('state','=','agreement_tz')]}"
+                                   widget="selection"/>
+                            <field name="conv_record" attrs="{'required':[('state','=','agreement_tz')]}"/>
+                            <field name="deadline"/>
+                        </group>
+                        <field name="manager_work_id"/>
+                        <field name="manager_upwork_id"/>
+
+                    </group>
+                    <group colspan="4" col="4">
+                        <notebook colspan="4">
+                            <page string="ТЗ и БД">
+                                <group colspan="2" col="2">
+                                    <separator string="Технической задание" colspan="2"/>
+                                    <field
+                                            context="{'object': 'out_campaign'}"
+                                            domain="[('object','=','out_campaign')]"
+                                            name="tz_pattern_file_id"
+                                            attrs="{'required':[('state','=','preparation_template')]}"
+                                            />
+
+                                    <field
+                                            context="{'object': 'out_campaign'}"
+                                            domain="[('object','=','out_campaign')]"
+                                            name="tz_filled_file_id"
+                                            attrs="{'required':[('state','=','filling_tz')]}"
+                                            />
+                                    <separator string="Комментарий по доработке" colspan="2"/>
+                                    <field name="re_tz_commentary" nolabel="1" colspan="2"/>
+                                    <field name="files_id" nolabel="1" mode="tree,form" colspan="2">
+                                        <tree string="Доработка ТЗ">
+                                            <field name="file_name" required="1"/>
+                                        </tree>
+
+                                        <form string="Доработка ТЗ">
+                                            <field name="file_name" required="1"/>
+                                            <field name="file" filename="file_name"
+                                                   on_change="onchange_filename('file_name',file)" nolabel="1"/>
+                                        </form>
+
+                                    </field>
+                                </group>
+                                <group colspan="2" col="2">
+                                    <separator string="Базы данных" colspan="2"/>
+                                    <field name="db_type"
+                                           attrs="{'required':[('state','=','agreement_tz')]}"/>
+                                    <field name="contact_num"
+                                           attrs="{'required':[('state','=','agreement_tz')]}"/>
+                                    <field
+                                            context="{'object': 'out_campaign'}"
+                                            domain="[('object','=','out_campaign')]"
+                                            name="db_file_id"
+                                            attrs="{'required':[('state','=','preparation_contact_basa')]}"
+                                            />
+                                    <field
+                                            context="{'object': 'out_campaign'}"
+                                            domain="[('object','=','out_campaign')]"
+                                            name="report_pattern_file_id"
+                                            attrs="{'required':[('state','in',('preparation_contact_basa', 'preparation_report_form'))]}"
+                                            />
+                                    <separator string="Комментарий по доработке" colspan="2"/>
+                                    <field name="re_db_commentary" colspan="2" nolabel="1"/>
+                                </group>
+                            </page>
+                            <page string="Организационные данные">
+                                <separator string="Тех. Настройки" colspan="4"/>
+                                <field name="aoh" nolabel="1" colspan="4" mode="tree">
+                                    <tree string="АОН" editable="top">
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                                <field name="proj_tels_id" nolabel="1" colspan="4" mode="tree">
+                                    <tree string="Внутренние номера проекта" editable="top">
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                                <separator string="Настройки электронной почты" colspan="4"/>
+                                <field name="settings_email" nolabel="1" colspan="4"
+                                       attrs="{'required':[('state','=','teh_configuring_project')]}"/>
+                            </page>
+                            <page string="Обучение и сценарий">
+                                <separator string="Обучение" colspan="4"/>
+                                <separator string="Список сотрудников для обучения" colspan="4"/>
+                                <field name="employees_for_training_ids" nolabel="1" colspan="4"/>
+                                <separator string="Список утвержденных партнером сотрудников" colspan="4"/>
+                                <field name="employees_aprov_partner_ids" nolabel="1" colspan="4"/>
+                                <separator string="Сценарий" colspan="4"/>
+                                <field
+                                        colspan="4"
+                                        context="{'object': 'out_campaign'}"
+                                        domain="[('object','=','out_campaign')]"
+                                        name="prior_scenario_file_id"
+                                        attrs="{'required':[('state','=','preparation_screenplay')]}"
+                                        />
+                                <field
+                                        colspan="4"
+                                        context="{'object': 'out_campaign'}"
+                                        domain="[('object','=','out_campaign')]"
+                                        name="scenario_file_id"
+                                        attrs="{'required':[('state','=','screenplay_on_completion')]}"
+                                        />
+                                <separator string="Комментарии по доработке сценария" colspan="4"/>
+                                <field name="scenario_comment" nolabel='1' colspan="4"/>
+                                <field name="distrib_name"/>
+                                <field name="distrib_file" filename="distrib_name"
+                                       on_change="onchange_filename('distrib_name',distrib_file)" nolabel="1"/>
+                            </page>
+                            <page string="Переписка по проекту">
+                                <field name="message_ids" nolabel="1" colspan="4" mode="tree">
+                                    <tree string="Переписка по проекту" editable="top">
+                                        <field name="text" required="1" colspan="2"/>
+                                        <field name="usr_id" string="Автор" readonly="1"/>
+                                        <field name="cr_date" readonly="1"/>
+                                        <field name="rep_file_id"/>
+                                    </tree>
+                                    <form string="Переписка по проекту">
+                                        <field name="rep_file_id"
+                                               context="{'object': 'outsourcing_contact_centr'}"
+                                               domain="[('object','=','outsourcing_contact_centr')]"
+                                                />
+                                        <field name="cr_date" readonly="1"/>
+                                        <field name="usr_id"/>
+                                        <field name="text" colspan="4"/>
+                                    </form>
+                                </field>
+                                <field name="history_ids" nolabel="1" colspan="4" mode="tree" readonly="1">
+                                    <tree string="История">
+                                        <field name="usr_id"/>
+                                        <field name="create_date"/>
+                                        <field name="state"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Отчеты">
+                                <field name="reports" nolabel="1" colspan="4" mode="tree">
+                                    <tree string="Отчеты">
+                                        <field name="create_date"/>
+                                        <field name="rep_file_id"/>
+                                        <field name="user_id"/>
+                                    </tree>
+                                    <form string="Отчеты">
+                                        <group col="4" colspan="6">
+                                            <separator colspan="4"/>
+                                            <field name="create_date" readonly="1"/>
+                                            <field name="user_id"/>
+                                            <separator colspan="4"/>
+                                            <field name="rep_file_id" required="1"/>
+                                        </group>
+                                    </form>
+                                </field>
+                            </page>
+                        </notebook>
+                    </group>
+                    <newline/>
+                    <group colspan="4" col="12">
+                        <separator string="Статус" colspan="12"/>
+                        <field name="state" nolabel="1"/>
+
+                        <!-- draft -> preparation_template -->
+                        <button name="action_out_d_pt"
+                                attrs="{'invisible':['|', ('state','!=','draft'), ('check_s', '=', False)]}"
+                                string="Подготовка шаблона ТЗ"
+                                />
+
+                        <!-- preparation_template -> sent_template_to_manager -->
+                        <button name="action_out_pt_sttm"
+                                attrs="{'invisible':['|', ('state','!=','preparation_template'), ('check_r', '=', False)]}"
+                                string="Отправить менеджеру"
+                                />
+
+                        <!-- sent_template_to_manager -> filling_tz -->
+                        <button name="action_out_sttm_ft"
+                                attrs="{'invisible':['|', ('state','!=','sent_template_to_manager'), ('check_u', '=', False)]}"
+                                string="Заполнить ТЗ"
+                                />
+
+                        <!-- filling_tz -> agreement_tz -->
+                        <button name="action_out_ft_at"
+                                attrs="{'invisible':['|', ('state','!=', 'filling_tz'), ('check_u', '=', False)]}"
+                                string="Согласовать ТЗ"
+                                />
+
+                        <!-- agreement_tz -> tz_on_completion -->
+                        <button name="action_out_at_toc"
+                                attrs="{'invisible':['|', ('state','!=','agreement_tz'), ('check_r', '=', False)]}"
+                                string="На доработку"
+                                />
+
+                        <!-- tz_on_completion -> agreement_tz -->
+                        <button name="action_out_toc_at"
+                                attrs="{'invisible':['|', ('state','!=', 'tz_on_completion'), ('check_u', '=', False)]}"
+                                string="Согласовать ТЗ"
+                                />
+
+                        <!-- agreement_tz -> preparation_screenplay -->
+                        <button name="action_out_at_ps"
+                                attrs="{'invisible':['|', ('state','!=','agreement_tz'), ('check_r', '=', False)]}"
+                                string="Подготовка сценария"
+                                />
+
+                        <!-- preparation_screenplay -> approval_screenplay -->
+                        <button name="action_out_ps_as"
+                                attrs="{'invisible':['|', ('state','!=', 'preparation_screenplay'), ('check_r', '=', False)]}"
+                                string="Утверждения сценария"
+                                />
+
+                        <!-- approval_screenplay -> screenplay_on_completion -->
+                        <button name="action_out_as_soc"
+                                attrs="{'invisible':['|', ('state','!=','approval_screenplay'), ('check_u', '=', False)]}"
+                                string="Сценарий на доработку"
+                                />
+
+                        <!-- screenplay_on_completion -> approval_screenplay -->
+                        <button name="action_soc_as"
+                                attrs="{'invisible':['|', ('state','!=', 'screenplay_on_completion'), ('check_r', '=', False)]}"
+                                string="Утверждения сценария"
+                                />
+
+                        <!-- approval_screenplay -> preparation_contact_basa -->
+                        <button name="action_out_as_pcb"
+                                attrs="{'invisible':['|', '|', ('state','!=','approval_screenplay'), ('check_u', '=', False), ('db_file_id', '!=', '')]}"
+                                string="Подготовка контактной базы"
+                                />
+
+                        <!-- preparation_contact_basa -> approval_contact_basa -->
+                        <button name="action_out_pcb_acb"
+                                type="workflow"
+                                attrs="{'invisible':['|', ('state','!=','preparation_contact_basa'), ('check_r', '=', False)]}"
+                                string="Согласование контактной базы"
+                                />
+
+                        <!-- approval_contact_basa -> contact_basa_on_completion -->
+                        <button name="action_out_acb_cboc"
+                                attrs="{'invisible':['|', ('state','!=','approval_contact_basa'), ('check_u', '=', False)]}"
+                                string="На доработку"
+                                />
+
+                        <!-- contact_basa_on_completion -> approval_contact_basa -->
+                        <button name="action_out_cboc_acb"
+                                attrs="{'invisible':['|', ('state','!=', 'contact_basa_on_completion'), ('check_r', '=', False)]}"
+                                string="Согласование контактной базы"
+                                />
+
+                        <!-- approval_contact_basa -> training_agents -->
+                        <button name="action_out_acb_ta"
+                                attrs="{'invisible':['|', ('state','!=','approval_contact_basa'), ('check_u', '=', False)]}"
+                                string="Обучение агентов"
+                                />
+
+                        <!-- approval_screenplay -> preparation_report_form -->
+                        <button name="action_out_as_prf"
+                                attrs="{'invisible':['|', '|', ('state','!=','approval_screenplay'), ('check_u', '=', False), ('db_file_id', '=', '')]}"
+                                string="Подготовка формы отчета"
+                                />
+
+                        <!-- preparation_report_form -> agreement_report_form -->
+                        <button name="action_out_prf_arf"
+                                attrs="{'invisible':['|', ('state','!=','preparation_report_form'), ('check_r', '=', False)]}"
+                                string="Согласование формы отчета"
+                                />
+
+                        <!-- agreement_report_form -> on_completion_report_form -->
+                        <button name="action_out_arf_ocrf"
+                                attrs="{'invisible':['|', ('state','!=','approval_report_form'), ('check_u', '=', False)]}"
+                                string="На доработку"
+                                />
+
+                        <!-- on_completion_report_form -> agreement_report_form -->
+                        <button name="action_out_acrf_arf"
+                                attrs="{'invisible':['|', ('state','!=','report_form_on_completion'), ('check_r', '=', False)]}"
+                                string="Согласование формы отчета"
+                                />
+
+                        <!-- agreement_report_form -> training_agents -->
+                        <button name="action_out_arf_ta"
+                                attrs="{'invisible':['|', ('state','!=','approval_report_form'), ('check_u', '=', False)]}"
+                                string="Обучение агентов"
+                                />
+
+                        <!-- training_agents -> testing_agents_partner -->
+                        <button name="action_out_ta_tap"
+                                attrs="{'invisible':['|', ('state','!=','training_agents'), ('check_r', '=', False)]}"
+                                string="Тестирование агентов партнером"
+                                />
+
+                        <!-- testing_agents_partner -> training_agents -->
+                        <button name="action_out_tap_ta"
+                                attrs="{'invisible':['|', ('state','!=','testing_agents_partner'), ('check_r', '=', False)]}"
+                                string="Обучение агентов"
+                                />
+
+                        <!-- testing_agents_partner -> teh_configuring_project -->
+                        <button name="action_out_tap_tcp"
+                                attrs="{'invisible':['|', ('state','!=','testing_agents_partner'), ('check_r', '=', False)]}"
+                                string="Тех. Настройка"
+                                />
+
+                        <!-- teh_configuring_project -> coordination_organ_quaeres -->
+                        <button name="action_out_tcp_coq"
+                                attrs="{'invisible':['|', ('state','!=','teh_configuring_project'), ('check_r', '=', False)]}"
+                                string="Согласование орг.вопросов"
+                                />
+
+                        <!-- coordination_organ_quaeres -> project_implementation -->
+                        <button name="action_out_coq_pi"
+                                attrs="{'invisible':['|', ('state','!=','coordination_organ_quaeres'), ('check_r', '=', False)]}"
+                                string="Реализация проекта"/>
+
+                        <button name="new_view"
+                                type="object"
+                                string="Перейти на страницу реализации проекта"
+                                attrs="{'invisible':[('state','!=','project_implementation')]}"
+                                />
+
+
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_action_launch_out_campaign">
+            <field name="name">Запуск исходящей кампании</field>
+            <field name="res_model">out.campaign</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', 'not in', ('project_implementation', 'agreement_reporting', 'closed'))]</field>
+            <field name="context">{}</field>
+            <field name="view_id" ref="view_out_campaign_tree"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_launch_tree_out_campaign">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_out_campaign_tree"/>
+            <field name="act_window_id" ref="window_action_launch_out_campaign"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_launch_form_out_campaign">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_out_campaign_launch_form"/>
+            <field name="act_window_id" ref="window_action_launch_out_campaign"/>
+        </record>
+
+        <menuitem
+                action="window_action_launch_out_campaign"
+                id="menu_launch_out_campaign"
+                parent="menu_outsourcing_contact_center"
+                sequence="1"/>
+
+
+        <record model="ir.ui.view" id="view_out_campaign_implement_form">
+            <field name="name">Реализация проекта (исходящие кампании)</field>
+            <field name="model">out.campaign</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Реализация проекта (исходящие кампании)">
+                    <group colspan="4">
+                        <field name="check_s"/>
+                        <field name="check_r"/>
+                        <field name="check_u"/>
+                    </group>
+                    <group colspan="4" col="4">
+                        <group colspan="4" col="2">
+                            <field name="partner_id"/>
+                            <field name="url"/>
+                            <field name="supervisor"/>
+                            <field name="report_type"/>
+                            <field name="project_duration"
+                                   attrs="{'required':[('state','=','project_implementation')]}"/>
+                            <field name="conv_record"/>
+                        </group>
+                        <notebook colspan="4">
+                            <page string="Данные по оплатам">
+                                <field name="pay_day"/>
+                                <field name="pay_sum"/>
+                                <field name="pay_currency"/>
+                                <field name="project_cost" attrs="{'required':[('state','=','project_implementation')]}"/>
+                                <field name="extra_pay_day" attrs="{'required':[('state','=','project_implementation')]}"/>
+                                <field name="extra_pay"/>
+                            </page>
+                            <page string="SLA проекта">
+                                <field name="sla_calls_ids" mode="tree,form" nolabel="1" colspan="4">
+                                    <tree string="Статистика звонков" editable="bottom">
+                                        <field name="datetime_call"/>
+                                        <field name="agent_id"/>
+                                        <field name="comment"/>
+                                        <field name="call_sla"/>
+                                    </tree>
+                                </field>
+                                <field name="sla_project_ids" mode="tree,form" nolabel="1" colspan="4">
+                                    <tree string="Показатели SLA CALL" editable="bottom">
+                                        <field name="date_id" widget="selection"/>
+                                        <field name="sla_id"
+                                               domain="[('type','=','project'),('compan_type','=','outgoing'),('model','=','outsourcing_contact_centr')]"
+                                               widget="selection"/>
+                                        <field name="influence"/>
+                                        <field name="plan"/>
+                                        <field name="fact"/>
+                                        <field name="compliance"/>
+                                        <field name="mbo"/>
+                                    </tree>
+                                </field>
+                                <field name="total_sla_project_ids" mode="tree" nolabel="1" colspan="4" readonly="1">
+                                    <tree string="Итого по каждому отчетному периоду">
+                                        <field name="date_id"/>
+                                        <field name="influence"/>
+                                        <field name="mbo"/>
+                                    </tree>
+                                </field>
+                                <field name="sla_agent_ids" mode="tree,form" nolabel="1" colspan="4">
+                                    <tree string="Показатели SLA агентов" editable="bottom">
+                                        <field name="datetime"/>
+                                        <field name="agent_id"/>
+                                        <field name="sla_id"
+                                               domain="[('type','=','agent'),('compan_type','=','outgoing'),('model','=','outsourcing_contact_centr')]"
+                                               widget="selection"/>
+                                        <field name="call_sla"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Переписка по проекту">
+                                <field name="message_ids" nolabel="1" colspan="4" mode="tree">
+                                    <tree string="Переписка по проекту" editable="top">
+                                        <field name="text" required="1" colspan="2"/>
+                                        <field name="usr_id" string="Автор" readonly="1"/>
+                                        <field name="cr_date" readonly="1"/>
+                                        <field name="rep_file_id"/>
+                                    </tree>
+                                    <form string="Переписка по проекту">
+                                        <field name="rep_file_id"
+                                               context="{'object': 'outsourcing_contact_centr'}"
+                                               domain="[('object','=','outsourcing_contact_centr')]"
+                                                />
+                                        <field name="cr_date" readonly="1"/>
+                                        <field name="usr_id"/>
+                                        <field name="text" colspan="4"/>
+                                    </form>
+                                </field>
+                                <field name="history_ids" nolabel="1" colspan="4" mode="tree" readonly="1">
+                                    <tree string="История">
+                                        <field name="usr_id"/>
+                                        <field name="create_date"/>
+                                        <field name="state"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Отчеты">
+                                <field name="reports" nolabel="1" colspan="4" mode="tree">
+                                    <tree string="Отчеты" editable="bottom">
+                                        <field name="type"/>
+                                        <field name="rep_file_id"/>
+                                        <field name="date_to"/>
+                                    </tree>
+                                </field>
+                                <group colspan="4" col="6">
+                                    <separator string="Дополнения к отчетам:" colspan="2"/>
+                                    <separator string="Дата предоставления отчета:" colspan="2"/>
+                                    <newline/>
+                                    <field name="add_report_name" nolabel="1"/>
+                                    <field name="additional_report" filename="add_report_name"
+                                           on_change="onchange_filename('add_report_name',additional_report)"
+                                           nolabel="1"/>
+                                    <field name="datetime_add_report" nolabel="1"/>
+                                </group>
+                            </page>
+                        </notebook>
+                        <group colspan="4" col="12">
+                            <separator string="Статус" colspan="12"/>
+                            <field name="state" nolabel="1"/>
+
+                            <!-- project_implementation -> agreement_reporting -->
+                            <button name="action_out_pi_ar"
+                                    attrs="{'invisible':['|', ('state','!=','project_implementation'), ('check_r', '=', False)]}"
+                                    string="Согласование отчетности"
+                                    />
+
+                            <!-- agreement_reporting -> project_implementation -->
+                            <button name="action_out_ar_pi"
+                                    attrs="{'invisible':['|', ('state','!=','agreement_reporting'), ('check_u', '=', False)]}"
+                                    string="Реализация проекта"
+                                    />
+
+                            <!-- agreement_reporting -> closed-->
+                            <button name="action_out_closed"
+                                    attrs="{'invisible':['|', ('state','!=','agreement_reporting'), ('check_u', '=', False)]}"
+                                    string="Закрыть проект"
+                                    />
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_action_implement_out_campaign">
+            <field name="name">Реализация проекта исходящей кампании</field>
+            <field name="res_model">out.campaign</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', 'in', ('project_implementation', 'agreement_reporting', 'closed'))]</field>
+            <field name="context">{}</field>
+            <field name="view_id" ref="view_out_campaign_tree"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_implement_tree_out_campaign">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_out_campaign_tree"/>
+            <field name="act_window_id" ref="window_action_implement_out_campaign"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_implement_form_out_campaign">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_out_campaign_implement_form"/>
+            <field name="act_window_id" ref="window_action_implement_out_campaign"/>
+        </record>
+
+        <menuitem
+                action="window_action_implement_out_campaign"
+                id="menu_implement_out_campaign"
+                parent="menu_outsourcing_contact_center"
+                sequence="2"/>
+
+    </data>
+</openerp>

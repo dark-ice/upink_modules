@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+    <!-- Формы -->
+    <record model="ir.ui.view" id="view_attach_files_tree">
+        <field name="name">attach.files.tree</field>
+        <field name="model">attach.files</field>
+        <field name="type">tree</field>
+        <field name="priority" eval="18"/>
+        <field name="arch" type="xml">
+            <tree string="Вложенния (файлы)">
+                <field name="name"/>
+                <field name="create_date" />
+                <field name="user_id" />
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_attach_files_form">
+        <field name="name">attach.files.form</field>
+        <field name="model">attach.files</field>
+        <field name="type">form</field>
+        <field name="priority" eval="16"/>
+        <field name="arch" type="xml">
+            <form string="Вложенния (файлы)">
+                <group colspan="2" col="2">
+                    <field name="name" required="1"/>
+                    <field name="file" filename="name" on_change="onchange_path(name)" required="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="window_attach_files">
+        <field name="name">Вложения</field>
+        <field name="res_model">attach.files</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_attach_files_tree"/>
+    </record>
+
+
+    <menuitem action="window_attach_files" id="attach_files_menuitem" name="Вложения" parent="base.menu_config"/>
+    </data>
+</openerp>

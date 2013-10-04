@@ -1,0 +1,279 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="view_ink_incidents_tree">
+            <field name="name">ink.incidents.tree</field>
+            <field name="model">ink.incidents</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree  colors="red:state=='accepted' and time_over_deadlines!=False;green:state=='accepted' and time_over_deadlines==False;">
+                    <field name="id"/>
+                    <field name="create_date"/>
+                    <field name="author_id"/>
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="deadline_date" />
+                    <field name="performer_id"/>
+                    <field name="state"/>
+                    <field name="time_over_deadlines" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_ink_incidents_form">
+            <field name="name">ink.incidents.form</field>
+            <field name="model">ink.incidents</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group colspan="4">
+                        <field name="check_a"/>
+                        <field name="check_p"/>
+                    </group>
+                    <group colspan="4" col="6">
+                        <field name="id"/>
+                        <field name="create_date"/>
+                        <newline />
+
+                        <field name="author_id" on_change="change_person(author_id)"/>
+                        <field name="author_department_id" readonly="1"/>
+                        <field name="author_parent_id" readonly="1"/>
+
+                        <field name="name" colspan="6"/>
+                        <field name="description" colspan="6"/>
+                        <field name="type" colspan="6"/>
+
+                        <field name="document_type"/>
+                        <field name="document_number"/>
+                        <newline />
+
+                        <field name="performer_id" on_change="change_person(performer_id, 'performer')"/>
+                        <field name="performer_department_id" readonly="1"/>
+                        <field name="performer_parent_id" readonly="1"/>
+
+                        <field name="deadline_date"/>
+                        <separator string="Обратная связь от исполнителя" colspan="6"/>
+                        <field name="fallback" nolabel="1" colspan="6" attrs="{'readonly': ['|', ('check_p', '=', False), ('state', '!=', 'in_pipeline')]}"/>
+                        <group colspan="6" col="4">
+                            <group colspan="2" col="2">
+                                <separator string="Комментарий по доработке  (от исполнителя)" colspan="2"/>
+                                <field name="comment_completion" nolabel="1" colspan="2" attrs="{'readonly': ['|', ('check_p', '=', False), ('state', '!=', 'decision')]}"/>
+                            </group>
+                            <group colspan="2" col="2">
+                                <separator string="Комментарий по доработке  (от инициатора)" colspan="2"/>
+                                <field name="comment_approval" nolabel="1" colspan="2" attrs="{'readonly': ['|', ('check_a', '=', False), ('state', '!=', 'approval')]}"/>
+                            </group>
+                        </group>
+
+                        <field name="time_over_decision" />
+                        <field name="time_over_waiting_initiator" />
+                        <field name="time_over_deadlines" />
+
+                         <field name="state"
+                               widget="statusbar"
+                               statusbar_visible="draft,decision,in_pipeline,approval,accepted"
+                               statusbar_colors='{"accepted":"orange","cancel":"gray","completion":"green"}'
+                               colspan="6"
+                                />
+                    </group>
+                    <group col="8" colspan="4">
+                        <!-- draft, completion, in_pipeline -> cancel -->
+                        <button string="Отмена"
+                                name="action_cancel"
+                                type="workflow"
+                                icon="gtk-cancel"
+                                attrs="{'invisible': ['|', ('check_a', '=', False), ('state', 'not in', ('draft', 'completion', 'in_pipeline'))]}"
+                                />
+                        <!-- draft,completion -> decision -->
+                        <button string="На принятие решения"
+                                name="action_decision"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('check_a', '=', False), ('state', 'not in', ('draft', 'completion'))]}"
+                                />
+                        <!-- decision -> completion -->
+                        <button string="На доработку"
+                                name="action_completion"
+                                type="workflow"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('check_p', '=', False), ('state', '!=', 'decision')]}"
+                                />
+                        <!-- decision -> in_pipeline -->
+                        <button string="В работу"
+                                name="action_in_pipeline"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('check_p', '=', False), ('state', '!=', 'decision')]}"
+                                />
+                        <!-- approval -> in_pipeline -->
+                        <button string="Вернуть в  работу"
+                                name="action_in_pipeline"
+                                type="workflow"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('check_p', '=', False), ('state', '!=', 'approval')]}"
+                                />
+                        <!-- in_pipeline, completion_performer -> approval -->
+                        <button string="Сдать на утверждение"
+                                name="action_approval"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('check_p', '=', False), ('state', 'not in', ('in_pipeline', 'completion_performer'))]}"
+                                />
+                        <!-- approval -> completion_performer -->
+                        <button string="На доработку исполнителю"
+                                name="action_completion_performer"
+                                type="workflow"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('check_a', '=', False), ('state', '!=', 'approval')]}"
+                                />
+                        <!-- approval -> accepted -->
+                        <button string="Принять"
+                                name="action_accepted"
+                                type="workflow"
+                                icon="gtk-yes"
+                                attrs="{'invisible': ['|', ('check_a', '=', False), ('state', '!=', 'approval')]}"
+                                />
+
+                    </group>
+
+                    <group colspan="4">
+                        <separator string="Комментарии" colspan="4" />
+                        <button
+                                name="add_note"
+                                string="Добавить комментарий"
+                                type="object"
+                                default_focus="1"
+                                icon="terp-document-new"
+                                colspan="4"
+                                attrs="{'invisible': [('state', 'in', ('cancel' ,'accepted'))]}"
+                                />
+                        <field name="comment_ids" nolabel="1" colspan="4" readonly="1">
+                            <tree string="Комментарии">
+                                <field name="name"/>
+                                <field name="create_uid" />
+                                <field name="create_date" />
+                            </tree>
+                        </field>
+                        <separator string="История переходов" colspan="4" />
+                        <field name="history_ids" nolabel="1" colspan="4" readonly="1">
+                            <tree string="История переходов">
+                                <field name="name"/>
+                                <field name="create_uid" />
+                                <field name="create_date" />
+                            </tree>
+                        </field>
+                    </group>
+
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_ink_incidents_search">
+            <field name="name">ink.incidents.search</field>
+            <field name="model">ink.incidents</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+
+                    <field name="id" />
+                    <field name="name" />
+                    <field name="create_date" />
+                    <field name="author_id" />
+                    <field name="performer_id" />
+                    <field name="deadline_date" />
+                    <field name="type"/>
+                    <field name="document_type"/>
+                    <field name="state"/>
+                    <newline />
+                    <filter icon="terp-go-year"
+                            string="Год"
+                            domain="[('create_date','&lt;=', time.strftime('%%Y-%%m-%%d')),('create_date','&gt;=',time.strftime('%%Y-01-01'))]"
+                            help="Текущий год"
+                            context="{'group_by':'create_date'}"/>
+
+                    <filter icon="terp-go-month"
+                            string="Месяц"
+                            name="month"
+                            domain="[('create_date','&lt;=',(datetime.date.today() + relativedelta(months=31)).strftime('%%Y-%%m-%%d')),('create_date','&gt;=',(datetime.date.today() - relativedelta(day=1)).strftime('%%Y-%%m-%%d'))]"
+                            help="Текущий месяц"
+                            context="{'group_by':'create_date'}"/>
+                    <filter icon="terp-go-today"
+                            string="День"
+                            separator="1"
+                            name="day"
+                            domain="[('create_date','&lt;', time.strftime('%%Y-%%m-%%d 23:59:59')), ('create_date','&gt;=', time.strftime('%%Y-%%m-%%d 00:00:00'))]"
+                            help="Сегодня"/>
+                    <separator orientation="vertical" />
+                    <filter icon="terp-gnome-cpu-frequency-applet+" string="Превышено время принятия решения"
+                            domain="[('time_over_decision','!=', False)]"
+                            help="Инциденты в которых превышено время принятия решения"/>
+                    <filter icon="terp-gnome-cpu-frequency-applet+" string="Превышено время ожидания ответа инициатора"
+                            domain="[('time_over_waiting_initiator','!=', False)]"
+                            help="Инциденты в которых превышено время ожидания ответа инициатора"/>
+                    <filter icon="terp-gnome-cpu-frequency-applet+" string="Превышено время сроков выполнения"
+                            domain="[('time_over_deadlines','!=', False)]"
+                            help="Инциденты в которых превышено время сроков выполнения"/>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_ink_incidents">
+            <field name="name">Реестр инцидентов INK</field>
+            <field name="res_model">ink.incidents</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="auto_refresh">1</field>
+            <field name="view_id" ref="view_ink_incidents_tree"/>
+            <field name="search_view_id" ref="view_ink_incidents_search"/>
+        </record>
+
+        <menuitem name="Реестр инцидентов" id="incidents" action="action_ink_incidents"
+                  parent="company_documents.company_notes_list" sequence="60"
+                  groups="incidents.user"/>
+
+        <!-- Note view -->
+        <record model="ir.ui.view" id="ink_incidents_comment_view">
+            <field name="name">ink.incidents.comment.form</field>
+            <field name="model">ink.incidents.comment</field>
+            <field name="type">form</field>
+            <field name="priority" eval="1"/>
+
+            <field name="arch" type="xml">
+                <form string="Комментарий">
+                    <separator string="Комментарий" colspan="4" />
+                    <field name="name" nolabel="1" colspan="4" default_focus="1"/>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="ink_incidents_add_new_note_view1">
+            <field name="name">ink.incidents.add.note.form1</field>
+            <field name="model">ink.incidents.comment</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Комментарий">
+                    <separator string="Комментарий" colspan="4" />
+                    <field name="name" nolabel="1" colspan="4" default_focus="1"/>
+                    <separator string="" colspan="6"/>
+                    <group colspan="6" col="4" >
+                        <button string="Отмена" icon="gtk-close" special="cancel" />
+                        <button name="action_add" type="object" string="Добавить" icon="gtk-ok" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- Add New Note action -->
+
+        <record model="ir.actions.act_window" id="action_ink_incidents_add_note">
+            <field name="name">Добавление заметки</field>
+            <field name="res_model">ink.incidents.comment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="ink_incidents_comment_view"/>
+            <field name="target">inline</field>
+            <field name="auto_refresh">1</field>
+        </record>
+    </data>
+</openerp>

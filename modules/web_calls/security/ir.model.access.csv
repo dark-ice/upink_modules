@@ -1,0 +1,5 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_web_calls","web.calls user","model_web_calls","group_calls_user",1,1,1,1
+"access_web_calls_non_targeted_report","web.calls.non.targeted.report manager","model_web_calls_non_targeted_report","group_calls_manager",1,1,1,0
+"access_web_calls_targeted_report","web.calls.targeted.report manager","model_web_calls_targeted_report","group_calls_manager",1,1,1,0
+"access_web_calls_responsible_report","web.calls.responsible.report manager","model_web_calls_responsible_report","group_calls_manager",1,1,1,0
