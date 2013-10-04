@@ -258,6 +258,9 @@
                     <field name="direction" colspan="4"/>
                     <field name="check_leader"/>
                     <field name="in_account"/>
+                    <newline />
+                    <field name="service_type" colspan="4"/>
+
                 </form>
             </field>
         </record>

@@ -1,4 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
+from datetime import datetime, timedelta, date
+import pytz
 from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
@@ -242,6 +244,47 @@ res_provider_category()
 class partner_added_services(Model):
     _name = "partner.added.services"
     _rec_name = 'comment'
+
+    def _get_service_status(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.browse(cr, uid, ids, context):
+            val = 'Новая'
+
+            if record.service_id.service_type == 'project':
+                launch_ids = self.pool.get('process.launch').search(cr, 1, [('partner_id', '=', record.partner_id.id), ('service_id', '=', record.service_id.id)])
+                if launch_ids:
+                    launch = self.pool.get('process.launch').read(cr, 1, launch_ids[-1], ['process_model', 'process_id'])
+                    if launch['process_model'] and launch['process_id']:
+                        process = self.pool.get(record['process_model']).read(cr, 1, record['process_id'], ['state', 'create_date'])
+
+                        if process['state'] == 'finish':
+                            val = 'Закрыт'
+                        elif datetime.strptime(process['create_date'], "%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.UTC) + timedelta(days=15) < datetime.now(pytz.UTC):
+                            val = 'Существующая'
+
+            elif record.service_id.service_type == 'process':
+                invoice_ids = self.pool.get('account.invoice').search(cr, 1, [('partner_id', '=', record.partner_id.id)])
+                pay_ids = self.pool.get('account.invoice.pay.line').search(cr, 1, [('invoice_id', 'in', invoice_ids), ('service_id', '=', record.service_id.id)])
+                if pay_ids:
+                    first_pay = self.pool.get('account.invoice.pay.line').read(cr, 1, pay_ids[0], ['pay_date'])
+                    last_pay = self.pool.get('account.invoice.pay.line').read(cr, 1, pay_ids[-1], ['pay_date'])
+                    pre_last_pay = None
+                    if len(pay_ids) > 1:
+                        pre_last_pay = self.pool.get('account.invoice.pay.line').read(cr, 1, pay_ids[-2], ['pay_date'])
+
+                    if pre_last_pay is not None and datetime.strptime(pre_last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=90) < datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC):
+                        val = 'Возврат'
+
+                    if datetime.strptime(first_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=30) < datetime.now(pytz.UTC):
+                        val = 'Существующая'
+                    if datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=40) < datetime.now(pytz.UTC):
+                        val = 'Приостановленная'
+                    if datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=90) < datetime.now(pytz.UTC):
+                        val = 'Отказ'
+
+            res[record.id] = val
+        return res
+
     _columns = {
         'service_id': fields.many2one('brief.services.stage', 'Услуга'),
         'comment': fields.text('Комментарий'),
@@ -249,6 +292,13 @@ class partner_added_services(Model):
         'check': fields.boolean('Подключенные услуги'),
         'budget': fields.float('Бюджет, y.e.'),
         'partner_base': fields.related('partner_id', 'partner_base', type='char', size=50),
+        'service_status': fields.function(
+            _get_service_status,
+            method=True,
+            string='Статус',
+            type='char',
+            size=200,
+        ),
     }
 
     _defaults = {
@@ -756,6 +806,19 @@ class res_partner(Model):
         res = self.name_get(cr, user, ids, context)
         return res
 
+    def _get_service_status(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.read(cr, uid, ids, ['added_services_ids'], context):
+            val = 'Новая'
+            service_ids
+            for service in self.pool.get('').read(cr, uid, record['added_services_ids'], []):
+                if service.service_type == 'process':
+                    pass
+                else:
+                    pass
+            res[record.id] = val
+        return res
+
     _columns = {
         'name': fields.char('Партнер (основной сайт)', size=250),
         'ur_name': fields.char('Юридическое название компании', size=250, help='Юридическое название компании'),
@@ -801,15 +864,22 @@ class res_partner(Model):
         'corporate_admin_panel': fields.char('Админпанель сайта', size=250),
         'corporate_admin_password': fields.char('Пароль админпанели сайта', size=250),
         'next_call': fields.datetime('Следующий звонок', help='Дата следующего контакта.'),
-        'partner_status': fields.selection(
-            [
-                ('new', 'Новый'),
-                ('existing', 'Существующий'),
-                ('stoped', 'Приостановлен'),
-                ('refusion', 'Отказ')
-            ],
-            'Статус партнера',
-            help='Этап работы с партнером. Поле заполняется менеджером'),
+        #'partner_status': fields.selection(
+        #    [
+        #        ('new', 'Новый'),
+        #        ('existing', 'Существующий'),
+        #        ('stoped', 'Приостановлен'),
+        #        ('refusion', 'Отказ')
+        #    ],
+        #    'Статус партнера',
+        #    help='Этап работы с партнером. Поле заполняется менеджером'),
+        'partner_status': fields.function(
+            _get_partner_status,
+            type='char',
+            size=200,
+            string='Статус партнера',
+            help='Этап работы с партнером. Поле заполняется менеджером'
+        ),
         'services_ids': fields.one2many(
             'crm.services.rel.stage',
             'partner_id',
