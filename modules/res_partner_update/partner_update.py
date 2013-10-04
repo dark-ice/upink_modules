@@ -810,13 +810,12 @@ class res_partner(Model):
         res = {}
         for record in self.read(cr, uid, ids, ['added_services_ids'], context):
             val = 'Новая'
-            service_ids
-            for service in self.pool.get('').read(cr, uid, record['added_services_ids'], []):
-                if service.service_type == 'process':
-                    pass
-                else:
-                    pass
-            res[record.id] = val
+            #for service in self.pool.get('').read(cr, uid, record['added_services_ids'], []):
+            #    if service.service_type == 'process':
+            #        pass
+            #    else:
+            #        pass
+            res[record['id']] = val
         return res
 
     _columns = {
