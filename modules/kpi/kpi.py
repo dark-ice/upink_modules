@@ -439,11 +439,14 @@ class KpiSmart(Model):
     )
 
     def _get_plan(self, cr, period_id, employee_id):
-        return self.search(cr, 1, [
+        l = self.search(cr, 1, [
             ('period_id.id', '=', period_id),
             ('responsible_id.id', '=', employee_id),
             ('state', 'not in', ('transfer', 'cancel', 'removed', 'draft', 'agreement'))
         ], count=True)
+        if l > 10:
+            l = 10
+        return l
 
     def _get_fact(self, cr, period_id, employee_id):
         return self.search(cr, 1, [
