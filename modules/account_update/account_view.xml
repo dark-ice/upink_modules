@@ -259,6 +259,7 @@
                     <tree string="Invoice Line" editable="top">
                         <field name="service_id" required="1"/>
                         <field name="brief_id"/>
+                        <field name="partner_id" invisible="1" />
                         <field name="account_id" invisible="1" required="1"/>
                         <field name="price_unit"
                                string="Стоимость $"

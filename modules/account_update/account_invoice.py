@@ -667,9 +667,10 @@ class AccountInvoiceLine(Model):
         'paid': fields.float('Оплачено', digits=(10, 2)),
         'price_unit': fields.float('Unit Price', required=True, digits=(10, 6)),
         'account_id': fields.many2one('account.account', 'Account', required=True, domain=[]),
+        'partner_id': fields.related('invoice_id', 'partner_id', string='Партнер', type='many2one', relation='res.partner', store=True),
 
         'nbr': fields.function(_show_number, method=True, string='Номер', type='integer', store=False),
-        'brief_id': fields.many2one('brief.main', 'Медиаплан', domain="[('services_ids', '=', service_id), ('partner_id', '=', invoice_id.partner_id)]"),
+        'brief_id': fields.many2one('brief.main', 'Медиаплан', domain="[('services_ids', '=', service_id), ('partner_id', '=', partner_id)]"),
     }
 
     _defaults = {
