@@ -1,5 +1,6 @@
 # coding=utf-8
 __author__ = 'andrey'
+from datetime import datetime
 from openerp import tools
 from openerp.osv import fields
 from openerp.osv.orm import Model
@@ -23,6 +24,22 @@ class ReportPlanning(Model):
             res[record['id']] = result
         return res
 
+    def _per(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        field = name[:-4]
+        for record in self.read(cr, uid, ids, [field], context):
+            res[record['id']] = (record[field] / 365000) * 100
+        return res
+
+    def _sum(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        field = "{name}_total".format(name=name,)
+        for record in self.read(cr, uid, ids, ['date'], context):
+            start_date = datetime.strptime(record['date'], "%Y-%m-%d")
+            f_ids = self.search(cr, uid, [('date', '<=', record['date']), ('date', '>=', start_date.strftime('%Y-%m-01'))])
+            res[record['id']] = sum(r[field] for r in self.read(cr, uid, f_ids, [field], context))
+        return res
+
     _columns = {
         'date_start': fields.date('c', select=True),
         'date_end': fields.date('по', select=True),
@@ -41,19 +58,35 @@ class ReportPlanning(Model):
         'plan_dev_account': fields.float('Развитие (счета)'),
 
         'plan_total': fields.float('Планы: всего'),
-        'plan_per': fields.float('% плана'),
+        'plan': fields.function(
+            _sum,
+            type='float',
+            string='Планы: всего получение'
+        ),
+        #'plan_per': fields.float('% плана'),
+        'plan_per': fields.function(
+            _per,
+            type='float',
+            digits=(10, 2),
+            string='Планы: % плана'
+        ),
 
         'fact_work': fields.float('Работа'),
         'fact_calling': fields.float('Привлечение'),
         'fact_dev': fields.float('Развитие'),
         #'fact_per': fields.float('Факты: % плана'),
         'fact_per': fields.function(
-            _fact_per,
+            _per,
             type='float',
             digits=(10, 2),
             string='Факты: % плана'
         ),
         'fact_total': fields.float('Факты: всего'),
+        'fact': fields.function(
+            _sum,
+            type='float',
+            string='Факты: всего получение'
+        ),
     }
 
     def init(self, cr):
