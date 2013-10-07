@@ -93,13 +93,13 @@ class ReportPlanning(Model):
                   x.plan_calling_account,
                   x.plan_dev,
                   x.plan_dev_account,
-                  x.plan_total,
-                  x.plan_per,
+                  plan_total,
+                  plan_per,
                   y.fact_work,
                   y.fact_dev,
                   y.fact_calling,
                   y.fact_total,
-                  y.fact_per
+                  fact_per
             )""")
 
     def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False):
