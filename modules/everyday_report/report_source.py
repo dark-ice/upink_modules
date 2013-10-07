@@ -144,7 +144,7 @@ class ReportSource(Model):
 
         #'plan_calling': fields.float('Привлечение план'),
         'plan_calling': fields.function(
-            _plan_total,
+            _plan_new,
             type='float',
             string='Планы: новые'
         ),
