@@ -264,7 +264,7 @@ class ReportStructure(Model):
                   mp_fact mp_fact_s,
 
                   total_fact total_fact_s,
-                  y.total_plan
+                  ppc_plan + smm_plan + seo_plan + call_plan + web_plan + video_plan + mp_plan total_plan
                 FROM (
                   SELECT
                     max(i.paid_date::date) paid_date,
@@ -285,17 +285,16 @@ class ReportStructure(Model):
                   LEFT JOIN (
                     SELECT
                       p.name,
-                      max(case when s.name=431 then s.plan else 0 end) ppc_plan,
-                      max(case when s.name=432 then s.plan else 0 end) smm_plan,
-                      max(case when s.name=433 then s.plan else 0 end) seo_plan,
-                      max(case when s.name=434 then s.plan else 0 end) call_plan,
-                      max(case when s.name=435 then s.plan else 0 end) web_plan,
-                      max(case when s.name=436 then s.plan else 0 end) video_plan,
-                      max(case when s.name=470 then s.plan else 0 end) mp_plan,
-                      max(case when s.name=431 then s.plan else 0 end) + max(case when s.name=432 then s.plan else 0 end) + max(case when s.name=433 then s.plan else 0 end) + max(case when s.name=434 then s.plan else 0 end) + max(case when s.name=435 then s.plan else 0 end) + max(case when s.name=436 then s.plan else 0 end) + max(case when s.name=470 then s.plan else 0 end) total_plan
+                      max(case when s.name=464 then s.plan else 0 end) ppc_plan,
+                      max(case when s.name=465 then s.plan else 0 end) smm_plan,
+                      max(case when s.name=466 then s.plan else 0 end) seo_plan,
+                      max(case when s.name=467 then s.plan else 0 end) call_plan,
+                      max(case when s.name=468 then s.plan else 0 end) web_plan,
+                      max(case when s.name=469 then s.plan else 0 end) video_plan,
+                      max(case when s.name=475 then s.plan else 0 end) mp_plan
                     FROM kpi_period p
                       LEFT JOIN kpi_kpi k on (k.period_id=p.id AND k.employee_id=10)
-                      LEFT JOIN kpi_sla s on (s.kpi_id=k.id)
+                      LEFT JOIN kpi_sla_sale s on (s.kpi_id=k.id)
                     WHERE p.calendar='rus'
                     GROUP BY s.kpi_id, p.name) y on (y.name=to_char(x.paid_date, 'YYYY/MM'))
             )""")
