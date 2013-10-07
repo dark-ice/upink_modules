@@ -14,6 +14,19 @@ AVAILABLE_PRIORITIES = [
     ('5', 'Самый низкий'),
 ]
 
+PARTNER_STATUS = (
+    ('new', 'Новая'),
+    ('exist', 'Существующая'),
+    ('paused', 'Приостановленная'),
+    ('cancel', 'Отказ'),
+    ('returned', 'Возврат'),
+    ('closed', 'Закрыт'),
+)
+
+
+def get_state(states, state):
+    return [item for item in states if item[0] == state][0]
+
 
 class res_partner_address(Model):
     _name = 'res.partner.address'
@@ -807,16 +820,54 @@ class res_partner(Model):
         return res
 
     def _get_partner_status(self, cr, uid, ids, name, arg, context=None):
+        service_pool = self.pool.get('brief.services.stage')
+        p_service_pool = self.pool.get('partner.added.services')
         res = {}
         for record in self.read(cr, uid, ids, ['added_services_ids'], context):
-            val = 'Новая'
-            #for service in self.pool.get('').read(cr, uid, record['added_services_ids'], []):
-            #    if service.service_type == 'process':
-            #        pass
-            #    else:
-            #        pass
+            process_service_ids = []
+            project_service_ids = []
+            val = 'new'
+            service_ids = [s['service_id'][0] for s in p_service_pool.read(cr, 1, record['added_services_ids'], ['service_id']) if s['service_id']]
+            for service in service_pool.read(cr, uid, service_ids, ['service_type']):
+                if service['service_type'] == 'process':
+                    process_service_ids += p_service_pool.search(cr, 1, [('id', 'in', record['added_services_ids']), ('service_id', '=', service['id'])])
+                else:
+                    project_service_ids += p_service_pool.search(cr, 1, [('id', 'in', record['added_services_ids']), ('service_id', '=', service['id'])])
+
+            if process_service_ids:
+                process_service_status = p_service_pool._get_service_status(cr, 1, process_service_ids, '', []).values()
+                if 'Приостановленная' in process_service_status:
+                    val = 'paused'
+                elif 'Существующая' in process_service_status:
+                    val = 'exist'
+                elif 'Отказ' in process_service_status:
+                    val = 'cancel'
+                elif 'Возврат' in process_service_status:
+                    val = 'returned'
+            elif project_service_ids:
+                project_service_status = p_service_pool._get_service_status(cr, 1, project_service_ids, '', []).values()
+                if 'Существующая' in project_service_status:
+                    val = 'exist'
+                elif 'Закрыт' in project_service_status:
+                    val = 'closed'
+
             res[record['id']] = val
         return res
+
+    def _search_partner_status(self, cr, uid, obj, name, args, context):
+        ids = set()
+        status = ''
+        for cond in args:
+            status = cond[2]
+            break
+        if status:
+            partner_ids = self.search(cr, 1, [('lead', '=', False), ('partner_type', '=', 'upsale')])
+            #for partner in self.read(cr, 1, partner_ids, ['added_services_ids']):
+            partner_statuses = self._get_partner_status(cr, 1, partner_ids, '', [])
+            ids = [k for k, v in partner_statuses.iteritems() if get_state(PARTNER_STATUS, status)[0] == v]
+        if ids:
+            return [('id', 'in', tuple(ids))]
+        return [('id', '=', '0')]
 
     _columns = {
         'name': fields.char('Партнер (основной сайт)', size=250),
@@ -874,8 +925,9 @@ class res_partner(Model):
         #    help='Этап работы с партнером. Поле заполняется менеджером'),
         'partner_status': fields.function(
             _get_partner_status,
-            type='char',
-            size=200,
+            fnct_search=_search_partner_status,
+            type='selection',
+            selection=PARTNER_STATUS,
             string='Статус партнера',
             help='Этап работы с партнером. Поле заполняется менеджером'
         ),

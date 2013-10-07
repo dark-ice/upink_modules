@@ -584,6 +584,7 @@
                         <field name="user_id">
                             <filter string="My Partners" icon="terp-personal+" domain="[('user_id','=',uid)]"/>
                         </field>
+                        <field name="partner_status" />
                     </group>
                     <newline/>
                     <group expand="0" string="Group By...">
@@ -1092,7 +1093,10 @@
                                 </group>
                             </page>
                             <page string="Управление качеством">
-
+                                <field name="terms_of_service" colspan="4"/>
+                                <field name="conformity" colspan="4"/>
+                                <field name="quality_feedback" colspan="4"/>
+                                <field name="completeness_of_reporting" colspan="4"/>
                                 <button name="add_note" string="Добавить заметку" type="object" icon="terp-document-new" colspan="4" context="{'type': 'skk'}"/>
                                 <field name="skk_note_ids" colspan="4" nolabel="1" readonly="1">
                                     <tree string="Заметки СКК">
