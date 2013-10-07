@@ -44,8 +44,8 @@ class ReportPlanning(Model):
             create or replace view day_report_planning as (
                 SELECT
                   row_number() over() as id,
-                  to_char(max(x.date), 'YYYY-MM-DD') date_end,
-                  to_char(max(x.date), 'YYYY-MM-DD') date_start,
+                  to_char(x.date, 'YYYY-MM-DD') date_end,
+                  to_char(x.date, 'YYYY-MM-DD') date_start,
                   x.date,
                   extract(week FROM x.date) week_number,
                   x.plan_work,
@@ -54,28 +54,25 @@ class ReportPlanning(Model):
                   x.plan_calling_account,
                   x.plan_dev,
                   x.plan_dev_account,
-                  x.plan_total,
-                  x.plan_per,
+                  x.plan_work + x.plan_calling + plan_dev plan_total,
+                  (x.plan_work + x.plan_calling + plan_dev)/365000 plan_per,
                   y.fact_work,
                   y.fact_dev,
                   y.fact_calling,
                   y.fact_total,
-                  y.fact_per
+                  365000/y.fact_total fact_per
                 FROM (
                   SELECT
                     r.date,
-                    sum(case when r.section_id=8 AND u.context_section_id=r.section_id then r.plan else 0 end) plan_work,
-                    sum(case when u.context_section_id=8 AND u.context_section_id=r.section_id then il.price_unit else 0 end) plan_work_account,
-                    sum(case when r.section_id=7 AND u.context_section_id=r.section_id then r.plan else 0 end) plan_calling,
-                    sum(case when u.context_section_id=7 AND u.context_section_id=r.section_id then il.price_unit else 0 end) plan_calling_account,
-                    sum(case when r.section_id=9 AND u.context_section_id=r.section_id then r.plan else 0 end) plan_dev,
-                    sum(case when u.context_section_id=9 AND u.context_section_id=r.section_id then il.price_unit else 0 end) plan_dev_account,
-                    sum(r.plan) plan_total,
-                    sum(r.plan)/365000 plan_per
+                    max(case when r.section_id=8 then r.plan else 0 end) plan_work,
+                    sum(case when u.context_section_id=8 AND u.context_section_id=r.section_id then i.total_ye else 0 end) plan_work_account,
+                    max(case when r.section_id=7 then r.plan else 0 end) plan_calling,
+                    sum(case when u.context_section_id=7 AND u.context_section_id=r.section_id then i.total_ye else 0 end) plan_calling_account,
+                    max(case when r.section_id=9 then r.plan else 0 end) plan_dev,
+                    sum(case when u.context_section_id=9 AND u.context_section_id=r.section_id then i.total_ye else 0 end) plan_dev_account
                   FROM day_report_plan r
                     LEFT JOIN account_invoice i on (r.date=i.plan_paid_date)
                     LEFT JOIN res_users u on (u.id=i.user_id)
-                    LEFT JOIN account_invoice_line il on (il.invoice_id=i.id)
                   GROUP BY r.date
                 ) x LEFT JOIN (
                   SELECT
@@ -83,8 +80,7 @@ class ReportPlanning(Model):
                     sum(case when u.context_section_id=8 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_work,
                     sum(case when u.context_section_id=7 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_calling,
                     sum(case when u.context_section_id=9 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_dev,
-                    sum(case when u.context_section_id in (8, 7, 9) AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_total,
-                    365000/sum(i.total_ye) fact_per
+                    sum(case when u.context_section_id in (8, 7, 9) AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_total
                   FROM day_report_plan r
                     LEFT JOIN account_invoice i on (r.date=i.paid_date)
                     LEFT JOIN res_users u on (u.id=i.user_id)
