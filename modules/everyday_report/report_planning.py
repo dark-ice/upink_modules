@@ -80,10 +80,10 @@ class ReportPlanning(Model):
                 ) x LEFT JOIN (
                   SELECT
                     r.date,
-                    sum(case when u.context_section_id=8 then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_work,
-                    sum(case when u.context_section_id=7 then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_calling,
-                    sum(case when u.context_section_id=9 then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_dev,
-                    sum(case when u.context_section_id in (8, 7, 9) then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_total,
+                    sum(case when u.context_section_id=8 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_work,
+                    sum(case when u.context_section_id=7 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_calling,
+                    sum(case when u.context_section_id=9 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_dev,
+                    sum(case when u.context_section_id in (8, 7, 9) AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_total,
                     365000/sum(i.total_ye) fact_per
                   FROM day_report_plan r
                     LEFT JOIN account_invoice i on (r.date=i.paid_date)
