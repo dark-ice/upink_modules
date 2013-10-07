@@ -11,6 +11,18 @@ class ReportPlanning(Model):
     _auto = False
     _order = 'date'
 
+    def _fact_per(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.read(cr, uid, ids, ['fact_total'], context):
+            result = 0
+            try:
+                result = 365000 / record['fact_total']
+            except:
+                pass
+
+            res[record['id']] = result
+        return res
+
     _columns = {
         'date_start': fields.date('c', select=True),
         'date_end': fields.date('по', select=True),
@@ -34,7 +46,13 @@ class ReportPlanning(Model):
         'fact_work': fields.float('Работа'),
         'fact_calling': fields.float('Привлечение'),
         'fact_dev': fields.float('Развитие'),
-        'fact_per': fields.float('Факты: % плана'),
+        #'fact_per': fields.float('Факты: % плана'),
+        'fact_per': fields.function(
+            _fact_per,
+            type='float',
+            digits=(10, 2),
+            string='Факты: % плана'
+        ),
         'fact_total': fields.float('Факты: всего'),
     }
 
@@ -59,8 +77,7 @@ class ReportPlanning(Model):
                   y.fact_work,
                   y.fact_dev,
                   y.fact_calling,
-                  y.fact_total,
-                  365000/y.fact_total fact_per
+                  y.fact_total
                 FROM (
                   SELECT
                     r.date,
@@ -98,8 +115,7 @@ class ReportPlanning(Model):
                   y.fact_work,
                   y.fact_dev,
                   y.fact_calling,
-                  y.fact_total,
-                  fact_per
+                  y.fact_total
             )""")
 
     def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False):
