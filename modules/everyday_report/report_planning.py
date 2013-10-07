@@ -64,12 +64,12 @@ class ReportPlanning(Model):
                 FROM (
                   SELECT
                     r.date,
-                    sum(case when r.section_id=8 then r.plan else 0 end) plan_work,
-                    sum(case when u.context_section_id=8 then il.price_unit else 0 end) plan_work_account,
-                    sum(case when r.section_id=7 then r.plan else 0 end) plan_calling,
-                    sum(case when u.context_section_id=7 then il.price_unit else 0 end) plan_calling_account,
-                    sum(case when r.section_id=9 then r.plan else 0 end) plan_dev,
-                    sum(case when u.context_section_id=9 then il.price_unit else 0 end) plan_dev_account,
+                    sum(case when r.section_id=8 AND u.context_section_id=r.section_id then r.plan else 0 end) plan_work,
+                    sum(case when u.context_section_id=8 AND u.context_section_id=r.section_id then il.price_unit else 0 end) plan_work_account,
+                    sum(case when r.section_id=7 AND u.context_section_id=r.section_id then r.plan else 0 end) plan_calling,
+                    sum(case when u.context_section_id=7 AND u.context_section_id=r.section_id then il.price_unit else 0 end) plan_calling_account,
+                    sum(case when r.section_id=9 AND u.context_section_id=r.section_id then r.plan else 0 end) plan_dev,
+                    sum(case when u.context_section_id=9 AND u.context_section_id=r.section_id then il.price_unit else 0 end) plan_dev_account,
                     sum(r.plan) plan_total,
                     sum(r.plan)/365000 plan_per
                   FROM day_report_plan r
