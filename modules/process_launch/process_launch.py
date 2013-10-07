@@ -232,7 +232,7 @@ class ProcessLaunch(Model):
             'brief.contract',
             'Договор',
             readonly=True,
-            required=True,
+            required=False,
             states={
                 'draft': [('readonly', False)],
                 'revision': [('readonly', False)],
@@ -245,6 +245,18 @@ class ProcessLaunch(Model):
             relation='attach.files',
             string='Файл утвержденого договора',
             readonly=True
+        ),
+        'contract_file_id': fields.many2one(
+            'ir.attachment',
+            'Файл договора',
+            readonly=True,
+            required=False,
+            states={
+                'draft': [('readonly', False)],
+                'revision': [('readonly', False)],
+            },
+            domain="['|', '&', ('res_model', '=', 'process.launch'), ('tmp_res_model', '=', 'contract_file'), '&', ('res_model', '=', 'res.partner'), ('res_id', '=', partner_id)]",
+            context="{'res_model': 'res.partner', 'res_id': partner_id}"
         ),
         'account_id': fields.many2one(
             'account.invoice',
@@ -378,6 +390,8 @@ class ProcessLaunch(Model):
             type='char'
         ),
 
+
+
         # SMM
         'targeted_advertising': fields.boolean(
             'Таргетированная реклама',
@@ -460,6 +474,8 @@ class ProcessLaunch(Model):
                 if next_state == 'agreement':
                     if not values.get('account_file_id', False) and not record['account_file_id'] and not values.get('account_id', False) and not record['account_id']:
                         error += 'Необходимо выбрать счет или прикрепить платежное поручение'
+                    if not values.get('contract_file_id', False) and not record['contract_file_id'] and not values.get('contract_id', False) and not record['contract_id']:
+                        error += 'Необходимо выбрать договор или прикрепить файл договора'
 
                 if error:
                     raise osv.except_osv("Единая карточка запуска", error)

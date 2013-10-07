@@ -38,7 +38,7 @@
                                 name="active"
                                 string="Целевые продажи"/>
                     <filter icon="STOCK_MEDIA_PLAY"
-                                domain="[('call_type','in', ['qa', 'order', 'atc'])]"
+                                domain="[('call_type','in', ['qa', 'order', 'atc', 'number'])]"
                                 name="active"
                                 string="Нецелевые продажи"/>
                     <separator orientation="vertical" />

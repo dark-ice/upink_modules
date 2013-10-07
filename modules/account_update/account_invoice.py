@@ -669,6 +669,7 @@ class AccountInvoiceLine(Model):
         'account_id': fields.many2one('account.account', 'Account', required=True, domain=[]),
 
         'nbr': fields.function(_show_number, method=True, string='Номер', type='integer', store=False),
+        'brief_id': fields.many2one('brief.main', 'Медиаплан', domain="[('services_ids', '=', service_id), ('partner_id', '=', invoice_id.partner_id)]"),
     }
 
     _defaults = {
