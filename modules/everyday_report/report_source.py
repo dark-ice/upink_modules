@@ -77,6 +77,18 @@ class ReportSource(Model):
             res[record['id']] = sum(r[field] for r in self.read(cr, uid, f_ids, [field], context))
         return res
 
+    def _plan_total(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.read(cr, uid, ids, ['plan_dev', 'plan_cold', 'plan_marketing', 'plan_moscow'], context):
+            res[record['id']] = record['plan_dev'] + record['plan_cold'] + record['plan_marketing'] + record['plan_moscow']
+        return res
+
+    def _plan_new(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.read(cr, uid, ids, ['plan_cold', 'plan_marketing'], context):
+            res[record['id']] = record['plan_cold'] + record['plan_marketing']
+        return res
+
     def _part(self, cr, uid, ids, name, arg, context=None):
         """
             Динамически определяет роли на форме
@@ -130,7 +142,12 @@ class ReportSource(Model):
             string='Развитие процент выполнения'
         ),
 
-        'plan_calling': fields.float('Привлечение план'),
+        #'plan_calling': fields.float('Привлечение план'),
+        'plan_calling': fields.function(
+            _plan_total,
+            type='float',
+            string='Планы: новые'
+        ),
         'fact_calling_s': fields.float('Привлечение факт'),
         'fact_calling': fields.function(
             _fact,
@@ -202,7 +219,12 @@ class ReportSource(Model):
             string='Москва процент выполнения'
         ),
 
-        'plan_total': fields.float('Планы: всего'),
+        #'plan_total': fields.float('Планы: всего'),
+        'plan_total': fields.function(
+            _plan_total,
+            type='float',
+            string='Планы: всего'
+        ),
         'fact_total_s': fields.float('Факты: всего'),
         'fact_total': fields.function(
             _fact,
@@ -232,11 +254,9 @@ class ReportSource(Model):
                   sum(case when u.context_section_id=18 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_moscow_s,
                   sum(case when u.context_section_id in (7, 9, 17, 18) AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_total_s,
                   max(case when r.section_id=9 then r.plan else 0 end) plan_dev,
-                  max(case when r.section_id in (7, 17, 18) then r.plan else 0 end) plan_calling,
                   max(case when r.section_id=7 then r.plan else 0 end) plan_cold,
                   max(case when r.section_id=17 then r.plan else 0 end) plan_marketing,
-                  max(case when r.section_id=18 then r.plan else 0 end) plan_moscow,
-                  max(case when r.section_id in (7, 9, 17, 18) then r.plan else 0 end) plan_total
+                  max(case when r.section_id=18 then r.plan else 0 end) plan_moscow
                 FROM account_invoice i
                   LEFT JOIN res_users u on (u.id=i.user_id)
                   LEFT JOIN day_report_source_plan r on (
