@@ -80,7 +80,7 @@ class accountBalanceManager(Model):
                   p.ur_name partner_urname,
                   il.specialist_id,
                   il.service_id,
-                  il.direction,
+                  il.direction division,
                   il.leader_group_id,
                   il.price_currency total,
                   il.price_unit total_dol,
