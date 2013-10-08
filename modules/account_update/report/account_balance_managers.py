@@ -110,11 +110,11 @@ class accountBalanceManager(Model):
                       ip.invoice_id,
                       ip.total,
                       ip.date_pay,
-                      ip.card_id card_id,
+                      ip.card_id,
                       sum(ipl.name) pay_line_name
                     FROM account_invoice_pay ip
                       left join account_invoice_pay_line ipl on (ipl.invoice_pay_id=ip.id)
-                    GROUP BY ip.invoice_id, ip.total, ip.date_pay
+                    GROUP BY ip.invoice_id, ip.total, ip.date_pay, ip.card_id
                   ) ip on (ip.invoice_id=i.id)
                 WHERE
                   i.type='out_invoice' AND i.date_invoice IS NOT NULL AND ip.total IS NOT NULL
