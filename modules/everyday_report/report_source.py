@@ -248,14 +248,14 @@ class ReportSource(Model):
                   to_char(i.paid_date, 'YYYY-MM-DD') date_start,
                   i.paid_date date,
                   sum(case when u.context_section_id=9 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_dev_s,
-                  sum(case when u.context_section_id in (7, 17, 18) AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_calling_s,
+                  sum(case when u.context_section_id in (7, 8, 18) AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_calling_s,
                   sum(case when u.context_section_id=7 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_cold_s,
-                  sum(case when u.context_section_id=17 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_marketing_s,
+                  sum(case when u.context_section_id=8 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_marketing_s,
                   sum(case when u.context_section_id=18 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_moscow_s,
-                  sum(case when u.context_section_id in (7, 9, 17, 18) AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_total_s,
+                  sum(case when u.context_section_id in (7, 9, 8, 18) AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_total_s,
                   max(case when r.section_id=9 then r.plan else 0 end) plan_dev,
                   max(case when r.section_id=7 then r.plan else 0 end) plan_cold,
-                  max(case when r.section_id=17 then r.plan else 0 end) plan_marketing,
+                  max(case when r.section_id=8 then r.plan else 0 end) plan_marketing,
                   max(case when r.section_id=18 then r.plan else 0 end) plan_moscow
                 FROM account_invoice i
                   LEFT JOIN res_users u on (u.id=i.user_id)
