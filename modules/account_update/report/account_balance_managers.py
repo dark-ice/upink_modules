@@ -76,6 +76,7 @@ class accountBalanceManager(Model):
                   i.number number,
                   i.partner_id partner_id,
                   p.name partner_name,
+                  p.ur_name partner_urname,
                   il.specialist_id,
                   il.service_id,
                   il.direction,
