@@ -67,57 +67,55 @@ class accountBalanceManager(Model):
         cr.execute("""
             create or replace view account_balance_manager as (
                 SELECT
-                     row_number() over() as id,
-                     i.user_id user_id,
-                     u.context_section_id section_id,
-                     i.date_invoice date_invoice,
-                     i.rate currency_rate,
-                     i.number number,
-                     i.partner_id partner_id,
-                     p.name partner_name,
-                     p.ur_name partner_urname,
-                     sum(il.price_currency) total,
-                     sum(il.price_unit) total_dol,
-                     ip.total pay_total,
-                     ip.total / i.rate pay_dol,
-                     ip.date_pay pay_date,
-                     ip.id pay_id,
-                     ip.card_id card_id,
-                     to_char(ip.date_pay, 'YYYY-MM-DD') date_end,
-                     to_char(ip.date_pay, 'YYYY-MM-DD') date_start,
-                     ipl.service_id service_id,
-                     ipl.name pay_line_name,
-                     ipl.name / i.rate pay_line_name_dol,
-                     bss.direction division,
-                     bss.leader_group_id leader_group_id
+                  row_number() over() as id,
+                  to_char(ip.date_pay, 'YYYY-MM-DD') date_end,
+                  to_char(ip.date_pay, 'YYYY-MM-DD') date_start,
+                  i.user_id user_id,
+                  i.date_invoice date_invoice,
+                  i.rate currency_rate,
+                  i.number number,
+                  i.partner_id partner_id,
+                  p.name partner_name,
+                  il.specialist_id,
+                  il.service_id,
+                  il.direction,
+                  il.leader_group_id,
+                  il.price_currency total,
+                  il.price_unit total_dol,
+                  u.context_section_id section_id,
+                  ip.total pay_total,
+                  ip.total / i.rate pay_dol,
+                  ip.pay_line_name,
+                  ip.pay_line_name / i.rate pay_line_name_dol
                 FROM
-                     account_invoice i
-                        left join account_invoice_line il on (il.invoice_id=i.id)
-                        left join account_invoice_pay ip on (ip.invoice_id=i.id)
-                        left join account_invoice_pay_line ipl on (ipl.invoice_pay_id=ip.id)
-                        left join brief_services_stage bss on (bss.id=ipl.service_id)
-                        left join res_users u on (u.id=i.user_id)
-                        left join res_partner p on (p.id=i.partner_id)
+                  account_invoice i
+                  left join res_users u on (u.id=i.user_id)
+                  left join res_partner p on (p.id=i.partner_id)
+                  left join (
+                    SELECT
+                      b.specialist_id,
+                      il.invoice_id,
+                      il.service_id,
+                      il.price_currency,
+                      il.price_unit,
+                      bss.direction,
+                      bss.leader_group_id
+                    FROM account_invoice_line il
+                      left join brief_main b on (b.id=il.brief_id)
+                      left join brief_services_stage bss on (bss.id=il.service_id)
+                  ) il on (il.invoice_id=i.id)
+                  left join (
+                    SELECT
+                      ip.invoice_id,
+                      ip.total,
+                      ip.date_pay,
+                      sum(ipl.name) pay_line_name
+                    FROM account_invoice_pay ip
+                      left join account_invoice_pay_line ipl on (ipl.invoice_pay_id=ip.id)
+                    GROUP BY ip.invoice_id, ip.total, ip.date_pay
+                  ) ip on (ip.invoice_id=i.id)
                 WHERE
-                    i.type='out_invoice' AND i.date_invoice IS NOT NULL AND ip.total IS NOT NULL
-                GROUP BY
-                    i.user_id,
-                    i.date_invoice,
-                    i.rate,
-                    i.number,
-                    i.partner_id,
-                    p.name,
-                    p.ur_name,
-                    u.context_section_id,
-                    i.type_account,
-                    ip.total,
-                    ip.date_pay,
-                    ip.id,
-                    ip.card_id,
-                    ipl.service_id,
-                    ipl.name,
-                    bss.direction,
-                    bss.leader_group_id
+                  i.type='out_invoice' AND i.date_invoice IS NOT NULL AND ip.total IS NOT NULL
             )
         """)
 
