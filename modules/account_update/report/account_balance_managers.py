@@ -70,7 +70,7 @@ class accountBalanceManager(Model):
                   row_number() over() as id,
                   to_char(ip.date_pay, 'YYYY-MM-DD') date_end,
                   to_char(ip.date_pay, 'YYYY-MM-DD') date_start,
-                  ip.date_pay,
+                  ip.date_pay pay_date,
                   i.user_id user_id,
                   i.date_invoice date_invoice,
                   i.rate currency_rate,
