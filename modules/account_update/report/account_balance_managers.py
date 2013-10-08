@@ -83,6 +83,7 @@ class accountBalanceManager(Model):
                   il.price_currency total,
                   il.price_unit total_dol,
                   u.context_section_id section_id,
+                  ip.card_id,
                   ip.total pay_total,
                   ip.total / i.rate pay_dol,
                   ip.pay_line_name,
@@ -109,6 +110,7 @@ class accountBalanceManager(Model):
                       ip.invoice_id,
                       ip.total,
                       ip.date_pay,
+                      ip.card_id card_id,
                       sum(ipl.name) pay_line_name
                     FROM account_invoice_pay ip
                       left join account_invoice_pay_line ipl on (ipl.invoice_pay_id=ip.id)
