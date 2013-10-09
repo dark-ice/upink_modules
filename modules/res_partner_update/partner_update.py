@@ -1456,7 +1456,7 @@ class PartnerQualityControl(Model):
             level = sum(c['value']*float(partner[c['name']])/100 for c in self.pool.get('res.partner.quality.criteria').read(cr, 1, record['criteria_ids'], ['name', 'value']))
 
             res[record['id']]['level_ydolit'] = level
-            res[record['id']]['index_ydolit'] = numpy.mean(level, record['mbo']) if record['mbo'] else level
+            res[record['id']]['index_ydolit'] = numpy.mean((level, record['mbo'])) if record['mbo'] else level
         return res
 
     _columns = {
