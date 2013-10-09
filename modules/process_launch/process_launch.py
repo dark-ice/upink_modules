@@ -468,6 +468,9 @@ class ProcessLaunch(Model):
             next_state = values.get('state', False)
             state = record['state']
 
+            print record
+            print values
+
             if next_state and next_state != state:
                 if next_state == 'revision' and (not values.get('comment', False) and not record['comment']):
                     error += 'Необходимо ввести комментарий по доработке'
