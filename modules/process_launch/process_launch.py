@@ -464,7 +464,7 @@ class ProcessLaunch(Model):
     @notify.msg_send(_name)
     def write(self, cr, uid, ids, values, context=None):
         error = ''
-        for record in self.read(cr, uid, ids, ['state', 'comment', 'account_file_id', 'account_id']):
+        for record in self.read(cr, uid, ids, ['state', 'comment', 'account_file_id', 'account_id', 'contract_file_id', 'contract_id']):
             next_state = values.get('state', False)
             state = record['state']
 
