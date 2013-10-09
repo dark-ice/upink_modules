@@ -24,6 +24,7 @@ class accountBalanceManager(Model):
         'pay_id': fields.integer('Номер платежа', readonly=True),
         'pay_date': fields.date('Дата платежа', readonly=True),
         'user_id': fields.many2one('res.users', 'Автор', select="1",),
+        'specialist_id': fields.many2one('res.users', 'Ответственный специалист', select="1",),
 
         'pay_total': fields.float('Сумма платежа', digits=(10, 2), readonly=True),
         'pay_dol': fields.float('Сумма платежа в $', digits=(10, 2), readonly=True),
