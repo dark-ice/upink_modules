@@ -475,7 +475,7 @@ class ProcessLaunch(Model):
                     if not values.get('account_file_id', False) and not record['account_file_id'] and not values.get('account_id', False) and not record['account_id']:
                         error += 'Необходимо выбрать счет или прикрепить платежное поручение'
 
-                    if not values.get('contract_file_id', False) and not record['contract_file_id'] and not values.get('contract_id', False) and not record['contract_id']:
+                    if not values.get('contract_file_id', False) and not record.get('contract_file_id') and not values.get('contract_id', False) and not record.get('contract_id'):
                         error += 'Необходимо выбрать договор или прикрепить файл договора'
 
                 if error:
