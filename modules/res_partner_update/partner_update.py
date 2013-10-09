@@ -1,5 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 from datetime import datetime, timedelta, date
+import numpy
 import pytz
 from openerp import tools
 from openerp.osv import fields, osv
@@ -21,6 +22,14 @@ PARTNER_STATUS = (
     ('cancel', 'Отказ'),
     ('returned', 'Возврат'),
     ('closed', 'Закрыт'),
+)
+
+
+CRITERIAS = (
+    ('terms_of_service', 'Сроки предоставления услуги'),
+    ('conformity', 'Соответствие услуги всем входным требованиям, указанным в ТЗ'),
+    ('quality_feedback', 'Качество обратной связи с представителем Компании , скорость и полнота ответов менеджера'),
+    ('completeness_of_reporting', 'Полнота отчетов о результатах рекламной кампании и соблюдение сроков их предоставления'),
 )
 
 
@@ -840,14 +849,19 @@ class res_partner(Model):
                     val = 'paused'
                 elif 'Существующая' in process_service_status:
                     val = 'exist'
-                elif 'Отказ' in process_service_status:
-                    val = 'cancel'
+                elif 'Новая' in process_service_status:
+                    val = 'new'
                 elif 'Возврат' in process_service_status:
                     val = 'returned'
+                elif 'Отказ' in process_service_status:
+                    val = 'cancel'
+
             elif project_service_ids:
                 project_service_status = p_service_pool._get_service_status(cr, 1, project_service_ids, '', []).values()
                 if 'Существующая' in project_service_status:
                     val = 'exist'
+                elif 'Новая' in project_service_status:
+                    val = 'new'
                 elif 'Закрыт' in project_service_status:
                     val = 'closed'
 
@@ -1152,6 +1166,7 @@ class res_partner(Model):
         ),
 
         'process_ids': fields.one2many('process.launch', 'partner_id', 'Процессы'),
+        'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством')
     }
 
     def _get_type(self, cr, uid, context=None):
@@ -1402,3 +1417,98 @@ class PartnerStatusHistory(Model):
         'partner_id': fields.many2one('res.partner', 'Партнер', invisible=True),
     }
 TransferHistory()
+
+
+class PartnerQualityControl(Model):
+    _name = 'res.partner.quality.control'
+    _description = u'Управление качеством'
+    _rec_name = 'period_id'
+
+    def change_ydolit(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
+        view_id = self.pool.get('ir.ui.view').search(cr, uid, [('name', 'like', 'Управление качеством'), ('model', '=', self._name), ('type', '=', 'form')])
+        return {
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': self._name,
+            'name': 'Управление качеством',
+            'view_id': view_id,
+            'res_id': ids[0] or 0,
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'nodestroy': True,
+            'context': {'add': True},
+        }
+
+    def save(self, cr, uid, ids, context=None):
+        return {'type': 'ir.actions.act_window_close'}
+
+    def _get_ydolit(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.read(cr, uid, ids, ['partner_id', 'criteria_ids', 'mbo'], context=context):
+            res[record['id']] = {
+                'level_ydolit': 0.0,
+                'index_ydolit': 0.0,
+            }
+            partner = self.pool.get('res.partner').read(cr, 1, record['partner_id'][0], ['terms_of_service', 'conformity', 'quality_feedback', 'completeness_of_reporting'])
+
+            level = sum(c['value']*float(partner[c['name']])/100 for c in self.pool.get('res.partner.quality.criteria').read(cr, 1, record['criteria_ids'], ['name', 'value']))
+
+            res[record['id']]['level_ydolit'] = level
+            res[record['id']]['index_ydolit'] = numpy.mean(level, record['mbo']) if record['mbo'] else level
+        return res
+
+    _columns = {
+        'period_id': fields.many2one(
+            'kpi.period',
+            'Период',
+            domain=[('calendar', '=', 'rus')]
+        ),
+        'partner_id': fields.many2one('res.partner', 'Партнер'),
+        'date_call': fields.datetime('Дата прозвона'),
+        'create_uid': fields.many2one('res.users', 'Специалист по упр. качеством', readonly=True),
+        'service_id': fields.many2one('brief.services.stage', 'Услуга'),
+        'direction': fields.related(
+            'service_id',
+            'direction',
+            string='Направление',
+            type='char',
+            size=10,
+            store=True,
+        ),
+        'specialist_id': fields.many2one('res.users', 'Специалист', readonly=True),
+        'criteria_ids': fields.one2many('res.partner.quality.criteria', 'quality_id', string='Критерии'),
+        'mbo': fields.float('MBO'),
+        # Троллинг Маши Кравчук за "Уровень удолит." в ТЗ
+        'level_ydolit': fields.function(
+            _get_ydolit,
+            type='float',
+            string='Уровень удовлетворительности',
+            multi='ydolit',
+            readonly=True,
+        ),
+        'index_ydolit': fields.function(
+            _get_ydolit,
+            type='float',
+            string='Индекс удовлетворительности',
+            multi='ydolit',
+            readonly=True,
+        ),
+    }
+PartnerQualityControl()
+
+
+class PartnerQualityCriteria(Model):
+    _name = 'res.partner.quality.criteria'
+    _description = u'Управление качеством - Критерии'
+
+    _columns = {
+        'name': fields.selection(
+            CRITERIAS, 'Критерий'
+        ),
+        'value': fields.float('Оценка'),
+        'comment': fields.text('Комментарий'),
+        'quality_id': fields.many2one('res.partner.quality.control', 'Управление качеством'),
+    }
+PartnerQualityCriteria()
