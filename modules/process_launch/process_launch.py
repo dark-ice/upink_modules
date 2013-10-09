@@ -526,7 +526,7 @@ class ProcessBase(AbstractModel):
         return [
             (
                 r['id'],
-                "{0} [{1}]".format(r['partner_id'][1].encode('utf8'), r['service_id'][1].encode('utf8'))
+                "{0}".format(r['partner_id'][1].encode('utf8'),)
             ) for r in self.read(cr, user, ids, ['partner_id', 'service_id'])]
 
     _columns = {
