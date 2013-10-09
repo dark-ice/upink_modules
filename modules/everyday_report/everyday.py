@@ -99,3 +99,30 @@ class AccountInvoice(Model):
         'factor': 0,
     }
 AccountInvoice()
+
+
+class AccountInvoiceLine(Model):
+    _inherit = 'account.invoice.line'
+
+    _columns = {
+        'factor': fields.float('Новая сумма в $', digits=(10, 2)),
+        'number': fields.related(
+            'invoice_id',
+            'number',
+            string='Номер',
+            type='char',
+            size=100
+        ),
+        'user_id': fields.related(
+            'invoice_id',
+            'user_id',
+            string='Автор',
+            type='many2one',
+            relation='res.users'
+        ),
+    }
+
+    _defaults = {
+        'factor': 0,
+    }
+AccountInvoiceLine()
