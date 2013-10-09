@@ -61,6 +61,7 @@
                     <field name="qa" />
                     <field name="ordr" />
                     <field name="atc" />
+                    <field name="number" />
                     <field name="total" />
                 </tree>
             </field>

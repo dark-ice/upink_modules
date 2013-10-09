@@ -20,7 +20,8 @@ class NonTargetedCalls(Model):
         'total': fields.integer('Итого'),
         'qa': fields.integer('Тех.поддержка'),
         'ordr': fields.integer('Уточнения по оформленному заказу'),
-        'atc': fields.integer('Проблема с АТС / ошиблись номером'),
+        'atc': fields.integer('Проблема с АТС'),
+        'number': fields.integer('Ошиблись номером'),
     }
 
     def init(self, cr):
@@ -36,8 +37,9 @@ class NonTargetedCalls(Model):
                     sum(case when call_type in ('qa', 'order', 'atc') then 1 else 0 end) total,
                     sum(case when call_type='qa' then 1 else 0 end) qa,
                     sum(case when call_type='order' then 1 else 0 end) ordr,
-                    sum(case when call_type='atc' then 1 else 0 end) atc
-                FROM web_calls WHERE call_type IN ('qa', 'order', 'atc') GROUP BY responsible_id, call_date::date
+                    sum(case when call_type='atc' then 1 else 0 end) atc,
+                    sum(case when call_type='number' then 1 else 0 end) number
+                FROM web_calls WHERE call_type IN ('qa', 'order', 'atc', 'number') GROUP BY responsible_id, call_date::date
             )""")
 
     def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False):

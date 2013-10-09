@@ -2,7 +2,7 @@
 
 {
     'name': 'eInvoicing Update',
-    'version': '0.30',
+    'version': '0.33',
     'author': 'Andrey Karbanovich',
     'category': 'Accounting & Finance',
     'complexity': 'easy',

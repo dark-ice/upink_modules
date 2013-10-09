@@ -258,6 +258,8 @@
                 <xpath expr="//tree[@string='Invoice Line']" position="replace">
                     <tree string="Invoice Line" editable="top">
                         <field name="service_id" required="1"/>
+                        <field name="brief_id"/>
+                        <field name="partner_id" invisible="1" />
                         <field name="account_id" invisible="1" required="1"/>
                         <field name="price_unit"
                                string="Стоимость $"
@@ -278,6 +280,7 @@
                 <xpath expr="//form[@string='Invoice Line']" position="replace">
                     <form string="Позиция счета">
                         <field name="service_id"/>
+                        <field name="brief_id"/>
                         <field name="account_id" invisible="1"/>
                         <field name="price_unit"
                                  string="Стоимость $"
@@ -402,11 +405,13 @@
                         </group>
                         <group colspan="2" col="2">
                             <field name="total_mr" required="1" on_change="change_cash(total_mr, change_mr, overrun_mr)"/>
-                            <field name="currency_id" readonly="1"/>
+                            <field name="currency_id" readonly="1" on_change="onchange_currency(date_invoice, currency_id)"/>
+                            <field name="rate" readonly="1" attrs="{'invisible': [('currency_id', '=', 2)]}"/>
                             <field name="change_mr" on_change="change_cash(total_mr, change_mr, overrun_mr)"/>
                             <field name="overrun_mr" on_change="change_cash(total_mr, change_mr, overrun_mr)" attrs="{'readonly': [('check_f', '=', False)]}"/>
                             <field name="commission_mr" attrs="{'readonly': [('check_f', '=', False)]}"/>
                             <field name="cash_mr" attrs="{'readonly': [('check_f', '=', False)]}"/>
+                            <field name="cash_mr_dol" readonly="1" attrs="{'invisible': [('currency_id', '=', 2)]}" />
                         </group>
                     </group>
                     <group col="4" colspan="4">
@@ -501,6 +506,7 @@
                     <field name="categ_id"/>
                     <field name="card_id"/>
                     <field name="cash_mr" string="Сумма ЗДС" sum="Сумма ЗДС"/>
+                    <field name="cash_mr_dol" string="Сумма ЗДС $" sum="Сумма ЗДС $"/>
                     <field name="currency_id"/>
                     <field name="payment_details" width="100"/>
                     <field name="date_invoice" string="Дата выставления ЗДС"/>

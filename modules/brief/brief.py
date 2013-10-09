@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 import logging
+from openerp import tools
 import pytz
 
 from datetime import datetime, timedelta
@@ -915,6 +916,19 @@ class brief_main(Model):
         ('media_approved', 'Медиаплан утвержден'),
         ('cancel', 'Заявка отменена'),
     )
+
+    def name_get(self, cr, user, ids, context=None):
+        if context is None:
+            context = {}
+        if not len(ids):
+            return []
+        res = []
+        for r in self.read(cr, user, ids, ['specialist_id']):
+            if r['specialist_id']:
+                res.append((r['id'], "Бриф № {0} [{1}]".format(r['id'], r['specialist_id'][1].encode('utf-8'))))
+            else:
+                res.append((r['id'], "Бриф № {0}".format(r['id'],)))
+        return res
 
     def action_add(self, cr, uid, ids, context=None):
         return {'type': 'ir.actions.act_window_close'}

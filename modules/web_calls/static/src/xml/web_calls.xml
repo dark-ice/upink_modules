@@ -35,7 +35,8 @@
                             <td>Запрос на отсутствующий товар</td>
                             <td>Тех.поддержка</td>
                             <td>Уточнения по оформленному заказу</td>
-                            <td>Проблема с АТС / ошиблись номером</td>
+                            <td>Проблема с АТС</td>
+                            <td>Ошиблись номером</td>
                         </tr>
                     </thead>
                     <tr>
@@ -56,6 +57,9 @@
                         </td>
                         <td>
                             <input type="radio" class="call_type" name="call_type" value="atc" />
+                        </td>
+                        <td>
+                            <input type="radio" class="call_type" name="call_type" value="number" />
                         </td>
                     </tr>
                 </table>

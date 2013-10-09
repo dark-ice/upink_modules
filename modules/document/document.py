@@ -161,6 +161,7 @@ class document_file(osv.osv):
         'parent_id': __get_def_directory,
         'name': lambda *a: random_name(),
         'res_model': lambda s, cr, u, ctx: ctx.get('res_model', False),
+        'res_id': lambda s, cr, u, ctx: ctx.get('res_id', False),
         'tmp_res_model': lambda s, cr, u, ctx: ctx.get('tmp_res_model', False),
     }
     _sql_constraints = [

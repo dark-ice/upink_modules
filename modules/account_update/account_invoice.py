@@ -139,6 +139,12 @@ class AccountInvoice(Model):
             res[record.id] = self._calculate_cash(record.total_mr, record.change_mr, record.overrun_mr)
         return res
 
+    def _get_cash_dol(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.browse(cr, uid, ids, context):
+            res[record.id] = round(self._calculate_cash(record.total_mr, record.change_mr, record.overrun_mr) / record.rate, 2)
+        return res
+
     def _search_cash(self, cr, uid, obj, name, args, context):
         ids = set()
         for cond in args:
@@ -164,16 +170,7 @@ class AccountInvoice(Model):
         return res
 
     def _get_paid_date(self, cr, uid, ids, name, arg, context=None):
-        history_pool = self.pool.get('account.invoice.history')
         res = {}
-        #for invoice_id in ids:
-        #    res[invoice_id] = None
-        #    history_ids = history_pool.search(cr, uid, [('invoice_id', '=', invoice_id)], limit=1)
-        #    if history_ids:
-        #        history_list = history_pool.read(cr, uid, history_ids, ['create_date', 'state'])
-        #        history = history_list[0]
-        #        if history['state'] == u'Оплачен полностью':
-        #            res[invoice_id] = history['create_date']
         for record in self.browse(cr, uid, ids):
             if record.state == 'paid' and record.pay_ids:
                 res[record.id] = record.pay_ids[-1].date_pay
@@ -435,6 +432,15 @@ class AccountInvoice(Model):
             fnct_search=_search_cash,
             help='Итоговая сумма ЗДС (без учета комиссии, сдачи и перерасхода)'
         ),
+        'cash_mr_dol': fields.function(
+            _get_cash_dol,
+            method=True,
+            string='Итого $',
+            type='float',
+            digits_compute=dp.get_precision('Account'),
+            fnct_search=_search_cash,
+            help='Итоговая сумма ЗДС $ (без учета комиссии, сдачи и перерасхода)'
+        ),
         'companies_distribution': fields.selection(
             (
                 ('100-0', '100/0'),
@@ -556,7 +562,6 @@ class AccountInvoice(Model):
 
     _defaults = {
         'date_invoice': fields.date.context_today,
-        #'number': lambda s, c, u, cnt: s._set_number(c, u),
         'check_a': True,
         'state_document': 'none',
     }
@@ -662,8 +667,10 @@ class AccountInvoiceLine(Model):
         'paid': fields.float('Оплачено', digits=(10, 2)),
         'price_unit': fields.float('Unit Price', required=True, digits=(10, 6)),
         'account_id': fields.many2one('account.account', 'Account', required=True, domain=[]),
+        'partner_id': fields.related('invoice_id', 'partner_id', string='Партнер', type='many2one', relation='res.partner', store=True),
 
         'nbr': fields.function(_show_number, method=True, string='Номер', type='integer', store=False),
+        'brief_id': fields.many2one('brief.main', 'Медиаплан', domain="[('services_ids', '=', service_id), ('partner_id', '=', partner_id)]"),
     }
 
     _defaults = {
