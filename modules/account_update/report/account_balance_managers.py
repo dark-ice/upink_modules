@@ -85,6 +85,7 @@ class accountBalanceManager(Model):
                   il.price_currency total,
                   il.price_unit total_dol,
                   u.context_section_id section_id,
+                  ip.id pay_id,
                   ip.card_id,
                   ip.total pay_total,
                   ip.total / i.rate pay_dol,
@@ -109,6 +110,7 @@ class accountBalanceManager(Model):
                   ) il on (il.invoice_id=i.id)
                   left join (
                     SELECT
+                      ip.id,
                       ip.invoice_id,
                       ip.total,
                       ip.date_pay,
@@ -116,7 +118,7 @@ class accountBalanceManager(Model):
                       sum(ipl.name) pay_line_name
                     FROM account_invoice_pay ip
                       left join account_invoice_pay_line ipl on (ipl.invoice_pay_id=ip.id)
-                    GROUP BY ip.invoice_id, ip.total, ip.date_pay, ip.card_id
+                    GROUP BY ip.invoice_id, ip.total, ip.date_pay, ip.card_id, ip.id
                   ) ip on (ip.invoice_id=i.id)
                 WHERE
                   i.type='out_invoice' AND i.date_invoice IS NOT NULL AND ip.total IS NOT NULL
