@@ -924,7 +924,10 @@ class brief_main(Model):
             return []
         res = []
         for r in self.read(cr, user, ids, ['specialist_id']):
-            res.append((r['id'], "Бриф № {0} [{1}]".format(r['id'], r['specialist_id'][1].encode('utf-8'))))
+            if r['specialist_id']:
+                res.append((r['id'], "Бриф № {0} [{1}]".format(r['id'], r['specialist_id'][1].encode('utf-8'))))
+            else:
+                res.append((r['id'], "Бриф № {0}".format(r['id'],)))
         return res
 
     def action_add(self, cr, uid, ids, context=None):
