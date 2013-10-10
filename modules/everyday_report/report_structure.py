@@ -268,14 +268,14 @@ class ReportStructure(Model):
                 FROM (
                   SELECT
                     max(i.paid_date::date) paid_date,
-                    sum(case when bss.direction='PPC' then il.price_unit else 0 end) ppc_fact,
-                    sum(case when bss.direction='SMM' then il.price_unit else 0 end) smm_fact,
-                    sum(case when bss.direction='SEO' then il.price_unit else 0 end) seo_fact,
-                    sum(case when bss.direction='CALL' then il.price_unit else 0 end) call_fact,
-                    sum(case when bss.direction='SITE' then il.price_unit else 0 end) web_fact,
-                    sum(case when bss.direction='VIDEO' then il.price_unit else 0 end) video_fact,
-                    sum(case when bss.direction='MP' then il.price_unit else 0 end) mp_fact,
-                    sum(case when bss.direction in ('PPC', 'SMM', 'SEO', 'CALL', 'SITE', 'VIDEO', 'MP') then il.price_unit else 0 end) total_fact
+                    sum(case when bss.direction='PPC' then il.factor else 0 end) ppc_fact,
+                    sum(case when bss.direction='SMM' then il.factor else 0 end) smm_fact,
+                    sum(case when bss.direction='SEO' then il.factor else 0 end) seo_fact,
+                    sum(case when bss.direction='CALL' then il.factor else 0 end) call_fact,
+                    sum(case when bss.direction='SITE' then il.factor else 0 end) web_fact,
+                    sum(case when bss.direction='VIDEO' then il.factor else 0 end) video_fact,
+                    sum(case when bss.direction='MP' then il.factor else 0 end) mp_fact,
+                    sum(case when bss.direction in ('PPC', 'SMM', 'SEO', 'CALL', 'SITE', 'VIDEO', 'MP') then il.factor else 0 end) total_fact
                   FROM account_invoice i
                     LEFT JOIN account_invoice_line il on (il.invoice_id=i.id)
                     LEFT JOIN brief_services_stage bss on (bss.id=il.service_id)

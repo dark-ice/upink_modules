@@ -739,6 +739,7 @@ class AccountInvoiceLine(Model):
             values.get('price_currency', 0.0),
         )['value']
         values.update(val)
+        values['factor'] = values.get('price_unit', 0.0)
         return super(AccountInvoiceLine, self).create(cr, uid, values, context)
 
     def write(self, cr, uid, ids, values, context=None):

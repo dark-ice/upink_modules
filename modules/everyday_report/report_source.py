@@ -244,26 +244,54 @@ class ReportSource(Model):
             create or replace view day_report_source as (
                 SELECT
                   row_number() over() as id,
-                  to_char(i.paid_date, 'YYYY-MM-DD') date_end,
-                  to_char(i.paid_date, 'YYYY-MM-DD') date_start,
-                  i.paid_date date,
-                  sum(case when u.context_section_id=9 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_dev_s,
-                  sum(case when u.context_section_id in (7, 8, 18) AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_calling_s,
-                  sum(case when u.context_section_id=7 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_cold_s,
-                  sum(case when u.context_section_id=8 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_marketing_s,
-                  sum(case when u.context_section_id=18 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_moscow_s,
-                  sum(case when u.context_section_id in (7, 9, 8, 18) AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_total_s,
+                  to_char(a.date, 'YYYY-MM-DD') date_end,
+                  to_char(a.date, 'YYYY-MM-DD') date_start,
+                  a.date,
+                  sum(fact_marketing) fact_marketing_s,
+                  sum(fact_cold) fact_cold_s,
+                  sum(fact_dev) fact_dev_s,
+                  sum(fact_moscow) fact_moscow_s,
+                  sum(fact_calling) fact_calling_s,
+                  sum(fact_total) fact_total_s,
                   max(case when r.section_id=9 then r.plan else 0 end) plan_dev,
                   max(case when r.section_id=7 then r.plan else 0 end) plan_cold,
                   max(case when r.section_id=8 then r.plan else 0 end) plan_marketing,
                   max(case when r.section_id=18 then r.plan else 0 end) plan_moscow
-                FROM account_invoice i
-                  LEFT JOIN res_users u on (u.id=i.user_id)
+                FROM (
+                  SELECT
+                    i.paid_date date,
+                    case when u.context_section_id=8 then il.factor else 0 end fact_marketing,
+                    case when u.context_section_id=7 then il.factor else 0 end fact_cold,
+                    case when u.context_section_id=9 then il.factor else 0 end fact_dev,
+                    case when u.context_section_id=18 then il.factor else 0 end fact_moscow,
+                    case when u.context_section_id in (7, 8, 18) then il.factor else 0 end fact_calling,
+                    case when u.context_section_id in (7, 8, 9, 18) then il.factor else 0 end fact_total
+                  FROM
+                    account_invoice i
+                    LEFT JOIN account_invoice_line il on (il.invoice_id=i.id)
+                    LEFT JOIN res_users u on (u.id=i.user_id)
+                  WHERE i.paid_date IS NOT NULL
+
+                  UNION
+
+                  SELECT
+                    ip.date_pay date,
+                    case when u.context_section_id=8 then ipl.name/i.rate else 0 end fact_marketing,
+                    case when u.context_section_id=7 then ipl.name/i.rate else 0 end fact_cold,
+                    case when u.context_section_id=9 then ipl.name/i.rate else 0 end fact_dev,
+                    case when u.context_section_id=18 then ipl.name/i.rate else 0 end fact_moscow,
+                    case when u.context_section_id in (7, 8, 18) then ipl.name/i.rate else 0 end fact_calling,
+                    case when u.context_section_id in (7, 8, 9, 18) then ipl.name/i.rate else 0 end fact_total
+                  FROM
+                    account_invoice_pay ip
+                    LEFT JOIN account_invoice i on (i.id=ip.invoice_id AND i.paid_date is null)
+                    LEFT JOIN account_invoice_pay_line ipl on (ipl.invoice_pay_id=ip.id)
+                    LEFT JOIN res_users u on (u.id=i.user_id)
+                ) a
                   LEFT JOIN day_report_source_plan r on (
-                    r.period_month::int=EXTRACT(MONTH FROM i.paid_date)
-                    AND r.period_year::int=EXTRACT(YEAR FROM i.paid_date))
-                WHERE paid_date is not NULL
-                GROUP BY i.paid_date
+                    r.period_month::int=EXTRACT(MONTH FROM a.date)
+                    AND r.period_year::int=EXTRACT(YEAR FROM a.date))
+                GROUP BY date
             )""")
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
