@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-from osv import osv, fields
 import sys
+from openerp.osv import fields, osv
+from openerp.osv.orm import Model
 from notify import notify
 
 URL_PREFIX = '/openerp/form/save_binary_data/'
 
 
-class storage_files(osv.osv):
+class storage_files(Model):
     _name = "storage.files"
     _rec_name = 'path'
 
@@ -18,78 +19,9 @@ class storage_files(osv.osv):
                result[obj.id] = URL_PREFIX + obj.name.replace('\\', '/').split('/')[-1] + url
         return result
 
-    def grant_access(self, cr, uid, ids, grant_access_users, comment=False, context=None):
-        if grant_access_users:
-            data = self.browse(cr,uid,ids)
-            for obj in data:
-                request = self.pool.get('res.request')
-                message_text = u"Вам доступен документ «%s» загружен пользователем «%s»" % (obj.path, obj.user_id.name)
-                if comment or obj.comment:
-                    print "Comment: %s" % comment
-                    try:
-                        c = comment if comment else obj.comment
-                        c = c.encode('utf-8')
-                        message_text += " с комментарием: {0} ".format(c)
-                    except:
-                        pass
-                #print message_text
-
-                message = {
-                        'body': message_text,
-                        'name': unicode("Вам дали доступ на новый файл", "utf-8"),
-                        'state': 'waiting',
-                        'priorty': '1',
-                        'act_from': uid,
-                        'active': True,
-                        'act_to': False,
-                }
-
-                for user in grant_access_users:
-                    message['act_to'] = user
-                    request.create(cr,uid,message)
-        return True
-
     @notify.msg_send(_name)
     def write(self, cr, uid, ids, values, context=None):
-        '''
-        data = self.read(cr, uid, ids,['responsible_user', 'groups_user', 'sendto_all'])
-        if values.get('responsible_user') or values.get('groups_user') or data[0]['responsible_user'] or data[0]['groups_user']:
-            if data[0]['sendto_all'] or values.get('sendto_all'):
-                current_responsible = data[0]['responsible_user']
-                current_groups_user = data[0]['groups_user']
-
-                future_responsible = []
-                future_groups_user = []
-                grant_access_users = []
-                grant_access_groups = []
-                if values.get('responsible_user') or current_responsible:
-                    future_responsible = values.get('responsible_user', [])
-                    grant_access_users = future_responsible if future_responsible else current_responsible
-                    #grant_access_users = list(set(future_responsible) + set(current_responsible))
-
-
-                if values.get('groups_user') or current_groups_user:
-                    gr_users = values.get('groups_user')[0][2] if values.get('groups_user') else []
-                    #list_groups_user = list(set(gr_users) + set(current_groups_user))
-                    list_groups_user = gr_users if gr_users else current_groups_user
-
-                    data_groups_user = self.pool.get('storage.groups').read(cr, uid, list_groups_user,['users_group','is_all'])
-                    if data_groups_user:
-                       for val in data_groups_user:
-                           if not val['is_all']:
-                               future_groups_user = future_groups_user + val['users_group']
-                           else:
-                               future_groups_user = self.pool.get('res.users').search(cr, uid, [('active','=',True)])
-                               break
-
-                    grant_access_groups = list(set(future_groups_user))
-                grant_access = list(set(grant_access_groups + grant_access_users))
-
-                #print "GA: %s" % grant_access
-                self.grant_access(cr, uid, ids, grant_access, values.get('comment', False))
-        '''
         values['sendto_all'] = False
-
         return super(storage_files, self).write(cr, uid, ids, values, context)
 
     def _get_path(self, cr, uid, ids, field_name, arg, context):
@@ -194,4 +126,4 @@ class storage_files(osv.osv):
             return field.data
         return False
 
-storage_files()
+#storage_files()
