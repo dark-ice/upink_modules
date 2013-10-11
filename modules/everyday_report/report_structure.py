@@ -238,9 +238,9 @@ class ReportStructure(Model):
             create or replace view day_report_structure as (
                 SELECT
                   row_number() over() as id,
-                  to_char(x.paid_date, 'YYYY-MM-DD') date_end,
-                  to_char(x.paid_date, 'YYYY-MM-DD') date_start,
-                  x.paid_date,
+                  to_char(x.date, 'YYYY-MM-DD') date_end,
+                  to_char(x.date, 'YYYY-MM-DD') date_start,
+                  x.date paid_date,
 
                   ppc_plan,
                   ppc_fact ppc_fact_s,
@@ -266,21 +266,51 @@ class ReportStructure(Model):
                   total_fact total_fact_s,
                   ppc_plan + smm_plan + seo_plan + call_plan + web_plan + video_plan + mp_plan total_plan
                 FROM (
-                  SELECT
-                    max(i.paid_date::date) paid_date,
-                    sum(case when bss.direction='PPC' then il.factor else 0 end) ppc_fact,
-                    sum(case when bss.direction='SMM' then il.factor else 0 end) smm_fact,
-                    sum(case when bss.direction='SEO' then il.factor else 0 end) seo_fact,
-                    sum(case when bss.direction='CALL' then il.factor else 0 end) call_fact,
-                    sum(case when bss.direction='SITE' then il.factor else 0 end) web_fact,
-                    sum(case when bss.direction='VIDEO' then il.factor else 0 end) video_fact,
-                    sum(case when bss.direction='MP' then il.factor else 0 end) mp_fact,
-                    sum(case when bss.direction in ('PPC', 'SMM', 'SEO', 'CALL', 'SITE', 'VIDEO', 'MP') then il.factor else 0 end) total_fact
-                  FROM account_invoice i
-                    LEFT JOIN account_invoice_line il on (il.invoice_id=i.id)
-                    LEFT JOIN brief_services_stage bss on (bss.id=il.service_id)
-                  WHERE i.paid_date IS NOT NULL
-                  GROUP BY i.paid_date
+                    SELECT
+                      date,
+                      sum(ppc_fact) ppc_fact,
+                      sum(smm_fact) smm_fact,
+                      sum(seo_fact) seo_fact,
+                      sum(call_fact) call_fact,
+                      sum(web_fact) web_fact,
+                      sum(video_fact) video_fact,
+                      sum(mp_fact) mp_fact,
+                      sum(total_fact) total_fact
+                    FROM (
+                      SELECT
+                        i.paid_date::date date,
+                        case when bss.direction='PPC' then il.factor else 0 end ppc_fact,
+                        case when bss.direction='SMM' then il.factor else 0 end smm_fact,
+                        case when bss.direction='SEO' then il.factor else 0 end seo_fact,
+                        case when bss.direction='CALL' then il.factor else 0 end call_fact,
+                        case when bss.direction='SITE' then il.factor else 0 end web_fact,
+                        case when bss.direction='VIDEO' then il.factor else 0 end video_fact,
+                        case when bss.direction='MP' then il.factor else 0 end mp_fact,
+                        case when bss.direction in ('PPC', 'SMM', 'SEO', 'CALL', 'SITE', 'VIDEO', 'MP') then il.factor else 0 end total_fact
+                      FROM account_invoice i
+                        LEFT JOIN account_invoice_line il on (il.invoice_id=i.id)
+                        LEFT JOIN brief_services_stage bss on (bss.id=il.service_id)
+                      WHERE i.paid_date IS NOT NULL
+
+                      UNION
+
+                      SELECT
+                        ip.date_pay date,
+                        case when bss.direction='PPC' then ipl.name/i.rate else 0 end ppc_fact,
+                        case when bss.direction='SMM' then ipl.name/i.rate else 0 end smm_fact,
+                        case when bss.direction='SEO' then ipl.name/i.rate else 0 end seo_fact,
+                        case when bss.direction='CALL' then ipl.name/i.rate else 0 end call_fact,
+                        case when bss.direction='SITE' then ipl.name/i.rate else 0 end web_fact,
+                        case when bss.direction='VIDEO' then ipl.name/i.rate else 0 end video_fact,
+                        case when bss.direction='MP' then ipl.name/i.rate else 0 end mp_fact,
+                        case when bss.direction in ('PPC', 'SMM', 'SEO', 'CALL', 'SITE', 'VIDEO', 'MP') then ipl.name/i.rate else 0 end total_fact
+                      FROM
+                        account_invoice_pay ip
+                        LEFT JOIN account_invoice i on (i.id=ip.invoice_id AND i.paid_date is null)
+                        LEFT JOIN account_invoice_pay_line ipl on (ipl.invoice_pay_id=ip.id)
+                        LEFT JOIN brief_services_stage bss on (bss.id=ipl.service_id)
+                        LEFT JOIN res_users u on (u.id=i.user_id)
+                    ) y GROUP BY y.date
                 ) x
                   LEFT JOIN (
                     SELECT
@@ -296,7 +326,7 @@ class ReportStructure(Model):
                       LEFT JOIN kpi_kpi k on (k.period_id=p.id AND k.employee_id=10)
                       LEFT JOIN kpi_sla_sale s on (s.kpi_id=k.id)
                     WHERE p.calendar='rus'
-                    GROUP BY s.kpi_id, p.name) y on (y.name=to_char(x.paid_date, 'YYYY/MM'))
+                    GROUP BY s.kpi_id, p.name) y on (y.name=to_char(x.date, 'YYYY/MM'))
             )""")
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
