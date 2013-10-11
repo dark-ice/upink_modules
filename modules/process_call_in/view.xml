@@ -225,141 +225,163 @@
                                 />
                         <newline/>
                         <!-- coordination -> filling_TK -->
+                        <!-- attrs="{'invisible': ['|', ('state', '!=', 'coordination'), ('check_m', '=', False)]}" -->
                         <button string="На заполнение ТЗ"
                                 name="filling_TK"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'coordination'), ('check_m', '=', False)]}"
+                                states="coordination"
                                 />
                         <!-- filling_TK -> approval_TK -->
+                        <!-- attrs="{'invisible': ['|', ('state', '!=', 'filling_TK'), ('check_a', '=', False)]}" -->
                         <button string="На согласование ТЗ"
                                 name="approval_TK"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'filling_TK'), ('check_a', '=', False)]}"
+                                states="filling_TK"
                                 />
                         <!-- approval_TK -> revision_TK -->
+                        <!-- attrs="{'invisible': ['|', ('state', '!=', 'approval_TK'), ('check_m', '=', False)]}" -->
                         <button string="На доработку ТЗ"
                                 name="revision_TK"
                                 type="workflow"
                                 icon="gtk-go-back"
-                                attrs="{'invisible': ['|', ('state', '!=', 'approval_TK'), ('check_m', '=', False)]}"
+                                states="approval_TK"
                                 />
                         <!-- revision_TK -> approval_TK -->
+                        <!-- attrs="{'invisible': ['|', ('state', '!=', 'revision_TK'), ('check_a', '=', False)]}" -->
                         <button string="Вернуть на согласование"
                                 name="approval_TK"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'revision_TK'), ('check_a', '=', False)]}"
+                                states="revision_TK"
                                 />
                         <!-- approval_TK -> filling_scenario -->
+                        <!-- attrs="{'invisible': ['|', ('state', '!=', 'approval_TK'), ('check_m', '=', False)]}" -->
                         <button string="На подготовку сценария"
                                 name="filling_scenario"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'approval_TK'), ('check_m', '=', False)]}"
+                                states="approval_TK"
                                 />
                         <!-- filling_scenario -> approval_scenario -->
+                        <!-- attrs="{'invisible': ['|', ('state', '!=', 'filling_scenario'), ('check_m', '=', False)]}" -->
                         <button string="На утверждение сценария"
                                 name="approval_scenario"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'filling_scenario'), ('check_m', '=', False)]}"
+                                states="filling_scenario"
                                 />
                         <!-- approval_scenario -> revision_scenario -->
+                        <!--attrs="{'invisible': ['|', ('state', '!=', 'approval_scenario'), ('check_a', '=', False)]}"-->
                         <button string="На доработку сценария"
                                 name="revision_scenario"
                                 type="workflow"
                                 icon="gtk-go-back"
-                                attrs="{'invisible': ['|', ('state', '!=', 'approval_scenario'), ('check_a', '=', False)]}"
+                                states="approval_scenario"
                                 />
                         <!-- revision_scenario -> approval_scenario -->
                         <button string="Вернуть на согласование"
                                 name="approval_scenario"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'revision_scenario'), ('check_m', '=', False)]}"
+                                states="revision_scenario"
                                 />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'revision_scenario'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
 
                         <!-- approval_scenario -> training_agents -->
                         <button string="На обучение агентов"
                                 name="training_agents"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'approval_scenario'), ('check_a', '=', False)]}"
+                                states="approval_scenario"
                                 />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'approval_scenario'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
                         <!-- training_agents -> testing_agents -->
                         <button string="На тестирование агентов партнером"
                                 name="testing_agents"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'training_agents'), ('check_m', '=', False)]}"
+                                states="training_agents"
                                 />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'training_agents'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
                         <!-- testing_agents -> training_agents -->
                         <button string="Вернуть на обучение агентов"
                                 name="training_agents"
                                 type="workflow"
                                 icon="gtk-go-back"
-                                attrs="{'invisible': ['|', ('state', '!=', 'testing_agents'), ('check_m', '=', False)]}"
-                                />
+                                states="testing_agents" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'testing_agents'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
                         <!-- testing_agents -> tech_setup -->
                         <button string="На тех. настройку проекта"
                                 name="tech_setup"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'testing_agents'), ('check_m', '=', False)]}"
-                                />
+                                states="testing_agents" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'testing_agents'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
 
                         <!-- tech_setup -> filling_template -->
                         <button string="На подготовку формы отчета"
                                 name="filling_template"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'tech_setup'), ('check_m', '=', False)]}"
-                                />
+                                states="tech_setup" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'tech_setup'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
                         <!-- filling_template -> approval_template -->
                         <button string="На согласование формы отчета"
                                 name="approval_template"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'filling_template'), ('check_m', '=', False)]}"
-                                />
+                                states="filling_template" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'filling_template'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
                         <!-- approval_template -> revision_template -->
                         <button string="На доработку формы отчета"
                                 name="revision_template"
                                 type="workflow"
                                 icon="gtk-go-back"
-                                attrs="{'invisible': ['|', ('state', '!=', 'approval_template'), ('check_a', '=', False)]}"
-                                />
+                                states="approval_template" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'approval_template'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
                         <!-- revision_template -> approval_template -->
                         <button string="Вернуть на согласование"
                                 name="approval_template"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'revision_template'), ('check_m', '=', False)]}"
-                                />
+                                states="revision_template" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'revision_template'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
 
                         <!-- approval_template -> development -->
                         <button string="На реализацию проекта"
                                 name="development"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'approval_template'), ('check_a', '=', False)]}"
-                                />
+                                states="approval_template" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'approval_template'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
                         <!-- development -> coordination_reporting -->
                         <button string="На согласование отчетности"
                                 name="coordination_reporting"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'development'), ('check_m', '=', False)]}"
-                                />
+                                states="development" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'development'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
                         <!-- coordination_reporting -> pause -->
                         <button string="Приостановление проекта"
                                 name="pause"
                                 type="workflow"
                                 icon="gtk-pause"
-                                attrs="{'invisible': ['|', ('state', '!=', 'coordination_reporting'), ('check_a', '=', False)]}"
-                                />
+                                states="coordination_reporting" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'coordination_reporting'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
                         <!-- pause -> coordination_reporting -->
                         <button string="На согласование отчетности"
                                 name="coordination_reporting"
@@ -372,15 +394,17 @@
                                 name="billing_surcharge"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'coordination_reporting'), ('check_a', '=', False)]}"
-                                />
+                                states="coordination_reporting" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'coordination_reporting'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
                         <!-- billing_surcharge -> finish -->
                         <button string="Проект завершен"
                                 name="finish"
                                 type="workflow"
                                 icon="gtk-yes"
-                                attrs="{'invisible': ['|', ('state', '!=', 'billing_surcharge'), ('check_a', '=', False)]}"
-                                />
+                                states="billing_surcharge" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'billing_surcharge'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
                     </group>
                 </form>
             </field>

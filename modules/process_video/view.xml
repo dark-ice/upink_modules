@@ -284,79 +284,89 @@
                                 name="filling_TK"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'coordination'), ('check_m', '=', False)]}"
-                                />
+                                states="coordination" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'coordination'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
                         <!-- filling_TK -> matching_TK -->
                         <button string="Согласование ТЗ"
                                 name="matching_TK"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'filling_TK'), ('check_a', '=', False)]}"
-                                />
+                                states="filling_TK" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'filling_TK'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
                         <!-- matching_TK -> filling_TK -->
                         <button string="На доработку ТЗ"
                                 name="filling_TK"
                                 type="workflow"
                                 icon="gtk-go-back"
-                                attrs="{'invisible': ['|', ('state', '!=', 'matching_TK'), ('check_m', '=', False)]}"
-                                />
+                                states="matching_TK" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'matching_TK'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
                         <!-- matching_TK -> development -->
                         <button string="Разработка идей"
                                 name="development"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'matching_TK'), ('check_m', '=', False)]}"
-                                />
+                                states="matching_TK" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'matching_TK'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
                         <!-- development -> selection -->
                         <button string="Выбор идеи"
                                 name="selection"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'development'), ('check_m', '=', False)]}"
-                                />
+                                states="development" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'development'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
                         <!-- selection -> development -->
                         <button string="На доработку идей"
                                 name="development"
                                 type="workflow"
                                 icon="gtk-go-back"
-                                attrs="{'invisible': ['|', ('state', '!=', 'selection'), ('check_a', '=', False)]}"
-                                />
+                                states="selection" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'selection'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
                         <!-- selection -> drawing_up -->
                         <button string="Составление сценария"
                                 name="drawing_up"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                states="selection"
-                                attrs="{'invisible': ['|', ('state', '!=', 'selection'), ('check_a', '=', False)]}"
-                                />
+                                states="selection" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'selection'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
                         <!-- drawing_up -> matching_script -->
                         <button string="Согласование сценария"
                                 name="matching_script"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'drawing_up'), ('check_m', '=', False)]}"
-                                />
+                                states="drawing_up" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'drawing_up'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
                         <!-- matching_script -> drawing_up -->
                         <button string="На доработку сценария"
                                 name="drawing_up"
                                 type="workflow"
                                 icon="gtk-go-back"
-                                attrs="{'invisible': ['|', ('state', '!=', 'matching_script'), ('check_a', '=', False)]}"
-                                />
+                                states="matching_script" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'matching_script'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
                         <!-- matching_script -> signing_application -->
                         <button string="Подписание приложения к договору"
                                 name="signing_application"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'matching_script'), ('check_a', '=', False)]}"
-                                />
+                                states="matching_script" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'matching_script'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
                         <!-- signing_application -> preparation -->
                         <button string="Подготовительные работы к разработке проекта"
                                 name="preparation"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'signing_application'), ('check_a', '=', False)]}"
-                                />
+                                states="signing_application" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'signing_application'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
                         <!-- preparation -> approval -->
                         <button string="Согласование вариантов"
                                 name="approval"
@@ -383,36 +393,41 @@
                                 name="assertion"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'work'), ('check_m', '=', False)]}"
-                                />
+                                states="work" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'work'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
                         <!-- assertion -> work -->
                         <button string="Работа над проектом"
                                 name="work"
                                 type="workflow"
                                 icon="gtk-go-back"
-                                attrs="{'invisible': ['|', ('state', '!=', 'assertion'), ('check_a', '=', False)]}"
-                                />
+                                states="assertion" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'assertion'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
                         <!-- assertion -> cancel -->
                         <button string="Отмена"
                                 name="cancel"
                                 type="workflow"
                                 icon="gtk-go-cancel"
-                                attrs="{'invisible': ['|', ('state', '!=', 'assertion'), ('check_a', '=', False)]}"
-                                />
+                                states="assertion" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'assertion'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
                         <!-- assertion -> transmission -->
                         <button string="Передача проекта"
                                 name="transmission"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'assertion'), ('check_a', '=', False)]}"
-                                />
+                                states="assertion" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'assertion'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
                         <!-- transmission -> finish -->
                         <button string="Проект передан"
                                 name="finish"
                                 type="workflow"
                                 icon="gtk-yes"
-                                attrs="{'invisible': ['|', ('state', '!=', 'transmission'), ('check_m', '=', False)]}"
-                                />
+                                states="transmission" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'transmission'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
                     </group>
                 </form>
             </field>

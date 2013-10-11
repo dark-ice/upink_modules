@@ -148,40 +148,45 @@
                                 name="drafting"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'coordination'), ('check_m', '=', False)]}"
-                                />
+                                states="coordination" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'coordination'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
 
                         <!-- drafting, revision -> approval -->
                         <button string="На утверждение стратегии"
                                 name="approval"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', 'not in', ('revision', 'drafting')), ('check_s', '=', False)]}"
-                                />
+                                states="revision,drafting" />
+                                <!--attrs="{'invisible': ['|', ('state', 'not in', ('revision', 'drafting')), ('check_s', '=', False)]}"-->
+                                <!--/>-->
 
                         <!-- approval -> revision -->
                         <button string="На доработку стратегии"
                                 name="revision"
                                 type="workflow"
                                 icon="gtk-go-back"
-                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_k', '=', False)]}"
-                                />
+                                states="approval" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_k', '=', False)]}"-->
+                                <!--/>-->
 
                         <!-- approval -> implementation -->
                         <button string="На реализацию стратегии"
                                 name="implementation"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_k', '=', False)]}"
-                                />
+                                states="approval" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_k', '=', False)]}"-->
+                                <!--/>-->
 
                         <!-- implementation -> finish -->
                         <button string="Работы закончены"
                                 name="finish"
                                 type="workflow"
                                 icon="gtk-yes"
-                                attrs="{'invisible': ['|', ('state', '!=', 'implementation'), ('check_s', '=', False)]}"
-                                />
+                                states="implementation" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'implementation'), ('check_s', '=', False)]}"-->
+                                <!--/>-->
                     </group>
                 </form>
             </field>

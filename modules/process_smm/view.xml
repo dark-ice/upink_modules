@@ -167,40 +167,45 @@
                                 name="creating"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'coordination'), ('check_m', '=', False)]}"
-                                />
+                                states="coordination" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'coordination'), ('check_m', '=', False)]}"-->
+                                <!--/>-->
 
                         <!-- creating, revision -> agreement -->
                         <button string="На согласование регламентирующей документации с партнером"
                                 name="agreement"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', 'not in', ('creating', 'revision')), ('check_s', '=', False)]}"
-                                />
+                                states="creating,revision" />
+                                <!--attrs="{'invisible': ['|', ('state', 'not in', ('creating', 'revision')), ('check_s', '=', False)]}"-->
+                                <!--/>-->
 
                         <!-- agreement -> revision -->
                         <button string="На доработку стратегии"
                                 name="revision"
                                 type="workflow"
                                 icon="gtk-go-back"
-                                attrs="{'invisible': ['|', ('state', '!=', 'agreement'), ('check_a', '=', False)]}"
-                                />
+                                states="agreement" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'agreement'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
 
                         <!-- agreement -> work -->
                         <button string="Работа по проекту"
                                 name="work"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'agreement'), ('check_a', '=', False)]}"
-                                />
+                                states="agreement" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'agreement'), ('check_a', '=', False)]}"-->
+                                <!--/>-->
 
                         <!-- work -> finish -->
                         <button string="Работы закончены"
                                 name="finish"
                                 type="workflow"
                                 icon="gtk-yes"
-                                attrs="{'invisible': ['|', ('state', '!=', 'work'), ('check_s', '=', False)]}"
-                                />
+                                states="work" />
+                                <!--attrs="{'invisible': ['|', ('state', '!=', 'work'), ('check_s', '=', False)]}"-->
+                                <!--/>-->
                     </group>
                 </form>
             </field>
