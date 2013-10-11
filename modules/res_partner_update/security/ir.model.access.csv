@@ -16,6 +16,9 @@
 "access_partner_bank_address","partner_bank_address user","model_res_partner_bank_address","base.group_user",1,1,1,1
 "access_partner_bank","partner_bank user","model_res_partner_bank","base.group_user",1,1,1,1
 "access_partner_status_history","partner_status_history user","model_res_partner_status_history","base.group_user",1,1,1,0
-
+"access_discount_nds","Скидки ндс","model_res_partner_ppc_discounts","base.discount_nds",1,1,1,0
+"access_discount","Скидки","model_res_partner_ppc_discounts","base.discount_other",1,1,1,0
+"access_discount_nds_history","Скидки ндс история","model_res_partner_ppc_discounts_history","base.discount_nds",1,1,1,0
+"access_discount_history","Скидки история","model_res_partner_ppc_discounts_history","base.discount_other",1,1,1,0
 
 
