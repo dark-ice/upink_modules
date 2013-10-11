@@ -13,7 +13,7 @@
 Библиотека в ERP.
     """,
     'images': [],
-    'depends': ['base', 'attachment', 'notify'],
+    'depends': ['base', 'notify'],
     'init_xml': [],
     'update_xml': [
         'security/storage_files_security.xml',

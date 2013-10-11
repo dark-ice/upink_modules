@@ -125,5 +125,4 @@ class storage_files(Model):
         if field.data:
             return field.data
         return False
-
-#storage_files()
+storage_files()

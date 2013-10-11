@@ -23,6 +23,7 @@
 from osv import osv
 from osv import fields
 
+
 class storage_folders(osv.osv):
 
     _name = "storage.folders"

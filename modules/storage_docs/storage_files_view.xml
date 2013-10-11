@@ -106,7 +106,7 @@
         </record>
 
         <menuitem id="storage_files_root"
-                  name="Документы"
+                  name="Библиотека"
                   web_icon="images/storage_files-hover.png"
                   web_icon_hover="images/storage_files.png"
                   action="window_storage_files_action"
