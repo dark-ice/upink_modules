@@ -28,7 +28,7 @@
     <record id="account_invoice_rule_view" model="ir.rule">
          <field name="name">Счет и ЗДС: обычные смертные</field>
         <field ref="model_account_invoice" name="model_id"/>
-        <field name="domain_force">[('user_id.id', '=', user.id)]</field>
+        <field name="domain_force">['|', ('user_id.id', '=', user.id), ('partner_id.user_id.id', '=', user.id), ]</field>
         <field name="perm_read" eval="True" />
         <field name="perm_create" eval="True" />
         <field name="perm_write" eval="True" />

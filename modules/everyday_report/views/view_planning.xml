@@ -16,9 +16,11 @@
                     <field name="plan_dev" sum="" />
                     <field name="plan_dev_account" sum="" />
                     <field name="plan_total" sum="" />
+                    <field name="plan" sum="" />
                     <field name="plan_per" sum="" />
                     <field name="fact_per" sum=""/>
                     <field name="fact_total" sum="" />
+                    <field name="fact" sum="" />
                     <field name="fact_work" sum="" />
                     <field name="fact_calling" sum="" />
                     <field name="fact_dev" sum="" />
