@@ -1046,7 +1046,16 @@
                                         <separator string="Описание ситуации" colspan="2"/>
                                         <field name="refusion_description" nolabel="1" colspan="2"/>
                                     </group>
+                                </group>
+                                <field name="check_ppc" invisible="1"/>
+                                <group colspan="4" col="4" attrs="{'invisible': [('check_ppc', '=', False)]}">
+                                    <separator string="Скидки" colspan="4"/>
+                                    <field name="discounts_ids" nolabel="1" colspan="4" context="{'partner_id': id}"/>
 
+                                    <separator string="Прошедшие скидки" colspan="4"/>
+                                    <field name="old_discounts_ids" nolabel="1" colspan="4" context="{'partner_id': id}" readonly="1"/>
+
+                                    <field name="discounts_history_ids" nolabel="1" colspan="4" context="{'partner_id': id}" readonly="1"/>
                                 </group>
                             </page>
                             <page string="Журнал">
@@ -1600,6 +1609,16 @@
                                         </group>
                                     </form>
                                     </field>
+                                </group>
+                                <field name="check_ppc" invisible="1"/>
+                                <group colspan="4" col="4" attrs="{'invisible': [('check_ppc', '=', False)]}">
+                                    <separator string="Скидки" colspan="4"/>
+                                    <field name="discounts_ids" nolabel="1" colspan="4" context="{'partner_id': id}"/>
+
+                                    <separator string="Прошедшие скидки" colspan="4"/>
+                                    <field name="old_discounts_ids" nolabel="1" colspan="4" context="{'partner_id': id}" readonly="1"/>
+
+                                    <field name="discounts_history_ids" nolabel="1" colspan="4" context="{'partner_id': id}" readonly="1"/>
                                 </group>
                             </page>
                             <page string="Журнал">
