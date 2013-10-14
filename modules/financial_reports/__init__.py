@@ -1,2 +1,2 @@
 # coding=utf-8
-import ppc
+import account_invoice_pay_line
