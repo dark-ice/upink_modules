@@ -126,9 +126,10 @@
                             <group colspan="4" col="4">
                                 <field name="variant_ids" colspan="4" nolabel="1">
                                     <tree string="Варианты идей">
-                                        <field name="name"/>
+                                        <field name="datas_fname"/>
+                                        <field name="create_date"/>
                                         <field name="user_id"/>
-                                        <field name="create_date" />
+                                        <field name="type"/>
                                     </tree>
                                 </field>
                                 <field name="idea_file" colspan="4"/>
@@ -137,9 +138,10 @@
                                 <separator colspan="4"/>
                                 <field name="scenario_ids" colspan="4" nolabel="1">
                                     <tree string="Варианты сценариев">
-                                        <field name="name"/>
+                                        <field name="datas_fname"/>
+                                        <field name="create_date"/>
                                         <field name="user_id"/>
-                                        <field name="create_date" />
+                                        <field name="type"/>
                                     </tree>
                                 </field>
                                 <field name="agreed_scenario_file" colspan="4"/>
@@ -150,9 +152,10 @@
                             <group colspan="4">
                                 <field name="param_ids" nolabel="1" colspan="4">
                                     <tree string="Параметры создаваемого продукта">
-                                        <field name="name"/>
-                                        <field name="user_id"/>
+                                        <field name="datas_fname"/>
                                         <field name="create_date"/>
+                                        <field name="user_id"/>
+                                        <field name="type"/>
                                     </tree>
                                 </field>
                                 <field name="selected_param_file" colspan="4" widget="char"/>
@@ -161,9 +164,10 @@
                             <group colspan="4">
                                 <field name="another_param_ids" nolabel="1" colspan="4">
                                     <tree string="Другие параметры на утверждение">
-                                        <field name="name"/>
-                                        <field name="user_id"/>
+                                        <field name="datas_fname"/>
                                         <field name="create_date"/>
+                                        <field name="user_id"/>
+                                        <field name="type"/>
                                     </tree>
                                 </field>
                                 <field name="selected_another_params_file" colspan="4" widget="char"/>
@@ -180,9 +184,10 @@
                             <group colspan="4" >
                                 <field name="graphic_ids" nolabel="1" colspan="4">
                                     <tree string="Графика для согласования">
-                                        <field name="name"/>
-                                        <field name="user_id"/>
+                                        <field name="datas_fname"/>
                                         <field name="create_date"/>
+                                        <field name="user_id"/>
+                                        <field name="type"/>
                                     </tree>
                                 </field>
                                 <field name="agreed_graphic_file" colspan="4" widget="char"/>
@@ -192,9 +197,10 @@
                             <group colspan="4">
                                 <field name="speaker_ids" nolabel="1" colspan="4">
                                     <tree string="Дикторы на утверждение">
-                                        <field name="name"/>
-                                        <field name="user_id"/>
+                                        <field name="datas_fname"/>
                                         <field name="create_date"/>
+                                        <field name="user_id"/>
+                                        <field name="type"/>
                                     </tree>
                                 </field>
                                 <field name="agreed_speaker_file" colspan="4" widget="char"/>
@@ -204,9 +210,10 @@
                             <group colspan="4">
                                 <field name="actor_ids" nolabel="1" colspan="4">
                                     <tree string="Актеры на утверждение">
-                                        <field name="name"/>
-                                        <field name="user_id"/>
+                                        <field name="datas_fname"/>
                                         <field name="create_date"/>
+                                        <field name="user_id"/>
+                                        <field name="type"/>
                                     </tree>
                                 </field>
                                 <field name="agreed_actor_file" colspan="4" widget="char"/>
@@ -216,9 +223,10 @@
                             <group colspan="4">
                                 <field name="music_ids" nolabel="1" colspan="4">
                                     <tree string="Музыкальное решение">
-                                        <field name="name"/>
-                                        <field name="user_id"/>
+                                        <field name="datas_fname"/>
                                         <field name="create_date"/>
+                                        <field name="user_id"/>
+                                        <field name="type"/>
                                     </tree>
                                 </field>
                             </group>
