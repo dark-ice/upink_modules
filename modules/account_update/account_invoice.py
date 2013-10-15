@@ -671,11 +671,13 @@ class AccountInvoiceLine(Model):
 
         'nbr': fields.function(_show_number, method=True, string='Номер', type='integer', store=False),
         'brief_id': fields.many2one('brief.main', 'Медиаплан', domain="[('services_ids', '=', service_id), ('partner_id', '=', partner_id)]"),
+        'no_brief': fields.boolean('Нет брифа'),
     }
 
     _defaults = {
         'account_id': lambda self, cr, uid, context: context.get('account_id', False),
         'name': lambda self, cr, uid, context: context.get('description', False),
+        'partner_id': lambda self, cr, uid, context: context.get('partner_id', False),
     }
 
     def _check_unique_insesitive(self, cr, uid, ids, context=None):
@@ -740,6 +742,8 @@ class AccountInvoiceLine(Model):
         )['value']
         values.update(val)
         values['factor'] = values.get('price_unit', 0.0)
+        if not values.get('no_brief') and not values.get('brief_id'):
+            raise osv.except_osv('Позиция счета', 'Необходимо указать есть ли бриф или выбрать связанный бриф')
         return super(AccountInvoiceLine, self).create(cr, uid, values, context)
 
     def write(self, cr, uid, ids, values, context=None):
@@ -1003,7 +1007,6 @@ class AccountInvoicePayLine(Model):
             self.update_line(cr, user, record['invoice_id'], record['service_id'])
 
         return flag
-
 AccountInvoicePayLine()
 
 
