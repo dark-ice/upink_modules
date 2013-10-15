@@ -244,26 +244,37 @@ class ReportSource(Model):
             create or replace view day_report_source as (
                 SELECT
                   row_number() over() as id,
-                  to_char(i.paid_date, 'YYYY-MM-DD') date_end,
-                  to_char(i.paid_date, 'YYYY-MM-DD') date_start,
-                  i.paid_date date,
-                  sum(case when u.context_section_id=9 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_dev_s,
-                  sum(case when u.context_section_id in (7, 8, 18) AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_calling_s,
-                  sum(case when u.context_section_id=7 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_cold_s,
-                  sum(case when u.context_section_id=8 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_marketing_s,
-                  sum(case when u.context_section_id=18 AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_moscow_s,
-                  sum(case when u.context_section_id in (7, 9, 8, 18) AND u.context_section_id=r.section_id then case i.factor when 0 then i.total_ye else i.factor end else 0 end) fact_total_s,
-                  max(case when r.section_id=9 then r.plan else 0 end) plan_dev,
-                  max(case when r.section_id=7 then r.plan else 0 end) plan_cold,
-                  max(case when r.section_id=8 then r.plan else 0 end) plan_marketing,
-                  max(case when r.section_id=18 then r.plan else 0 end) plan_moscow
-                FROM account_invoice i
+                  to_char(ip.date_pay, 'YYYY-MM-DD') date_end,
+                  to_char(ip.date_pay, 'YYYY-MM-DD') date_start,
+                  ip.date_pay date,
+                  max(r.plan_dev) plan_dev,
+                  max(r.plan_cold) plan_cold,
+                  max(r.plan_marketing) plan_marketing,
+                  max(r.plan_moscow) plan_moscow,
+                  sum(case when u.context_section_id=8 then ipl.factor else 0 end) fact_marketing_s,
+                  sum(case when u.context_section_id=7 then ipl.factor else 0 end) fact_cold_s,
+                  sum(case when u.context_section_id=9 then ipl.factor else 0 end) fact_dev_s,
+                  sum(case when u.context_section_id=18 then ipl.factor else 0 end) fact_moscow_s,
+                  sum(case when u.context_section_id in (7, 8, 18) then ipl.factor else 0 end) fact_calling_s,
+                  sum(case when u.context_section_id in (7, 8, 9, 18) then ipl.factor else 0 end) fact_total_s
+                FROM
+                  account_invoice_pay ip
+                  LEFT JOIN account_invoice_pay_line ipl on (ipl.invoice_pay_id=ip.id)
+                  LEFT JOIN account_invoice i on (i.id=ip.invoice_id)
                   LEFT JOIN res_users u on (u.id=i.user_id)
-                  LEFT JOIN day_report_source_plan r on (
-                    r.period_month::int=EXTRACT(MONTH FROM i.paid_date)
-                    AND r.period_year::int=EXTRACT(YEAR FROM i.paid_date))
-                WHERE paid_date is not NULL
-                GROUP BY i.paid_date
+                  LEFT JOIN (
+                    SELECT
+                      r.period_month,
+                      r.period_year,
+                      sum(case when r.section_id=9 then r.plan else 0 end) plan_dev,
+                      sum(case when r.section_id=7 then r.plan else 0 end) plan_cold,
+                      sum(case when r.section_id=8 then r.plan else 0 end) plan_marketing,
+                      sum(case when r.section_id=18 then r.plan else 0 end) plan_moscow
+                    FROM day_report_source_plan r
+                    GROUP BY r.period_month, r.period_year
+                  ) r on (r.period_month::int=EXTRACT(MONTH FROM ip.date_pay)
+                    AND r.period_year::int=EXTRACT(YEAR FROM ip.date_pay))
+                  GROUP BY ip.date_pay
             )""")
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):

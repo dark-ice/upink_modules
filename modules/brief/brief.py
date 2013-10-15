@@ -135,10 +135,17 @@ class brief_services_stage(Model):
         'check_leader': fields.boolean(u"Трубуется проверка руководителя операционного направления"),
         'direction': fields.char(u"Направление", size=255),
         'in_account': fields.boolean(u"Можно ли выставлять счет на услугу"),
+        'service_type': fields.selection(
+            (
+                ('project', 'Проектная'),
+                ('process', 'Процессная'),
+            ), 'Тип'
+        )
     }
 
     _defaults = {
-        'in_account': True
+        'in_account': True,
+        'service_type': 'process'
     }
 
 brief_services_stage()

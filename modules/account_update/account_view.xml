@@ -105,7 +105,7 @@
                     <notebook colspan="4">
                         <page string="Счет">
                             <field colspan="4" name="invoice_line" nolabel="1" widget="one2many_list"
-                                   context="{'type': type, 'account_id': account_id, 'description': number}" />
+                                   context="{'type': type, 'account_id': account_id, 'description': number, 'partner_id': partner_id}" />
 
                             <group col="6" colspan="2">
                                 <field name="untaxed"/>
@@ -258,9 +258,10 @@
                 <xpath expr="//tree[@string='Invoice Line']" position="replace">
                     <tree string="Invoice Line" editable="top">
                         <field name="service_id" required="1"/>
-                        <field name="brief_id"/>
+                        <field name="no_brief" />
+                        <field name="brief_id" attrs="{'required': [('no_brief', '=', False)], 'readonly': [('no_brief', '=', True)]}"/>
                         <field name="partner_id" invisible="1" />
-                        <field name="account_id" invisible="1" required="1"/>
+                        <field name="account_id" invisible="1" />
                         <field name="price_unit"
                                string="Стоимость $"
                                on_change="onchange_price(parent.currency_id, parent.date_invoice, paid, price_unit, 0)"/>

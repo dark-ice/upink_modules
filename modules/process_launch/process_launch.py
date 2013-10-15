@@ -86,8 +86,9 @@ class ProcessLaunch(Model):
             if data['account_id']:
                 account_id = data['account_id'][0]
             if service_id and account_id:
-                line_id, price, price_ye, paid, line_ids = self._get_account_info(cr, 1, account_id, service_id)
-                res[data['id']] = line_ids
+                result = self._get_account_info(cr, 1, account_id, service_id)
+                if result:
+                    res[data['id']] = result[4]
         return res
 
     def _get_head(self, cr, user, leader_group_id):

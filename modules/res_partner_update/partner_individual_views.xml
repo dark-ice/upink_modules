@@ -584,6 +584,7 @@
                         <field name="user_id">
                             <filter string="My Partners" icon="terp-personal+" domain="[('user_id','=',uid)]"/>
                         </field>
+                        <field name="partner_status" />
                     </group>
                     <newline/>
                     <group expand="0" string="Group By...">
@@ -634,7 +635,6 @@
                             <field name="user_id"/>
                             <field name="categ_id" string="Тематика" />
                             <field name="partner_type" invisible="1"/>
-                            <field name="active" attrs="{'invisible': [('check', '=', False)]}" />
 
                         </group>
                         <notebook colspan="4">
@@ -651,6 +651,7 @@
                                             <field name="comment" />
                                             <field name="check"/>
                                             <field name="budget" />
+                                            <field name="service_status" readonly="1"/>
                                         </tree>
                                     </field>
                                     <field name="operation_deps" colspan="4" nolabel="1" mode="tree">
@@ -1100,11 +1101,19 @@
                                     </field>
                                 </group>
                             </page>
-                            <page string="Значимость критериев">
+                            <page string="Управление качеством">
                                 <field name="terms_of_service" colspan="4"/>
                                 <field name="conformity" colspan="4"/>
                                 <field name="quality_feedback" colspan="4"/>
                                 <field name="completeness_of_reporting" colspan="4"/>
+
+                                <button type="action"
+                                    name="%(action_quality_wizard)d"
+                                    string="Создать"
+                                    context="{'partner_id': id}"
+                                    icon="gtk-ok"/>
+                                <field name="control_ids" mode="tree" colspan="4" nolabel="1" readonly="1"/>
+
                                 <button name="add_note" string="Добавить заметку" type="object" icon="terp-document-new" colspan="4" context="{'type': 'skk'}"/>
                                 <field name="skk_note_ids" colspan="4" nolabel="1" readonly="1">
                                     <tree string="Заметки СКК">
@@ -1198,7 +1207,6 @@
                 <form>
                     <group col="4" colspan="4">
                         <field name="section_id" invisible="1"/>
-                        <field name="check" invisible="1"/>
                         <field name="id" invisible="1"/>
                         <group colspan="4" col="8">
                             <field name="name" string="Кандидат (основной сайт)"/>
@@ -1221,8 +1229,6 @@
                             <newline />
                             <field name="ur_name" colspan="8"/>
                             <button name="to_partner" type="object" string="Создать партнера" icon="gtk-ok" />
-                            <newline />
-                            <field name="active" attrs="{'invisible': [('check', '=', False)]}" />
                         </group>
                         <notebook colspan="4">
                             <page string="Контакты">
@@ -1239,6 +1245,7 @@
                                             <field name="comment"/>
                                             <field name="check"/>
                                             <field name="budget" attrs="{'required': [('partner_base', '=', 'hot')]}"/>
+                                            <field name="service_status" readonly="1"/>
                                         </tree>
                                     </field>
                                     <field

@@ -99,3 +99,86 @@ class AccountInvoice(Model):
         'factor': 0,
     }
 AccountInvoice()
+
+
+class AccountInvoiceLine(Model):
+    _inherit = 'account.invoice.line'
+
+    _columns = {
+        'factor': fields.float('Новая сумма в $', digits=(10, 2)),
+        'number': fields.related(
+            'invoice_id',
+            'number',
+            string='Номер',
+            type='char',
+            size=100
+        ),
+        'user_id': fields.related(
+            'invoice_id',
+            'user_id',
+            string='Автор',
+            type='many2one',
+            relation='res.users'
+        ),
+
+    }
+
+    _defaults = {
+        'factor': 0,
+    }
+AccountInvoiceLine()
+
+
+class AccountInvoicePayLine(Model):
+    _inherit = 'account.invoice.pay.line'
+
+    def _get_total_ye(self, cr, uid, ids, field_name, field_value, arg, context=None):
+        result = {}
+        for record in self.read(cr, uid, ids, ['invoice_id', 'name'], context=context):
+            invoice = self.pool.get('account.invoice').read(cr, 1, record['invoice_id'][0], ['rate'])
+            total = record['name'] / invoice['rate']
+            result[record['id']] = total
+        result
+        return result
+
+    _columns = {
+        'factor': fields.float('Новая сумма в $', digits=(10, 2)),
+        'number': fields.related(
+            'invoice_id',
+            'number',
+            string='Номер',
+            type='char',
+            size=100
+        ),
+        'user_id': fields.related(
+            'invoice_id',
+            'user_id',
+            string='Автор',
+            type='many2one',
+            relation='res.users'
+        ),
+        'name_ye': fields.function(
+            _get_total_ye,
+            type="float",
+            digits=(12, 2),
+            string="Сумма платежа в $",
+            method=True,
+            store=False,
+            readonly=True
+        ),
+        'partner_id': fields.related(
+            'invoice_id',
+            'partner_id',
+            string='Партнер',
+            type='many2one',
+            relation='res.partner'
+        ),
+    }
+
+    def create(self, cr, user, vals, context=None):
+        if vals.get('name') and vals.get('invoice_id'):
+            invoice = self.pool.get('account.invoice').read(cr, 1, vals['invoice_id'], ['rate'])
+            if invoice:
+                vals['factor'] = vals['name'] / invoice['rate']
+        return super(AccountInvoicePayLine, self).create(cr, user, vals, context)
+AccountInvoicePayLine()
