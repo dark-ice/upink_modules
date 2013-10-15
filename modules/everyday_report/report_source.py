@@ -251,12 +251,12 @@ class ReportSource(Model):
                   max(r.plan_cold) plan_cold,
                   max(r.plan_marketing) plan_marketing,
                   max(r.plan_moscow) plan_moscow,
-                  sum(case when u.context_section_id=8 then ipl.factor else 0 end) fact_marketing,
-                  sum(case when u.context_section_id=7 then ipl.factor else 0 end) fact_cold,
-                  sum(case when u.context_section_id=9 then ipl.factor else 0 end) fact_dev,
-                  sum(case when u.context_section_id=18 then ipl.factor else 0 end) fact_moscow,
-                  sum(case when u.context_section_id in (7, 8, 18) then ipl.factor else 0 end) fact_calling,
-                  sum(case when u.context_section_id in (7, 8, 9, 18) then ipl.factor else 0 end) fact_total
+                  sum(case when u.context_section_id=8 then ipl.factor else 0 end) fact_marketing_s,
+                  sum(case when u.context_section_id=7 then ipl.factor else 0 end) fact_cold_s,
+                  sum(case when u.context_section_id=9 then ipl.factor else 0 end) fact_dev_s,
+                  sum(case when u.context_section_id=18 then ipl.factor else 0 end) fact_moscow_s,
+                  sum(case when u.context_section_id in (7, 8, 18) then ipl.factor else 0 end) fact_calling_s,
+                  sum(case when u.context_section_id in (7, 8, 9, 18) then ipl.factor else 0 end) fact_total_s
                 FROM
                   account_invoice_pay ip
                   LEFT JOIN account_invoice_pay_line ipl on (ipl.invoice_pay_id=ip.id)
