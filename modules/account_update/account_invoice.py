@@ -671,7 +671,7 @@ class AccountInvoiceLine(Model):
 
         'nbr': fields.function(_show_number, method=True, string='Номер', type='integer', store=False),
         'brief_id': fields.many2one('brief.main', 'Медиаплан', domain="[('services_ids', '=', service_id), ('partner_id', '=', partner_id)]"),
-        'no_brief': fields.boolean('Нет брифа'),
+        'no_brief': fields.boolean('Нет медиаплана'),
     }
 
     _defaults = {
