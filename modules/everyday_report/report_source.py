@@ -247,16 +247,16 @@ class ReportSource(Model):
                   to_char(a.date, 'YYYY-MM-DD') date_end,
                   to_char(a.date, 'YYYY-MM-DD') date_start,
                   a.date,
-                  sum(fact_marketing) fact_marketing_s,
-                  sum(fact_cold) fact_cold_s,
-                  sum(fact_dev) fact_dev_s,
-                  sum(fact_moscow) fact_moscow_s,
-                  sum(fact_calling) fact_calling_s,
-                  sum(fact_total) fact_total_s,
-                  max(case when r.section_id=9 then r.plan else 0 end) plan_dev,
-                  max(case when r.section_id=7 then r.plan else 0 end) plan_cold,
-                  max(case when r.section_id=8 then r.plan else 0 end) plan_marketing,
-                  max(case when r.section_id=18 then r.plan else 0 end) plan_moscow
+                  fact_marketing fact_marketing_s,
+                  fact_cold fact_cold_s,
+                  fact_dev fact_dev_s,
+                  fact_moscow fact_moscow_s,
+                  fact_calling fact_calling_s,
+                  fact_total fact_total_s,
+                  case when r.section_id=9 then r.plan else 0 end plan_dev,
+                  case when r.section_id=7 then r.plan else 0 end plan_cold,
+                  case when r.section_id=8 then r.plan else 0 end plan_marketing,
+                  case when r.section_id=18 then r.plan else 0 end plan_moscow
                 FROM (
                   SELECT
                     ip.date_pay date,
@@ -275,7 +275,6 @@ class ReportSource(Model):
                   LEFT JOIN day_report_source_plan r on (
                     r.period_month::int=EXTRACT(MONTH FROM a.date)
                     AND r.period_year::int=EXTRACT(YEAR FROM a.date))
-                GROUP BY date
             )""")
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
