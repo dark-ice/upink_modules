@@ -238,63 +238,30 @@ class ReportStructure(Model):
             create or replace view day_report_structure as (
                 SELECT
                   row_number() over() as id,
-                  to_char(x.date, 'YYYY-MM-DD') date_end,
-                  to_char(x.date, 'YYYY-MM-DD') date_start,
-                  x.date paid_date,
+                  to_char(ip.date_pay, 'YYYY-MM-DD') date_end,
+                  to_char(ip.date_pay, 'YYYY-MM-DD') date_start,
+                  ip.date_pay date,
+                  max(ppc_plan) ppc_plan,
+                  sum(case when bss.direction='PPC' then ipl.factor else 0 end) ppc_fact_s,
+                  max(smm_plan) smm_plan,
+                  sum(case when bss.direction='SMM' then ipl.factor else 0 end) smm_fact_s,
+                  max(seo_plan) seo_plan,
+                  sum(case when bss.direction='SEO' then ipl.factor else 0 end) seo_fact_s,
+                  max(call_plan) call_plan,
+                  sum(case when bss.direction='CALL' then ipl.factor else 0 end) call_fact_s,
+                  max(web_plan) web_plan,
+                  sum(case when bss.direction='SITE' then ipl.factor else 0 end) web_fact_s,
+                  max(video_plan) video_plan,
+                  sum(case when bss.direction='VIDEO' then ipl.factor else 0 end) video_fact_s,
+                  max(mp_plan) mp_plan,
+                  sum(case when bss.direction='MP' then ipl.factor else 0 end) mp_fact_s,
+                  max(total_plan) total_plan,
+                  sum(case when bss.direction in ('PPC', 'SMM', 'SEO', 'CALL', 'SITE', 'VIDEO', 'MP') then ipl.factor else 0 end) total_fact_s
 
-                  ppc_plan,
-                  ppc_fact ppc_fact_s,
-
-                  smm_plan,
-                  smm_fact smm_fact_s,
-
-                  seo_plan,
-                  seo_fact seo_fact_s,
-
-                  call_plan,
-                  call_fact call_fact_s,
-
-                  web_plan,
-                  web_fact web_fact_s,
-
-                  video_plan,
-                  video_fact video_fact_s,
-
-                  mp_plan,
-                  mp_fact mp_fact_s,
-
-                  total_fact total_fact_s,
-                  ppc_plan + smm_plan + seo_plan + call_plan + web_plan + video_plan + mp_plan total_plan
-                FROM (
-                    SELECT
-                      date,
-                      sum(ppc_fact) ppc_fact,
-                      sum(smm_fact) smm_fact,
-                      sum(seo_fact) seo_fact,
-                      sum(call_fact) call_fact,
-                      sum(web_fact) web_fact,
-                      sum(video_fact) video_fact,
-                      sum(mp_fact) mp_fact,
-                      sum(total_fact) total_fact
-                    FROM (
-                      SELECT
-                        ip.date_pay date,
-                        case when bss.direction='PPC' then ipl.factor else 0 end ppc_fact,
-                        case when bss.direction='SMM' then ipl.factor else 0 end smm_fact,
-                        case when bss.direction='SEO' then ipl.factor else 0 end seo_fact,
-                        case when bss.direction='CALL' then ipl.factor else 0 end call_fact,
-                        case when bss.direction='SITE' then ipl.factor else 0 end web_fact,
-                        case when bss.direction='VIDEO' then ipl.factor else 0 end video_fact,
-                        case when bss.direction='MP' then ipl.factor else 0 end mp_fact,
-                        case when bss.direction in ('PPC', 'SMM', 'SEO', 'CALL', 'SITE', 'VIDEO', 'MP') then ipl.factor else 0 end total_fact
-                      FROM
-                        account_invoice_pay ip
-                        LEFT JOIN account_invoice i on (i.id=ip.invoice_id)
-                        LEFT JOIN account_invoice_pay_line ipl on (ipl.invoice_pay_id=ip.id)
-                        LEFT JOIN brief_services_stage bss on (bss.id=ipl.service_id)
-                        LEFT JOIN res_users u on (u.id=i.user_id)
-                    ) y GROUP BY y.date
-                ) x
+                FROM
+                  account_invoice_pay ip
+                  LEFT JOIN account_invoice_pay_line ipl on (ipl.invoice_pay_id=ip.id)
+                  LEFT JOIN brief_services_stage bss on (bss.id=ipl.service_id)
                   LEFT JOIN (
                     SELECT
                       p.name,
@@ -304,12 +271,15 @@ class ReportStructure(Model):
                       max(case when s.name=467 then s.plan else 0 end) call_plan,
                       max(case when s.name=468 then s.plan else 0 end) web_plan,
                       max(case when s.name=469 then s.plan else 0 end) video_plan,
-                      max(case when s.name=475 then s.plan else 0 end) mp_plan
+                      max(case when s.name=475 then s.plan else 0 end) mp_plan,
+                      sum(s.plan) total_plan
                     FROM kpi_period p
                       LEFT JOIN kpi_kpi k on (k.period_id=p.id AND k.employee_id=10)
                       LEFT JOIN kpi_sla_sale s on (s.kpi_id=k.id)
                     WHERE p.calendar='rus'
-                    GROUP BY s.kpi_id, p.name) y on (y.name=to_char(x.date, 'YYYY/MM'))
+                    GROUP BY s.kpi_id, p.name
+                  ) y on (y.name=to_char(ip.date_pay, 'YYYY/MM'))
+                  GROUP BY date_pay
             )""")
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
