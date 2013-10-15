@@ -278,35 +278,18 @@ class ReportStructure(Model):
                       sum(total_fact) total_fact
                     FROM (
                       SELECT
-                        i.paid_date::date date,
-                        case when bss.direction='PPC' then il.factor else 0 end ppc_fact,
-                        case when bss.direction='SMM' then il.factor else 0 end smm_fact,
-                        case when bss.direction='SEO' then il.factor else 0 end seo_fact,
-                        case when bss.direction='CALL' then il.factor else 0 end call_fact,
-                        case when bss.direction='SITE' then il.factor else 0 end web_fact,
-                        case when bss.direction='VIDEO' then il.factor else 0 end video_fact,
-                        case when bss.direction='MP' then il.factor else 0 end mp_fact,
-                        case when bss.direction in ('PPC', 'SMM', 'SEO', 'CALL', 'SITE', 'VIDEO', 'MP') then il.factor else 0 end total_fact
-                      FROM account_invoice i
-                        LEFT JOIN account_invoice_line il on (il.invoice_id=i.id)
-                        LEFT JOIN brief_services_stage bss on (bss.id=il.service_id)
-                      WHERE i.paid_date IS NOT NULL
-
-                      UNION
-
-                      SELECT
                         ip.date_pay date,
-                        case when bss.direction='PPC' then ipl.name/i.rate else 0 end ppc_fact,
-                        case when bss.direction='SMM' then ipl.name/i.rate else 0 end smm_fact,
-                        case when bss.direction='SEO' then ipl.name/i.rate else 0 end seo_fact,
-                        case when bss.direction='CALL' then ipl.name/i.rate else 0 end call_fact,
-                        case when bss.direction='SITE' then ipl.name/i.rate else 0 end web_fact,
-                        case when bss.direction='VIDEO' then ipl.name/i.rate else 0 end video_fact,
-                        case when bss.direction='MP' then ipl.name/i.rate else 0 end mp_fact,
-                        case when bss.direction in ('PPC', 'SMM', 'SEO', 'CALL', 'SITE', 'VIDEO', 'MP') then ipl.name/i.rate else 0 end total_fact
+                        case when bss.direction='PPC' then ipl.factor else 0 end ppc_fact,
+                        case when bss.direction='SMM' then ipl.factor else 0 end smm_fact,
+                        case when bss.direction='SEO' then ipl.factor else 0 end seo_fact,
+                        case when bss.direction='CALL' then ipl.factor else 0 end call_fact,
+                        case when bss.direction='SITE' then ipl.factor else 0 end web_fact,
+                        case when bss.direction='VIDEO' then ipl.factor else 0 end video_fact,
+                        case when bss.direction='MP' then ipl.factor else 0 end mp_fact,
+                        case when bss.direction in ('PPC', 'SMM', 'SEO', 'CALL', 'SITE', 'VIDEO', 'MP') then ipl.factor else 0 end total_fact
                       FROM
                         account_invoice_pay ip
-                        LEFT JOIN account_invoice i on (i.id=ip.invoice_id AND i.paid_date is null)
+                        LEFT JOIN account_invoice i on (i.id=ip.invoice_id)
                         LEFT JOIN account_invoice_pay_line ipl on (ipl.invoice_pay_id=ip.id)
                         LEFT JOIN brief_services_stage bss on (bss.id=ipl.service_id)
                         LEFT JOIN res_users u on (u.id=i.user_id)

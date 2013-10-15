@@ -195,9 +195,9 @@ class ReportPlanning(Model):
                     i.plan_calling_account,
                     i.plan_dev_account,
                     i.plan_work_account,
-                    fact_work_full + fact_work_part fact_work,
-                    fact_calling_full + fact_calling_part fact_calling,
-                    fact_dev_full + fact_dev_part fact_dev
+                    fact_work_part fact_work,
+                    fact_calling_part fact_calling,
+                    fact_dev_part fact_dev
                   FROM day_report_plan r
                     LEFT JOIN (
                       SELECT
@@ -211,22 +211,10 @@ class ReportPlanning(Model):
                     ) i on (r.date=i.plan_paid_date)
                     LEFT JOIN (
                       SELECT
-                        i.paid_date,
-                        sum(case when u.context_section_id=8 then il.factor else 0 end) fact_work_full,
-                        sum(case when u.context_section_id=7 then il.factor else 0 end) fact_calling_full,
-                        sum(case when u.context_section_id=9 then il.factor else 0 end) fact_dev_full
-                      FROM
-                        account_invoice i
-                        LEFT JOIN account_invoice_line il on (il.invoice_id=i.id)
-                        LEFT JOIN res_users u on (u.id=i.user_id)
-                      GROUP BY i.paid_date
-                    ) i2 on (i2.paid_date=r.date)
-                    LEFT JOIN (
-                      SELECT
                         ip.date_pay,
-                        sum(case when u.context_section_id=8 then ipl.name/i.rate else 0 end) fact_work_part,
-                        sum(case when u.context_section_id=7 then ipl.name/i.rate else 0 end) fact_calling_part,
-                        sum(case when u.context_section_id=9 then ipl.name/i.rate else 0 end) fact_dev_part
+                        sum(case when u.context_section_id=8 then ipl.factor else 0 end) fact_work_part,
+                        sum(case when u.context_section_id=7 then ipl.factor else 0 end) fact_calling_part,
+                        sum(case when u.context_section_id=9 then ipl.factor else 0 end) fact_dev_part
                       FROM
                         account_invoice_pay ip
                         LEFT JOIN account_invoice i on (i.id=ip.invoice_id AND i.paid_date is null)
@@ -239,11 +227,8 @@ class ReportPlanning(Model):
                     i.plan_calling_account,
                     i.plan_dev_account,
                     i.plan_work_account,
-                    fact_work_full,
                     fact_work_part,
-                    fact_calling_full,
                     fact_calling_part,
-                    fact_dev_full,
                     fact_dev_part
                   ) r
             )""")

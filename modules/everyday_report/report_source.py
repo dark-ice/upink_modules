@@ -259,32 +259,16 @@ class ReportSource(Model):
                   max(case when r.section_id=18 then r.plan else 0 end) plan_moscow
                 FROM (
                   SELECT
-                    i.paid_date date,
-                    case when u.context_section_id=8 then il.factor else 0 end fact_marketing,
-                    case when u.context_section_id=7 then il.factor else 0 end fact_cold,
-                    case when u.context_section_id=9 then il.factor else 0 end fact_dev,
-                    case when u.context_section_id=18 then il.factor else 0 end fact_moscow,
-                    case when u.context_section_id in (7, 8, 18) then il.factor else 0 end fact_calling,
-                    case when u.context_section_id in (7, 8, 9, 18) then il.factor else 0 end fact_total
-                  FROM
-                    account_invoice i
-                    LEFT JOIN account_invoice_line il on (il.invoice_id=i.id)
-                    LEFT JOIN res_users u on (u.id=i.user_id)
-                  WHERE i.paid_date IS NOT NULL
-
-                  UNION
-
-                  SELECT
                     ip.date_pay date,
-                    case when u.context_section_id=8 then ipl.name/i.rate else 0 end fact_marketing,
-                    case when u.context_section_id=7 then ipl.name/i.rate else 0 end fact_cold,
-                    case when u.context_section_id=9 then ipl.name/i.rate else 0 end fact_dev,
-                    case when u.context_section_id=18 then ipl.name/i.rate else 0 end fact_moscow,
-                    case when u.context_section_id in (7, 8, 18) then ipl.name/i.rate else 0 end fact_calling,
-                    case when u.context_section_id in (7, 8, 9, 18) then ipl.name/i.rate else 0 end fact_total
+                    case when u.context_section_id=8 then ipl.factor else 0 end fact_marketing,
+                    case when u.context_section_id=7 then ipl.factor else 0 end fact_cold,
+                    case when u.context_section_id=9 then ipl.factor else 0 end fact_dev,
+                    case when u.context_section_id=18 then ipl.factor else 0 end fact_moscow,
+                    case when u.context_section_id in (7, 8, 18) then ipl.factor else 0 end fact_calling,
+                    case when u.context_section_id in (7, 8, 9, 18) then ipl.factor else 0 end fact_total
                   FROM
                     account_invoice_pay ip
-                    LEFT JOIN account_invoice i on (i.id=ip.invoice_id AND i.paid_date is null)
+                    LEFT JOIN account_invoice i on (i.id=ip.invoice_id)
                     LEFT JOIN account_invoice_pay_line ipl on (ipl.invoice_pay_id=ip.id)
                     LEFT JOIN res_users u on (u.id=i.user_id)
                 ) a
