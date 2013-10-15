@@ -26,3 +26,4 @@ class AccountInvoicePayLine(Model):
         'close': fields.boolean('Закрыт счет?'),
         'close_date': fields.date('Дата закрытия'),
     }
+AccountInvoicePayLine()
