@@ -81,6 +81,8 @@ class ProcessSlaWizard(TransientModel):
                         }) for i in sla_obj.line_ids]
                 if sla:
                     value.update({'line_ids': sla})
+                else:
+                    raise osv.except_osv("Error", "Заполните хоть один показатель!")
         return {'value': value}
 
     _columns = {
@@ -88,12 +90,10 @@ class ProcessSlaWizard(TransientModel):
         'process_model': fields.char('Process Model', size=64, readonly=False, invisible=True),
         'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')], required=True),
         'line_ids': fields.one2many('process.sla.line.wizard', 'sla_id', 'Показатели'),
-        'write': fields.boolean('Сохраняем?'),
         'sla_id': fields.integer('Sla id')
     }
 
     _defaults = {
-        'write': lambda cr, u, i, ctx: ctx.get('write'),
         'sla_id': lambda cr, u, i, ctx: ctx.get('sla_id'),
         'process_model': lambda cr, u, i, ctx: ctx.get('process_model'),
         'process_id': lambda cr, u, i, ctx: ctx.get('process_id'),
@@ -104,35 +104,21 @@ class ProcessSlaWizard(TransientModel):
         sla_pool = self.pool.get('process.sla')
 
         for record in self.browse(cr, uid, ids, context):
-
-            if record.write:
-                values = {
-                    'line_ids': [(6, 0,
-                                  {
-                                      'name': i.name.id,
-                                      'units': i.units,
-                                      'weight': i.weight,
-                                      'fact': i.fact
-                                  }) for i in record.line_ids],
-                    'avg_mbo': numpy.mean([i.mbo for i in record.line_ids]) or 0.0
-                }
-
-            else:
-                values = {
-                    'process_model': record.process_model,
-                    'process_id': record.process_id,
-                    'period_id': record.period_id.id,
-                    'type': record.type,
-                    'line_ids': [(0, 0,
-                                  {
-                                      'name': i.name.id,
-                                      'units': i.units,
-                                      'weight': i.weight,
-                                      'fact': i.fact
-                                  }) for i in record.line_ids],
-                    'avg_mbo': numpy.mean([i.mbo for i in record.line_ids]) or 0.0
-                }
-                sla_pool.create(cr, 1, values)
+            values = {
+                'process_model': record.process_model,
+                'process_id': record.process_id,
+                'period_id': record.period_id.id,
+                'type': record.type,
+                'line_ids': [(0, 0,
+                              {
+                                  'name': i.name.id,
+                                  'units': i.units,
+                                  'weight': i.weight,
+                                  'fact': i.fact
+                              }) for i in record.line_ids],
+                'avg_mbo': numpy.mean([i.mbo for i in record.line_ids]) or 0.0
+            }
+            sla_pool.create(cr, 1, values)
         return {'type': 'ir.actions.act_window_close'}
 ProcessSlaWizard()
 
@@ -140,4 +126,9 @@ ProcessSlaWizard()
 class ProcessSlaLineWizard(TransientModel):
     _name = 'process.sla.line.wizard'
     _inherit = 'process.sla.line'
+
+    _columns = {
+        'sla_id': fields.many2one('process.sla.wizard', 'SLA'),
+
+    }
 ProcessSlaLineWizard()
