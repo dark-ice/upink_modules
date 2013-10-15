@@ -246,7 +246,7 @@ class ReportSource(Model):
                   row_number() over() as id,
                   to_char(ip.date_pay, 'YYYY-MM-DD') date_end,
                   to_char(ip.date_pay, 'YYYY-MM-DD') date_start,
-                  ip.date_pay,
+                  ip.date_pay date,
                   max(r.plan_dev) plan_dev,
                   max(r.plan_cold) plan_cold,
                   max(r.plan_marketing) plan_marketing,
