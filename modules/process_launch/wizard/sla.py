@@ -81,8 +81,6 @@ class ProcessSlaWizard(TransientModel):
                         }) for i in sla_obj.line_ids]
                 if sla:
                     value.update({'line_ids': sla})
-                else:
-                    raise osv.except_osv("Error", "Заполните хоть один показатель!")
         return {'value': value}
 
     _columns = {
