@@ -74,6 +74,7 @@
                     <field name="partner_id" string="Партнер" readonly="1"/>
                     <field name="service_id" readonly="1"/>
                     <field name="user_id" string="Автор" readonly="1"/>
+                    <field name="pay_date" readonly="1"/>
                     <field name="name_ye" string="Стоимость $" readonly="1"/>
                     <field name="factor" string="Сумма для отчета"/>
                 </tree>
@@ -90,6 +91,7 @@
                     <field name="partner_id" string="Партнер"/>
                     <field name="service_id"/>
                     <field name="user_id" string="Автор"/>
+                    <field name="pay_date"/>
                     <field name="name_ye" string="Стоимость $"/>
                     <field name="factor" string="Сумма для отчета"/>
                 </search>
