@@ -217,7 +217,7 @@ class ReportPlanning(Model):
                         sum(case when u.context_section_id=9 then ipl.factor else 0 end) fact_dev_part
                       FROM
                         account_invoice_pay ip
-                        LEFT JOIN account_invoice i on (i.id=ip.invoice_id AND i.paid_date is null)
+                        LEFT JOIN account_invoice i on (i.id=ip.invoice_id)
                         LEFT JOIN account_invoice_pay_line ipl on (ipl.invoice_pay_id=ip.id)
                         LEFT JOIN res_users u on (u.id=i.user_id)
                       GROUP BY ip.date_pay
