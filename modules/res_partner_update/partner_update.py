@@ -1,4 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
+from datetime import datetime, timedelta, date
+import numpy
+import pytz
 from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
@@ -11,6 +14,27 @@ AVAILABLE_PRIORITIES = [
     ('4', 'Низкий'),
     ('5', 'Самый низкий'),
 ]
+
+PARTNER_STATUS = (
+    ('new', 'Новая'),
+    ('exist', 'Существующая'),
+    ('paused', 'Приостановленная'),
+    ('cancel', 'Отказ'),
+    ('returned', 'Возврат'),
+    ('closed', 'Закрыт'),
+)
+
+
+CRITERIAS = (
+    ('terms_of_service', 'Сроки предоставления услуги'),
+    ('conformity', 'Соответствие услуги всем входным требованиям, указанным в ТЗ'),
+    ('quality_feedback', 'Качество обратной связи с представителем Компании , скорость и полнота ответов менеджера'),
+    ('completeness_of_reporting', 'Полнота отчетов о результатах рекламной кампании и соблюдение сроков их предоставления'),
+)
+
+
+def get_state(states, state):
+    return [item for item in states if item[0] == state][0]
 
 
 class res_partner_address(Model):
@@ -242,6 +266,47 @@ res_provider_category()
 class partner_added_services(Model):
     _name = "partner.added.services"
     _rec_name = 'comment'
+
+    def _get_service_status(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.browse(cr, uid, ids, context):
+            val = 'Новая'
+
+            if record.service_id.service_type == 'project':
+                launch_ids = self.pool.get('process.launch').search(cr, 1, [('partner_id', '=', record.partner_id.id), ('service_id', '=', record.service_id.id)])
+                if launch_ids:
+                    launch = self.pool.get('process.launch').read(cr, 1, launch_ids[-1], ['process_model', 'process_id'])
+                    if launch['process_model'] and launch['process_id']:
+                        process = self.pool.get(launch['process_model']).read(cr, 1, launch['process_id'], ['state', 'create_date'])
+
+                        if process['state'] == 'finish':
+                            val = 'Закрыт'
+                        elif datetime.strptime(process['create_date'], "%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.UTC) + timedelta(days=15) < datetime.now(pytz.UTC):
+                            val = 'Существующая'
+
+            elif record.service_id.service_type == 'process':
+                invoice_ids = self.pool.get('account.invoice').search(cr, 1, [('partner_id', '=', record.partner_id.id)])
+                pay_ids = self.pool.get('account.invoice.pay.line').search(cr, 1, [('invoice_id', 'in', invoice_ids), ('service_id', '=', record.service_id.id)])
+                if pay_ids:
+                    first_pay = self.pool.get('account.invoice.pay.line').read(cr, 1, pay_ids[0], ['pay_date'])
+                    last_pay = self.pool.get('account.invoice.pay.line').read(cr, 1, pay_ids[-1], ['pay_date'])
+                    pre_last_pay = None
+                    if len(pay_ids) > 1:
+                        pre_last_pay = self.pool.get('account.invoice.pay.line').read(cr, 1, pay_ids[-2], ['pay_date'])
+
+                    if pre_last_pay is not None and datetime.strptime(pre_last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=90) < datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC):
+                        val = 'Возврат'
+
+                    if datetime.strptime(first_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=30) < datetime.now(pytz.UTC):
+                        val = 'Существующая'
+                    if datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=40) < datetime.now(pytz.UTC):
+                        val = 'Приостановленная'
+                    if datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=90) < datetime.now(pytz.UTC):
+                        val = 'Отказ'
+
+            res[record.id] = val
+        return res
+
     _columns = {
         'service_id': fields.many2one('brief.services.stage', 'Услуга'),
         'comment': fields.text('Комментарий'),
@@ -249,6 +314,13 @@ class partner_added_services(Model):
         'check': fields.boolean('Подключенные услуги'),
         'budget': fields.float('Бюджет, y.e.'),
         'partner_base': fields.related('partner_id', 'partner_base', type='char', size=50),
+        'service_status': fields.function(
+            _get_service_status,
+            method=True,
+            string='Статус',
+            type='char',
+            size=200,
+        ),
     }
 
     _defaults = {
@@ -756,6 +828,61 @@ class res_partner(Model):
         res = self.name_get(cr, user, ids, context)
         return res
 
+    def _get_partner_status(self, cr, uid, ids, name, arg, context=None):
+        service_pool = self.pool.get('brief.services.stage')
+        p_service_pool = self.pool.get('partner.added.services')
+        res = {}
+        for record in self.read(cr, uid, ids, ['added_services_ids'], context):
+            process_service_ids = []
+            project_service_ids = []
+            val = 'new'
+            service_ids = [s['service_id'][0] for s in p_service_pool.read(cr, 1, record['added_services_ids'], ['service_id']) if s['service_id']]
+            for service in service_pool.read(cr, uid, service_ids, ['service_type']):
+                if service['service_type'] == 'process':
+                    process_service_ids += p_service_pool.search(cr, 1, [('id', 'in', record['added_services_ids']), ('service_id', '=', service['id'])])
+                else:
+                    project_service_ids += p_service_pool.search(cr, 1, [('id', 'in', record['added_services_ids']), ('service_id', '=', service['id'])])
+
+            if process_service_ids:
+                process_service_status = p_service_pool._get_service_status(cr, 1, process_service_ids, '', []).values()
+                if 'Приостановленная' in process_service_status:
+                    val = 'paused'
+                elif 'Существующая' in process_service_status:
+                    val = 'exist'
+                elif 'Новая' in process_service_status:
+                    val = 'new'
+                elif 'Возврат' in process_service_status:
+                    val = 'returned'
+                elif 'Отказ' in process_service_status:
+                    val = 'cancel'
+
+            elif project_service_ids:
+                project_service_status = p_service_pool._get_service_status(cr, 1, project_service_ids, '', []).values()
+                if 'Существующая' in project_service_status:
+                    val = 'exist'
+                elif 'Новая' in project_service_status:
+                    val = 'new'
+                elif 'Закрыт' in project_service_status:
+                    val = 'closed'
+
+            res[record['id']] = val
+        return res
+
+    def _search_partner_status(self, cr, uid, obj, name, args, context):
+        ids = set()
+        status = ''
+        for cond in args:
+            status = cond[2]
+            break
+        if status:
+            partner_ids = self.search(cr, 1, [('lead', '=', False), ('partner_type', '=', 'upsale')])
+            #for partner in self.read(cr, 1, partner_ids, ['added_services_ids']):
+            partner_statuses = self._get_partner_status(cr, 1, partner_ids, '', [])
+            ids = [k for k, v in partner_statuses.iteritems() if get_state(PARTNER_STATUS, status)[0] == v]
+        if ids:
+            return [('id', 'in', tuple(ids))]
+        return [('id', '=', '0')]
+
     _columns = {
         'name': fields.char('Партнер (основной сайт)', size=250),
         'ur_name': fields.char('Юридическое название компании', size=250, help='Юридическое название компании'),
@@ -801,15 +928,23 @@ class res_partner(Model):
         'corporate_admin_panel': fields.char('Админпанель сайта', size=250),
         'corporate_admin_password': fields.char('Пароль админпанели сайта', size=250),
         'next_call': fields.datetime('Следующий звонок', help='Дата следующего контакта.'),
-        'partner_status': fields.selection(
-            [
-                ('new', 'Новый'),
-                ('existing', 'Существующий'),
-                ('stoped', 'Приостановлен'),
-                ('refusion', 'Отказ')
-            ],
-            'Статус партнера',
-            help='Этап работы с партнером. Поле заполняется менеджером'),
+        #'partner_status': fields.selection(
+        #    [
+        #        ('new', 'Новый'),
+        #        ('existing', 'Существующий'),
+        #        ('stoped', 'Приостановлен'),
+        #        ('refusion', 'Отказ')
+        #    ],
+        #    'Статус партнера',
+        #    help='Этап работы с партнером. Поле заполняется менеджером'),
+        'partner_status': fields.function(
+            _get_partner_status,
+            fnct_search=_search_partner_status,
+            type='selection',
+            selection=PARTNER_STATUS,
+            string='Статус партнера',
+            help='Этап работы с партнером. Поле заполняется менеджером'
+        ),
         'services_ids': fields.one2many(
             'crm.services.rel.stage',
             'partner_id',
@@ -1031,6 +1166,7 @@ class res_partner(Model):
         ),
 
         'process_ids': fields.one2many('process.launch', 'partner_id', 'Процессы'),
+        'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством')
     }
 
     def _get_type(self, cr, uid, context=None):
@@ -1281,3 +1417,98 @@ class PartnerStatusHistory(Model):
         'partner_id': fields.many2one('res.partner', 'Партнер', invisible=True),
     }
 TransferHistory()
+
+
+class PartnerQualityControl(Model):
+    _name = 'res.partner.quality.control'
+    _description = u'Управление качеством'
+    _rec_name = 'period_id'
+
+    def change_ydolit(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
+        view_id = self.pool.get('ir.ui.view').search(cr, uid, [('name', 'like', 'Управление качеством'), ('model', '=', self._name), ('type', '=', 'form')])
+        return {
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': self._name,
+            'name': 'Управление качеством',
+            'view_id': view_id,
+            'res_id': ids[0] or 0,
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'nodestroy': True,
+            'context': {'add': True},
+        }
+
+    def save(self, cr, uid, ids, context=None):
+        return {'type': 'ir.actions.act_window_close'}
+
+    def _get_ydolit(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.read(cr, uid, ids, ['partner_id', 'criteria_ids', 'mbo'], context=context):
+            res[record['id']] = {
+                'level_ydolit': 0.0,
+                'index_ydolit': 0.0,
+            }
+            partner = self.pool.get('res.partner').read(cr, 1, record['partner_id'][0], ['terms_of_service', 'conformity', 'quality_feedback', 'completeness_of_reporting'])
+
+            level = sum(c['value']*float(partner[c['name']])/100 for c in self.pool.get('res.partner.quality.criteria').read(cr, 1, record['criteria_ids'], ['name', 'value']))
+
+            res[record['id']]['level_ydolit'] = level
+            res[record['id']]['index_ydolit'] = numpy.mean((level, record['mbo'])) if record['mbo'] else level
+        return res
+
+    _columns = {
+        'period_id': fields.many2one(
+            'kpi.period',
+            'Период',
+            domain=[('calendar', '=', 'rus')]
+        ),
+        'partner_id': fields.many2one('res.partner', 'Партнер'),
+        'date_call': fields.datetime('Дата прозвона'),
+        'create_uid': fields.many2one('res.users', 'Специалист по упр. качеством', readonly=True),
+        'service_id': fields.many2one('brief.services.stage', 'Услуга'),
+        'direction': fields.related(
+            'service_id',
+            'direction',
+            string='Направление',
+            type='char',
+            size=10,
+            store=True,
+        ),
+        'specialist_id': fields.many2one('res.users', 'Специалист', readonly=True),
+        'criteria_ids': fields.one2many('res.partner.quality.criteria', 'quality_id', string='Критерии'),
+        'mbo': fields.float('MBO'),
+        # Троллинг Маши Кравчук за "Уровень удолит." в ТЗ
+        'level_ydolit': fields.function(
+            _get_ydolit,
+            type='float',
+            string='Уровень удовлетворительности',
+            multi='ydolit',
+            readonly=True,
+        ),
+        'index_ydolit': fields.function(
+            _get_ydolit,
+            type='float',
+            string='Индекс удовлетворительности',
+            multi='ydolit',
+            readonly=True,
+        ),
+    }
+PartnerQualityControl()
+
+
+class PartnerQualityCriteria(Model):
+    _name = 'res.partner.quality.criteria'
+    _description = u'Управление качеством - Критерии'
+
+    _columns = {
+        'name': fields.selection(
+            CRITERIAS, 'Критерий'
+        ),
+        'value': fields.float('Оценка'),
+        'comment': fields.text('Комментарий'),
+        'quality_id': fields.many2one('res.partner.quality.control', 'Управление качеством'),
+    }
+PartnerQualityCriteria()

@@ -161,5 +161,74 @@
             <field name="view_id" ref="view_notes_tree" />
             <field name="limit">5</field>
         </record>
+
+
+        <record model="ir.ui.view" id="view_control_form">
+            <field name="name">Управление качеством</field>
+            <field name="model">res.partner.quality.control</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Управление качеством">
+                    <group colspan="4" col="6">
+                        <field name="period_id" readonly="1"/>
+                        <field name="date_call" readonly="1"/>
+                        <field name="create_uid" readonly="1"/>
+
+                        <field name="service_id" readonly="1"/>
+                        <field name="direction" readonly="1"/>
+                        <field name="specialist_id" readonly="1"/>
+                    </group>
+                    <field name="criteria_ids" colspan="4" nolabel="1" mode="tree">
+                        <tree string="Критерии" editable="top">
+                            <field name="name" readonly="1"/>
+                            <field name="value"/>
+                            <field name="comment"/>
+                        </tree>
+                    </field>
+                    <group colspan="4" col="6">
+                        <field name="level_ydolit" readonly="1"/>
+                        <field name="mbo"/>
+                        <field name="index_ydolit" readonly="1"/>
+                    </group>
+                    <newline />
+                    <group>
+                        <button string="Отмена" icon="gtk-close" special="cancel" invisible="'add' not in context"/>
+                        <button name="save" type="object" string="Сохранить" icon="gtk-ok" invisible="'add' not in context"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_control_tree">
+            <field name="name">Управление качеством</field>
+            <field name="model">res.partner.quality.control</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Управление качеством">
+                    <field name="id" invisible="1"/>
+                    <field name="period_id"/>
+                    <field name="date_call"/>
+                    <field name="create_uid"/>
+                    <field name="service_id"/>
+                    <field name="direction"/>
+                    <field name="specialist_id"/>
+                    <field name="level_ydolit"/>
+                    <field name="mbo"/>
+                    <field name="index_ydolit"/>
+                    <button type="object"
+                            name="change_ydolit"
+                            string="Изменить"
+                            icon="gtk-ok"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_quality_control">
+            <field name="name">Управление качеством</field>
+            <field name="res_model">res.partner.quality.control</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_control_tree" />
+        </record>
     </data>
 </openerp>
