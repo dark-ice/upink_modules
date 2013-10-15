@@ -72,9 +72,9 @@
                 <tree editable="top">
                     <field name="number" readonly="1"/>
                     <field name="partner_id" string="Партнер" readonly="1"/>
-                    <field name="service_id"/>
+                    <field name="service_id" readonly="1"/>
                     <field name="user_id" string="Автор" readonly="1"/>
-                    <field name="name_ye" string="Стоимость $"/>
+                    <field name="name_ye" string="Стоимость $" readonly="1"/>
                     <field name="factor" string="Сумма для отчета"/>
                 </tree>
             </field>
