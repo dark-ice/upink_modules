@@ -240,7 +240,7 @@ class ReportStructure(Model):
                   row_number() over() as id,
                   to_char(ip.date_pay, 'YYYY-MM-DD') date_end,
                   to_char(ip.date_pay, 'YYYY-MM-DD') date_start,
-                  ip.date_pay date,
+                  ip.date_pay paid_date,
                   max(ppc_plan) ppc_plan,
                   sum(case when bss.direction='PPC' then ipl.factor else 0 end) ppc_fact_s,
                   max(smm_plan) smm_plan,
