@@ -136,7 +136,9 @@ class AccountInvoicePayLine(Model):
         result = {}
         for record in self.read(cr, uid, ids, ['invoice_id', 'name'], context=context):
             invoice = self.pool.get('account.invoice').read(cr, 1, record['invoice_id'][0], ['rate'])
-            result[record['id']] = record['name'] / invoice['rate']
+            total = record['name'] / invoice['rate']
+            result[record['id']] = total
+        result
         return result
 
     _columns = {
@@ -155,13 +157,14 @@ class AccountInvoicePayLine(Model):
             type='many2one',
             relation='res.users'
         ),
-        'total_ye': fields.function(
+        'name_ye': fields.function(
             _get_total_ye,
             type="float",
             digits=(12, 2),
             string="Сумма платежа в $",
             method=True,
-            store=False
+            store=False,
+            readonly=True
         ),
         'partner_id': fields.related(
             'invoice_id',
