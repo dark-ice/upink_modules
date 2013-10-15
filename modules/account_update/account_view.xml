@@ -259,7 +259,7 @@
                     <tree string="Invoice Line" editable="top">
                         <field name="service_id" required="1"/>
                         <field name="no_brief" />
-                        <field name="brief_id" attrs="{'required': [('no_brief', '=', False)]}"/>
+                        <field name="brief_id" attrs="{'required': [('no_brief', '=', False)], 'readonly': [('no_brief', '=', True)]}"/>
                         <field name="partner_id" invisible="1" />
                         <field name="account_id" invisible="1" />
                         <field name="price_unit"
