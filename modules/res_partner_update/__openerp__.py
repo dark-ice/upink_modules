@@ -2,7 +2,7 @@
 
 {
     'name': 'CRM - Partner Update',
-    'version': '1.10',
+    'version': '1.12',
     'category': 'Customer Relationship Management',
     'author': 'Andrey Karbanovich [UpSale&Inksystem]',
     'complexity': "easy",

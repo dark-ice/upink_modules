@@ -277,7 +277,7 @@ class partner_added_services(Model):
                 if launch_ids:
                     launch = self.pool.get('process.launch').read(cr, 1, launch_ids[-1], ['process_model', 'process_id'])
                     if launch['process_model'] and launch['process_id']:
-                        process = self.pool.get(record['process_model']).read(cr, 1, record['process_id'], ['state', 'create_date'])
+                        process = self.pool.get(launch['process_model']).read(cr, 1, launch['process_id'], ['state', 'create_date'])
 
                         if process['state'] == 'finish':
                             val = 'Закрыт'
