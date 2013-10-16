@@ -278,11 +278,11 @@ class partner_added_services(Model):
                     launch = self.pool.get('process.launch').read(cr, 1, launch_ids[-1], ['process_model', 'process_id'])
                     if launch['process_model'] and launch['process_id']:
                         process = self.pool.get(launch['process_model']).read(cr, 1, launch['process_id'], ['state', 'create_date'])
-
-                        if process['state'] == 'finish':
-                            val = 'Закрыт'
-                        elif datetime.strptime(process['create_date'], "%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.UTC) + timedelta(days=15) < datetime.now(pytz.UTC):
-                            val = 'Существующая'
+                        if process:
+                            if process['state'] == 'finish':
+                                val = 'Закрыт'
+                            elif datetime.strptime(process['create_date'], "%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.UTC) + timedelta(days=15) < datetime.now(pytz.UTC):
+                                val = 'Существующая'
 
             elif record.service_id.service_type == 'process':
                 invoice_ids = self.pool.get('account.invoice').search(cr, 1, [('partner_id', '=', record.partner_id.id)])
