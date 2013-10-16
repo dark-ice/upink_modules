@@ -16,7 +16,7 @@
     'installable': True,
     'auto_install': False,
     'update_xml': [
-        #'views/view_plan.xml',
+        'views/view_account_invoice_pay_line.xml',
     ],
     'js': [],
     'css': [],

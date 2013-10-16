@@ -1431,7 +1431,7 @@ class PartnerStatusHistory(Model):
         'create_date': fields.datetime('Дата', readonly=True),
         'partner_id': fields.many2one('res.partner', 'Партнер', invisible=True),
     }
-TransferHistory()
+PartnerStatusHistory()
 
 
 class PartnerPpcDiscounts(Model):
@@ -1526,8 +1526,6 @@ class PartnerPpcDiscounts(Model):
                     'old_permanent': record['permanent'],
                 })]})
         return super(PartnerPpcDiscounts, self).write(cr, user, ids, vals, context)
-
-
 PartnerPpcDiscounts()
 
 
@@ -1566,8 +1564,7 @@ class PartnerPpcDiscountsHistory(Model):
         'old_finish_date': fields.date('Предидущая Дата окончания'),
         'old_permanent': fields.boolean('Предидущее На постоянной основе'),
     }
-
-PartnerPpcDiscountsHistory()TransferHistory()
+PartnerPpcDiscountsHistory()
 
 
 class PartnerQualityControl(Model):

@@ -135,10 +135,11 @@ class AccountInvoicePayLine(Model):
     def _get_total_ye(self, cr, uid, ids, field_name, field_value, arg, context=None):
         result = {}
         for record in self.read(cr, uid, ids, ['invoice_id', 'name'], context=context):
-            invoice = self.pool.get('account.invoice').read(cr, 1, record['invoice_id'][0], ['rate'])
-            total = record['name'] / invoice['rate']
-            result[record['id']] = total
-        result
+            result[record['id']] = 0
+            if record['invoice_id']:
+                invoice = self.pool.get('account.invoice').read(cr, 1, record['invoice_id'][0], ['rate'])
+                total = record['name'] / invoice['rate']
+                result[record['id']] = total
         return result
 
     _columns = {
@@ -171,7 +172,8 @@ class AccountInvoicePayLine(Model):
             'partner_id',
             string='Партнер',
             type='many2one',
-            relation='res.partner'
+            relation='res.partner',
+            store=True
         ),
     }
 

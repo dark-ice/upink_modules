@@ -1,6 +1,74 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <openerp>
     <data>
+        <menuitem id="menu_direction_report" parent="account.menu_finance_root" name="Финансовые отчеты" sequence="6"/>
+        <menuitem id="menu_direction_report_settings" parent="menu_direction_report" name="Настройки" sequence="99"/>
 
+        <record model="ir.ui.view" id="view_account_invoice_factor_tree">
+            <field name="name">Отметка о счете</field>
+            <field name="model">account.invoice.pay.line</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree editable="top">
+                    <field name="number" readonly="1"/>
+                    <field name="invoice_date" readonly="1"/>
+                    <field name="partner_id" string="Партнер" readonly="1"/>
+                    <field name="user_id" string="Автор" readonly="1"/>
+                    <field name="service_id" readonly="1"/>
+                    <field name="specialist_id" readonly="1"/>
+                    <field name="name_ye" readonly="1" />
+                    <field name="factor" string="Сумма для отчета"/>
+                    <field name="close" on_change="onchange_close(close)"/>
+                    <field name="close_date" attrs="{'readonly': [('close', '=', False)]}" />
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_invoice_factor_search">
+            <field name="name">Отметка о счете</field>
+            <field name="model">account.invoice.pay.line</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="number" />
+                    <field name="partner_id" string="Партнер"/>
+                    <field name="user_id" string="Автор"/>
+                    <field name="service_id" />
+                    <field name="specialist_id" />
+                    <field name="name_ye" />
+                    <field name="factor" string="Сумма для отчета"/>
+                    <field name="close" />
+                    <field name="close_date" />
+                    <newline />
+                    <filter icon="STOCK_MEDIA_PLAY"
+                            domain="[('close','=', True)]"
+                            name="active"
+                            string="Закрытые счета"/>
+                    <filter icon="STOCK_MEDIA_STOP"
+                            domain="[('close','=', False)]"
+                            name="deactive"
+                            string="Незакрытые счета"/>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Счет" icon="terp-partner" name="Number" context="{'group_by':' invoice_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Партнеру" icon="terp-partner" context="{'group_by': 'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="window_account_invoice_factor" model="ir.actions.act_window">
+            <field name="name">Отметка о счете</field>
+            <field name="res_model">account.invoice.pay.line</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_account_invoice_factor_tree"/>
+            <field name="search_view_id" ref="view_account_invoice_factor_search"/>
+            <field name="domain">[('service_id.direction', '=', 'PPC')]</field>
+        </record>
+
+        <menuitem action="window_account_invoice_factor" id="menu_daccount_invoice_factor" parent="menu_direction_report_settings" sequence="1"/>
     </data>
 </openerp>
