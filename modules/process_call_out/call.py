@@ -44,6 +44,21 @@ class ProcessCallOut(Model):
 
     _columns = {
         'state': fields.selection(STATES, 'статус', readonly=True),
+        'history_ids': fields.one2many(
+            'process.history',
+            'process_id',
+            'История',
+            domain=[('process_model', '=', _name)]),
+        'report_ids': fields.one2many(
+            'process.reports',
+            'process_id',
+            'Отчеты',
+            domain=[('process_model', '=', _name)]),
+        'message_ids': fields.one2many(
+            'process.messages',
+            'process_id',
+            'Переписка по проекту',
+            domain=[('process_model', '=', _name)]),
         'tz_filled_file_id': fields.many2one('ir.attachment', 'Заполненное ТЗ'),
         're_tz_commentary': fields.text('Комментарии по доработке'),
 
