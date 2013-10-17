@@ -52,7 +52,8 @@ class AccountInvoicePayLine(Model):
             _get_specialist,
             type='many2one',
             relation='res.users',
-            string='Аккаунт-менеджер'
+            string='Аккаунт-менеджер',
+            store=True
         ),
         'close': fields.boolean('Закрыт счет?'),
         'close_date': fields.date('Дата закрытия'),
@@ -60,7 +61,16 @@ class AccountInvoicePayLine(Model):
             'invoice_id',
             'date_invoice',
             type='date',
-            string='Дата выставления счета'
-        )
+            string='Дата выставления счета',
+            store=True,
+        ),
+        'paid_type': fields.selection(
+            (
+                ('cash', 'Оплата'),
+                ('pre', 'Предоплата'),
+                ('sur', 'Доплата'),
+                ('post', 'Пост оплата'),
+            ), 'Тип оплаты'
+        ),
     }
 AccountInvoicePayLine()

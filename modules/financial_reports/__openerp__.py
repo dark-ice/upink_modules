@@ -11,7 +11,7 @@
     """,
     'author': 'Andrey Karbanovich',
     'website': 'http://upsale.ru',
-    'depends': ['base', 'account'],
+    'depends': ['base', 'account', 'process_launch'],
     'data': [],
     'installable': True,
     'auto_install': False,

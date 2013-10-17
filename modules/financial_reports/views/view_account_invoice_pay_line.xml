@@ -10,6 +10,7 @@
             <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree editable="top">
+                    <field name="invoice_id" invisible="1"/>
                     <field name="number" readonly="1"/>
                     <field name="invoice_date" readonly="1"/>
                     <field name="partner_id" string="Партнер" readonly="1"/>
@@ -18,6 +19,7 @@
                     <field name="specialist_id" readonly="1"/>
                     <field name="name_ye" readonly="1" />
                     <field name="factor" string="Сумма для отчета"/>
+                    <field name="paid_type" />
                     <field name="close" on_change="onchange_close(close)"/>
                     <field name="close_date" attrs="{'readonly': [('close', '=', False)]}" />
                 </tree>
@@ -33,11 +35,11 @@
                     <field name="number" />
                     <field name="partner_id" string="Партнер"/>
                     <field name="user_id" string="Автор"/>
-                    <field name="service_id" />
+                    <field name="service_id" domain="[('direction', '=', 'PPC')]"/>
                     <field name="specialist_id" />
+                    <field name="paid_type" />
                     <field name="name_ye" />
                     <field name="factor" string="Сумма для отчета"/>
-                    <field name="close" />
                     <field name="close_date" />
                     <newline />
                     <filter icon="STOCK_MEDIA_PLAY"
@@ -50,9 +52,17 @@
                             string="Незакрытые счета"/>
                     <newline/>
                     <group expand="0" string="Группировать по...">
-                        <filter string="Счет" icon="terp-partner" name="Number" context="{'group_by':' invoice_id'}"/>
+                        <filter string="Счет" icon="terp-partner" context="{'group_by': 'invoice_id'}"/>
                         <separator orientation="vertical"/>
                         <filter string="Партнеру" icon="terp-partner" context="{'group_by': 'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Услуге" icon="terp-partner" context="{'group_by': 'service_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Дата выставления счета" icon="terp-partner" context="{'group_by': 'invoice_date'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Дата закрытия счета" icon="terp-partner" context="{'group_by': 'close_date'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Аккаунт-менеджер" icon="terp-partner" context="{'group_by': 'specialist_id'}"/>
                         <separator orientation="vertical"/>
                     </group>
                 </search>

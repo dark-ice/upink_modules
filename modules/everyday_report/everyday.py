@@ -164,7 +164,7 @@ class AccountInvoicePayLine(Model):
             digits=(12, 2),
             string="Сумма платежа в $",
             method=True,
-            store=False,
+            store=True,
             readonly=True
         ),
         'partner_id': fields.related(
