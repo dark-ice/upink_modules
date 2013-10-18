@@ -2,7 +2,7 @@
 
 {
     'name': 'CRM - Partner Update',
-    'version': '1.10',
+    'version': '1.11',
     'category': 'Customer Relationship Management',
     'author': 'Andrey Karbanovich [UpSale&Inksystem]',
     'complexity': "easy",
@@ -21,6 +21,7 @@ Res.Partner Update
         'security/ir.model.access.csv',
         'security/partner_security.xml',
         'wizard/quality_view.xml',
+        'wizard/service_view.xml',
         'partner_view.xml',
         'partner_individual_views.xml',
         'partner_eu_view.xml',
