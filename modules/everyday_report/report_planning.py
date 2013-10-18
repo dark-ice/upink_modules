@@ -204,7 +204,7 @@ class ReportPlanning(Model):
                         i.plan_paid_date,
                         sum(case when u.context_section_id=8 then i.total_ye else 0 end) plan_work_account,
                         sum(case when u.context_section_id=7 then i.total_ye else 0 end) plan_calling_account,
-                        sum(case when u.context_section_id=9 then i.total_ye else 0 end) plan_dev_account
+                        sum(case when u.context_section_id=9 or i.user_id=14 then i.total_ye else 0 end) plan_dev_account
                       FROM account_invoice i
                       LEFT JOIN res_users u on (u.id=i.user_id)
                       GROUP BY i.plan_paid_date
@@ -214,7 +214,7 @@ class ReportPlanning(Model):
                         ip.date_pay,
                         sum(case when u.context_section_id=8 then ipl.factor else 0 end) fact_work_part,
                         sum(case when u.context_section_id=7 then ipl.factor else 0 end) fact_calling_part,
-                        sum(case when u.context_section_id=9 then ipl.factor else 0 end) fact_dev_part
+                        sum(case when u.context_section_id=9 or i.user_id=14 then ipl.factor else 0 end) fact_dev_part
                       FROM
                         account_invoice_pay ip
                         LEFT JOIN account_invoice i on (i.id=ip.invoice_id)
