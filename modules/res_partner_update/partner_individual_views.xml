@@ -892,6 +892,14 @@
                                             </notebook>
                                         </form>
                                     </field>
+                                    <separator string="Сумма за отчетный период" colspan="4"/>
+                                    <field colspan="4" mode="tree" name="report_payment_ids" nolabel="1">
+                                        <tree string="Сумма за отчетный период">
+                                            <field name="partner_id" invisible="1"/>
+                                            <field name="period_id"/>
+                                            <field name="payment_sum"/>
+                                        </tree>
+                                    </field>
                                     <separator string="ЗДС" colspan="4"/>
                                     <field colspan="4" mode="tree" name="zds_ids" nolabel="1" context="{'partner_id': id}">
                                         <tree string="ЗДС" colors="orange:state=='confirm';green:state=='close';gray:state=='cancel';red:state=='proforma2'">
@@ -1465,6 +1473,14 @@
                                                 </page>
                                             </notebook>
                                         </form>
+                                    </field>
+                                    <separator string="Сумма за отчетный период" colspan="4"/>
+                                    <field colspan="4" mode="tree" name="report_payment_ids" nolabel="1">
+                                        <tree string="Сумма за отчетный период">
+                                            <field name="partner_id" invisible="1"/>
+                                            <field name="period_id"/>
+                                            <field name="payment_sum"/>
+                                        </tree>
                                     </field>
                                     <separator string="ЗДС" colspan="4"/>
                                     <field colspan="4" mode="tree" name="zds_ids" nolabel="1" context="{'partner_id': id}">

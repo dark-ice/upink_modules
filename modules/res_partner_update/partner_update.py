@@ -1,4 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
+from datetime import datetime
 from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
@@ -670,6 +671,24 @@ class res_partner(Model):
                 res[record.id] = False
         return res
 
+    def _get_report_payment(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        sum_list = {}
+        pay_pool = self.pool.get('account.invoice.pay')
+        for record in self.read(cr, uid, ids, ['invoice_ids']):
+            pay_ids = pay_pool.search(cr, 1, [('invoice_id', 'in', record['invoice_ids'])], order='date_pay')
+            for pay in pay_pool.read(cr, 1, pay_ids, ['total', 'date_pay', 'invoice_id']):
+                invoice = self.pool.get('account.invoice').read(cr, 1, pay['invoice_id'][0], ['rate'])
+                date = datetime.strptime(pay['date_pay'], "%Y-%m-%d")
+                period = self.pool.get('kpi.period').get_by_date(cr, date, calendar='rus')
+                try:
+                    sum_list[period.id] += pay['total'] / invoice['rate']
+                except KeyError:
+                    sum_list[period.id] = pay['total'] / invoice['rate']
+            res[record['id']] = [(0, 0, {'period_id': k, 'payment_sum': v}) for k, v in sum_list.iteritems()]
+
+        return res
+
     def _get_date(self, cr, uid, ids, name, arg, context=None):
         res = {}
         for record in self.perm_read(cr, uid, ids):
@@ -1031,6 +1050,15 @@ class res_partner(Model):
         ),
 
         'process_ids': fields.one2many('process.launch', 'partner_id', 'Процессы'),
+
+        'report_payment_ids': fields.function(
+            _get_report_payment,
+            type="one2many",
+            relation="invoice.reporting.period",
+            store=False,
+            readonly=True,
+            string=""
+        )
     }
 
     def _get_type(self, cr, uid, context=None):
@@ -1281,3 +1309,21 @@ class PartnerStatusHistory(Model):
         'partner_id': fields.many2one('res.partner', 'Партнер', invisible=True),
     }
 TransferHistory()
+
+
+class InvoiceReportingPeriod(Model):
+    _name = 'invoice.reporting.period'
+    _order = 'period_name desc'
+    _columns = {
+        'partner_id': fields.many2one('res.partner', 'Партнер'),
+        'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')]),
+        'payment_sum': fields.float('Сумма по всем платежам за данный период, $'),
+        'period_name': fields.related(
+            'period_id',
+            'name',
+            type='char',
+            size=7,
+            store=True
+        ),
+    }
+InvoiceReportingPeriod()
