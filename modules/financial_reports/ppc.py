@@ -2,7 +2,7 @@
 import calendar
 from datetime import date, datetime
 from openerp import tools
-from openerp.osv import fields
+from openerp.osv import fields, osv
 from openerp.osv.orm import Model
 
 
@@ -18,6 +18,34 @@ class PPCReport(Model):
     _name = 'financial.reports.ppc'
     _description = u'Финансовые отчеты - PPC'
 
+    def _check_access(self, cr, uid, ids, name, arg, context=None):
+        """
+            Динамически определяет роли на форме
+        """
+        res = {}
+        for record_id in ids:
+            access = str()
+
+            #  Руководитель PPC (Чуб Юля)
+            if uid == 96:
+                access += 'h'
+
+            #  Функциональный директор (Чабанов Кирилл)
+            if uid == 472:
+                access += 'd'
+
+            #  Финансист (Овчарова Таня)
+            if uid == 170:
+                access += 'f'
+
+            val = False
+            letter = name[6]
+            if letter in access or uid == 1:
+                val = True
+
+            res[record_id] = val
+        return res
+
     def get_lines(self, cr, date_start, date_end):
         pay_line_pool = self.pool.get('account.invoice.pay.line')
         domain = [
@@ -25,12 +53,29 @@ class PPCReport(Model):
             '|',
             ('close_date', '=', False),
             ('close_date', '>=', date_start),
+            ('partner_id', '!=', False),
+            ('invoice_id', '!=', False),
         ]
-        pay_line_ids = pay_line_pool.search(cr, 1, domain)
+        pay_line_ids = pay_line_pool.search(cr, 1, domain, order='partner_id, service_id, invoice_date')
         lines = []
+        # Итого
+        total_period = 0
+        balance_period = 0
+        profit_period = 0
+        costs_employee_period = 0
+        costs_period = 0
+        costs_partner_period = 0
+        rollovers_income = 0
+        rollovers_outcome = 0
+        count_partner = 0
+
         for record in pay_line_pool.read(cr, 1, pay_line_ids, []):
             google = False
             rate = 1
+            costs_partner = 0
+            costs_employee = 0
+            total = 0
+
             vals = {
                 'service_id': record['service_id'][0] if record['service_id'] else False,
                 'partner_id': record['partner_id'][0] if record['partner_id'] else False,
@@ -53,7 +98,7 @@ class PPCReport(Model):
                 'costs_employee': 0,
                 'profit': 0,
             }
-            if record['close_date'] < date_end:
+            if record['close'] and record['close_date'] < date_end:
                 vals['close_date'] = record['close_date']
 
             if record['partner_id']:
@@ -83,24 +128,56 @@ class PPCReport(Model):
                             vals['discount_up'] = discount['percent']
 
             if vals['discount_nds'] == 0:
-                vals['discount_nds'] = 1.18
+                vals['discount_nds'] = 18
             if record['invoice_id']:
                 invoice = self.pool.get('account.invoice').read(cr, 1, record['invoice_id'][0], ['rate'])
                 rate = invoice['rate']
 
             if record['service_id'][0] in (17, 21, 22, ):
                 # 30 - курс долара у Яндекса
-                vals['costs_partner'] = (1 - vals['discount_up'] / 100) * record['factor'] * rate / 30
+                costs_partner = (1 - vals['discount_up'] / 100) * record['factor'] * rate / 30
             elif record['service_id'][0] in (18, ):
                 if google:
-                    vals['costs_partner'] = (record['factor'] - 4500 / rate) / vals['discount_nds']
+                    costs_partner = (record['factor'] - 4500 / rate) / (1 + vals['discount_nds'] / 100)
                 else:
-                    vals['costs_partner'] = record['factor'] * (1 - vals['discount_up'] / 100) / vals['discount_nds']
+                    costs_partner = record['factor'] * (1 - vals['discount_up'] / 100) / (1 + vals['discount_nds'] / 100)
+            elif record['service_id'][0] in (23,):
+                costs_partner = record['factor'] * (1 - vals['discount_up'] / 100)
 
-            if vals['close_date'] == 'Не закрыт':
-                vals['carry_over_revenue'] = record['factor']
+            if record['specialist_id']:
+                source_date = datetime.strptime(record['invoice_date'], '%Y-%m-%d')
+                period = self.pool.get('kpi.period').get_by_date(cr, source_date)
+                kpi_ids = self.pool.get('kpi.kpi').search(cr, 1, [('period_id', '=', period.id), ('employee_id.user_id', '=', record['specialist_id'][0])])
+                if kpi_ids:
+                    kpi_total = self.pool.get('kpi.kpi')._get_cash(cr, 1, kpi_ids, 'total', None)
+                    total = kpi_total[kpi_ids[0]]['total']
+
+                specialist_pay_line_ids = pay_line_pool.search(
+                    cr,
+                    1,
+                    domain + [('specialist_id', '=', record['specialist_id'][0])],
+                    order='partner_id, service_id, invoice_date'
+                )
+                sum_pay = sum(p['factor'] for p in pay_line_pool.read(cr, 1, specialist_pay_line_ids, ['factor']))
+                try:
+                    costs_employee = total * record['factor'] / sum_pay
+                except ZeroDivisionError:
+                    costs_employee = 0
+
+            if date_end >= record['invoice_date'] >= date_start and record['close']:
+                vals['co_costs_partner'] = 0
+                vals['costs_partner'] = costs_partner
+                vals['co_costs_employee'] = 0
+                vals['costs_employee'] = costs_employee
             else:
-                pass
+                vals['co_costs_partner'] = costs_partner
+                vals['costs_partner'] = 0
+                vals['co_costs_employee'] = costs_employee
+                vals['costs_employee'] = 0
+                vals['carry_over_revenue'] = record['factor']
+                vals['total'] = 0
+
+            vals['profit'] = vals['carry_over_revenue'] + vals['total'] - vals['co_costs_partner'] - vals['costs_partner'] - vals['co_costs_employee'] - vals['costs_employee']
 
             lines.append((0, 0, vals))
 
@@ -108,6 +185,8 @@ class PPCReport(Model):
 
     def onchange_date(self, cr, uid, ids, date_start, date_end):
         if date_end and date_start:
+            if date_end < date_start:
+                raise osv.except_osv('PPC', 'Нельзя выбирать дату конца периода меньше чем дата начала периода')
             lines = self.get_lines(cr, date_start, date_end)
             return {'value': {'line_ids': lines}}
         else:
@@ -117,19 +196,31 @@ class PPCReport(Model):
         res = {}
 
         for data in self.read(cr, uid, ids, ['start_date', 'end_date'], context):
-            lines = self.get_lines(cr, data['start_date'], data['end_date'])
-            res[data['id']] = 0
+            res[data['id']] = self.get_lines(cr, data['start_date'], data['end_date'])
         return res
 
     _columns = {
-        'start_date': fields.date('С'),
-        'end_date': fields.date('По'),
-        'state': fields.selection(STATES, string='Статус'),
+        'start_date': fields.date(
+            'С',
+            readonly=True,
+            states={
+                'draft': [('readonly', False)]
+            }
+        ),
+        'end_date': fields.date(
+            'По',
+            readonly=True,
+            states={
+                'draft': [('readonly', False)]
+            }
+        ),
+        'state': fields.selection(STATES, string='Статус', readonly=True,),
 
         'history_ids': fields.one2many(
             'financial.history',
             'financial_id',
             'История',
+            readonly=True,
             domain=[('financial_model', '=', _name)],
             context={'financial_model': _name}),
 
@@ -141,6 +232,32 @@ class PPCReport(Model):
             method=True,
             store=False,
             readonly=True),
+        'check_h': fields.function(
+            _check_access,
+            method=True,
+            string='Проверка на руководителя PPC',
+            type='boolean',
+            invisible=True
+        ),
+        'check_d': fields.function(
+            _check_access,
+            method=True,
+            string='Проверка на функционального директора',
+            type='boolean',
+            invisible=True
+        ),
+        'check_f': fields.function(
+            _check_access,
+            method=True,
+            string='Проверка на финансиста',
+            type='boolean',
+            invisible=True
+        ),
+    }
+
+    _defaults = {
+        'state': 'draft',
+        'check_h': lambda s, c, u, cnt: u == 96 or u == 1,
     }
 PPCReport()
 
@@ -168,16 +285,16 @@ class PPCReportLine(Model):
         'total': fields.float('Сумма платежа $'),
         'close_date': fields.char('Дата ЗД', size=50),
 
-        'carry_over_revenue': fields.float('Переходящие доходы'),
+        'carry_over_revenue': fields.float('Переходящие доходы, $'),
 
-        'discount_up': fields.float('Скидка Up в аккаунте'),
-        'discount_partner': fields.float('Скидка Партнера'),
-        'discount_nds': fields.float('НДС'),
+        'discount_up': fields.float('Скидка Up в аккаунте, %'),
+        'discount_partner': fields.float('Скидка Партнера, %'),
+        'discount_nds': fields.float('НДС, %'),
 
-        'co_costs_partner': fields.float('Переходящие затраты на партнера'),
-        'costs_partner': fields.float('Затраты на Партнера'),
-        'co_costs_employee': fields.float('Переходящие затраты на персонал'),
-        'costs_employee': fields.float('Затраты на персонал'),
-        'profit': fields.float('Валовая прибыль'),
+        'co_costs_partner': fields.float('Переходящие затраты на партнера, $'),
+        'costs_partner': fields.float('Затраты на Партнера, $'),
+        'co_costs_employee': fields.float('Переходящие затраты на персонал, $'),
+        'costs_employee': fields.float('Затраты на персонал, $'),
+        'profit': fields.float('Валовая прибыль, $'),
     }
 PPCReportLine()

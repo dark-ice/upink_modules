@@ -1073,20 +1073,20 @@ class Kpi(Model):
 
     def _get_cash(self, cr, uid, ids, name, arg, context=None):
         res = {}
-        for record in self.browse(cr, uid, ids, context):
+        for record in self.read(cr, uid, ids, ['grade_cash', 'sv', 'days', 'work_days_1', 'total_mbo', 'without_mbo', 'night_work', 'cash_night', 'weekend_work', 'cash_weekend'], context):
             salary, variable, total = self._calculate_cash(
-                record.grade_cash,
-                record.sv,
-                record.days,
-                record.work_days_1 or 1,
-                record.total_mbo,
-                record.without_mbo,
-                record.night_work,
-                record.cash_night,
-                record.weekend_work,
-                record.cash_weekend
+                record['grade_cash'],
+                record['sv'],
+                record['days'],
+                record['work_days_1'] or 1,
+                record['total_mbo'],
+                record['without_mbo'],
+                record['night_work'],
+                record['cash_night'],
+                record['weekend_work'],
+                record['cash_weekend']
             )
-            res[record.id] = {
+            res[record['id']] = {
                 'salary': salary,
                 'variable': variable,
                 'total': total
