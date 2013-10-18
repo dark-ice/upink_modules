@@ -16,9 +16,27 @@ class PPCReport(Model):
     _name = 'financial.reports.ppc'
     _description = u'Финансовые отчеты - PPC'
 
+    def get_lines(self, cr, date_start, date_end):
+        pay_line_pool = self.pool.get('account.invoice.pay.line')
+        pay_line_ids = pay_line_pool.search(cr, 1, ['|', '&', ('invoice_date', '<', date_start), ('close_date', '>', date_end), '&', ('invoice_date', '>=', date_start), ('invoice_date', '<=', date_end), '|', ('close_date', '>=', date_start), ('close_date', '=', False), ('service_id.direction', '=', 'PPC')])
+        lines = []
+        for record in pay_line_pool.read(cr, 1, pay_line_ids, []):
+            lines.append((record['id'], record['service_id'][1], record['partner_id'][1]))
+
+        return lines
+
+    def onchange_date(self, cr, uid, ids, date_start, date_end):
+        if date_end and date_start:
+            lines = self.get_lines(cr, date_start, date_end)
+            return {'value': {}}
+        else:
+            return {'value': {}}
+
     def _line_ids(self, cr, uid, ids, name, arg, context=None):
         res = {}
-        for data in self.read(cr, uid, ids, ['service_id', 'partner_id'], context):
+
+        for data in self.read(cr, uid, ids, ['start_date', 'end_date'], context):
+            lines = self.get_lines(cr, data['start_date'], data['end_date'])
             #for record in self.pool.get('brief.main').read(cr, 1, brief_ids, ['rep_file_id']):
             #    attach.extend([(0, 0, {'name': i.name, 'file': i.file, 'object': 'process.launch', 'user_id': i.user_id.id})
             #                   for i in self.pool.get('attach.files').browse(cr, 1, record['rep_file_id'])])

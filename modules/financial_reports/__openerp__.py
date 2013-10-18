@@ -17,6 +17,7 @@
     'auto_install': False,
     'update_xml': [
         'views/view_account_invoice_pay_line.xml',
+        'views/ppc.xml',
     ],
     'js': [],
     'css': [],

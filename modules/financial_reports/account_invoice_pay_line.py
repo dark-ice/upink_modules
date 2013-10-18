@@ -32,7 +32,7 @@ class AccountInvoicePayLine(Model):
                     for launch in self.pool.get('process.launch').read(cr, 1, launch_ids, ['process_id', 'process_model']):
                         if launch['process_model'] and launch['process_id']:
                             process = self.pool.get(launch['process_model']).read(cr, 1, launch['process_id'], ['specialist_id'])
-                            if process['specialist_id']:
+                            if process.get('specialist_id'):
                                 res[record['id']] = process['specialist_id'][0]
         return res
 
