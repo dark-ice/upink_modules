@@ -9,6 +9,28 @@
                 <form>
                     <field name="start_date" on_change="onchange_date(start_date, end_date)"/>
                     <field name="end_date" on_change="onchange_date(start_date, end_date)"/>
+                    <field name="line_ids" readonly="1" nolabel="1" colspan="4">
+                        <tree string="Отчет">
+                            <field name="partner_id" />
+                            <field name="service_id" />
+                            <field name="invoice_id" />
+                            <field name="specialist_id" />
+                            <field name="paid_type" />
+                            <field name="pay_date" />
+                            <field name="total" />
+                            <field name="close_date" />
+                            <field name="carry_over_revenue" />
+                            <field name="discount_up" />
+                            <field name="discount_partner" />
+                            <field name="discount_nds" />
+                            <field name="co_costs_partner" />
+                            <field name="costs_partner" />
+                            <field name="co_costs_employee" />
+                            <field name="costs_employee" />
+                            <field name="profit" />
+                        </tree>
+                    </field>
+
                     <field name="state"/>
                 </form>
             </field>

@@ -1458,7 +1458,7 @@ class PartnerPpcDiscounts(Model):
         'create_uid': fields.many2one('res.users', 'Автор', readonly=True),
         'create_date': fields.datetime('Дата', readonly=True),
         'old_percent': fields.float('старое значение'),
-        'history_ids':fields.one2many('res.partner.ppc.discounts.history', 'discount_id', string='История')
+        'history_ids': fields.one2many('res.partner.ppc.discounts.history', 'discount_id', string='История')
     }
 
     _defaults = {
