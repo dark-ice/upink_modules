@@ -15,6 +15,7 @@
                         <field name="partner_id" invisible="1"/>
                         <field name="name" required="1" string="ФИО" on_change='insert_site_name(context)'/>
                         <field name="function" required="1" string="Должность"/>
+                        <field name="main_face"/>
                     </group>
                     <group colspan="4" col="4">
                         <separator string="Почтовый адрес" colspan="4"/>
@@ -69,8 +70,9 @@
             <field name="priority" eval="1"/>
             <field name="type">tree</field>
             <field name="arch" type="xml">
-                <tree>
+                <tree colors="blue:main_face">
                     <field name="name" required="1" string="ФИО"/>
+                    <field name="main_face" invisible="1"/>
                     <field name="function" required="1" string="Должность"/>
                     <field name="phones_all"/>
                     <field name="email_all" />
@@ -579,6 +581,7 @@
                         <field name="phone_s"/>
                         <field name="site_s"/>
                         <field name="email_s"/>
+                        <field name="full_name_s"/>
 
                         <field name="country"/>
                         <field name="user_id">
@@ -1731,6 +1734,7 @@
                         <field name="phone_s"/>
                         <field name="site_s"/>
                         <field name="email_s"/>
+                        <field name="full_name_s"/>
 
                         <field name="user_id">
                             <filter string="My Partners" icon="terp-personal+" domain="[('user_id','=',uid)]"/>

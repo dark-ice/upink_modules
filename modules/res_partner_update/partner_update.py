@@ -195,6 +195,7 @@ class res_partner_address(Model):
             fnct_search=_search_icq
         ),
         'icq_default': fields.related('icq_ids', 'name', type='char', size=128, string='ICQ'),
+        'main_face': fields.boolean('Главное контактное лицо')
     }
     _constraints = [
         (
@@ -227,6 +228,26 @@ class res_partner_address(Model):
                 else:
                     res.append((r['id'], addr or '/'))
         return res
+
+    def check_main(self, cr, select_id, partner_id):
+        main_ids = self.search(cr, 1, [('partner_id', '=', partner_id), ('main_face', '=', True), ('id', '!=', select_id)])
+        if main_ids:
+            self.write(cr, 1, main_ids, {'main_face': False})
+
+    def create(self, cr, user, vals, context=None):
+        new_id = super(res_partner_address, self).create(cr, user, vals)
+        if vals.get('main_face'):
+            self.check_main(cr, new_id, vals['partner_id'])
+        return new_id
+
+    def write(self, cr, user, ids, vals, context=None):
+        flag = super(res_partner_address, self).write(cr, user, ids, vals, context)
+        if flag and vals.get('main_face'):
+            for record in self.read(cr, user, ids, ['partner_id']):
+                self.check_main(cr, record['id'], record['partner_id'][0])
+        return flag
+
+
 res_partner_address()
 
 
@@ -753,6 +774,13 @@ class res_partner(Model):
             return [('id', 'in', partner_ids)]
         return [('id', '=', '0')]
 
+    def _search_full_name(self, cr, uid, obj, name, args, context=None):
+        rek_ids = self.pool.get('res.partner.bank').search(cr, uid, [('fullname', args[0][1], args[0][2])])
+        partner_ids = [b['partner_id'][0] for b in self.pool.get('res.partner.bank').read(cr, uid, rek_ids, ['partner_id']) if b['partner_id']]
+        if partner_ids:
+            return [('id', 'in', partner_ids)]
+        return [('id', '=', '0')]
+
     def name_get(self, cr, user, ids, context=None):
         if not ids:
             return []
@@ -774,6 +802,16 @@ class res_partner(Model):
         ids = self._search(cr, user, args, limit=limit, context=context, access_rights_uid=user)
         res = self.name_get(cr, user, ids, context)
         return res
+
+    # def _main_name(self, cr, uid, ids, field, arg, context):
+    #     res = {}
+    #     for i in self.browse(cr, 1, ids, context):
+    #         main = self.pool.get('res.partner.address').search(cr, 1, [('main_face', '=', True), ('id', '=', i.address[0].id)])
+    #         name = self.pool.get('res.partner.address').read(cr, uid, main, ['name'])
+    #         if name:
+    #             res[i.id] = name[0]['name']
+    #         return res
+
 
     _columns = {
         'name': fields.char('Партнер (основной сайт)', size=250),
@@ -932,6 +970,9 @@ class res_partner(Model):
         'partner_site_two': fields.related('address', 'partner_site', type='char', string='Сайт партнера(2)'),
 
         'partner_name': fields.related('address', 'name', type='char', string='Имя контакта'),
+        # TODO сделать вывод только главного контакта на главной
+        # 'partner_name': fields.function(_main_name, type="char", method=True, string='Имя контакта'),
+
         'circulation': fields.one2many('res.partner.circulation', 'partner_id', 'Оборот партнера в $'),
         'has_eshop': fields.selection(
             [
@@ -1033,7 +1074,14 @@ class res_partner(Model):
             type='char',
             fnct_search=_search_email
         ),
-
+        'full_name_s': fields.function(
+            lambda *a: [],
+            method=True,
+            string='Реквизиты партнера. ПОЛНОЕ НАИМЕНОВАНИЕ ПАРТНЁРА',
+            type='char',
+            size=250,
+            fnct_search=_search_full_name
+        ),
         'create_date': fields.datetime(
             'Дата создания',
             select=True,
