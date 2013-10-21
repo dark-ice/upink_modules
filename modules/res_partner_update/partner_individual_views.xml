@@ -905,6 +905,11 @@
                                             <field name="period_id"/>
                                             <field name="payment_sum"/>
                                         </tree>
+                                        <form string="Сумма за отчетный период">
+                                            <field name="partner_id" invisible="1"/>
+                                            <field name="period_id"/>
+                                            <field name="payment_sum"/>
+                                        </form>
                                     </field>
                                     <separator string="ЗДС" colspan="4"/>
                                     <field colspan="4" mode="tree" name="zds_ids" nolabel="1" context="{'partner_id': id}">
@@ -1496,6 +1501,11 @@
                                             <field name="period_id"/>
                                             <field name="payment_sum"/>
                                         </tree>
+                                        <form string="Сумма за отчетный период">
+                                            <field name="partner_id" invisible="1"/>
+                                            <field name="period_id"/>
+                                            <field name="payment_sum"/>
+                                        </form>
                                     </field>
                                     <separator string="ЗДС" colspan="4"/>
                                     <field colspan="4" mode="tree" name="zds_ids" nolabel="1" context="{'partner_id': id}">
