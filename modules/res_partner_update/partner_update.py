@@ -807,12 +807,22 @@ class res_partner(Model):
         res = {}
         for i in self.read(cr, 1, ids, ['address']):
             name = ''
+            phone = ''
+            site = ''
             address_ids = self.pool.get('res.partner.address').search(cr, 1, [('main_face', '=', True), ('id', 'in', i['address'])])
-            if address_ids:
-                address = self.pool.get('res.partner.address').read(cr, uid, address_ids[0], ['name'])
-                name = address['name']
-            res[i['id']] = name
 
+            if address_ids:
+                address = self.pool.get('res.partner.address').read(cr, uid, address_ids[0], ['name', 'phone_ids', 'site_ids'])
+                phone_name = self.pool.get('tel.reference').read(cr, uid, address['phone_ids'], ['phone'])
+                site_name = self.pool.get('res.partner.address.site').read(cr, uid, address['site_ids'], ['name'])
+                name = address['name']
+                phone = phone_name[0]['phone']
+                site = site_name[0]['name']
+            res[i['id']] = {
+                'partner_name': name,
+                'phone_default': phone,
+                'email_default': site
+            }
         return res
 
 
@@ -970,11 +980,12 @@ class res_partner(Model):
         'write_date': fields.datetime('Последняя дата контакта', readonly=True),
 
         'partner_site': fields.related('address', 'partner_site', type='char', string='Сайт партнера'),
+        # 'partner_site': fields.function(_main_name, type="char", method=True, string='Сайт партнера', multi='address'),
         'partner_site_two': fields.related('address', 'partner_site', type='char', string='Сайт партнера(2)'),
 
         # 'partner_name': fields.related('address', 'name', type='char', string='Имя контакта'),
         # TODO сделать вывод только главного контакта на главной
-        'partner_name': fields.function(_main_name, type="char", method=True, string='Имя контакта'),
+        'partner_name': fields.function(_main_name, type="char", method=True, string='Имя контакта', multi='address'),
 
         'circulation': fields.one2many('res.partner.circulation', 'partner_id', 'Оборот партнера в $'),
         'has_eshop': fields.selection(
@@ -986,9 +997,10 @@ class res_partner(Model):
 
 
         'partner_site_default': fields.related('address', 'site_ids', 'name', type='char', string='Сайт партнера'),
-        'phone_default': fields.related('address', 'phone_ids', 'phone', type='char', size=128, string='Телефон'),
-        'email_default': fields.related('address', 'email_ids', 'name', type='char', size=128, string='Эл. почта'),
-
+        # 'phone_default': fields.related('address', 'phone_ids', 'phone', type='char', size=128, string='Телефон'),
+        'phone_default': fields.function(_main_name, type="char", method=True, string='Телефон', multi='address'),
+        # 'email_default': fields.related('address', 'email_ids', 'name', type='char', size=128, string='Эл. почта'),
+        'email_default': fields.function(_main_name, type="char", method=True, string='Эл. почта', multi='address'),
 
         'last_circulation': fields.function(_last_circulation, type="float", method=True),
         'fin_dog': fields.selection(
@@ -1080,7 +1092,7 @@ class res_partner(Model):
         'full_name_s': fields.function(
             lambda *a: [],
             method=True,
-            string='Реквизиты партнера. ПОЛНОЕ НАИМЕНОВАНИЕ ПАРТНЁРА',
+            string='Полное наименование партнера',
             type='char',
             size=250,
             fnct_search=_search_full_name
@@ -1368,7 +1380,7 @@ class InvoiceReportingPeriod(Model):
     _columns = {
         'partner_id': fields.many2one('res.partner', 'Партнер'),
         'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')]),
-        'payment_sum': fields.float('Сумма по всем платежам за данный период, $'),
+        'payment_sum': fields.float('Сумма платежей, $'),
         'period_name': fields.related(
             'period_id',
             'name',

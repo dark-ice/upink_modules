@@ -581,12 +581,14 @@
                         <field name="phone_s"/>
                         <field name="site_s"/>
                         <field name="email_s"/>
-                        <field name="full_name_s"/>
+
 
                         <field name="country"/>
                         <field name="user_id">
                             <filter string="My Partners" icon="terp-personal+" domain="[('user_id','=',uid)]"/>
                         </field>
+                        <newline/>
+                        <field name="full_name_s"/>
                     </group>
                     <newline/>
                     <group expand="0" string="Group By...">
@@ -1734,11 +1736,14 @@
                         <field name="phone_s"/>
                         <field name="site_s"/>
                         <field name="email_s"/>
-                        <field name="full_name_s"/>
+
 
                         <field name="user_id">
                             <filter string="My Partners" icon="terp-personal+" domain="[('user_id','=',uid)]"/>
                         </field>
+                        <newline/>
+
+                        <field name="full_name_s"/>
                     </group>
                     <newline/>
                     <group expand="0" string="Group By...">
