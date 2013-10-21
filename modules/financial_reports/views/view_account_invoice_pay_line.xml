@@ -70,7 +70,7 @@
         </record>
 
         <record id="window_account_invoice_factor" model="ir.actions.act_window">
-            <field name="name">Отметка о счете</field>
+            <field name="name">Отметка о счете PPC</field>
             <field name="res_model">account.invoice.pay.line</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>

@@ -55,6 +55,7 @@ class PPCReport(Model):
             ('close_date', '>=', date_start),
             ('partner_id', '!=', False),
             ('invoice_id', '!=', False),
+            ('specialist_id', '!=', False)
         ]
         pay_line_ids = pay_line_pool.search(cr, 1, domain, order='partner_id, service_id, invoice_date')
         lines = []
@@ -67,7 +68,13 @@ class PPCReport(Model):
         costs_partner_period = 0
         rollovers_income = 0
         rollovers_outcome = 0
-        count_partner = 0
+        partners = set()
+
+        costs_employee_period_tax = 0
+        costs_employee_period_tax_ye = 0
+        costs_tax_period = 0
+        costs_tx_period_ye = 0
+        employeers = set()
 
         for record in pay_line_pool.read(cr, 1, pay_line_ids, []):
             google = False
@@ -98,7 +105,7 @@ class PPCReport(Model):
                 'costs_employee': 0,
                 'profit': 0,
             }
-            if record['close'] and record['close_date'] < date_end:
+            if record['close'] and record['close_date'] <= date_end:
                 vals['close_date'] = record['close_date']
 
             if record['partner_id']:
@@ -152,6 +159,16 @@ class PPCReport(Model):
                     kpi_total = self.pool.get('kpi.kpi')._get_cash(cr, 1, kpi_ids, 'total', None)
                     total = kpi_total[kpi_ids[0]]['total']
 
+                    if record['specialist_id'][0] not in employeers:
+                        employeers.add(record['specialist_id'][0])
+                        kpi_elements = self.pool.get('kpi.kpi')._get_employee_items(cr, 1, kpi_ids, 'formal_tax', None)
+                        tax = kpi_elements[kpi_ids[0]]
+                        costs_employee_period_tax += total - tax
+                        costs_employee_period_tax_ye += costs_employee_period_tax / 8.0
+                        costs_tax_period += tax
+                        costs_tx_period_ye += tax / 8.0
+
+
                 specialist_pay_line_ids = pay_line_pool.search(
                     cr,
                     1,
@@ -164,11 +181,15 @@ class PPCReport(Model):
                 except ZeroDivisionError:
                     costs_employee = 0
 
-            if date_end >= record['invoice_date'] >= date_start and record['close']:
+            if date_end >= record['invoice_date'] >= date_start and record['close_date'] != 'Не закрыт':
                 vals['co_costs_partner'] = 0
                 vals['costs_partner'] = costs_partner
                 vals['co_costs_employee'] = 0
                 vals['costs_employee'] = costs_employee
+
+                total_period += record['factor']
+                costs_employee_period += costs_employee
+
             else:
                 vals['co_costs_partner'] = costs_partner
                 vals['costs_partner'] = 0
@@ -177,18 +198,45 @@ class PPCReport(Model):
                 vals['carry_over_revenue'] = record['factor']
                 vals['total'] = 0
 
-            vals['profit'] = vals['carry_over_revenue'] + vals['total'] - vals['co_costs_partner'] - vals['costs_partner'] - vals['co_costs_employee'] - vals['costs_employee']
+            if date_end >= record['invoice_date'] >= date_start:
+                partners.add(record['partner_id'][0])
+
+            if date_end >= record['close_date'] >= date_start:
+                costs_partner_period += vals['co_costs_partner'] + vals['costs_partner']
+                vals['profit'] = vals['carry_over_revenue'] + vals['total'] - vals['co_costs_partner'] - vals['costs_partner'] - vals['co_costs_employee'] - vals['costs_employee']
+                profit_period += vals['profit']
+            elif record['close_date'] == 'Не закрыт':
+                rollovers_income += vals['carry_over_revenue'] + vals['total']
+                rollovers_outcome += vals['co_costs_partner'] + vals['costs_partner']
 
             lines.append((0, 0, vals))
 
-        return lines
+        costs_period = costs_employee_period + costs_partner_period
+        balance_period = total_period - costs_period
+
+        return lines, total_period, balance_period, profit_period, costs_employee_period, costs_period, costs_partner_period, rollovers_income, rollovers_outcome, len(partners), costs_employee_period_tax, costs_employee_period_tax_ye, costs_tax_period, costs_tx_period_ye
 
     def onchange_date(self, cr, uid, ids, date_start, date_end):
         if date_end and date_start:
             if date_end < date_start:
                 raise osv.except_osv('PPC', 'Нельзя выбирать дату конца периода меньше чем дата начала периода')
-            lines = self.get_lines(cr, date_start, date_end)
-            return {'value': {'line_ids': lines}}
+            lines, total_period, balance_period, profit_period, costs_employee_period, costs_period, costs_partner_period, rollovers_income, rollovers_outcome, partners, costs_employee_period_tax, costs_employee_period_tax_ye, costs_tax_period, costs_tx_period_ye = self.get_lines(cr, date_start, date_end)
+            return {'value': {
+                'line_ids': lines,
+                'total_period': total_period,
+                'balance_period': balance_period,
+                'profit_period': profit_period,
+                'costs_employee_period': costs_employee_period,
+                'costs_period': costs_period,
+                'costs_partner_period': costs_partner_period,
+                'rollovers_income': rollovers_income,
+                'rollovers_outcome': rollovers_outcome,
+                'count_partners': partners,
+                'costs_employee_period_tax': costs_employee_period_tax,
+                'costs_employee_period_tax_ye': costs_employee_period_tax_ye,
+                'costs_tax_period': costs_tax_period,
+                'costs_tx_period_ye': costs_tx_period_ye
+            }}
         else:
             return {'value': {}}
 
@@ -196,7 +244,23 @@ class PPCReport(Model):
         res = {}
 
         for data in self.read(cr, uid, ids, ['start_date', 'end_date'], context):
-            res[data['id']] = self.get_lines(cr, data['start_date'], data['end_date'])
+            lines, total_period, balance_period, profit_period, costs_employee_period, costs_period, costs_partner_period, rollovers_income, rollovers_outcome, partners, costs_employee_period_tax, costs_employee_period_tax_ye, costs_tax_period, costs_tx_period_ye = self.get_lines(cr, data['start_date'], data['end_date'])
+            res[data['id']] = {
+                'line_ids': lines,
+                'total_period': total_period,
+                'balance_period': balance_period,
+                'profit_period': profit_period,
+                'costs_employee_period': costs_employee_period,
+                'costs_period': costs_period,
+                'costs_partner_period': costs_partner_period,
+                'rollovers_income': rollovers_income,
+                'rollovers_outcome': rollovers_outcome,
+                'count_partners': partners,
+                'costs_employee_period_tax': costs_employee_period_tax,
+                'costs_employee_period_tax_ye': costs_employee_period_tax_ye,
+                'costs_tax_period': costs_tax_period,
+                'costs_tx_period_ye': costs_tx_period_ye
+            }
         return res
 
     _columns = {
@@ -231,7 +295,138 @@ class PPCReport(Model):
             string='Линии отчета',
             method=True,
             store=False,
+            multi='report',
             readonly=True),
+
+        'total_period': fields.function(
+            _line_ids,
+            type='float',
+            string='Доход за период',
+            method=True,
+            store=False,
+            multi='report',
+            readonly=True
+        ),
+
+        'balance_period': fields.function(
+            _line_ids,
+            type='float',
+            string='Остаток денежного потока',
+            method=True,
+            store=False,
+            multi='report',
+            readonly=True
+        ),
+
+        'profit_period': fields.function(
+            _line_ids,
+            type='float',
+            string='Валовая прибыль',
+            method=True,
+            store=False,
+            multi='report',
+            readonly=True
+        ),
+
+        'costs_employee_period': fields.function(
+            _line_ids,
+            type='float',
+            string='Расходы на ЗП',
+            method=True,
+            store=False,
+            multi='report',
+            readonly=True
+        ),
+        'costs_period': fields.function(
+            _line_ids,
+            type='float',
+            string='Расход за период',
+            method=True,
+            store=False,
+            multi='report',
+            readonly=True
+        ),
+
+        'costs_partner_period': fields.function(
+            _line_ids,
+            type='float',
+            string='Расходы на Партнера за период',
+            method=True,
+            store=False,
+            multi='report',
+            readonly=True
+        ),
+
+        'rollovers_income': fields.function(
+            _line_ids,
+            type='float',
+            string='Переходящие доходы',
+            method=True,
+            store=False,
+            multi='report',
+            readonly=True
+        ),
+
+        'rollovers_outcome': fields.function(
+            _line_ids,
+            type='float',
+            string='Переходящие расходы',
+            method=True,
+            store=False,
+            multi='report',
+            readonly=True
+        ),
+
+        'count_partners': fields.function(
+            _line_ids,
+            type='integer',
+            string='Всего партнеров шт.',
+            method=True,
+            store=False,
+            multi='report',
+            readonly=True
+        ),
+
+        'costs_employee_period_tax': fields.function(
+            _line_ids,
+            type='integer',
+            string='Зарплата',
+            method=True,
+            store=False,
+            multi='report',
+            readonly=True
+        ),
+
+        'costs_employee_period_tax_ye': fields.function(
+            _line_ids,
+            type='integer',
+            string='Зарплата, $',
+            method=True,
+            store=False,
+            multi='report',
+            readonly=True
+        ),
+
+        'costs_tax_period': fields.function(
+            _line_ids,
+            type='integer',
+            string='Налоги',
+            method=True,
+            store=False,
+            multi='report',
+            readonly=True
+        ),
+
+        'costs_tx_period_ye': fields.function(
+            _line_ids,
+            type='integer',
+            string='Налоги, $',
+            method=True,
+            store=False,
+            multi='report',
+            readonly=True
+        ),
+
         'check_h': fields.function(
             _check_access,
             method=True,
