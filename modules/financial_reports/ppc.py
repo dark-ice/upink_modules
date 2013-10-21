@@ -164,10 +164,9 @@ class PPCReport(Model):
                         kpi_elements = self.pool.get('kpi.kpi')._get_employee_items(cr, 1, kpi_ids, 'formal_tax', None)
                         tax = kpi_elements[kpi_ids[0]]
                         costs_employee_period_tax += total - tax
-                        costs_employee_period_tax_ye += costs_employee_period_tax / 8.0
+                        costs_employee_period_tax_ye += (total - tax) / 8.0
                         costs_tax_period += tax
                         costs_tx_period_ye += tax / 8.0
-
 
                 specialist_pay_line_ids = pay_line_pool.search(
                     cr,
@@ -186,8 +185,6 @@ class PPCReport(Model):
                 vals['costs_partner'] = costs_partner
                 vals['co_costs_employee'] = 0
                 vals['costs_employee'] = costs_employee
-
-                total_period += record['factor']
                 costs_employee_period += costs_employee
 
             else:
@@ -200,6 +197,7 @@ class PPCReport(Model):
 
             if date_end >= record['invoice_date'] >= date_start:
                 partners.add(record['partner_id'][0])
+                total_period += vals['total']
 
             if date_end >= record['close_date'] >= date_start:
                 costs_partner_period += vals['co_costs_partner'] + vals['costs_partner']
