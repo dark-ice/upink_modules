@@ -939,11 +939,15 @@ class res_partner(Model):
 
             if address_ids:
                 address = self.pool.get('res.partner.address').read(cr, uid, address_ids[0], ['name', 'phone_ids', 'site_ids'])
-                phone_name = self.pool.get('tel.reference').read(cr, uid, address['phone_ids'], ['phone'])
-                site_name = self.pool.get('res.partner.address.site').read(cr, uid, address['site_ids'], ['name'])
+
                 name = address['name']
-                phone = phone_name[0]['phone']
-                site = site_name[0]['name']
+                if address['site_ids']:
+                    site_name = self.pool.get('res.partner.address.site').read(cr, uid, address['site_ids'][0], ['name'])
+                    site = site_name['name']
+                if address['phone_ids']:
+                    phone_name = self.pool.get('tel.reference').read(cr, uid, address['phone_ids'][0], ['phone'])
+                    phone = phone_name['phone']
+
             res[i['id']] = {
                 'partner_name': name,
                 'phone_default': phone,
