@@ -315,7 +315,7 @@ class partner_added_services(Model):
                     if len(pay_ids) > 1:
                         pre_last_pay = self.pool.get('account.invoice.pay.line').read(cr, 1, pay_ids[-2], ['pay_date'])
 
-                    if pre_last_pay is not None and datetime.strptime(pre_last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=90) < datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC):
+                    if pre_last_pay is not None and pre_last_pay.get('pay_date') and datetime.strptime(pre_last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=90) < datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC):
                         val = 'Возврат'
 
                     if datetime.strptime(first_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=30) < datetime.now(pytz.UTC):
@@ -1246,7 +1246,7 @@ class res_partner(Model):
         ),
 
         'process_ids': fields.one2many('process.launch', 'partner_id', 'Процессы'),
-        'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством')
+        'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством'),
 
         'report_payment_ids': fields.function(
             _get_report_payment,
@@ -1600,7 +1600,7 @@ class PartnerQualityCriteria(Model):
         'comment': fields.text('Комментарий'),
         'quality_id': fields.many2one('res.partner.quality.control', 'Управление качеством'),
     }
-PartnerQualityCriteria()TransferHistory()
+PartnerQualityCriteria()
 
 
 class InvoiceReportingPeriod(Model):

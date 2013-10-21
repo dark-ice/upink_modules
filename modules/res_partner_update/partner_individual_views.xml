@@ -2,14 +2,14 @@
 <openerp>
     <data>
         <!-- Контакты -->
-        <record model="ir.ui.view" id="view_partner_address_form1">
+        <record model="ir.ui.view" id="view_partner_address_form1" >
             <field name="name">res.partner.address.form1</field>
             <field name="model">res.partner.address</field>
             <field name="priority" eval="1"/>
             <field name="type">form</field>
             <field name="arch" type="xml">
 
-                <form>
+                <form string="Контакты">
                     <group colspan="4" col="4">
                         <!--<field name="default_site" invisible="1"/>-->
                         <field name="partner_id" invisible="1"/>
