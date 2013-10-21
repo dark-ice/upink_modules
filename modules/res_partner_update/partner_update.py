@@ -348,12 +348,38 @@ class partner_added_services(Model):
             size=200,
         ),
         'history_id': fields.integer(),
-        'history_ids': fields.one2many('partner.added.services.history', 'history_service_id', 'ids истории')
+        'history_ids': fields.one2many('partner.added.services.history', 'history_service_id', 'ids истории'),
+
+        'date_start_from': fields.date('Дата начала с'),
+        'date_start_to': fields.date('Дата начала по'),
+        'date_finish_from': fields.date('Дата окончания с'),
+        'date_finish_to': fields.date('Дата окончания по'),
     }
 
     _defaults = {
         'partner_base': lambda s, cr, u, cnt: cnt.get('partner_base')
     }
+
+    def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=None):
+        date_st_to = None
+        date_fn_to = None
+        date_st_from = None
+        date_fn_from = None
+        date_indx = []
+
+        for indx, item in enumerate(args):
+            if 'date_start_from' == item[0]:
+                date_st_from = item[2]
+                date_indx.append(indx)
+            if 'date_start_to' == item[0]:
+                date_st_to = item[2]
+                date_indx.append(indx)
+            if 'date_finish_to' == item[0]:
+                date_fn_to = item[2]
+                date_indx.append(indx)
+            if 'date_finish_from' == item[0]:
+                date_fn_from = item[2]
+                date_indx.append(indx)
 
 
 partner_added_services()
