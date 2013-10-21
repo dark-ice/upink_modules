@@ -2,19 +2,20 @@
 <openerp>
     <data>
         <!-- Контакты -->
-        <record model="ir.ui.view" id="view_partner_address_form1">
+        <record model="ir.ui.view" id="view_partner_address_form1" >
             <field name="name">res.partner.address.form1</field>
             <field name="model">res.partner.address</field>
             <field name="priority" eval="1"/>
             <field name="type">form</field>
             <field name="arch" type="xml">
 
-                <form>
+                <form string="Контакты">
                     <group colspan="4" col="4">
                         <!--<field name="default_site" invisible="1"/>-->
                         <field name="partner_id" invisible="1"/>
                         <field name="name" required="1" string="ФИО" on_change='insert_site_name(context)'/>
                         <field name="function" required="1" string="Должность"/>
+                        <field name="main_face"/>
                     </group>
                     <group colspan="4" col="4">
                         <separator string="Почтовый адрес" colspan="4"/>
@@ -69,8 +70,9 @@
             <field name="priority" eval="1"/>
             <field name="type">tree</field>
             <field name="arch" type="xml">
-                <tree>
+                <tree colors="blue:main_face">
                     <field name="name" required="1" string="ФИО"/>
+                    <field name="main_face" invisible="1"/>
                     <field name="function" required="1" string="Должность"/>
                     <field name="phones_all"/>
                     <field name="email_all" />
@@ -580,11 +582,14 @@
                         <field name="site_s"/>
                         <field name="email_s"/>
 
+
                         <field name="country"/>
                         <field name="user_id">
                             <filter string="My Partners" icon="terp-personal+" domain="[('user_id','=',uid)]"/>
                         </field>
                         <field name="partner_status" />
+                        <newline/>
+                        <field name="full_name_s"/>
                     </group>
                     <newline/>
                     <group expand="0" string="Group By...">
@@ -893,6 +898,19 @@
                                             </notebook>
                                         </form>
                                     </field>
+                                    <separator string="Сумма за отчетный период" colspan="4"/>
+                                    <field colspan="4" mode="tree" name="report_payment_ids" nolabel="1">
+                                        <tree string="Сумма за отчетный период">
+                                            <field name="partner_id" invisible="1"/>
+                                            <field name="period_id"/>
+                                            <field name="payment_sum"/>
+                                        </tree>
+                                        <form string="Сумма за отчетный период">
+                                            <field name="partner_id" invisible="1"/>
+                                            <field name="period_id"/>
+                                            <field name="payment_sum"/>
+                                        </form>
+                                    </field>
                                     <separator string="ЗДС" colspan="4"/>
                                     <field colspan="4" mode="tree" name="zds_ids" nolabel="1" context="{'partner_id': id}">
                                         <tree string="ЗДС" colors="orange:state=='confirm';green:state=='close';gray:state=='cancel';red:state=='proforma2'">
@@ -1198,6 +1216,7 @@
                 <form>
                     <group col="4" colspan="4">
                         <field name="section_id" invisible="1"/>
+                        <field name="check" invisible="1"/>
                         <field name="id" invisible="1"/>
                         <group colspan="4" col="8">
                             <field name="name" string="Кандидат (основной сайт)"/>
@@ -1220,6 +1239,8 @@
                             <newline />
                             <field name="ur_name" colspan="8"/>
                             <button name="to_partner" type="object" string="Создать партнера" icon="gtk-ok" />
+                            <newline />
+                            <field name="active" attrs="{'invisible': [('check', '=', False)]}" />
                         </group>
                         <notebook colspan="4">
                             <page string="Контакты">
@@ -1471,6 +1492,19 @@
                                                     </field>
                                                 </page>
                                             </notebook>
+                                        </form>
+                                    </field>
+                                    <separator string="Сумма за отчетный период" colspan="4"/>
+                                    <field colspan="4" mode="tree" name="report_payment_ids" nolabel="1">
+                                        <tree string="Сумма за отчетный период">
+                                            <field name="partner_id" invisible="1"/>
+                                            <field name="period_id"/>
+                                            <field name="payment_sum"/>
+                                        </tree>
+                                        <form string="Сумма за отчетный период">
+                                            <field name="partner_id" invisible="1"/>
+                                            <field name="period_id"/>
+                                            <field name="payment_sum"/>
                                         </form>
                                     </field>
                                     <separator string="ЗДС" colspan="4"/>
@@ -1726,6 +1760,9 @@
                         <field name="user_id">
                             <filter string="My Partners" icon="terp-personal+" domain="[('user_id','=',uid)]"/>
                         </field>
+                        <newline/>
+
+                        <field name="full_name_s"/>
                     </group>
                     <newline/>
                     <group expand="0" string="Group By...">

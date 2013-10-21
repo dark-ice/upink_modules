@@ -218,6 +218,7 @@ class res_partner_address(Model):
             fnct_search=_search_icq
         ),
         'icq_default': fields.related('icq_ids', 'name', type='char', size=128, string='ICQ'),
+        'main_face': fields.boolean('Главное контактное лицо')
     }
     _constraints = [
         (
@@ -250,6 +251,26 @@ class res_partner_address(Model):
                 else:
                     res.append((r['id'], addr or '/'))
         return res
+
+    def check_main(self, cr, select_id, partner_id):
+        main_ids = self.search(cr, 1, [('partner_id', '=', partner_id), ('main_face', '=', True), ('id', '!=', select_id)])
+        if main_ids:
+            self.write(cr, 1, main_ids, {'main_face': False})
+
+    def create(self, cr, user, vals, context=None):
+        new_id = super(res_partner_address, self).create(cr, user, vals)
+        if vals.get('main_face'):
+            self.check_main(cr, new_id, vals['partner_id'])
+        return new_id
+
+    def write(self, cr, user, ids, vals, context=None):
+        flag = super(res_partner_address, self).write(cr, user, ids, vals, context)
+        if flag and vals.get('main_face'):
+            for record in self.read(cr, user, ids, ['partner_id']):
+                self.check_main(cr, record['id'], record['partner_id'][0])
+        return flag
+
+
 res_partner_address()
 
 
@@ -294,7 +315,7 @@ class partner_added_services(Model):
                     if len(pay_ids) > 1:
                         pre_last_pay = self.pool.get('account.invoice.pay.line').read(cr, 1, pay_ids[-2], ['pay_date'])
 
-                    if pre_last_pay is not None and datetime.strptime(pre_last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=90) < datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC):
+                    if pre_last_pay is not None and pre_last_pay.get('pay_date') and datetime.strptime(pre_last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=90) < datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC):
                         val = 'Возврат'
 
                     if datetime.strptime(first_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=30) < datetime.now(pytz.UTC):
@@ -742,6 +763,24 @@ class res_partner(Model):
                 res[record.id] = False
         return res
 
+    def _get_report_payment(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        sum_list = {}
+        pay_pool = self.pool.get('account.invoice.pay')
+        for record in self.read(cr, uid, ids, ['invoice_ids']):
+            pay_ids = pay_pool.search(cr, 1, [('invoice_id', 'in', record['invoice_ids'])], order='date_pay')
+            for pay in pay_pool.read(cr, 1, pay_ids, ['total', 'date_pay', 'invoice_id']):
+                invoice = self.pool.get('account.invoice').read(cr, 1, pay['invoice_id'][0], ['rate'])
+                date = datetime.strptime(pay['date_pay'], "%Y-%m-%d")
+                period = self.pool.get('kpi.period').get_by_date(cr, date, calendar='rus')
+                try:
+                    sum_list[period.id] += pay['total'] / invoice['rate']
+                except KeyError:
+                    sum_list[period.id] = pay['total'] / invoice['rate']
+            res[record['id']] = [(0, 0, {'period_id': k, 'payment_sum': v}) for k, v in sum_list.iteritems()]
+
+        return res
+
     def _get_date(self, cr, uid, ids, name, arg, context=None):
         res = {}
         for record in self.perm_read(cr, uid, ids):
@@ -802,6 +841,13 @@ class res_partner(Model):
                                                           [('address', 'in', address_ids), '|', ('active', '=', False),
                                                            ('active', '!=', False)], context=context)
 
+        if partner_ids:
+            return [('id', 'in', partner_ids)]
+        return [('id', '=', '0')]
+
+    def _search_full_name(self, cr, uid, obj, name, args, context=None):
+        rek_ids = self.pool.get('res.partner.bank').search(cr, uid, [('fullname', args[0][1], args[0][2])])
+        partner_ids = [b['partner_id'][0] for b in self.pool.get('res.partner.bank').read(cr, uid, rek_ids, ['partner_id']) if b['partner_id']]
         if partner_ids:
             return [('id', 'in', partner_ids)]
         return [('id', '=', '0')]
@@ -882,6 +928,29 @@ class res_partner(Model):
         if ids:
             return [('id', 'in', tuple(ids))]
         return [('id', '=', '0')]
+
+    def _main_name(self, cr, uid, ids, field, arg, context):
+        res = {}
+        for i in self.read(cr, 1, ids, ['address']):
+            name = ''
+            phone = ''
+            site = ''
+            address_ids = self.pool.get('res.partner.address').search(cr, 1, [('main_face', '=', True), ('id', 'in', i['address'])])
+
+            if address_ids:
+                address = self.pool.get('res.partner.address').read(cr, uid, address_ids[0], ['name', 'phone_ids', 'site_ids'])
+                phone_name = self.pool.get('tel.reference').read(cr, uid, address['phone_ids'], ['phone'])
+                site_name = self.pool.get('res.partner.address.site').read(cr, uid, address['site_ids'], ['name'])
+                name = address['name']
+                phone = phone_name[0]['phone']
+                site = site_name[0]['name']
+            res[i['id']] = {
+                'partner_name': name,
+                'phone_default': phone,
+                'email_default': site
+            }
+        return res
+
 
     _columns = {
         'name': fields.char('Партнер (основной сайт)', size=250),
@@ -1047,7 +1116,10 @@ class res_partner(Model):
         'partner_site': fields.related('address', 'partner_site', type='char', string='Сайт партнера'),
         'partner_site_two': fields.related('address', 'partner_site', type='char', string='Сайт партнера(2)'),
 
-        'partner_name': fields.related('address', 'name', type='char', string='Имя контакта'),
+        # 'partner_name': fields.related('address', 'name', type='char', string='Имя контакта'),
+        # TODO сделать вывод только главного контакта на главной
+        'partner_name': fields.function(_main_name, type="char", method=True, string='Имя контакта', multi='address'),
+
         'circulation': fields.one2many('res.partner.circulation', 'partner_id', 'Оборот партнера в $'),
         'has_eshop': fields.selection(
             [
@@ -1058,9 +1130,10 @@ class res_partner(Model):
 
 
         'partner_site_default': fields.related('address', 'site_ids', 'name', type='char', string='Сайт партнера'),
-        'phone_default': fields.related('address', 'phone_ids', 'phone', type='char', size=128, string='Телефон'),
-        'email_default': fields.related('address', 'email_ids', 'name', type='char', size=128, string='Эл. почта'),
-
+        # 'phone_default': fields.related('address', 'phone_ids', 'phone', type='char', size=128, string='Телефон'),
+        'phone_default': fields.function(_main_name, type="char", method=True, string='Телефон', multi='address'),
+        # 'email_default': fields.related('address', 'email_ids', 'name', type='char', size=128, string='Эл. почта'),
+        'email_default': fields.function(_main_name, type="char", method=True, string='Эл. почта', multi='address'),
 
         'last_circulation': fields.function(_last_circulation, type="float", method=True),
         'fin_dog': fields.selection(
@@ -1149,7 +1222,14 @@ class res_partner(Model):
             type='char',
             fnct_search=_search_email
         ),
-
+        'full_name_s': fields.function(
+            lambda *a: [],
+            method=True,
+            string='Полное наименование партнера',
+            type='char',
+            size=250,
+            fnct_search=_search_full_name
+        ),
         'create_date': fields.datetime(
             'Дата создания',
             select=True,
@@ -1166,7 +1246,16 @@ class res_partner(Model):
         ),
 
         'process_ids': fields.one2many('process.launch', 'partner_id', 'Процессы'),
-        'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством')
+        'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством'),
+
+        'report_payment_ids': fields.function(
+            _get_report_payment,
+            type="one2many",
+            relation="invoice.reporting.period",
+            store=False,
+            readonly=True,
+            string=""
+        )
     }
 
     def _get_type(self, cr, uid, context=None):
@@ -1512,3 +1601,21 @@ class PartnerQualityCriteria(Model):
         'quality_id': fields.many2one('res.partner.quality.control', 'Управление качеством'),
     }
 PartnerQualityCriteria()
+
+
+class InvoiceReportingPeriod(Model):
+    _name = 'invoice.reporting.period'
+    _order = 'period_name desc'
+    _columns = {
+        'partner_id': fields.many2one('res.partner', 'Партнер'),
+        'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')]),
+        'payment_sum': fields.float('Сумма платежей, $'),
+        'period_name': fields.related(
+            'period_id',
+            'name',
+            type='char',
+            size=7,
+            store=True
+        ),
+    }
+InvoiceReportingPeriod()
