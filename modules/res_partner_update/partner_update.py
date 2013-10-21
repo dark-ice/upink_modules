@@ -337,7 +337,7 @@ class partner_added_services(Model):
         'date_start':fields.date('Дата подключения'),
         'date_finish':fields.date('Дата окончания'),
         'partner_id': fields.many2one('res.partner', 'Партнер', inbisible=True),
-        'check': fields.function(_set_check, type="boolean", method=True),
+        'check': fields.function(_set_check, type="boolean", method=True, string='Статус подключения'),
         'budget': fields.float('Бюджет, y.e.'),
         'partner_base': fields.related('partner_id', 'partner_base', type='char', size=50),
         'service_status': fields.function(

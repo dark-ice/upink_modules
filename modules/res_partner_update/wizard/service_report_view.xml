@@ -1,0 +1,22 @@
+<openerp>
+    <data>
+         <!--<record id="service_report_view" model="ir.ui.view">-->
+            <!--<field name="name">service.report.wizard.view</field>-->
+            <!--<field name="model">service.report.wizard</field>-->
+            <!--<field name="type">tree</field>-->
+            <!--<field name="report_service" type="xml">-->
+                <!--<field name="service_id" required="1"/>-->
+            <!--</field>-->
+        <!--</record>-->
+
+        <!--<record id="action_service_report_view" model="ir.actions.act_window">-->
+            <!--<field name="name">Отчет по услугам </field>-->
+            <!--<field name="type">ir.actions.act_window</field>-->
+            <!--<field name="res_model">service.report.wizard</field>-->
+            <!--<field name="view_type">form</field>-->
+            <!--<field name="view_id" ref="service_report_view"/>-->
+        <!--</record>-->
+
+        <!--<menuitem action="action_service_report_view" id="menu_service_report_view" parent="base.menu_address_book" sequence="40"/>-->
+    </data>
+</openerp>
