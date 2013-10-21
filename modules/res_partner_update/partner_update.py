@@ -803,14 +803,17 @@ class res_partner(Model):
         res = self.name_get(cr, user, ids, context)
         return res
 
-    # def _main_name(self, cr, uid, ids, field, arg, context):
-    #     res = {}
-    #     for i in self.browse(cr, 1, ids, context):
-    #         main = self.pool.get('res.partner.address').search(cr, 1, [('main_face', '=', True), ('id', '=', i.address[0].id)])
-    #         name = self.pool.get('res.partner.address').read(cr, uid, main, ['name'])
-    #         if name:
-    #             res[i.id] = name[0]['name']
-    #         return res
+    def _main_name(self, cr, uid, ids, field, arg, context):
+        res = {}
+        for i in self.read(cr, 1, ids, ['address']):
+            name = ''
+            address_ids = self.pool.get('res.partner.address').search(cr, 1, [('main_face', '=', True), ('id', 'in', i['address'])])
+            if address_ids:
+                address = self.pool.get('res.partner.address').read(cr, uid, address_ids[0], ['name'])
+                name = address['name']
+            res[i['id']] = name
+
+        return res
 
 
     _columns = {
@@ -969,9 +972,9 @@ class res_partner(Model):
         'partner_site': fields.related('address', 'partner_site', type='char', string='Сайт партнера'),
         'partner_site_two': fields.related('address', 'partner_site', type='char', string='Сайт партнера(2)'),
 
-        'partner_name': fields.related('address', 'name', type='char', string='Имя контакта'),
+        # 'partner_name': fields.related('address', 'name', type='char', string='Имя контакта'),
         # TODO сделать вывод только главного контакта на главной
-        # 'partner_name': fields.function(_main_name, type="char", method=True, string='Имя контакта'),
+        'partner_name': fields.function(_main_name, type="char", method=True, string='Имя контакта'),
 
         'circulation': fields.one2many('res.partner.circulation', 'partner_id', 'Оборот партнера в $'),
         'has_eshop': fields.selection(
