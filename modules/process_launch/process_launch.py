@@ -263,7 +263,7 @@ class ProcessLaunch(Model):
             'account.invoice',
             'Счет',
             readonly=True,
-            domain="[('partner_id', '=', partner_id), ('invoice_line.service_id', 'in', [service_id])]",
+            domain="[('partner_id', '=', partner_id), ('invoice_line.service_id', 'in', [service_id]), ('type', '=', 'out_invoice')]",
             states={
                 'draft': [('readonly', False)],
                 'revision': [('readonly', False)],
