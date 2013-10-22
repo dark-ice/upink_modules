@@ -79,7 +79,211 @@
 
                         <field name="invoice_line_id" invisible="True"/>
                         <group col="6" colspan="4">
-                            <field name="account_id" on_change="onchange_account_id(account_id, service_id)"/>
+                            <field name="account_ids" nolabel="1" colspan="6" on_change="onchange_account_ids(account_ids, service_id)">
+                                <tree string="Счета" colors="orange:state=='proforma';#00C322:state=='paid';gray:state=='cancel'">
+                                    <field name="reference" invisible="1"/>
+                                    <field name="name" invisible="1"/>
+                                    <field name="id" invisible="1"/>
+                                    <field name="check_f" invisible="1"/>
+
+                                    <field name="number"/>
+                                    <field name="date_invoice" string="Дата счета"/>
+                                    <field name="partner_id" string="Партнер"/>
+                                    <field name="full_name"/>
+                                    <field name="user_id" string="Автор"/>
+                                    <field name="currency_id"/>
+                                    <field name="a_total" sum=""/>
+                                    <field name="a_subtotal" sum=""/>
+                                    <field name="type_account"/>
+                                    <field name="notes"/>
+
+                                    <field name="state"/>
+                                    <button type="action"
+                                            name="%(account_update.action_account_invoice_pay)d"
+                                            string="Провести платеж"
+                                            attrs="{'invisible': ['|', ('check_f', '=', False), ('state', 'in', ('paid', 'draft'))]}"
+                                            icon="gtk-ok"/>
+                                    <field name="paid_date"/>
+                                    <field name="close_doc_create"/>
+                                    <field name="state_document"/>
+                                </tree>
+                                <form string="Счет">
+                                    <group colspan="4">
+                                        <field name="check_a"/>
+                                        <field name="check_f"/>
+                                        <field name="check_r"/>
+                                        <field name="id" invisible="1"/>
+                                    </group>
+                                    <group colspan="4" col="8">
+
+                                        <field name="user_id" string="Автор" attrs="{'readonly': [('check_r', '=', False)]}"/>
+                                        <field name="date_invoice" on_change="onchange_currency(date_invoice, currency_id)"/>
+                                        <field name="number" attrs="{'readonly': [('check_a', '=', False), ('check_f', '=', False)]}"/>
+                                        <field name="type_account"/>
+                                        <newline/>
+                                        <field string="Партнер" name="partner_id" on_change="onchange_bank(partner_id, lead_id)"
+                                               options='{"quick_create": false}' attrs="{'readonly': [('lead_id', '!=', False)]}"/>
+                                        <field name="lead_id" on_change="onchange_bank(partner_id, lead_id)"
+                                               attrs="{'readonly': [('partner_id', '!=', False)]}" invisible="True"/>
+                                        <field name="full_name" readonly="True"/>
+                                        <field name="plan_paid_date" />
+                                        <field name="paid_type" />
+                                        <newline/>
+                                        <field name="bank_id" required="1" on_change="change_bank(bank_id)"/>
+                                        <field name="currency_id" width="50"
+                                               on_change="onchange_currency(date_invoice, currency_id)"/>
+                                        <field name="rate" width="50"/>
+                                        <newline/>
+                                        <field name="account_id" string="Фирма" widget="selection" required="1" on_change="onchange_account(account_id)"/>
+                                        <field name="tax" invisible="1"/>
+                                        <field name="reconciled" invisible="1"/>
+                                    </group>
+                                    <notebook colspan="4">
+                                        <page string="Счет">
+                                            <field colspan="4" name="invoice_line" nolabel="1" widget="one2many_list"
+                                                   context="{'type': type, 'account_id': account_id, 'description': number}" />
+
+                                            <group col="6" colspan="2">
+                                                <field name="untaxed"/>
+                                                <field name="a_tax"/>
+                                                <field name="a_total"/>
+                                            </group>
+                                            <group col="4" colspan="2">
+                                                <field name="state" widget="statusbar" statusbar_visible="draft,open,paid"
+                                                       statusbar_colors='{"proforma":"blue","cancel":"red"}'/>
+                                                <group col="8" colspan="4" groups="base.group_user">
+
+                                                    <!-- cancel -> draft -->
+                                                    <button name="draft"
+                                                            icon="gtk-go-back"
+                                                            string="В черновик"
+                                                            colspan="1"
+                                                            attrs="{'invisible': [
+                                                                '|', ('state', '!=', 'cancel'), ('check_a', '=', False)
+                                                            ]}"
+                                                            />
+
+                                                    <!-- draft -> cancel -->
+                                                    <button name="cancel"
+                                                            icon="gtk-cancel"
+                                                            string="Отмена"
+                                                            colspan="1"
+                                                            attrs="{'invisible': [
+                                                                '|', ('state', '!=', 'draft'), ('check_a', '=', False)
+                                                            ]}"
+                                                            />
+
+                                                    <!-- draft -> open -->
+                                                    <button name="invoice_open"
+                                                            icon="gtk-go-forward"
+                                                            string="Выставить счет"
+                                                            colspan="1"
+                                                            attrs="{'invisible': [
+                                                                '|', ('state', '!=', 'draft'), ('check_a', '=', False)
+                                                            ]}"
+                                                            />
+
+                                                    <!-- open -> proforma -->
+                                                    <button name="invoice_proforma"
+                                                            icon="gtk-go-forward"
+                                                            string="Частично оплачен"
+                                                            colspan="1"
+                                                            attrs="{'invisible': [
+                                                                '|', ('state', '!=', 'open'), ('check_f', '=', False)
+                                                            ]}"
+                                                            />
+
+                                                    <!-- open, proforma -> paid -->
+                                                    <button name="invoice_paid"
+                                                            icon="gtk-ok"
+                                                            string="Оплачен полностью"
+                                                            colspan="1"
+                                                            attrs="{'invisible': [
+                                                                '|', ('state', 'not in', ('proforma', 'open')), ('check_f', '=', False)
+                                                            ]}"
+                                                            />
+                                                    <newline/>
+                                                    <!-- attrs="{'invisible': [('lang', '=', 'ru')]}"  -->
+                                                    <button name="%(account_update.account_update_payment_ru)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Распечатать счет на оплату" type="action" icon="gtk-print" context="{'print': 'yes'}"/>
+
+                                                    <button name="%(account_update.account_update_payment_ua)d" attrs="{'invisible': [('lang', '!=', 'ua')]}" string="Распечатать счет на оплату" type="action" icon="gtk-print"/>
+                                                    <button name="%(account_update.account_update_post_pdf)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Распечатать конверт" type="action" icon="gtk-print"/>
+                                                </group>
+                                            </group>
+                                            <separator string="Комментарий" colspan="4"/>
+                                            <field name="notes" colspan="4" nolabel="1"/>
+                                        </page>
+                                        <page string="Платеж">
+                                            <button type="action"
+                                                    name="%(account_update.action_account_invoice_pay)d"
+                                                    string="Провести платеж"
+                                                    context="{'invoice_id': id, 'type_account': type_account}"
+                                                    attrs="{'invisible': [('check_f', '=', False)]}"
+                                                    icon="gtk-ok"/>
+                                            <field colspan="4" name="pay_ids" nolabel="1" widget="one2many_list" readonly="1">
+                                                <tree string="Платежи">
+                                                    <field name="id"/>
+                                                    <field name="date_pay"/>
+                                                    <field name="total"/>
+                                                </tree>
+                                            </field>
+                                        </page>
+                                        <page string="Закрывающие документы">
+                                            <group col="10" colspan="4">
+                                                <field name="lang" invisible="1" />
+                                                <button type="action"
+                                                    name="%(account_update.action_account_invoice_document)d"
+                                                    string="Сформировать закрывающий документ"
+                                                    context="{'invoice_id': id, 'name': 'completion_ru'}"
+                                                    attrs="{'invisible': [('check_f', '=', False)]}"
+                                                    icon="gtk-ok"
+                                                    />
+                                            </group>
+
+                                            <field name="document_ids" nolabel="1" colspan="4" attrs="{'readonly': [('check_f', '=', False)]}">
+                                                <tree string="Закрывающие документы">
+                                                    <!--field name="name"/-->
+                                                    <field name="lang" invisible="1"/>
+                                                    <field name="document_date"/>
+                                                    <field name="document_cash"/>
+                                                    <!-- attrs="{'invisible': [('name', '!=', 'completion_ru')]}"
+                                                    attrs="{'invisible': [('name', '!=', 'completion_ua')]}"
+                                                    attrs="{'invisible': [('name', '!=', 'payment_ru')]}" -->
+                                                    <button name="%(account_update.account_update_completion_ru)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Акт выполненных работ" type="action" icon="gtk-print"/>
+                                                    <button name="%(account_update.account_update_completion_ua)d" attrs="{'invisible': [('lang', '!=', 'ua')]}" string="Акт выполненных работ" type="action" icon="gtk-print"/>
+                                                    <button name="%(account_update.account_update_invoice)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Счет-фактура" type="action" icon="gtk-print"/>
+                                                </tree>
+                                                <form  string="Закрывающие документы">
+                                                    <field name="invoice_id" invisible="1" />
+                                                    <field name="name" invisible="1" />
+                                                    <field name="document_date"/>
+                                                    <field name="document_cash"/>
+                                                    <field name="document_line_id" nolabel="1" colspan="4"  widget="one2many_list">
+                                                        <tree string="Платеж" editable="top">
+                                                            <field name="service_id" readonly="1"/>
+                                                            <field name="name" sum="Сумма платежа"/>
+                                                        </tree>
+                                                    </field>
+                                                </form>
+                                            </field>
+                                            <button name="%(account_update.account_update_payment_ru)d" attrs="{'invisible': [('lang', '!=', 'ru')]}" string="Распечатать счет на оплату (без печати)" type="action" icon="gtk-print" context="{'print': 'no'}"/>
+
+                                            <button name="%(account_update.account_update_payment_ua)d" attrs="{'invisible': [('lang', '!=', 'ua')]}" string="Распечатать счет на оплату (без печати)" type="action" icon="gtk-print" context="{'print': 'no'}"/>
+                                            <button name="%(account_update.ir_actions_report_xml_all_list)d" string="Распечатать все документы в Excel"  attrs="{'invisible': ['|', ('lang', '!=', 'ru'), ('check_f', '=', False)]}" type="action" icon="gtk-print" />
+                                        </page>
+                                        <page string="История">
+                                            <separator string="История переходов" colspan="4"/>
+                                            <field name="history_ids" nolabel="1" colspan="4" readonly="1">
+                                                <tree>
+                                                    <field name="state"/>
+                                                    <field name="create_uid"/>
+                                                    <field name="create_date"/>
+                                                </tree>
+                                            </field>
+                                        </page>
+                                    </notebook>
+                                </form>
+                            </field>
                             <field name="account_file_id"/>
                             <field name="pay_date"/>
                             <newline/>
