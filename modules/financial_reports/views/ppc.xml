@@ -42,6 +42,7 @@
                             <field name="paid_type" />
                             <field name="pay_date" />
                             <field name="total" />
+                            <field name="rate" />
                             <field name="close_date" />
                             <field name="carry_over_revenue" />
                             <field name="discount_up" />

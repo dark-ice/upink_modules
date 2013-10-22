@@ -104,6 +104,7 @@ class PPCReport(Model):
                 'co_costs_employee': 0,
                 'costs_employee': 0,
                 'profit': 0,
+                'rate': 0,
             }
             if record['close'] and record['close_date'] <= date_end:
                 vals['close_date'] = record['close_date']
@@ -139,6 +140,7 @@ class PPCReport(Model):
             if record['invoice_id']:
                 invoice = self.pool.get('account.invoice').read(cr, 1, record['invoice_id'][0], ['rate'])
                 rate = invoice['rate']
+                vals['rate'] = rate
 
             if record['service_id'][0] in (17, 21, 22, ):
                 # 30 - курс долара у Яндекса
@@ -489,5 +491,6 @@ class PPCReportLine(Model):
         'co_costs_employee': fields.float('Переходящие затраты на персонал, $'),
         'costs_employee': fields.float('Затраты на персонал, $'),
         'profit': fields.float('Валовая прибыль, $'),
+        'rate': fields.float('Курс'),
     }
 PPCReportLine()

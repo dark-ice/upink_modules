@@ -61,7 +61,7 @@ class AccountInvoicePayLine(Model):
             'invoice_id',
             'date_invoice',
             type='date',
-            string='Дата выставления счета',
+            string='Дата платежа',
             store=True,
         ),
         'paid_type': fields.selection(
