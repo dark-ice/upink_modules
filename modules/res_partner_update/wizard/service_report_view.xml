@@ -1,22 +1,92 @@
 <openerp>
     <data>
-         <!--<record id="service_report_view" model="ir.ui.view">-->
-            <!--<field name="name">service.report.wizard.view</field>-->
-            <!--<field name="model">service.report.wizard</field>-->
-            <!--<field name="type">tree</field>-->
-            <!--<field name="report_service" type="xml">-->
-                <!--<field name="service_id" required="1"/>-->
-            <!--</field>-->
-        <!--</record>-->
+        <record id="view_complex_service_report" model="ir.ui.view">
+            <field name="name">complex.service.report.wizard</field>
+            <field name="model">partner.added.services.history.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Комплексный отчет по услугам">
+                    <field name="date_start"/>
+                    <field name="date_finish"/>
+                    <separator string="" colspan="4" />
+                    <group col="4" colspan="4">
+                        <button string="Отмена" icon="gtk-close" special="cancel" />
+                        <button name="get_report" string="Сформировать отчет" type="object" icon="gtk-ok"/>
+                    </group>
+                </form>
+            </field>
+        </record>
 
-        <!--<record id="action_service_report_view" model="ir.actions.act_window">-->
-            <!--<field name="name">Отчет по услугам </field>-->
-            <!--<field name="type">ir.actions.act_window</field>-->
-            <!--<field name="res_model">service.report.wizard</field>-->
-            <!--<field name="view_type">form</field>-->
-            <!--<field name="view_id" ref="service_report_view"/>-->
-        <!--</record>-->
+       <!-- Invoice Act Wizard -->
+        <record id="action_complex_service_report" model="ir.actions.act_window">
+            <field name="name">Комплексный отчет по услугам</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">partner.added.services.history.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_complex_service_report"/>
+            <field name="context">{}</field>
+            <field name="target">new</field>
+        </record>
 
-        <!--<menuitem action="action_service_report_view" id="menu_service_report_view" parent="base.menu_address_book" sequence="40"/>-->
+
+        <record id="view_complex_service_report2" model="ir.ui.view">
+            <field name="name">complex.service.report.wizard2</field>
+            <field name="model">partner.added.services.history.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Комплексный отчет по услугам">
+                    <field name="date_start" readonly="True"/>
+                    <field name="date_finish" readonly="True"/>
+                    <separator colspan="4"/>
+                    <group colspan="4" col="6">
+                        <field name="count_ids" nolabel="1" readonly="True">
+                            <tree string="Количество услуг и партнеров по ним">
+                                <field name="count_services"/>
+                                <field name="count_partners"/>
+                            </tree>
+                            <form>
+                                <field name="count_services"/>
+                                <field name="count_partners"/>
+                            </form>
+                        </field>
+
+                        <field name="count_service_ids" nolabel="1" readonly="True">
+                            <tree string="Название услуг и количество партнеров по ним">
+                                <field name="service_id"/>
+                                <field name="count_partners"/>
+                            </tree>
+                            <form>
+                                <field name="service_id"/>
+                                <field name="count_partners"/>
+                            </form>
+                        </field>
+
+                        <field name="count_direction_ids" nolabel="1" readonly="True">
+                            <tree string="Название направление и количество партнеров по ним">
+                                <field name="direction_name"/>
+                                <field name="count_partners"/>
+                            </tree>
+                            <form>
+                                <field name="direction_name"/>
+                                <field name="count_partners"/>
+                            </form>
+                        </field>
+                    </group>
+
+                </form>
+            </field>
+        </record>
+
+       <!-- Invoice Act Wizard -->
+        <record id="action_complex_service_report2" model="ir.actions.act_window">
+            <field name="name">Комплексный отчет по услугам</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">partner.added.services.history.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_complex_service_report2"/>
+        </record>
+
+        <menuitem parent="base.menu_base_partner" id='partner_reports' name='Отчеты'  sequence="30"/>
+        <menuitem action="action_complex_service_report" id="menu_complex_service_report2" parent="partner_reports" sequence="60"/>
     </data>
 </openerp>

@@ -350,38 +350,11 @@ class partner_added_services(Model):
         'history_id': fields.integer(),
         'history_ids': fields.one2many('partner.added.services.history', 'history_service_id', 'ids истории'),
 
-        'date_start_from': fields.date('Дата начала с'),
-        'date_start_to': fields.date('Дата начала по'),
-        'date_finish_from': fields.date('Дата окончания с'),
-        'date_finish_to': fields.date('Дата окончания по'),
     }
 
     _defaults = {
         'partner_base': lambda s, cr, u, cnt: cnt.get('partner_base')
     }
-
-    def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=None):
-        date_st_to = None
-        date_fn_to = None
-        date_st_from = None
-        date_fn_from = None
-        date_indx = []
-
-        for indx, item in enumerate(args):
-            if 'date_start_from' == item[0]:
-                date_st_from = item[2]
-                date_indx.append(indx)
-            if 'date_start_to' == item[0]:
-                date_st_to = item[2]
-                date_indx.append(indx)
-            if 'date_finish_to' == item[0]:
-                date_fn_to = item[2]
-                date_indx.append(indx)
-            if 'date_finish_from' == item[0]:
-                date_fn_from = item[2]
-                date_indx.append(indx)
-
-
 partner_added_services()
 
 
@@ -411,6 +384,14 @@ class PartnerAddedServicesHistory(Model):
     _columns = {
         'history_service_id': fields.integer('Id'),
         'service_id': fields.many2one('brief.services.stage', 'Услуга'),
+        'direction': fields.related(
+            'service_id',
+            'direction',
+            string='Направление',
+            type='char',
+            size=10,
+            store=True,
+        ),
         'comment': fields.text('Комментарий'),
         'date_start': fields.date('Дата подключения'),
         'date_finish': fields.date('Дата окончания'),
@@ -425,6 +406,11 @@ class PartnerAddedServicesHistory(Model):
             type='boolean',
             invisible=True
         ),
+
+        'date_start_from': fields.date('Дата начала с'),
+        'date_start_to': fields.date('Дата начала по'),
+        'date_finish_from': fields.date('Дата окончания с'),
+        'date_finish_to': fields.date('Дата окончания по'),
     }
 
     def change_history(self, cr, uid, ids, context=None):
@@ -461,6 +447,51 @@ class PartnerAddedServicesHistory(Model):
                 })]})
         return super(PartnerAddedServicesHistory, self).write(cr, user, ids, vals, context)
 
+    def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=None):
+        sql_postfix = []
+        date_st_to = None
+        date_fn_to = None
+        date_st_from = None
+        date_fn_from = None
+        date_indx = []
+
+        for indx, item in enumerate(args):
+            if 'date_start_from' == item[0]:
+                date_st_from = item[2]
+                date_indx.append(indx)
+            if 'date_start_to' == item[0]:
+                date_st_to = item[2]
+                date_indx.append(indx)
+            if 'date_finish_to' == item[0]:
+                date_fn_to = item[2]
+                date_indx.append(indx)
+            if 'date_finish_from' == item[0]:
+                date_fn_from = item[2]
+                date_indx.append(indx)
+
+        if date_st_from is not None and date_st_to is None:
+            sql_postfix.append("date_start='{0}'::date".format(date_st_from,))
+        elif date_st_from is not None and date_st_to is not None:
+            sql_postfix.append("date_start between '{0}'::date and '{1}'::date".format(date_st_from, date_st_to))
+
+        if date_fn_from is not None and date_fn_to is None:
+            sql_postfix.append("date_finish='{0}'::date".format(date_fn_from,))
+        elif date_fn_from is not None and date_fn_to is not None:
+            sql_postfix.append("date_finish between '{0}'::date and '{1}'::date".format(date_fn_from, date_fn_to))
+
+        sql_postfix_str = ' AND '.join(sql_postfix)
+        if sql_postfix_str:
+            sql = 'SELECT id FROM partner_added_services_history WHERE {0}'.format(sql_postfix_str,)
+            cr.execute(sql)
+            res_ids = set(service_id[0] for service_id in cr.fetchall())
+            args.append(['id', 'in', tuple(res_ids)])
+
+        if date_indx:
+            date_indx.sort()
+            date_indx.reverse()
+            for indx in date_indx:
+                del args[indx]
+        return super(PartnerAddedServicesHistory, self).search(cr, uid, args, offset, limit, order, context, count)
 
 PartnerAddedServicesHistory()
 
