@@ -237,7 +237,8 @@ class ProcessLaunch(Model):
             states={
                 'draft': [('readonly', False)],
                 'revision': [('readonly', False)],
-            }
+            },
+            domain="[('partner_id', '=', partner_id)]"
         ),
         'contract_file': fields.related(
             'contract_id',
