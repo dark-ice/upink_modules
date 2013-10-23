@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <record id="view_reports_ppc_form" model="ir.ui.view">
-            <field name="name">Финансовые отчеты - PPC</field>
-            <field name="model">financial.reports.ppc</field>
+        <record id="view_reports_call_form" model="ir.ui.view">
+            <field name="name">Финансовые отчеты - CALL</field>
+            <field name="model">financial.reports.call</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form>
@@ -85,9 +85,9 @@
             </field>
         </record>
 
-        <record id="view_reports_ppc_tree" model="ir.ui.view">
-            <field name="name">Финансовые отчеты - PPC</field>
-            <field name="model">financial.reports.ppc</field>
+        <record id="view_reports_call_tree" model="ir.ui.view">
+            <field name="name">Финансовые отчеты - CALL</field>
+            <field name="model">financial.reports.call</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree>
@@ -99,18 +99,18 @@
         </record>
 
         <!-- Quality Wizard -->
-        <record id="action_reports_ppc" model="ir.actions.act_window">
-            <field name="name">PPC</field>
+        <record id="action_reports_call" model="ir.actions.act_window">
+            <field name="name">CALL</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">financial.reports.ppc</field>
+            <field name="res_model">financial.reports.call</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="view_reports_ppc_tree"/>
+            <field name="view_id" ref="view_reports_call_tree"/>
             <field name="context">{}</field>
             <field name="domain">[]</field>
             <field name="target">inline</field>
         </record>
 
-        <menuitem id="menu_direction_report_ppc" parent="menu_direction_report" action="action_reports_ppc" name="PPC" sequence="1"/>
+        <menuitem id="menu_direction_report_call" parent="menu_direction_report" action="action_reports_call" name="CALL" sequence="30"/>
     </data>
 </openerp>

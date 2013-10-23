@@ -56,6 +56,7 @@
                         <field name="user_id" readonly="1"/>
                         <field name="responsible_id" readonly="1"/>
                         <field name="advertising_id"/>
+                        <field name="site_url" widget="url"/>
                     </group>
                     <notebook colspan="4">
                         <page string="Данные по запуску процесса">
@@ -66,10 +67,10 @@
                             <field name="contract_id" readonly="1"/>
                             <field name="contract_file" readonly="1"/>
 
-                            <field name="invoice_line_id" invisible="True"/>
                             <group col="6" colspan="4">
-                                <field name="account_id" readonly="1"/>
+                                <field name="account_ids" nolabel="1" colspan="6"/>
                                 <field name="account_file_id"/>
+                                <field name="account_date"/>
                                 <newline/>
                                 <field name="price" readonly="1"/>
                                 <field name="price_ye" readonly="1"/>

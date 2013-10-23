@@ -73,4 +73,11 @@ class AccountInvoicePayLine(Model):
             ), 'Тип оплаты'
         ),
     }
+
+    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
+        if context is None:
+            context = {}
+        if context.get('report'):
+            order = 'partner_id ASC, service_id ASC, invoice_date ASC'
+        return super(AccountInvoicePayLine, self).search(cr, user, args, offset, limit, order, context, count)
 AccountInvoicePayLine()

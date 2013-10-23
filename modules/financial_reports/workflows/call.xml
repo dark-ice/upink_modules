@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <openerp>
     <data>
-        <record model="workflow" id="wkf_report_ppc">
-            <field name="name">wkf.report.ppc</field>
-            <field name="osv">financial.reports.ppc</field>
+        <record model="workflow" id="wkf_report_call">
+            <field name="name">wkf.report.call</field>
+            <field name="osv">financial.reports.call</field>
             <field name="on_create">True</field>
         </record>
 
         <!-- Workflow activities -->
         <!-- draft -->
-        <record model="workflow.activity" id="act_report_ppc_draft">
-            <field name="wkf_id" ref="wkf_report_ppc" />
+        <record model="workflow.activity" id="act_report_call_draft">
+            <field name="wkf_id" ref="wkf_report_call" />
             <field name="flow_start">True</field>
             <field name="name">Отчет сгенерирован</field>
             <field name="kind">function</field>
             <field name="action">write({'state': 'draft'})</field>
         </record>
         <!-- head -->
-        <record model="workflow.activity" id="act_report_ppc_head">
-            <field name="wkf_id" ref="wkf_report_ppc" />
+        <record model="workflow.activity" id="act_report_call_head">
+            <field name="wkf_id" ref="wkf_report_call" />
             <field name="name">Утвержден руководителем</field>
             <field name="kind">function</field>
             <field name="action">write({'state': 'head'})</field>
         </record>
         <!-- director -->
-        <record model="workflow.activity" id="act_report_ppc_director">
-            <field name="wkf_id" ref="wkf_report_ppc" />
+        <record model="workflow.activity" id="act_report_call_director">
+            <field name="wkf_id" ref="wkf_report_call" />
             <field name="name">Утвержден функциональным директором</field>
             <field name="kind">function</field>
             <field name="action">write({'state': 'director'})</field>
         </record>
         <!-- finansist -->
-        <record model="workflow.activity" id="act_report_ppc_finansist">
-            <field name="wkf_id" ref="wkf_report_ppc" />
+        <record model="workflow.activity" id="act_report_call_finansist">
+            <field name="wkf_id" ref="wkf_report_call" />
             <field name="name">Утвержден финансистом</field>
             <field name="kind">function</field>
             <field name="action">write({'state': 'finansist'})</field>
@@ -40,22 +40,22 @@
 
         <!-- Workflow transition -->
         <!-- draft -> head -->
-        <record model="workflow.transition" id="a_d_h">
-            <field name="act_from" ref="act_report_ppc_draft" />
-            <field name="act_to" ref="act_report_ppc_head" />
+        <record model="workflow.transition" id="a_call_d_h">
+            <field name="act_from" ref="act_report_call_draft" />
+            <field name="act_to" ref="act_report_call_head" />
             <field name="signal">head</field>
             <field name="condition">start_date and end_date</field>
         </record>
         <!-- head -> director -->
-        <record model="workflow.transition" id="a_h_d">
-            <field name="act_from" ref="act_report_ppc_head" />
-            <field name="act_to" ref="act_report_ppc_director" />
+        <record model="workflow.transition" id="a_call_h_d">
+            <field name="act_from" ref="act_report_call_head" />
+            <field name="act_to" ref="act_report_call_director" />
             <field name="signal">director</field>
         </record>
         <!-- director -> finansist -->
-        <record model="workflow.transition" id="a_d_f">
-            <field name="act_from" ref="act_report_ppc_director" />
-            <field name="act_to" ref="act_report_ppc_finansist" />
+        <record model="workflow.transition" id="a_call_d_f">
+            <field name="act_from" ref="act_report_call_director" />
+            <field name="act_to" ref="act_report_call_finansist" />
             <field name="signal">finansist</field>
         </record>
     </data>

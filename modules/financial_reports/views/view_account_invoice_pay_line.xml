@@ -77,6 +77,7 @@
             <field name="view_id" ref="view_account_invoice_factor_tree"/>
             <field name="search_view_id" ref="view_account_invoice_factor_search"/>
             <field name="domain">[('service_id.direction', '=', 'PPC')]</field>
+            <field name="context">{'report': True}</field>
         </record>
         <menuitem action="window_account_invoice_factor_ppc" id="menu_daccount_invoice_factor_ppc" parent="menu_direction_report_settings" sequence="1"/>
 
@@ -113,6 +114,7 @@
             <field name="view_id" ref="view_account_invoice_factor_tree_seo"/>
             <field name="search_view_id" ref="view_account_invoice_factor_search_seo"/>
             <field name="domain">[('service_id.direction', '=', 'SEO')]</field>
+            <field name="context">{'report': True}</field>
         </record>
         <menuitem action="window_account_invoice_factor_seo" id="menu_daccount_invoice_factor_seo" parent="menu_direction_report_settings" sequence="10"/>
 
@@ -149,6 +151,7 @@
             <field name="view_id" ref="view_account_invoice_factor_tree_smm"/>
             <field name="search_view_id" ref="view_account_invoice_factor_search_smm"/>
             <field name="domain">[('service_id.direction', '=', 'SMM')]</field>
+            <field name="context">{'report': True}</field>
         </record>
         <menuitem action="window_account_invoice_factor_smm" id="menu_daccount_invoice_factor_smm" parent="menu_direction_report_settings" sequence="20"/>
 

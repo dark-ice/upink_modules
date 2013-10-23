@@ -178,7 +178,7 @@ class PPCReport(Model):
                 )
                 sum_pay = sum(p['factor'] for p in pay_line_pool.read(cr, 1, specialist_pay_line_ids, ['factor']))
                 try:
-                    costs_employee = total * record['factor'] / sum_pay
+                    costs_employee = (total * record['factor'] / sum_pay) / 8.0
                 except ZeroDivisionError:
                     costs_employee = 0
 
@@ -205,7 +205,7 @@ class PPCReport(Model):
                 costs_partner_period += vals['co_costs_partner'] + vals['costs_partner']
                 vals['profit'] = vals['carry_over_revenue'] + vals['total'] - vals['co_costs_partner'] - vals['costs_partner'] - vals['co_costs_employee'] - vals['costs_employee']
                 profit_period += vals['profit']
-            elif record['close_date'] == 'Не закрыт':
+            elif vals['close_date'] == 'Не закрыт':
                 rollovers_income += vals['carry_over_revenue'] + vals['total']
                 rollovers_outcome += vals['co_costs_partner'] + vals['costs_partner']
 

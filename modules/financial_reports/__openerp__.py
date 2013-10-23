@@ -1,7 +1,7 @@
 # coding=utf-8
 {
     'name': 'Финансовые отчеты',
-    'version': '1.0',
+    'version': '0.2',
     'category': 'Reports',
     'complexity': "easy",
     'application': True,
@@ -23,8 +23,19 @@
     'installable': True,
     'auto_install': False,
     'update_xml': [
+        'workflows/ppc.xml',
+        'workflows/seo.xml',
+        'workflows/smm.xml',
+        'workflows/call.xml',
+        'workflows/site.xml',
+        'workflows/video.xml',
         'views/view_account_invoice_pay_line.xml',
         'views/ppc.xml',
+        'views/seo.xml',
+        'views/smm.xml',
+        'views/call.xml',
+        'views/site.xml',
+        'views/video.xml',
     ],
     'js': [],
     'css': [],
