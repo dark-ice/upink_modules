@@ -685,6 +685,17 @@
                                                               }"
                                                     attrs="{'invisible': [('check', '=', False)]}"/>
                                         </tree>
+                                        <form>
+                                            <field name="service_id" required="1"/>
+                                            <field name="id" invisible="1" />
+                                            <field name="check" readonly="1"/>
+                                            <field name="date_start" readonly="1"/>
+                                            <field name="date_finish" readonly="1"/>
+                                            <field name="budget" />
+                                            <field name="service_status" readonly="1"/>
+                                            <field name="comment" />
+                                            <field name="partner_id" invisible="1"/>
+                                        </form>
                                     </field>
 
                                     <field name="operation_deps" colspan="4" nolabel="1" mode="tree">
@@ -1318,6 +1329,17 @@
                                                               }"
                                                     attrs="{'invisible': [('check', '=', False)]}"/>
                                         </tree>
+                                        <form>
+                                            <field name="service_id" required="1"/>
+                                            <field name="id" invisible="1" />
+                                            <field name="check" readonly="1"/>
+                                            <field name="date_start" readonly="1"/>
+                                            <field name="date_finish" readonly="1"/>
+                                            <field name="budget" />
+                                            <field name="service_status" readonly="1"/>
+                                            <field name="comment" />
+                                            <field name="partner_id" invisible="1"/>
+                                        </form>
                                     </field>
 
                                     <field

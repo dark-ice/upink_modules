@@ -86,7 +86,7 @@
             <field name="view_id" ref="view_complex_service_report2"/>
         </record>
 
-        <menuitem parent="base.menu_base_partner" id='partner_reports' name='Отчеты'  sequence="30"/>
+        <menuitem parent="base.menu_base_partner" id='partner_reports' name='Отчеты по услугам партнера'  sequence="2"/>
         <menuitem action="action_complex_service_report" id="menu_complex_service_report2" parent="partner_reports" sequence="60"/>
     </data>
 </openerp>

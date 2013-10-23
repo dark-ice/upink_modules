@@ -1,4 +1,6 @@
 # coding=utf-8
+from datetime import date
+
 __author__ = 'andrey'
 import netsvc
 from openerp.osv import fields, osv
@@ -490,10 +492,29 @@ class ProcessLaunch(Model):
 
     def process_add(self, cr, user, ids):
         flag = True
+        service_pool = self.pool.get('partner.added.services')
         for record in self.read(cr, user, ids, ['partner_id', 'service_id']):
-            as_ids = self.pool.get('partner.added.services').search(cr, user, [('partner_id', '=', record['partner_id'][0]), ('service_id', '=', record['service_id'][0])])
-            if as_ids:
-                flag = self.pool.get('partner.added.services').write(cr, user, as_ids, {'check': True})
+            as_ids = service_pool.search(cr, user, [('partner_id', '=', record['partner_id'][0]), ('service_id', '=', record['service_id'][0])])
+            h_ids = self.pool.get('partner.added.services.history').search(cr, 1, [('history_service_id', 'in', as_ids), ('date_finish', '=', False)])
+            if not h_ids:
+                for service in service_pool.read(cr, user, as_ids, ['budget', 'comment']):
+                    history_vals = {
+                        'budget': service['budget'],
+                        'comment': service['comment'],
+                        'service_id': record['service_id'][0],
+                        'partner_id': record['partner_id'][0],
+                        'date_start': date.today().strftime('%Y-%m-%d')
+                        }
+                    flag = service_pool.write(
+                        cr,
+                        user,
+                        as_ids,
+                        {
+                            'date_start': date.today().strftime('%Y-%m-%d'),
+                            'date_finish': False,
+                            'history_ids': [(0, 0, history_vals)]
+
+                        }, context=None)
         return flag
 ProcessLaunch()
 
