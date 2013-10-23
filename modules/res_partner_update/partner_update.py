@@ -941,7 +941,7 @@ class res_partner(Model):
                 address = self.pool.get('res.partner.address').read(cr, uid, address_ids[0], ['name', 'phone_ids', 'email_ids'])
 
                 name = address['name']
-                if address['site_ids']:
+                if address['email_ids']:
                     site_name = self.pool.get('res.partner.address.email').read(cr, uid, address['email_ids'][0], ['name'])
                     site = site_name['name']
                 if address['phone_ids']:
