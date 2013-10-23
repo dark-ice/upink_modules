@@ -938,11 +938,11 @@ class res_partner(Model):
             address_ids = self.pool.get('res.partner.address').search(cr, 1, [('main_face', '=', True), ('id', 'in', i['address'])])
 
             if address_ids:
-                address = self.pool.get('res.partner.address').read(cr, uid, address_ids[0], ['name', 'phone_ids', 'site_ids'])
+                address = self.pool.get('res.partner.address').read(cr, uid, address_ids[0], ['name', 'phone_ids', 'email_ids'])
 
                 name = address['name']
                 if address['site_ids']:
-                    site_name = self.pool.get('res.partner.address.site').read(cr, uid, address['site_ids'][0], ['name'])
+                    site_name = self.pool.get('res.partner.address.email').read(cr, uid, address['email_ids'][0], ['name'])
                     site = site_name['name']
                 if address['phone_ids']:
                     phone_name = self.pool.get('tel.reference').read(cr, uid, address['phone_ids'][0], ['phone'])
@@ -1001,15 +1001,6 @@ class res_partner(Model):
         'corporate_admin_panel': fields.char('Админпанель сайта', size=250),
         'corporate_admin_password': fields.char('Пароль админпанели сайта', size=250),
         'next_call': fields.datetime('Следующий звонок', help='Дата следующего контакта.'),
-        #'partner_status': fields.selection(
-        #    [
-        #        ('new', 'Новый'),
-        #        ('existing', 'Существующий'),
-        #        ('stoped', 'Приостановлен'),
-        #        ('refusion', 'Отказ')
-        #    ],
-        #    'Статус партнера',
-        #    help='Этап работы с партнером. Поле заполняется менеджером'),
         'partner_status': fields.function(
             _get_partner_status,
             fnct_search=_search_partner_status,
@@ -1065,7 +1056,6 @@ class res_partner(Model):
             'Причина отказа',
             help='Причина по которой Партнер отказался.',
         ),
-        #'emails': fields.one2many('mailgate.message', 'partner_id', 'Emails', readonly=True),
         'note_ids': fields.one2many(
             'crm.lead.notes',
             'partner_id',
@@ -1117,11 +1107,6 @@ class res_partner(Model):
         'product_id': fields.one2many('crm.patner.product', 'res_partner', string="Товары"),
         'write_date': fields.datetime('Последняя дата контакта', readonly=True),
 
-        'partner_site': fields.related('address', 'partner_site', type='char', string='Сайт партнера'),
-        'partner_site_two': fields.related('address', 'partner_site', type='char', string='Сайт партнера(2)'),
-
-        # 'partner_name': fields.related('address', 'name', type='char', string='Имя контакта'),
-        # TODO сделать вывод только главного контакта на главной
         'partner_name': fields.function(_main_name, type="char", method=True, string='Имя контакта', multi='address'),
 
         'circulation': fields.one2many('res.partner.circulation', 'partner_id', 'Оборот партнера в $'),
@@ -1134,9 +1119,7 @@ class res_partner(Model):
 
 
         'partner_site_default': fields.related('address', 'site_ids', 'name', type='char', string='Сайт партнера'),
-        # 'phone_default': fields.related('address', 'phone_ids', 'phone', type='char', size=128, string='Телефон'),
         'phone_default': fields.function(_main_name, type="char", method=True, string='Телефон', multi='address'),
-        # 'email_default': fields.related('address', 'email_ids', 'name', type='char', size=128, string='Эл. почта'),
         'email_default': fields.function(_main_name, type="char", method=True, string='Эл. почта', multi='address'),
 
         'last_circulation': fields.function(_last_circulation, type="float", method=True),
