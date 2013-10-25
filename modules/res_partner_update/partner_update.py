@@ -375,7 +375,6 @@ class partner_added_services(Model):
                     'budget': service['budget'],
                     'comment': service['comment'],
                 })
-                print partner_id, service_id, service['comment']
                 flag = self.write(
                     cr,
                     1,
