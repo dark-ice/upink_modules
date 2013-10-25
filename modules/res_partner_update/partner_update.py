@@ -365,12 +365,17 @@ class partner_added_services(Model):
             'service_id': service_id,
             'date_start': date_start,
         }
-        if h_ids and date_start:
+        if date_start:
+            if not h_ids:
+                lines = [(0, 0, vals)]
+            else:
+                lines = [(1, h_ids[0], vals)]
             for service in self.read(cr, 1, as_ids, ['budget', 'comment']):
                 vals.update({
                     'budget': service['budget'],
                     'comment': service['comment'],
                 })
+                print partner_id, service_id, service['comment']
                 flag = self.write(
                     cr,
                     1,
@@ -378,7 +383,7 @@ class partner_added_services(Model):
                     {
                         'date_start': date_start,
                         'date_finish': False,
-                        'history_ids': [(0, 0, vals)]
+                        'history_ids': lines
                     })
         return flag
 
