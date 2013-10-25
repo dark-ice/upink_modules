@@ -42,6 +42,21 @@ class PartnerAddedServicesWizard(TransientModel):
                 raise osv.except_osv('Отключение услуги', 'Дата окончания не может быть меньше даты начала')
             if date_st['history_ids']:
                 history_id = date_st['history_ids'][-1]
+            if history_id != 0:
+                history = self.pool.get('partner.added.services.history').read(cr, 1, history_id, ['date_start', 'date_finish', 'service_id'])
+            if history['date_start'] == date_st['date_start']:
+                lines = [(1, history_id, {'date_finish': wizard['date'], 'budget': wizard['budget'], 'comment': wizard['comment']})]
+            else:
+                if not history['date_finish']:
+                    raise osv.except_osv('Незакрытая услуга', 'Пожалуйста, закройте предидущий период по этой услуге!')
+                lines = [(0, 0, {
+                    'date_finish': wizard['date'],
+                    'date_start': date_st['date_start'],
+                    'budget': wizard['budget'],
+                    'comment': wizard['comment'],
+                    'partner_id': wizard['partner_id'],
+                    'service_id': wizard['service_id']
+                })]
             service_pool.write(
                 cr,
                 uid,
@@ -49,7 +64,7 @@ class PartnerAddedServicesWizard(TransientModel):
                 {
                     'check': False,
                     'date_finish': wizard['date'],
-                    'history_ids': [(1, history_id, {'date_finish': wizard['date'], 'budget': wizard['budget'], 'comment': wizard['comment']})]
+                    'history_ids': lines
                 },
                 context=None)
 

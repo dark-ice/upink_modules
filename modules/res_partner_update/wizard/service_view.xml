@@ -5,7 +5,7 @@
             <field name="model">partner.added.services.wizard</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
-                <form string="Управление качеством">
+                <form string="Сервисы">
                     <field name="date" required="1"/>
                     <field name="type" invisible="1"/>
                     <field name="partner_id" invisible="1"/>
