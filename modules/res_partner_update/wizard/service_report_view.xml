@@ -19,7 +19,7 @@
 
        <!-- Invoice Act Wizard -->
         <record id="action_complex_service_report" model="ir.actions.act_window">
-            <field name="name">Комплексный отчет по услугам</field>
+            <field name="name">Комплексный отчет по услугам </field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">partner.added.services.history.wizard</field>
             <field name="view_type">form</field>
