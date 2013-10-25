@@ -18,7 +18,7 @@ AVAILABLE_PRIORITIES = [
 PARTNER_STATUS = (
     ('new', 'Новая'),
     ('exist', 'Существующая'),
-    ('paused', 'Приостановленная'),
+    ('paused', 'В зоне риска'),
     ('cancel', 'Отказ'),
     ('returned', 'Возврат'),
     ('closed', 'Закрыт'),
@@ -321,7 +321,7 @@ class partner_added_services(Model):
                     if datetime.strptime(first_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=30) < datetime.now(pytz.UTC):
                         val = 'Существующая'
                     if datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=40) < datetime.now(pytz.UTC):
-                        val = 'Приостановленная'
+                        val = 'В зоне риска'
                     if datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=90) < datetime.now(pytz.UTC):
                         val = 'Отказ'
 
@@ -891,7 +891,7 @@ class res_partner(Model):
 
             if process_service_ids:
                 process_service_status = p_service_pool._get_service_status(cr, 1, process_service_ids, '', []).values()
-                if 'Приостановленная' in process_service_status:
+                if 'В зоне риска' in process_service_status:
                     val = 'paused'
                 elif 'Существующая' in process_service_status:
                     val = 'exist'
