@@ -382,13 +382,14 @@ class partner_added_services(Model):
                     })
         return flag
 
-    def set_all_services(self, cr, uid, ids):
+    def set_all_services(self, cr, uid, ids, context=None):
         invoice_ids = self.pool.get('account.invoice').search(cr, 1, [('type', '=', 'out_invoice')], order='date_invoice')
         vals = {}
         for i in self.pool.get('account.invoice').read(cr, 1, invoice_ids, ['partner_id', 'date_invoice', 'invoice_line']):
             for j in self.pool.get('account.invoice.line').read(cr, 1, i['invoice_line'], ['service_id']):
-                if not vals.get((i['partner_id'][0], j['service_id'][0])):
-                    vals[(i['partner_id'][0], j['service_id'][0])] = i['date_invoice']
+                if i['partner_id'] and j['service_id']:
+                    if not vals.get((i['partner_id'][0], j['service_id'][0])):
+                        vals[(i['partner_id'][0], j['service_id'][0])] = i['date_invoice']
         for k, v in vals.iteritems():
             self.connect_service(cr, k[0], k[1], v)
 

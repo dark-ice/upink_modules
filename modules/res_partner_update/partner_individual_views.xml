@@ -2097,7 +2097,7 @@
             <field name="arch" type="xml">
                 <form>
                     <group colspan="6" col="4" >
-                        <button type="method" name="set_all_services" string="Поехали!" />
+                        <button type="object" name="set_all_services" string="Поехали!" />
                     </group>
                 </form>
             </field>
@@ -2110,6 +2110,6 @@
             <field name="view_mode">form</field>
             <field name="view_id" ref="view_set_service_form"/>
         </record>
-        <menuitem action="set_services" id="set_all_services" parent="account.menu_finance" sequence="100"/>
+        <menuitem action="set_services" id="set_all_services_button" parent="account.menu_finance" sequence="100"/>
     </data>
 </openerp>
