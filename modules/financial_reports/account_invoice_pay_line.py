@@ -72,6 +72,9 @@ class AccountInvoicePayLine(Model):
                 ('post', 'Пост оплата'),
             ), 'Тип оплаты'
         ),
+        'add_revenues': fields.float('Доп. доходы'),
+        'add_costs': fields.float('Доп. расходы'),
+        'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')]),
     }
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):

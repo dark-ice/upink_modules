@@ -1,4 +1,5 @@
 # coding=utf-8
+import calendar
 from datetime import datetime
 from openerp import tools
 from openerp.osv import fields, osv
@@ -54,7 +55,7 @@ class SMMReport(Model):
             ('close_date', '>=', date_start),
             ('partner_id', '!=', False),
             ('invoice_id', '!=', False),
-            ('specialist_id', '!=', False)
+            #('specialist_id', '!=', False)
         ]
         pay_line_ids = pay_line_pool.search(cr, 1, domain, order='partner_id, service_id, invoice_date')
         lines = []
@@ -76,9 +77,8 @@ class SMMReport(Model):
         employeers = set()
 
         for record in pay_line_pool.read(cr, 1, pay_line_ids, []):
-            google = False
             rate = 1
-            costs_partner = 0
+            costs_partner = record['add_costs']
             costs_employee = 0
             total = 0
 
@@ -89,14 +89,10 @@ class SMMReport(Model):
                 'paid_type': record['paid_type'] or 'cash',
                 'invoice_id': record['invoice_id'][0] if record['invoice_id'] else False,
                 'pay_date': record['invoice_date'],
-                'total': record['factor'],
+                'total': record['factor'] + record['add_revenues'],
                 'close_date': 'Не закрыт',
 
                 'carry_over_revenue': 0,
-
-                'discount_up': 0,
-                'discount_partner': 0,
-                'discount_nds': 0,
 
                 'co_costs_partner': 0,
                 'costs_partner': 0,
@@ -108,52 +104,33 @@ class SMMReport(Model):
             if record['close'] and record['close_date'] <= date_end:
                 vals['close_date'] = record['close_date']
 
-            if record['partner_id']:
-                discounts_ids = self.pool.get('res.partner.ppc.discounts').search(
-                    cr,
-                    1,
-                    [
-                        ('service_id', '=', record['service_id'][0]),
-                        ('partner_id', '=', record['partner_id'][0]),
-                        '|',
-                        '&', ('start_date', '<=', record['invoice_date']), ('finish_date', '>=', record['invoice_date']),
-                        ('permanent', '=', True),
-                    ]
-                )
-                for discount in self.pool.get('res.partner.ppc.discounts').read(cr, 1, discounts_ids, []):
-                    if discount['discount_type'] == 'nds':
-                        vals['discount_nds'] = discount['percent']
-                    elif discount['discount_type'] == 'partner_discount':
-                        vals['discount_partner'] = discount['percent']
-                    elif discount['discount_type'] == 'yandex_discount':
-                        vals['discount_up'] = discount['percent']
-                    elif discount['discount_type'] == 'google_discount':
-                        if discount['google']:
-                            vals['discount_up'] = 4500
-                            google = True
-                        else:
-                            vals['discount_up'] = discount['percent']
-
-            if vals['discount_nds'] == 0:
-                vals['discount_nds'] = 18
             if record['invoice_id']:
                 invoice = self.pool.get('account.invoice').read(cr, 1, record['invoice_id'][0], ['rate'])
                 rate = invoice['rate']
                 vals['rate'] = rate
 
-            if record['service_id'][0] in (17, 21, 22, ):
-                # 30 - курс долара у Яндекса
-                costs_partner = (1 - vals['discount_up'] / 100) * record['factor'] * rate / 30
-            elif record['service_id'][0] in (18, ):
-                if google:
-                    costs_partner = (record['factor'] - 4500 / rate) / (1 + vals['discount_nds'] / 100)
-                else:
-                    costs_partner = record['factor'] * (1 - vals['discount_up'] / 100) / (1 + vals['discount_nds'] / 100)
-            elif record['service_id'][0] in (23,):
-                costs_partner = record['factor'] * (1 - vals['discount_up'] / 100)
+            first_day = '{0}01'.format(record['invoice_date'][:-2],)
+            source_date = datetime.strptime(record['invoice_date'], '%Y-%m-%d')
+            day_in_month = calendar.monthrange(source_date.year, source_date.month)[1]
+            last_day = '{0}{1}'.format(record['invoice_date'][:-2], day_in_month)
+
+            if record['partner_id']:
+                zds_ids = self.pool.get('account.invoice').search(
+                    cr,
+                    1,
+                    [
+                        ('division_id', '=', 2),
+                        ('date_invoice', '<=', last_day),
+                        ('type', '=', 'in_invoice'),
+                        ('partner_id', '=', record['partner_id'][0])
+                    ])
+                for m in self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'date_invoice']):
+                    if m['date_invoice'] >= first_day:
+                        vals['costs_partner'] += m['cash_mr_dol']
+                    else:
+                        vals['co_costs_partner'] += m['cash_mr_dol']
 
             if record['specialist_id']:
-                source_date = datetime.strptime(record['invoice_date'], '%Y-%m-%d')
                 period = self.pool.get('kpi.period').get_by_date(cr, source_date)
                 kpi_ids = self.pool.get('kpi.kpi').search(cr, 1, [('period_id', '=', period.id), ('employee_id.user_id', '=', record['specialist_id'][0])])
                 if kpi_ids:
@@ -182,15 +159,11 @@ class SMMReport(Model):
                     costs_employee = 0
 
             if date_end >= record['invoice_date'] >= date_start and record['close_date'] != 'Не закрыт':
-                vals['co_costs_partner'] = 0
-                vals['costs_partner'] = costs_partner
                 vals['co_costs_employee'] = 0
                 vals['costs_employee'] = costs_employee
                 costs_employee_period += costs_employee
 
             else:
-                vals['co_costs_partner'] = costs_partner
-                vals['costs_partner'] = 0
                 vals['co_costs_employee'] = costs_employee
                 vals['costs_employee'] = 0
                 vals['carry_over_revenue'] = record['factor']
@@ -480,10 +453,6 @@ class SMMReportLine(Model):
         'close_date': fields.char('Дата ЗД', size=50),
 
         'carry_over_revenue': fields.float('Переходящие доходы, $'),
-
-        'discount_up': fields.float('Скидка Up в аккаунте, %'),
-        'discount_partner': fields.float('Скидка Партнера, %'),
-        'discount_nds': fields.float('НДС, %'),
 
         'co_costs_partner': fields.float('Переходящие затраты на партнера, $'),
         'costs_partner': fields.float('Затраты на Партнера, $'),

@@ -95,7 +95,7 @@
         <record model="ir.ui.view" id="view_account_invoice_factor_search_seo">
             <field name="name">Отметка о счете SEO</field>
             <field name="model">account.invoice.pay.line</field>
-            <field name="type">tree</field>
+            <field name="type">search</field>
             <field name="inherit_id" ref="view_account_invoice_factor_search"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='service_id']" position="replace">
@@ -127,12 +127,16 @@
                 <xpath expr="//field[@name='specialist_id']" position="replace">
                     <field name="specialist_id" string="Специалист"/>
                 </xpath>
+                <xpath expr="//field[@name='factor']" position="after">
+                    <field name="add_revenues" />
+                    <field name="add_costs" />
+                </xpath>
             </field>
         </record>
         <record model="ir.ui.view" id="view_account_invoice_factor_search_smm">
             <field name="name">Отметка о счете SMM</field>
             <field name="model">account.invoice.pay.line</field>
-            <field name="type">tree</field>
+            <field name="type">search</field>
             <field name="inherit_id" ref="view_account_invoice_factor_search"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='service_id']" position="replace">
@@ -140,6 +144,10 @@
                 </xpath>
                 <xpath expr="//field[@name='specialist_id']" position="replace">
                     <field name="specialist_id" string="Специалист"/>
+                </xpath>
+                <xpath expr="//field[@name='factor']" position="after">
+                    <field name="add_revenues" />
+                    <field name="add_costs" />
                 </xpath>
             </field>
         </record>
@@ -164,12 +172,17 @@
                 <xpath expr="//field[@name='specialist_id']" position="replace">
                     <field name="specialist_id" string="Специалист"/>
                 </xpath>
+                <xpath expr="//field[@name='factor']" position="after">
+                    <field name="period_id"/>
+                    <field name="add_revenues" string="Затраты на персонал"/>
+                    <field name="add_costs" string="Расходы на связь"/>
+                </xpath>
             </field>
         </record>
         <record model="ir.ui.view" id="view_account_invoice_factor_search_call">
             <field name="name">Отметка о счете CALL</field>
             <field name="model">account.invoice.pay.line</field>
-            <field name="type">tree</field>
+            <field name="type">search</field>
             <field name="inherit_id" ref="view_account_invoice_factor_search"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='service_id']" position="replace">
@@ -205,7 +218,7 @@
         <record model="ir.ui.view" id="view_account_invoice_factor_search_site">
             <field name="name">Отметка о счете SITE</field>
             <field name="model">account.invoice.pay.line</field>
-            <field name="type">tree</field>
+            <field name="type">search</field>
             <field name="inherit_id" ref="view_account_invoice_factor_search"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='service_id']" position="replace">
@@ -241,7 +254,7 @@
         <record model="ir.ui.view" id="view_account_invoice_factor_search_video">
             <field name="name">Отметка о счете VIDEO</field>
             <field name="model">account.invoice.pay.line</field>
-            <field name="type">tree</field>
+            <field name="type">search</field>
             <field name="inherit_id" ref="view_account_invoice_factor_search"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='service_id']" position="replace">

@@ -57,14 +57,12 @@ class PPCReport(Model):
             ('invoice_id', '!=', False),
             ('specialist_id', '!=', False)
         ]
-        pay_line_ids = pay_line_pool.search(cr, 1, domain, order='partner_id, service_id, invoice_date')
+        pay_line_ids = pay_line_pool.search(cr, 1, domain, order='partner_id ASC, service_id ASC, invoice_date ASC')
         lines = []
         # Итого
         total_period = 0
-        balance_period = 0
         profit_period = 0
         costs_employee_period = 0
-        costs_period = 0
         costs_partner_period = 0
         rollovers_income = 0
         rollovers_outcome = 0
