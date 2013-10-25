@@ -105,7 +105,7 @@ class DirectionNameForPartner(TransientModel):
     _name = 'direction.name.for.partner'
     _columns = {
         'count_direction_id': fields.integer('ids отчета по количеству направлений'),
-        'direction_name': fields.char('имя напрвления', size=256),
+        'direction_name': fields.char('Направление', size=256),
         'count_partners': fields.integer('Количество партнеров'),
     }
 

@@ -51,7 +51,7 @@
                         </field>
 
                         <field name="count_service_ids" nolabel="1" readonly="True">
-                            <tree string="Название услуг и количество партнеров по ним">
+                            <tree string="Услуги и количество партнеров">
                                 <field name="service_id"/>
                                 <field name="count_partners"/>
                             </tree>
@@ -62,7 +62,7 @@
                         </field>
 
                         <field name="count_direction_ids" nolabel="1" readonly="True">
-                            <tree string="Название направление и количество партнеров по ним">
+                            <tree string="Направления и количество партнеров">
                                 <field name="direction_name"/>
                                 <field name="count_partners"/>
                             </tree>
