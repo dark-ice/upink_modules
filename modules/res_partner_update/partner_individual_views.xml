@@ -663,16 +663,16 @@
                                             <field name="service_status" readonly="1"/>
                                             <field name="comment" />
                                             <field name="partner_id" invisible="1"/>
-                                            <button type="action"
-                                                    name="%(action_service_wizard)d"
-                                                    string="Включить"
-                                                    icon="STOCK_YES"
-                                                    context="{'service_id' : service_id,
-                                                              'type' : check,
-                                                              'partner_id'  :  partner_id,
-                                                              'comment' : comment,
-                                                              'budget' : budget}"
-                                                    attrs="{'invisible': ['|', ('check', '=', True),('id', '=', False)]}"/>
+                                            <!--<button type="action"-->
+                                                    <!--name="%(action_service_wizard)d"-->
+                                                    <!--string="Включить"-->
+                                                    <!--icon="STOCK_YES"-->
+                                                    <!--context="{'service_id' : service_id,-->
+                                                              <!--'type' : check,-->
+                                                              <!--'partner_id'  :  partner_id,-->
+                                                              <!--'comment' : comment,-->
+                                                              <!--'budget' : budget}"-->
+                                                    <!--attrs="{'invisible': ['|', ('check', '=', True),('id', '=', False)]}"/>-->
                                             <button type="action"
                                                     name="%(action_service_close_wizard)d"
                                                     string="Выключить"
@@ -1307,16 +1307,16 @@
                                             <field name="service_status" readonly="1"/>
                                             <field name="comment" />
                                             <field name="partner_id" invisible="1"/>
-                                            <button type="action"
-                                                    name="%(action_service_wizard)d"
-                                                    string="Включить"
-                                                    icon="STOCK_YES"
-                                                    context="{'service_id' : service_id,
-                                                              'type' : check,
-                                                              'partner_id'  :  partner_id,
-                                                              'comment' : comment,
-                                                              'budget' : budget}"
-                                                    attrs="{'invisible': ['|', ('check', '=', True),('id', '=', False)]}"/>
+                                            <!--<button type="action"-->
+                                                    <!--name="%(action_service_wizard)d"-->
+                                                    <!--string="Включить"-->
+                                                    <!--icon="STOCK_YES"-->
+                                                    <!--context="{'service_id' : service_id,-->
+                                                              <!--'type' : check,-->
+                                                              <!--'partner_id'  :  partner_id,-->
+                                                              <!--'comment' : comment,-->
+                                                              <!--'budget' : budget}"-->
+                                                    <!--attrs="{'invisible': ['|', ('check', '=', True),('id', '=', False)]}"/>-->
                                             <button type="action"
                                                     name="%(action_service_close_wizard)d"
                                                     string="Выключить"
@@ -2088,5 +2088,28 @@
 
 
         <menuitem action="service_report_action" id="menu_service_report_view" parent="partner_reports" sequence="50"/>
+
+        <record model="ir.ui.view" id="view_set_service_form">
+            <field name="name">set.service.form</field>
+            <field name="model">partner.added.services</field>
+            <field name="priority" eval="1"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group colspan="6" col="4" >
+                        <button type="method" name="set_all_services" string="Поехали!" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="set_services">
+            <field name="name">Даты услуг(Таня)</field>
+            <field name="res_model">partner.added.services</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_set_service_form"/>
+        </record>
+        <menuitem action="set_services" id="set_all_services" parent="account.menu_finance" sequence="100"/>
     </data>
 </openerp>

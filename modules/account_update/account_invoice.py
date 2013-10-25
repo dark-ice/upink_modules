@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, division
 import decimal_precision as dp
+from datetime import date
 from openerp import netsvc
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
@@ -571,6 +572,23 @@ class AccountInvoice(Model):
             if values.get('card_id'):
                 card = self.pool.get('account.invoice.card').browse(cr, uid, values['card_id'], context)
                 values['currency_id'] = card.currency_id.id
+        # записываю новые данные в услуги
+        if values.get('invoice_line'):
+            service_pool = self.pool.get('partner.added.services')
+            for i in values.get('invoice_line'):
+                if i[2].get('service_id') and values.get('partner_id') and values.get('date_invoice'):
+                    i_ids = self.search(cr, 1, [
+                        ('partner_id', '=', values['partner_id']),
+                        ('date_invoice', '<', values['date_invoice']),
+                        ('invoice_line.service_id', '=', i[2]['service_id'])
+                    ])
+                    if i_ids:
+                        invoice = self.read(cr, 1, i_ids[0], ['date_invoice'])
+                        date_start = invoice['date_invoice']
+                    else:
+                        date_start = values['date_invoice']
+
+                    service_pool.connect_service(cr, values['partner_id'], i[2]['service_id'], date_start)
         return super(AccountInvoice, self).create(cr, uid, values, context)
 
     @notify.msg_send(_inherit)

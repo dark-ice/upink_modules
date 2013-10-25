@@ -355,6 +355,43 @@ class partner_added_services(Model):
     _defaults = {
         'partner_base': lambda s, cr, u, cnt: cnt.get('partner_base')
     }
+
+    def connect_service(self, cr, partner_id, service_id, date_start):
+        flag = False
+        as_ids = self.search(cr, 1, [('partner_id', '=', partner_id), ('service_id', '=', service_id)])
+        h_ids = self.pool.get('partner.added.services.history').search(cr, 1, [('history_service_id', 'in', as_ids), ('date_finish', '=', False)])
+        vals = {
+            'partner_id': partner_id,
+            'service_id': service_id,
+            'date_start': date_start,
+        }
+        if h_ids and date_start:
+            for service in self.read(cr, 1, as_ids, ['budget', 'comment']):
+                vals.update({
+                    'budget': service['budget'],
+                    'comment': service['comment'],
+                })
+                flag = self.write(
+                    cr,
+                    1,
+                    as_ids,
+                    {
+                        'date_start': date_start,
+                        'date_finish': False,
+                        'history_ids': [(0, 0, vals)]
+                    })
+        return flag
+
+    def set_all_services(self, cr, uid, ids):
+        invoice_ids = self.pool.get('account.invoice').search(cr, 1, [('type', '=', 'out_invoice')], order='date_invoice')
+        vals = {}
+        for i in self.pool.get('account.invoice').read(cr, 1, invoice_ids, ['partner_id', 'date_invoice', 'invoice_line']):
+            for j in self.pool.get('account.invoice.line').read(cr, 1, i['invoice_line'], ['service_id']):
+                if not vals.get((i['partner_id'][0], j['service_id'][0])):
+                    vals[(i['partner_id'][0], j['service_id'][0])] = i['date_invoice']
+        for k, v in vals.iteritems():
+            self.connect_service(cr, k[0], k[1], v)
+
 partner_added_services()
 
 

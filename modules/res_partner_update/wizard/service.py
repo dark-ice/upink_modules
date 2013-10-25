@@ -34,52 +34,33 @@ class PartnerAddedServicesWizard(TransientModel):
 
     def set_service(self, cr, uid, ids, context=None):
         service_pool = self.pool.get('partner.added.services')
-        history_pool = self.pool.get('partner.added.services.history')
         for wizard in self.read(cr, uid, ids, []):
-            history_vals = {
-                'budget': wizard['budget'],
-                'comment': wizard['comment'],
-                'service_id': wizard['service_id'],
-                'partner_id': wizard['partner_id'],
-            }
-            if not wizard['type']:
-                history_vals.update(
-                    {
-                        'check': True,
-                        'date_start': wizard['date']
-                    }
-                )
-                #last_id = history_pool.create(cr, uid, history_vals)
-                service_pool.write(
-                    cr,
-                    uid,
-                    [wizard['active_id']],
-                    {
-                        'check': True,
-                        #'history_id': last_id,
-                        'date_start': wizard['date'],
-                        'date_finish': False,
-                        'history_ids': [(0, 0, history_vals)]
 
-                    }, context=None)
-            else:
-                history_id = 0
-                date_st = service_pool.read(cr, uid, wizard['active_id'], ['date_start', 'history_ids'])
-                if date_st['date_start'] >  wizard['date']:
-                    raise osv.except_osv('Отключение услуги', 'Дата окончания не может быть меньше даты начала')
-                if date_st['history_ids']:
-                    history_id = date_st['history_ids'][-1]
-                service_pool.write(
-                    cr,
-                    uid,
-                    [wizard['active_id']],
-                    {
-                        'check': False,
-                        'date_finish': wizard['date'],
-                        'history_ids': [(1, history_id, {'date_finish': wizard['date'], 'budget': wizard['budget'], 'comment': wizard['comment']})]
-                    },
-                    context=None)
-                #history_pool.write(cr, uid, [wizard['history_id']], {'date_finish': wizard['date'], 'budget': wizard['budget'], 'comment': wizard['comment']}, context=None)
+            history_id = 0
+            date_st = service_pool.read(cr, uid, wizard['active_id'], ['date_start', 'history_ids'])
+            if date_st['date_start'] > wizard['date']:
+                raise osv.except_osv('Отключение услуги', 'Дата окончания не может быть меньше даты начала')
+            if date_st['history_ids']:
+                history_id = date_st['history_ids'][-1]
+            service_pool.write(
+                cr,
+                uid,
+                [wizard['active_id']],
+                {
+                    'check': False,
+                    'date_finish': wizard['date'],
+                    'history_ids': [(1, history_id, {'date_finish': wizard['date'], 'budget': wizard['budget'], 'comment': wizard['comment']})]
+                },
+                context=None)
+
+            invoice_ids = self.pool.get('account.invoice').search(cr, 1, [
+                ('partner_id', '=',  wizard['partner_id']),
+                ('date_invoice', '>', wizard['date']),
+                ('invoice_line.service_id', '=', wizard['service_id'])
+            ])
+            if invoice_ids:
+                invoice = self.pool.get('account.invoice').read(cr, invoice_ids[0], ['date_invoice'])
+                service_pool.connect_service(cr, wizard['partner_id'], wizard['service_id'], invoice['date_start'])
         return {'type': 'ir.actions.act_window_close'}
 
 PartnerAddedServicesWizard()
