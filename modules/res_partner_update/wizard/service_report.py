@@ -8,8 +8,8 @@ from openerp.osv.orm import TransientModel
 class PartnerAddedServicesHistoryWizard(TransientModel):
     _name = 'partner.added.services.history.wizard'
     _columns = {
-        'date_start': fields.date('Дата начала с'),
-        'date_finish': fields.date('Дата окончания с'),
+        'date_start': fields.date('Дата начала'),
+        'date_finish': fields.date('Дата окончания'),
         'count_ids': fields.one2many('service.count.for.partner', 'count_id', 'количество услуг'),
         'count_service_ids': fields.one2many('service.name.for.partner', 'count_service_id', 'количество по услугам'),
         'count_direction_ids': fields.one2many('direction.name.for.partner', 'count_direction_id', 'количество по направлениям')
