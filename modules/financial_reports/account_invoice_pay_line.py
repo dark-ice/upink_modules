@@ -31,9 +31,12 @@ class AccountInvoicePayLine(Model):
                     launch_ids = self.pool.get('process.launch').search(cr, 1, [('partner_id', '=', invoice['partner_id'][0]), ('service_id', '=', record['service_id'][0])])
                     for launch in self.pool.get('process.launch').read(cr, 1, launch_ids, ['process_id', 'process_model']):
                         if launch['process_model'] and launch['process_id']:
-                            process = self.pool.get(launch['process_model']).read(cr, 1, launch['process_id'], ['specialist_id'])
+                            process = self.pool.get(launch['process_model']).read(cr, 1, launch['process_id'], ['specialist_id', 'site_url'])
                             if process.get('specialist_id'):
-                                res[record['id']] = process['specialist_id'][0]
+                                res[record['id']] = {
+                                    'specialist_id': process['specialist_id'][0],
+                                    'site_url': process['site_url'],
+                                }
         return res
 
     def onchange_close(self, cr, uid, ids, close):
@@ -53,7 +56,15 @@ class AccountInvoicePayLine(Model):
             type='many2one',
             relation='res.users',
             string='Аккаунт-менеджер',
-            store=True
+            store=True,
+            multi='process'
+        ),
+        'site_url': fields.function(
+            _get_specialist,
+            type='char',
+            string='Сайт',
+            store=True,
+            multi='process'
         ),
         'close': fields.boolean('Закрыт счет?'),
         'close_date': fields.date('Дата закрытия'),

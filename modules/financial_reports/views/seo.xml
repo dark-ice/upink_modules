@@ -39,6 +39,7 @@
                             <field name="service_id" />
                             <field name="invoice_id" />
                             <field name="specialist_id" />
+                            <field name="site_url" />
                             <field name="paid_type" />
                             <field name="pay_date" />
                             <field name="total" />

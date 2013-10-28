@@ -85,25 +85,65 @@
             <field name="name">Отметка о счете SEO</field>
             <field name="model">account.invoice.pay.line</field>
             <field name="type">tree</field>
-            <field name="inherit_id" ref="view_account_invoice_factor_tree"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='specialist_id']" position="replace">
-                    <field name="specialist_id" string="Специалист"/>
-                </xpath>
+                <tree editable="top">
+                    <field name="invoice_id" invisible="1"/>
+                    <field name="number" readonly="1"/>
+                    <field name="invoice_date" readonly="1"/>
+                    <field name="partner_id" string="Партнер" readonly="1"/>
+                    <field name="user_id" string="Автор" readonly="1"/>
+                    <field name="service_id" readonly="1"/>
+                    <field name="specialist_id" readonly="1" string="Специалист"/>
+                    <field name="site_url" readonly="1"/>
+                    <field name="name_ye" readonly="1" />
+                    <field name="factor" string="Сумма для отчета"/>
+                    <field name="paid_type" />
+                    <field name="close" on_change="onchange_close(close)"/>
+                    <field name="close_date" attrs="{'readonly': [('close', '=', False)]}" />
+                </tree>
             </field>
         </record>
         <record model="ir.ui.view" id="view_account_invoice_factor_search_seo">
             <field name="name">Отметка о счете SEO</field>
             <field name="model">account.invoice.pay.line</field>
             <field name="type">search</field>
-            <field name="inherit_id" ref="view_account_invoice_factor_search"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='service_id']" position="replace">
+                <search>
+                    <field name="number" />
+                    <field name="partner_id" string="Партнер"/>
+                    <field name="user_id" string="Автор"/>
                     <field name="service_id" domain="[('direction', '=', 'SEO')]"/>
-                </xpath>
-                <xpath expr="//field[@name='specialist_id']" position="replace">
-                    <field name="specialist_id" string="Специалист"/>
-                </xpath>
+                    <field name="specialist_id" string="Специалист" />
+                    <field name="site_url" />
+                    <field name="paid_type" />
+                    <field name="name_ye" />
+                    <field name="factor" string="Сумма для отчета"/>
+                    <field name="close_date" />
+                    <newline />
+                    <filter icon="STOCK_MEDIA_PLAY"
+                            domain="[('close','=', True)]"
+                            name="active"
+                            string="Закрытые счета"/>
+                    <filter icon="STOCK_MEDIA_STOP"
+                            domain="[('close','=', False)]"
+                            name="deactive"
+                            string="Незакрытые счета"/>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Счет" icon="terp-partner" context="{'group_by': 'invoice_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Партнеру" icon="terp-partner" context="{'group_by': 'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Услуге" icon="terp-partner" context="{'group_by': 'service_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Дата выставления счета" icon="terp-partner" context="{'group_by': 'invoice_date'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Дата закрытия счета" icon="terp-partner" context="{'group_by': 'close_date'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Специалист" icon="terp-partner" context="{'group_by': 'specialist_id'}"/>
+                        <separator orientation="vertical"/>
+                    </group>
+                </search>
             </field>
         </record>
         <record id="window_account_invoice_factor_seo" model="ir.actions.act_window">
@@ -122,33 +162,67 @@
             <field name="name">Отметка о счете SMM</field>
             <field name="model">account.invoice.pay.line</field>
             <field name="type">tree</field>
-            <field name="inherit_id" ref="view_account_invoice_factor_tree"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='specialist_id']" position="replace">
-                    <field name="specialist_id" string="Специалист"/>
-                </xpath>
-                <xpath expr="//field[@name='factor']" position="after">
+                <tree editable="top">
+                    <field name="invoice_id" invisible="1"/>
+                    <field name="number" readonly="1"/>
+                    <field name="invoice_date" readonly="1"/>
+                    <field name="partner_id" string="Партнер" readonly="1"/>
+                    <field name="user_id" string="Автор" readonly="1"/>
+                    <field name="service_id" readonly="1"/>
+                    <field name="specialist_id" readonly="1" string="Специалист"/>
+                    <field name="name_ye" readonly="1" />
+                    <field name="factor" string="Сумма для отчета"/>
                     <field name="add_revenues" />
                     <field name="add_costs" />
-                </xpath>
+                    <field name="paid_type" />
+                    <field name="close" on_change="onchange_close(close)"/>
+                    <field name="close_date" attrs="{'readonly': [('close', '=', False)]}" />
+                </tree>
             </field>
         </record>
         <record model="ir.ui.view" id="view_account_invoice_factor_search_smm">
             <field name="name">Отметка о счете SMM</field>
             <field name="model">account.invoice.pay.line</field>
             <field name="type">search</field>
-            <field name="inherit_id" ref="view_account_invoice_factor_search"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='service_id']" position="replace">
+                <search>
+                    <field name="number" />
+                    <field name="partner_id" string="Партнер"/>
+                    <field name="user_id" string="Автор"/>
                     <field name="service_id" domain="[('direction', '=', 'SMM')]"/>
-                </xpath>
-                <xpath expr="//field[@name='specialist_id']" position="replace">
-                    <field name="specialist_id" string="Специалист"/>
-                </xpath>
-                <xpath expr="//field[@name='factor']" position="after">
+                    <field name="specialist_id" string="Специалист" />
+                    <field name="paid_type" />
+                    <field name="name_ye" />
+                    <field name="factor" string="Сумма для отчета"/>
                     <field name="add_revenues" />
                     <field name="add_costs" />
-                </xpath>
+                    <field name="close_date" />
+                    <newline />
+                    <filter icon="STOCK_MEDIA_PLAY"
+                            domain="[('close','=', True)]"
+                            name="active"
+                            string="Закрытые счета"/>
+                    <filter icon="STOCK_MEDIA_STOP"
+                            domain="[('close','=', False)]"
+                            name="deactive"
+                            string="Незакрытые счета"/>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Счет" icon="terp-partner" context="{'group_by': 'invoice_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Партнеру" icon="terp-partner" context="{'group_by': 'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Услуге" icon="terp-partner" context="{'group_by': 'service_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Дата выставления счета" icon="terp-partner" context="{'group_by': 'invoice_date'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Дата закрытия счета" icon="terp-partner" context="{'group_by': 'close_date'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Специалист" icon="terp-partner" context="{'group_by': 'specialist_id'}"/>
+                        <separator orientation="vertical"/>
+                    </group>
+                </search>
             </field>
         </record>
         <record id="window_account_invoice_factor_smm" model="ir.actions.act_window">
@@ -167,30 +241,68 @@
             <field name="name">Отметка о счете CALL</field>
             <field name="model">account.invoice.pay.line</field>
             <field name="type">tree</field>
-            <field name="inherit_id" ref="view_account_invoice_factor_tree"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='specialist_id']" position="replace">
-                    <field name="specialist_id" string="Специалист"/>
-                </xpath>
-                <xpath expr="//field[@name='factor']" position="after">
+                <tree editable="top">
+                    <field name="invoice_id" invisible="1"/>
+                    <field name="number" readonly="1"/>
+                    <field name="invoice_date" readonly="1"/>
+                    <field name="partner_id" string="Партнер" readonly="1"/>
+                    <field name="user_id" string="Автор" readonly="1"/>
+                    <field name="service_id" readonly="1"/>
+                    <field name="specialist_id" readonly="1" string="Специалист"/>
+                    <field name="name_ye" readonly="1" />
+                    <field name="factor" string="Сумма для отчета"/>
                     <field name="period_id"/>
                     <field name="add_revenues" string="Затраты на персонал"/>
                     <field name="add_costs" string="Расходы на связь"/>
-                </xpath>
+                    <field name="paid_type" />
+                    <field name="close" on_change="onchange_close(close)"/>
+                    <field name="close_date" attrs="{'readonly': [('close', '=', False)]}" />
+                </tree>
             </field>
         </record>
         <record model="ir.ui.view" id="view_account_invoice_factor_search_call">
             <field name="name">Отметка о счете CALL</field>
             <field name="model">account.invoice.pay.line</field>
             <field name="type">search</field>
-            <field name="inherit_id" ref="view_account_invoice_factor_search"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='service_id']" position="replace">
+                <search>
+                    <field name="number" />
+                    <field name="partner_id" string="Партнер"/>
+                    <field name="user_id" string="Автор"/>
                     <field name="service_id" domain="[('direction', '=', 'CALL')]"/>
-                </xpath>
-                <xpath expr="//field[@name='specialist_id']" position="replace">
-                    <field name="specialist_id" string="Специалист"/>
-                </xpath>
+                    <field name="specialist_id" string="Специалист" />
+                    <field name="paid_type" />
+                    <field name="name_ye" />
+                    <field name="factor" string="Сумма для отчета"/>
+                    <field name="add_revenues" />
+                    <field name="add_costs" />
+                    <field name="close_date" />
+                    <newline />
+                    <filter icon="STOCK_MEDIA_PLAY"
+                            domain="[('close','=', True)]"
+                            name="active"
+                            string="Закрытые счета"/>
+                    <filter icon="STOCK_MEDIA_STOP"
+                            domain="[('close','=', False)]"
+                            name="deactive"
+                            string="Незакрытые счета"/>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Счет" icon="terp-partner" context="{'group_by': 'invoice_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Партнеру" icon="terp-partner" context="{'group_by': 'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Услуге" icon="terp-partner" context="{'group_by': 'service_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Дата выставления счета" icon="terp-partner" context="{'group_by': 'invoice_date'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Дата закрытия счета" icon="terp-partner" context="{'group_by': 'close_date'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Специалист" icon="terp-partner" context="{'group_by': 'specialist_id'}"/>
+                        <separator orientation="vertical"/>
+                    </group>
+                </search>
             </field>
         </record>
         <record id="window_account_invoice_factor_call" model="ir.actions.act_window">
@@ -208,25 +320,65 @@
             <field name="name">Отметка о счете SITE</field>
             <field name="model">account.invoice.pay.line</field>
             <field name="type">tree</field>
-            <field name="inherit_id" ref="view_account_invoice_factor_tree"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='specialist_id']" position="replace">
-                    <field name="specialist_id" string="Специалист"/>
-                </xpath>
+                <tree editable="top">
+                    <field name="invoice_id" invisible="1"/>
+                    <field name="number" readonly="1"/>
+                    <field name="invoice_date" readonly="1"/>
+                    <field name="partner_id" string="Партнер" readonly="1"/>
+                    <field name="user_id" string="Автор" readonly="1"/>
+                    <field name="service_id" readonly="1"/>
+                    <field name="specialist_id" readonly="1" string="Специалист"/>
+                    <field name="name_ye" readonly="1" />
+                    <field name="factor" string="Сумма для отчета"/>
+                    <field name="paid_type" />
+                    <field name="close" on_change="onchange_close(close)"/>
+                    <field name="close_date" attrs="{'readonly': [('close', '=', False)]}" />
+                </tree>
             </field>
         </record>
         <record model="ir.ui.view" id="view_account_invoice_factor_search_site">
             <field name="name">Отметка о счете SITE</field>
             <field name="model">account.invoice.pay.line</field>
             <field name="type">search</field>
-            <field name="inherit_id" ref="view_account_invoice_factor_search"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='service_id']" position="replace">
+                <search>
+                    <field name="number" />
+                    <field name="partner_id" string="Партнер"/>
+                    <field name="user_id" string="Автор"/>
                     <field name="service_id" domain="[('direction', '=', 'SITE')]"/>
-                </xpath>
-                <xpath expr="//field[@name='specialist_id']" position="replace">
-                    <field name="specialist_id" string="Специалист"/>
-                </xpath>
+                    <field name="specialist_id" string="Специалист" />
+                    <field name="paid_type" />
+                    <field name="name_ye" />
+                    <field name="factor" string="Сумма для отчета"/>
+                    <field name="add_revenues" />
+                    <field name="add_costs" />
+                    <field name="close_date" />
+                    <newline />
+                    <filter icon="STOCK_MEDIA_PLAY"
+                            domain="[('close','=', True)]"
+                            name="active"
+                            string="Закрытые счета"/>
+                    <filter icon="STOCK_MEDIA_STOP"
+                            domain="[('close','=', False)]"
+                            name="deactive"
+                            string="Незакрытые счета"/>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Счет" icon="terp-partner" context="{'group_by': 'invoice_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Партнеру" icon="terp-partner" context="{'group_by': 'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Услуге" icon="terp-partner" context="{'group_by': 'service_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Дата выставления счета" icon="terp-partner" context="{'group_by': 'invoice_date'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Дата закрытия счета" icon="terp-partner" context="{'group_by': 'close_date'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Специалист" icon="terp-partner" context="{'group_by': 'specialist_id'}"/>
+                        <separator orientation="vertical"/>
+                    </group>
+                </search>
             </field>
         </record>
         <record id="window_account_invoice_factor_site" model="ir.actions.act_window">
@@ -244,25 +396,65 @@
             <field name="name">Отметка о счете VIDEO</field>
             <field name="model">account.invoice.pay.line</field>
             <field name="type">tree</field>
-            <field name="inherit_id" ref="view_account_invoice_factor_tree"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='specialist_id']" position="replace">
-                    <field name="specialist_id" string="Специалист"/>
-                </xpath>
+                <tree editable="top">
+                    <field name="invoice_id" invisible="1"/>
+                    <field name="number" readonly="1"/>
+                    <field name="invoice_date" readonly="1"/>
+                    <field name="partner_id" string="Партнер" readonly="1"/>
+                    <field name="user_id" string="Автор" readonly="1"/>
+                    <field name="service_id" readonly="1"/>
+                    <field name="specialist_id" readonly="1" string="Специалист"/>
+                    <field name="name_ye" readonly="1" />
+                    <field name="factor" string="Сумма для отчета"/>
+                    <field name="paid_type" />
+                    <field name="close" on_change="onchange_close(close)"/>
+                    <field name="close_date" attrs="{'readonly': [('close', '=', False)]}" />
+                </tree>
             </field>
         </record>
         <record model="ir.ui.view" id="view_account_invoice_factor_search_video">
             <field name="name">Отметка о счете VIDEO</field>
             <field name="model">account.invoice.pay.line</field>
             <field name="type">search</field>
-            <field name="inherit_id" ref="view_account_invoice_factor_search"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='service_id']" position="replace">
-                    <field name="service_id" domain="[('direction', '=', 'VIDEO')]"/>
-                </xpath>
-                <xpath expr="//field[@name='specialist_id']" position="replace">
-                    <field name="specialist_id" string="Специалист"/>
-                </xpath>
+                <search>
+                    <field name="number" />
+                    <field name="partner_id" string="Партнер"/>
+                    <field name="user_id" string="Автор"/>
+                    <field name="service_id" domain="[('direction', '=', 'SITE')]"/>
+                    <field name="specialist_id" string="Специалист" />
+                    <field name="paid_type" />
+                    <field name="name_ye" />
+                    <field name="factor" string="Сумма для отчета"/>
+                    <field name="add_revenues" />
+                    <field name="add_costs" />
+                    <field name="close_date" />
+                    <newline />
+                    <filter icon="STOCK_MEDIA_PLAY"
+                            domain="[('close','=', True)]"
+                            name="active"
+                            string="Закрытые счета"/>
+                    <filter icon="STOCK_MEDIA_STOP"
+                            domain="[('close','=', False)]"
+                            name="deactive"
+                            string="Незакрытые счета"/>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Счет" icon="terp-partner" context="{'group_by': 'invoice_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Партнеру" icon="terp-partner" context="{'group_by': 'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Услуге" icon="terp-partner" context="{'group_by': 'service_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Дата выставления счета" icon="terp-partner" context="{'group_by': 'invoice_date'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Дата закрытия счета" icon="terp-partner" context="{'group_by': 'close_date'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Специалист" icon="terp-partner" context="{'group_by': 'specialist_id'}"/>
+                        <separator orientation="vertical"/>
+                    </group>
+                </search>
             </field>
         </record>
         <record id="window_account_invoice_factor_video" model="ir.actions.act_window">

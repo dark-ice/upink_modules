@@ -82,6 +82,7 @@ class ReportSeo(Model):
                 'service_id': record['service_id'][0] if record['service_id'] else False,
                 'partner_id': record['partner_id'][0] if record['partner_id'] else False,
                 'specialist_id': record['specialist_id'][0] if record['specialist_id'] else False,
+                'site_url': record['site_url'] or '',
                 'paid_type': record['paid_type'] or 'cash',
                 'invoice_id': record['invoice_id'][0] if record['invoice_id'] else False,
                 'pay_date': record['invoice_date'],
@@ -414,6 +415,7 @@ class ReportSeoLine(Model):
         'report_id': fields.many2one('financial.reports.seo', 'Отчет SEO'),
         'partner_id': fields.many2one('res.partner', 'Партнер'),
         'specialist_id': fields.many2one('res.users', 'Аккаунт-менеджер'),
+        'site_url': fields.char('Сайт', size=250),
         'paid_type': fields.selection(
             (
                 ('cash', 'Оплата'),

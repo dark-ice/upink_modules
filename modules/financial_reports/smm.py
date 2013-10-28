@@ -1,6 +1,7 @@
 # coding=utf-8
 import calendar
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
@@ -76,6 +77,17 @@ class SMMReport(Model):
         costs_tx_period_ye = 0
         employeers = set()
 
+        co_costs = {}
+        current_periods = set()
+        current_pay = 0
+        source_date_start = datetime.strptime(date_start, '%Y-%m-%d')
+        source_date_end = datetime.strptime(date_end, '%Y-%m-%d')
+        td = source_date_end - source_date_start
+        rtd = relativedelta(seconds=int(td.total_seconds()),  microseconds=td.microseconds)
+        months = rtd.month or 0
+        for delta in range(months):
+            current_periods.add(self.pool.get('kpi.period').get_by_date(cr, source_date_start + relativedelta(months=delta)).id)
+
         for record in pay_line_pool.read(cr, 1, pay_line_ids, []):
             rate = 1
             costs_partner = record['add_costs']
@@ -124,14 +136,19 @@ class SMMReport(Model):
                         ('type', '=', 'in_invoice'),
                         ('partner_id', '=', record['partner_id'][0])
                     ])
-                for m in self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'date_invoice']):
-                    if m['date_invoice'] >= first_day:
-                        vals['costs_partner'] += m['cash_mr_dol']
-                    else:
-                        vals['co_costs_partner'] += m['cash_mr_dol']
 
+                for m in self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'date_invoice']):
+                    zds_period = self.pool.get('kpi.period').get_by_date(cr, datetime.strptime(m['date_invoice'], '%Y-%m-%d'))
+                    if zds_period.id in current_periods and m['date_invoice'] >= date_start:
+                        costs_partner += m['cash_mr_dol']
+                    else:
+                        try:
+                            co_costs[zds_period.id]['partner'] += m['cash_mr_dol']
+                        except KeyError:
+                            co_costs[zds_period.id] = {'partner': m['cash_mr_dol']}
+
+            period = self.pool.get('kpi.period').get_by_date(cr, source_date)
             if record['specialist_id']:
-                period = self.pool.get('kpi.period').get_by_date(cr, source_date)
                 kpi_ids = self.pool.get('kpi.kpi').search(cr, 1, [('period_id', '=', period.id), ('employee_id.user_id', '=', record['specialist_id'][0])])
                 if kpi_ids:
                     kpi_total = self.pool.get('kpi.kpi')._get_cash(cr, 1, kpi_ids, 'total', None)
@@ -152,20 +169,44 @@ class SMMReport(Model):
                     domain + [('specialist_id', '=', record['specialist_id'][0])],
                     order='partner_id, service_id, invoice_date'
                 )
-                sum_pay = sum(p['factor'] for p in pay_line_pool.read(cr, 1, specialist_pay_line_ids, ['factor']))
+                for p in pay_line_pool.read(cr, 1, specialist_pay_line_ids, ['factor', 'invoice_date']):
+                    invoice_period = self.pool.get('kpi.period').get_by_date(cr, datetime.strptime(p['invoice_date'], '%Y-%m-%d'))
+                    if invoice_period.id in current_periods and p['invoice_date'] >= date_start:
+                        current_pay += p['factor']
+                    else:
+                        try:
+                            co_costs[invoice_period.id]['pay'] += p['factor']
+                        except KeyError:
+                            co_costs[invoice_period.id]['pay'] = p['factor']
+
+                #try:
+                #    costs_employee = (total * record['factor'] / current_pay) / 8.0
+                #except ZeroDivisionError:
+                #    costs_employee = 0
+
+            for co_cost in co_costs.values():
                 try:
-                    costs_employee = (total * record['factor'] / sum_pay) / 8.0
+                    vals['co_costs_partner'] += co_cost['partner'] / co_cost['pay']
+                except KeyError:
+                    vals['co_costs_partner'] += 0
+                except ZeroDivisionError:
+                    vals['co_costs_partner'] += 0
+
+            if date_end >= record['invoice_date'] >= date_start:
+                try:
+                    costs_employee = (total * record['factor'] / current_pay) / 8.0
                 except ZeroDivisionError:
                     costs_employee = 0
-
-            if date_end >= record['invoice_date'] >= date_start and record['close_date'] != 'Не закрыт':
-                vals['co_costs_employee'] = 0
                 vals['costs_employee'] = costs_employee
                 costs_employee_period += costs_employee
-
             else:
+                try:
+                    costs_employee = (total * record['factor'] / co_costs[period.id]['pay']) / 8.0
+                except KeyError:
+                    costs_employee = 0
+                except ZeroDivisionError:
+                    costs_employee = 0
                 vals['co_costs_employee'] = costs_employee
-                vals['costs_employee'] = 0
                 vals['carry_over_revenue'] = record['factor']
                 vals['total'] = 0
 
