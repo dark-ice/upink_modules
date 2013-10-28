@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 try:
     from collections import Counter
-except:
+except ImportError:
     from res_partner_update.counter import Counter
 
 from openerp.osv import fields
