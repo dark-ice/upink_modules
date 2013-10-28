@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from collections import Counter
+from res_partner_update.counter import Counter
 
 from openerp.osv import fields
 from openerp.osv.orm import TransientModel
