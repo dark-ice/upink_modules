@@ -1054,6 +1054,14 @@ class res_partner(Model):
             return [('id', 'in', tuple(partner_id))]
         return [('id', '=', '0')]
 
+    def _search_service_name(self, cr, uid, obj, name, args, context):
+        service_pool = self.pool.get('partner.added.services')
+        services_ids = service_pool.search(cr, 1, [('service_id', '=', args[0][2])])
+        partner_ids = set([r['partner_id'][0] for r in service_pool.read(cr, 1, services_ids, ['partner_id']) if r['partner_id']])
+        if partner_ids:
+            return [('id', 'in', tuple(partner_ids))]
+        return [('id', '=', '0')]
+
     def name_get(self, cr, user, ids, context=None):
         if not ids:
             return []
@@ -1371,7 +1379,8 @@ class res_partner(Model):
             type="many2one",
             relation='brief.services.stage',
             string='Услуга',
-            method=True
+            method=True,
+            fnct_search=_search_service_name
         ),
         'site_s': fields.function(
             lambda *a: [],
@@ -1426,6 +1435,8 @@ class res_partner(Model):
             selection=PARTNER_STATUS,
             fnct_search=_search_service_status
         ),
+
+
 
         'date_start_from': fields.date('дата начала с'),
         'date_start_to': fields.date('дата начала по'),

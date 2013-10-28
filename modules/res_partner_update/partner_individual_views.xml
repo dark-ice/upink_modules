@@ -592,6 +592,7 @@
                         <field name="date_finish_from"/>
                         <field name="date_finish_to"/>
                         <field name="service_status"/>
+                        <field name="service"/>
                     </group>
                     <newline/>
                     <group expand="0" string="Group By...">
@@ -1855,6 +1856,7 @@
                         <field name="date_finish_from"/>
                         <field name="date_finish_to"/>
                         <field name="service_status"/>
+                        <field name="service"/>
 
                         <field name="user_id">
                             <filter string="My Partners" icon="terp-personal+" domain="[('user_id','=',uid)]"/>
