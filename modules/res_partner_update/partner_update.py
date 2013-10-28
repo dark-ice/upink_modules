@@ -1035,6 +1035,13 @@ class res_partner(Model):
             return [('id', 'in', partner_ids)]
         return [('id', '=', '0')]
 
+    def _search_full_name(self, cr, uid, obj, name, args, context=None):
+        rek_ids = self.pool.get('res.partner.bank').search(cr, uid, [('fullname', args[0][1], args[0][2])])
+        partner_ids = [b['partner_id'][0] for b in self.pool.get('res.partner.bank').read(cr, uid, rek_ids, ['partner_id']) if b['partner_id']]
+        if partner_ids:
+            return [('id', 'in', partner_ids)]
+        return [('id', '=', '0')]
+
     def _search_phone(self, cr, uid, obj, name, args, context):
         site_ids = self.pool.get('tel.reference').search(
             cr,
@@ -1175,6 +1182,43 @@ class res_partner(Model):
         if ids:
             return [('id', 'in', tuple(ids))]
         return [('id', '=', '0')]
+
+    def _check_ppc(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for val in ids:
+            added_ids = self.pool.get('partner.added.services').search(cr, 1, [('partner_id', '=', val)])
+            services = self.pool.get('partner.added.services').read(cr, 1, added_ids, ['service_id'])
+            service_domain = [item['service_id'][0] for item in services if item['service_id']]
+            res[val] = False
+            if self.pool.get('brief.services.stage').search(cr, 1, [('id', 'in', service_domain), ('direction', '=', 'PPC')], count=True):
+                res[val] = True
+        return res
+
+    def _main_name(self, cr, uid, ids, field, arg, context):
+        res = {}
+        for i in self.read(cr, 1, ids, ['address']):
+            name = ''
+            phone = ''
+            site = ''
+            address_ids = self.pool.get('res.partner.address').search(cr, 1, [('main_face', '=', True), ('id', 'in', i['address'])])
+
+            if address_ids:
+                address = self.pool.get('res.partner.address').read(cr, uid, address_ids[0], ['name', 'phone_ids', 'email_ids'])
+
+                name = address['name']
+                if address['email_ids']:
+                    site_name = self.pool.get('res.partner.address.email').read(cr, uid, address['email_ids'][0], ['name'])
+                    site = site_name['name']
+                if address['phone_ids']:
+                    phone_name = self.pool.get('tel.reference').read(cr, uid, address['phone_ids'][0], ['phone'])
+                    phone = phone_name['phone']
+
+            res[i['id']] = {
+                'partner_name': name,
+                'phone_default': phone,
+                'email_default': site
+            }
+        return res
 
     _columns = {
         'name': fields.char('Партнер (основной сайт)', size=250),
