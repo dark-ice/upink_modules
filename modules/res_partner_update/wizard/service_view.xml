@@ -1,0 +1,45 @@
+<openerp>
+    <data>
+            <record id="view_service_wizard" model="ir.ui.view">
+            <field name="name">Service</field>
+            <field name="model">partner.added.services.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Сервисы">
+                    <field name="date" required="1"/>
+                    <field name="type" invisible="1"/>
+                    <field name="partner_id" invisible="1"/>
+                    <field name="service_id" invisible="1"/>
+                    <field name="comment" invisible="1"/>
+                    <field name="budget" invisible="1"/>
+                    <separator colspan="4" />
+                    <group col="4" colspan="4">
+                        <button string="Отмена" icon="gtk-close" special="cancel" />
+                        <button name="set_service" string="Сохранить" type="object" icon="gtk-ok" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- Service Wizard -->
+        <record id="action_service_wizard" model="ir.actions.act_window">
+            <field name="name">Service</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">partner.added.services.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_service_wizard"/>
+            <field name="context">{}</field>
+            <field name="target">new</field>
+        </record>
+
+        <record id="action_service_close_wizard" model="ir.actions.act_window">
+            <field name="name">Service</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">partner.added.services.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_service_wizard"/>
+            <field name="context">{}</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</openerp>

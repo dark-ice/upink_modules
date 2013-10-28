@@ -1,4 +1,6 @@
 # coding=utf-8
+from datetime import date
+
 __author__ = 'andrey'
 import netsvc
 from openerp.osv import fields, osv
@@ -516,10 +518,10 @@ class ProcessLaunch(Model):
 
     def process_add(self, cr, user, ids):
         flag = True
-        for record in self.read(cr, user, ids, ['partner_id', 'service_id']):
-            as_ids = self.pool.get('partner.added.services').search(cr, user, [('partner_id', '=', record['partner_id'][0]), ('service_id', '=', record['service_id'][0])])
-            if as_ids:
-                flag = self.pool.get('partner.added.services').write(cr, user, as_ids, {'check': True})
+        service_pool = self.pool.get('partner.added.services')
+        for record in self.read(cr, user, ids, ['partner_id', 'service_id', 'account_id']):
+            if not record['account_id']:
+                flag = service_pool.connect_service(cr, record['partner_id'][0], record['service_id'][0], date.today().strftime('%Y-%m-%d'))
         return flag
 ProcessLaunch()
 

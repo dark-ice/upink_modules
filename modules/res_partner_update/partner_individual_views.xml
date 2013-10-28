@@ -590,6 +590,14 @@
                         <field name="partner_status" />
                         <newline/>
                         <field name="full_name_s"/>
+                        <field name="service_s"/>
+                        <newline/>
+                        <field name="date_start_from"/>
+                        <field name="date_start_to"/>
+                        <field name="date_finish_from"/>
+                        <field name="date_finish_to"/>
+                        <field name="service_status"/>
+                        <field name="service"/>
                     </group>
                     <newline/>
                     <group expand="0" string="Group By...">
@@ -652,13 +660,50 @@
                                 <group colspan="4" col="4">
                                     <field name="added_services_ids" colspan="4" nolabel="1" mode="tree">
                                         <tree string="Услуги" editable="top">
+                                            <field name="id" invisible="1" />
                                             <field name="service_id" required="1"/>
-                                            <field name="comment" />
-                                            <field name="check"/>
+                                            <field name="check" readonly="1"/>
+                                            <field name="date_start" attrs="{'required': [('date_finish', '!=', False)]}" readonly="1"/>
+                                            <field name="date_finish" readonly="1"/>
                                             <field name="budget" />
                                             <field name="service_status" readonly="1"/>
+                                            <field name="comment" />
+                                            <field name="partner_id" invisible="1"/>
+                                            <!--<button type="action"-->
+                                                    <!--name="%(action_service_wizard)d"-->
+                                                    <!--string="Включить"-->
+                                                    <!--icon="STOCK_YES"-->
+                                                    <!--context="{'service_id' : service_id,-->
+                                                              <!--'type' : check,-->
+                                                              <!--'partner_id'  :  partner_id,-->
+                                                              <!--'comment' : comment,-->
+                                                              <!--'budget' : budget}"-->
+                                                    <!--attrs="{'invisible': ['|', ('check', '=', True),('id', '=', False)]}"/>-->
+                                            <button type="action"
+                                                    name="%(action_service_close_wizard)d"
+                                                    string="Выключить"
+                                                    icon="STOCK_MEDIA_RECORD"
+                                                    context="{'service_id' : service_id,
+                                                              'type' : check,
+                                                              'partner_id'  :  partner_id,
+                                                              'comment' : comment,
+                                                              'budget' : budget,
+                                                              }"
+                                                    attrs="{'invisible': [('check', '=', False)]}"/>
                                         </tree>
+                                        <form>
+                                            <field name="service_id" required="1"/>
+                                            <field name="id" invisible="1" />
+                                            <field name="check" readonly="1"/>
+                                            <field name="date_start" readonly="1"/>
+                                            <field name="date_finish" readonly="1"/>
+                                            <field name="budget" />
+                                            <field name="service_status" readonly="1"/>
+                                            <field name="comment" />
+                                            <field name="partner_id" invisible="1"/>
+                                        </form>
                                     </field>
+
                                     <field name="operation_deps" colspan="4" nolabel="1" mode="tree">
                                         <tree string="Операционные направления" editable="top">
                                             <field name="department"/>
@@ -685,6 +730,29 @@
                                         context="{'partner_id': id}"
                                         icon="gtk-ok"/>
                                     <field name="process_ids" nolabel="1" colspan="4" />
+                                    <separator string="Истории услуг" colspan="4"/>
+                                    <field name="added_services_history_ids" colspan="4" nolabel="1" readonly="1">
+                                        <tree string="История услуги" editable="top">
+                                            <field name="service_id"/>
+                                            <field name="date_start" />
+                                            <field name="date_finish" />
+                                            <field name="budget" />
+                                            <field name="comment" />
+                                            <field name="check_r" invisible="1"/>
+                                            <button name="change_history" string="Изменить" type="object" icon="gtk-ok" attrs="{'invisible': [('check_r', '=', False)]}"/>
+                                        </tree>
+                                    </field>
+                                    <field name="added_services_history_change_ids" colspan="4" nolabel="1" readonly="1">
+                                        <tree string="История изменений в истории услуг" editable="top">
+                                            <field name="service_id"/>
+                                            <field name="date_start" />
+                                            <field name="old_date_start" />
+                                            <field name="date_finish" />
+                                            <field name="old_date_finish" />
+                                            <field name="create_uid" />
+                                            <field name="create_date" />
+                                        </tree>
+                                    </field>
                                 </group>
 
                             </page>
@@ -1259,16 +1327,52 @@
                             </page>
                             <page string="Услуги">
                                 <group colspan="4" col="4">
-                                    <field name="added_services_ids" colspan="4" nolabel="1" mode="tree" context="{'partner_base': partner_base}">
+                                    <field name="added_services_ids" colspan="4" nolabel="1" mode="tree">
                                         <tree string="Услуги" editable="top">
-                                            <field name='partner_base' invisible="1"/>
                                             <field name="service_id" required="1"/>
-                                            <field name="comment"/>
-                                            <field name="check"/>
-                                            <field name="budget" attrs="{'required': [('partner_base', '=', 'hot')]}"/>
+                                            <field name="id" invisible="1" />
+                                            <field name="check" readonly="1"/>
+                                            <field name="date_start" attrs="{'required': [('date_finish', '!=', False)]}" readonly="1"/>
+                                            <field name="date_finish" readonly="1"/>
+                                            <field name="budget" />
                                             <field name="service_status" readonly="1"/>
+                                            <field name="comment" />
+                                            <field name="partner_id" invisible="1"/>
+                                            <!--<button type="action"-->
+                                                    <!--name="%(action_service_wizard)d"-->
+                                                    <!--string="Включить"-->
+                                                    <!--icon="STOCK_YES"-->
+                                                    <!--context="{'service_id' : service_id,-->
+                                                              <!--'type' : check,-->
+                                                              <!--'partner_id'  :  partner_id,-->
+                                                              <!--'comment' : comment,-->
+                                                              <!--'budget' : budget}"-->
+                                                    <!--attrs="{'invisible': ['|', ('check', '=', True),('id', '=', False)]}"/>-->
+                                            <button type="action"
+                                                    name="%(action_service_close_wizard)d"
+                                                    string="Выключить"
+                                                    icon="STOCK_MEDIA_RECORD"
+                                                    context="{'service_id' : service_id,
+                                                              'type' : check,
+                                                              'partner_id'  :  partner_id,
+                                                              'comment' : comment,
+                                                              'budget' : budget,
+                                                              }"
+                                                    attrs="{'invisible': [('check', '=', False)]}"/>
                                         </tree>
+                                        <form>
+                                            <field name="service_id" required="1"/>
+                                            <field name="id" invisible="1" />
+                                            <field name="check" readonly="1"/>
+                                            <field name="date_start" readonly="1"/>
+                                            <field name="date_finish" readonly="1"/>
+                                            <field name="budget" />
+                                            <field name="service_status" readonly="1"/>
+                                            <field name="comment" />
+                                            <field name="partner_id" invisible="1"/>
+                                        </form>
                                     </field>
+
                                     <field
                                             name="access_ids"
                                             nolabel="1"
@@ -1289,6 +1393,29 @@
                                         context="{'partner_id': id}"
                                         icon="gtk-ok"/>
                                     <field name="process_ids" nolabel="1" colspan="4" />
+                                    <separator string="Истории услуг" colspan="4"/>
+                                    <field name="added_services_history_ids" colspan="4" nolabel="1" readonly="1">
+                                        <tree string="История услуги" editable="top">
+                                            <field name="service_id"/>
+                                            <field name="date_start" />
+                                            <field name="date_finish" />
+                                            <field name="budget" />
+                                            <field name="comment" />
+                                            <field name="check_r" invisible="1"/>
+                                            <button name="change_history" string="Изменить" type="object" icon="gtk-ok" attrs="{'invisible': [('check_r', '=', False)]}"/>
+                                        </tree>
+                                    </field>
+                                    <field name="added_services_history_change_ids" colspan="4" nolabel="1" readonly="1">
+                                        <tree string="История изменений истории услуг" editable="top">
+                                            <field name="service_id"/>
+                                            <field name="date_start" />
+                                            <field name="old_date_start" />
+                                            <field name="date_finish" />
+                                            <field name="old_date_finish" />
+                                            <field name="create_uid" />
+                                            <field name="create_date" />
+                                        </tree>
+                                    </field>
                                 </group>
 
                             </page>
@@ -1775,6 +1902,14 @@
                         <field name="phone_s"/>
                         <field name="site_s"/>
                         <field name="email_s"/>
+                        <field name="service_s"/>
+                        <newline/>
+                        <field name="date_start_from"/>
+                        <field name="date_start_to"/>
+                        <field name="date_finish_from"/>
+                        <field name="date_finish_to"/>
+                        <field name="service_status"/>
+                        <field name="service"/>
 
                         <field name="user_id">
                             <filter string="My Partners" icon="terp-personal+" domain="[('user_id','=',uid)]"/>
@@ -1950,5 +2085,89 @@
                 </tree>
             </field>
         </record>
+        <record model="ir.ui.view" id="view_services_history_form">
+            <field name="name">partner.added.services.history.form</field>
+            <field name="model">partner.added.services.history</field>
+            <field name="priority" eval="1"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <field name='date_start'/>
+                    <field name='date_finish'/>
+                    <separator colspan="4"/>
+                    <group colspan="6" col="4" >
+                        <button string="Отмена" icon="gtk-close" special="cancel" />
+                        <button name="save" type="object" string="Изменить" icon="gtk-ok" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="service_report">
+            <field name="name">service.report</field>
+            <field name="model">partner.added.services.history</field>
+            <field name="type">tree</field>
+            <field name="priority">2</field>
+            <field name="arch" type="xml">
+                <tree string="Услуги" editable="top" >
+                    <field name="partner_id" readonly="1"/>
+                    <field name="service_id" readonly="1"/>
+                    <field name="date_start" readonly="1"/>
+                    <field name="date_finish" readonly="1"/>
+                    <field name="direction" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="service_report_filter">
+            <field name="name">res.partner.service.filter</field>
+            <field name="model">partner.added.services.history</field>
+            <field name="priority" eval="1"/>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="date_start_from"/>
+                    <field name="date_start_to"/>
+                    <field name="date_finish_from"/>
+                    <field name="date_finish_to"/>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="service_report_action">
+            <field name="name">Отчет по текущим услугам</field>
+            <field name="res_model">partner.added.services.history</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="service_report"/>
+            <field name="context">{'lead': False, 'report': True}</field>
+        </record>
+
+
+        <menuitem action="service_report_action" id="menu_service_report_view" parent="partner_reports" sequence="50"/>
+
+        <record model="ir.ui.view" id="view_set_service_form">
+            <field name="name">set.service.form</field>
+            <field name="model">partner.added.services</field>
+            <field name="priority" eval="1"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group colspan="6" col="4" >
+                        <button type="object" name="set_all_services" string="Поехали!" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="set_services">
+            <field name="name">Даты услуг(Таня)</field>
+            <field name="res_model">partner.added.services</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_set_service_form"/>
+        </record>
+        <menuitem action="set_services" id="set_all_services_button" parent="account.menu_finance" sequence="100"/>
     </data>
 </openerp>
