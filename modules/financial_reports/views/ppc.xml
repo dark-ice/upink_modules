@@ -83,6 +83,7 @@
                         />
                     <newline />
                     <button string="Выгрузить EXCEL" type="action" name="%(action_report_ppc)d" />
+                    <button string="Обновить" type="object" name="save" />
                 </form>
             </field>
         </record>
