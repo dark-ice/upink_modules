@@ -419,7 +419,7 @@ class ReportSeo(Model):
             currency = currency_rate_pool.read(cr, 1, currency_date_ids[0], ['rate'])
         else:
             currency = currency_pool.read(cr, 1, currency_id, ['rate'])
-        return currency
+        return currency['rate']
 
     def create(self, cr, user, vals, context=None):
         date = datetime.now().strftime('%Y-%m-%d')
