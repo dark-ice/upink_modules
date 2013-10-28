@@ -150,7 +150,7 @@ class PPCReport(Model):
             elif record['service_id'][0] in (23,):
                 costs_partner = record['factor'] * (1 - vals['discount_up'] / 100)
 
-            if record['specialist_id']:
+            if record['specialist_id'] and record['invoice_date']:
                 source_date = datetime.strptime(record['invoice_date'], '%Y-%m-%d')
                 period = self.pool.get('kpi.period').get_by_date(cr, source_date)
                 kpi_ids = self.pool.get('kpi.kpi').search(cr, 1, [('period_id', '=', period.id), ('employee_id.user_id', '=', record['specialist_id'][0])])
