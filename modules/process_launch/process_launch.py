@@ -278,6 +278,9 @@ class ProcessLaunch(Model):
         ),
         'account_ids': fields.many2many(
             'account.invoice',
+            'account_invoice_launch_rel',
+            'launch_id',
+            'invoice_id',
             'Счет',
             readonly=False,
             domain="[('partner_id', '=', partner_id), ('invoice_line.service_id', 'in', [service_id]), ('type', '=', 'out_invoice')]",),
