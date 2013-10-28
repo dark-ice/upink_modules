@@ -94,8 +94,10 @@ class ProcessLaunch(Model):
             if data['account_ids']:
                 account_ids = data['account_ids']
             if service_id and account_ids:
-                value['price'], value['price_ye'], value['paid'], value['invoice_pay_ids'] = self._get_account_info(cr, 1, account_ids, service_id)
-
+                try:
+                    value['price'], value['price_ye'], value['paid'], value['invoice_pay_ids'] = self._get_account_info(cr, 1, account_ids, service_id)
+                except TypeError:
+                    pass
             res[data['id']] = value
         return res
 
