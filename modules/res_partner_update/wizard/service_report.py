@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 try:
-    from collections imoport Counter
+    from collections import Counter
 except:
     from res_partner_update.counter import Counter
 
