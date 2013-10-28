@@ -413,6 +413,12 @@ class partner_added_services(Model):
                 if i['partner_id'] and j['service_id']:
                     if not vals.get((i['partner_id'][0], j['service_id'][0])):
                         vals[(i['partner_id'][0], j['service_id'][0])] = i['date_invoice']
+
+        process_ids = self.pool.get('process.launch').search(cr, 1, [])
+        for p in self.pool.get('process.launch').read(cr, 1, process_ids, ['partner_id', 'service_id', 'create_date']):
+            if p['partner_id'] and p['service_id']:
+                if not vals.get((p['partner_id'][0], p['service_id'][0])):
+                    vals[(p['partner_id'][0], p['service_id'][0])] = p['create_date']
         for k, v in vals.iteritems():
             self.connect_service(cr, k[0], k[1], v)
 
