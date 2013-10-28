@@ -397,12 +397,45 @@ class ReportSeo(Model):
             multi='report',
             readonly=True
         ),
+
+        'rate_rus': fields.float('Курс 1$ к руб.'),
+        'rate_uah': fields.float('Курс 1$ к грн.'),
     }
 
     _defaults = {
         'state': 'draft',
         'check_h': lambda s, c, u, cnt: u == 61 or u == 1,
     }
+
+    def get_rate(self, cr, date, currency_id):
+        currency_rate_pool = self.pool.get('res.currency.rate')
+        currency_pool = self.pool.get('res.currency')
+        currency_date_ids = currency_rate_pool.search(
+            cr,
+            1,
+            [('name', '=', date), ('currency_id', '=', currency_id)]
+        )
+        if currency_date_ids:
+            currency = currency_rate_pool.read(cr, 1, currency_date_ids[0], ['rate'])
+        else:
+            currency = currency_pool.read(cr, 1, currency_id, ['rate'])
+        return currency
+
+    def create(self, cr, user, vals, context=None):
+        date = datetime.now().strftime('%Y-%m-%d')
+        vals['rate_rus'] = self.get_rate(cr, date, 31)
+        vals['rate_uah'] = self.get_rate(cr, date, 23)
+
+        return super(ReportSeo, self).create(cr, user, vals, context)
+
+    def write(self, cr, user, ids, vals, context=None):
+        date = datetime.now().strftime('%Y-%m-%d')
+        for record in self.read(cr, user, ids, ['rate_rus', 'rate_uah']):
+            if not record['rate_uah']:
+                vals['rate_uah'] = self.get_rate(cr, date, 23)
+            if not record['rate_rus']:
+                vals['rate_rus'] = self.get_rate(cr, date, 31)
+        return super(ReportSeo, self).write(cr, user, ids, vals, context)
 ReportSeo()
 
 
