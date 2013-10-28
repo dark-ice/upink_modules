@@ -398,8 +398,8 @@ class ReportSeo(Model):
             readonly=True
         ),
 
-        'rate_rus': fields.float('Курс 1$ к руб.'),
-        'rate_uah': fields.float('Курс 1$ к грн.'),
+        'rate_rus': fields.float('Курс 1$ к руб.', readonly=True),
+        'rate_uah': fields.float('Курс 1$ к грн.', readonly=True),
     }
 
     _defaults = {

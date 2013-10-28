@@ -461,6 +461,9 @@ class SMMReport(Model):
             type='boolean',
             invisible=True
         ),
+
+        'rate_rus': fields.float('Курс 1$ к руб.', readonly=True),
+        'rate_uah': fields.float('Курс 1$ к грн.', readonly=True),
     }
 
     _defaults = {

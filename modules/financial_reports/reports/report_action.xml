@@ -23,10 +23,27 @@
             <field name='in_format'>oo-ods</field>
             <field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/>
             <field name='multi' eval='False'/>
-            <field name='name'>PPC</field>
+            <field name='name'>SEO</field>
             <field name='report_rml'>financial_reports/reports/seo.ods</field>
             <field name='report_name'>financial.seo</field>
             <field name='model'>financial.reports.seo</field>
+            <field name='type'>ir.actions.report.xml</field>
+            <field name='attachment_use' eval='False'/>
+            <field name='parser_loc'>financial_reports/reports/parser.py</field>
+            <field name='tml_source'>file</field>
+            <field name='parser_state'>loc</field>
+            <field name='styles_mode'>default</field>
+        </record>
+
+        <record model='ir.actions.report.xml' id='action_report_smm'>
+            <field name='report_type'>aeroo</field>
+            <field name='in_format'>oo-ods</field>
+            <field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/>
+            <field name='multi' eval='False'/>
+            <field name='name'>SMM</field>
+            <field name='report_rml'>financial_reports/reports/smm.ods</field>
+            <field name='report_name'>financial.smm</field>
+            <field name='model'>financial.reports.smm</field>
             <field name='type'>ir.actions.report.xml</field>
             <field name='attachment_use' eval='False'/>
             <field name='parser_loc'>financial_reports/reports/parser.py</field>
