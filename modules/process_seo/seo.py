@@ -107,6 +107,13 @@ class ProcessSeo(Model):
             domain=[('process_model', '=', _name)],
             context={'process_model': _name}),
 
+        'costs_ids': fields.one2many(
+            'process.costs',
+            'process_id',
+            'Затраты на партнера',
+            domain=[('process_model', '=', _name)],
+            context={'process_model': _name}),
+
         'task_ids': fields.one2many('process.seo.tasks', 'process_id', 'Задачи в рамках проекта'),
 
         'check_a': fields.function(

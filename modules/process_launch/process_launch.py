@@ -78,17 +78,23 @@ class ProcessLaunch(Model):
 
     def _get_pay_ids(self, cr, uid, ids, name, arg, context=None):
         res = {}
-        for data in self.read(cr, uid, ids, ['service_id', 'account_id'], context):
+        for data in self.read(cr, uid, ids, ['service_id', 'account_ids'], context):
+            value = {
+                'price': 0,
+                'price_ye': 0,
+                'paid': 0,
+                'invoice_pay_ids': []
+            }
             service_id = 0
             account_id = 0
             if data['service_id']:
                 service_id = data['service_id'][0]
-            if data['account_id']:
-                account_id = data['account_id'][0]
-            if service_id and account_id:
-                result = self._get_account_info(cr, 1, account_id, service_id)
-                if result:
-                    res[data['id']] = result[4]
+            if data['account_ids']:
+                account_ids = data['account_ids']
+            if service_id and account_ids:
+                value['price'], value['price_ye'], value['paid'], value['invoice_pay_ids'] = self._get_account_info(cr, 1, account_ids, service_id)
+
+            res[data['id']] = value
         return res
 
     def _get_head(self, cr, user, leader_group_id):
@@ -102,17 +108,27 @@ class ProcessLaunch(Model):
         service = self.pool.get('brief.services.stage').read(cr, uid, [service_id], ['direction', 'leader_group_id'])
         return service[0]['direction'], self._get_head(cr, uid, service[0]['leader_group_id'][0])
 
-    def _get_account_info(self, cr, uid, account_id, service_id):
-        value = self.pool.get('account.invoice.line').search(cr, uid, [('invoice_id', '=', account_id),
-                                                                       ('service_id', '=', service_id)])
-        if value:
-            invoice_lines = self.pool.get('account.invoice.line').read(cr, uid, value,
+    def _get_account_info(self, cr, uid, account_ids, service_id):
+        line_ids = self.pool.get('account.invoice.line').search(
+            cr,
+            uid,
+            [
+                ('invoice_id', 'in', account_ids),
+                ('service_id', '=', service_id)
+            ])
+        if line_ids:
+            invoice_lines = self.pool.get('account.invoice.line').read(cr, uid, line_ids,
                                                                        ['price_currency', 'price_unit', 'paid'])
-            invoice_line = invoice_lines[0]
-            pay_line_ids = self.pool.get('account.invoice.pay.line').search(cr, uid, [('invoice_id', '=', account_id),
-                                                                                      ('service_id', '=', service_id)])
-            return invoice_line['id'], invoice_line['price_currency'], invoice_line['price_unit'], invoice_line[
-                'paid'], pay_line_ids
+            price_currency = 0
+            price_unit = 0
+            paid = 0
+            for line in invoice_lines:
+                price_currency += line['price_currency']
+                price_unit += line['price_unit']
+                paid += line['paid']
+            pay_line_ids = self.pool.get('account.invoice.pay.line').search(cr, uid, [('invoice_id', 'in', account_ids),
+
+            return price_currency, price_unit, paid, pay_line_ids
 
     def onchange_partner_id(self, cr, uid, ids, partner_id, context=None):
         domain = []
@@ -124,7 +140,7 @@ class ProcessLaunch(Model):
             service_domain = [item['service_id'][0] for item in services if item['service_id']]
 
         return {'domain': {'service_id': [('id', 'in', service_domain)], 'contract_id': domain,
-                           'account_id': domain + [('type', '=', 'out_invoice')]}}
+                           'account_ids': domain + [('type', '=', 'out_invoice')]}}
 
     def onchange_service_id(self, cr, uid, ids, partner_id, service_id, context=None):
         domain = []
@@ -152,7 +168,7 @@ class ProcessLaunch(Model):
         return {
             'domain': {
                 'contract_id': domain,
-                'account_id': [('id', 'in', invoice_ids), ('type', '=', 'out_invoice')]
+                'account_ids': [('id', 'in', invoice_ids), ('type', '=', 'out_invoice')]
             },
             'value': {
                 'direction': direction,
@@ -161,25 +177,25 @@ class ProcessLaunch(Model):
             }
         }
 
-    def onchange_account_id(self, cr, uid, ids, account_id, service_id, context=None):
+    def onchange_account_ids(self, cr, uid, ids, account_ids, service_id, context=None):
         value = {
-            'invoice_line_id': False,
             'price': False,
             'price_ye': False,
             'paid': False,
             'invoice_pay_ids': False
         }
-        if account_id and service_id:
+        if account_ids and service_id:
+            account_ids = [y for i in account_ids for y in i[2]]
             value_ids = self.pool.get('account.invoice.line').search(
                 cr,
                 1,
                 [
-                    ('invoice_id', '=', account_id),
-                    ('service_id', '=', service_id)])
+                    ('invoice_id', 'in', account_ids),
+                    ('service_id', '=', service_id)
+                ])
             if value_ids:
-                line_id, price, price_ye, paid, line_ids = self._get_account_info(cr, 1, account_id, service_id)
+                price, price_ye, paid, line_ids = self._get_account_info(cr, 1, account_ids, service_id)
                 value = {
-                    'invoice_line_id': line_id,
                     'price': price,
                     'price_ye': price_ye,
                     'paid': paid,
@@ -260,15 +276,11 @@ class ProcessLaunch(Model):
             domain="['|', '&', ('res_model', '=', 'process.launch'), ('tmp_res_model', '=', 'contract_file'), '&', ('res_model', '=', 'res.partner'), ('res_id', '=', partner_id)]",
             context="{'res_model': 'res.partner', 'res_id': partner_id}"
         ),
-        'account_id': fields.many2one(
+        'account_ids': fields.many2many(
             'account.invoice',
             'Счет',
-            readonly=True,
-            domain="[('partner_id', '=', partner_id), ('invoice_line.service_id', 'in', [service_id]), ('type', '=', 'out_invoice')]",
-            states={
-                'draft': [('readonly', False)],
-                'revision': [('readonly', False)],
-            }),
+            readonly=False,
+            domain="[('partner_id', '=', partner_id), ('invoice_line.service_id', 'in', [service_id]), ('type', '=', 'out_invoice')]",),
         'account_file_id': fields.many2one(
             'ir.attachment',
             'Файл платежного поручения',
@@ -287,43 +299,41 @@ class ProcessLaunch(Model):
                 'draft': [('readonly', False)],
                 'revision': [('readonly', False)],
             }),
-        'invoice_line_id': fields.many2one('account.invoice.line', 'Позиция счета', readonly=True),
-        'price': fields.related(
-            'invoice_line_id',
-            'price_currency',
+        'price': fields.function(
+            _get_pay_ids,
+            method=True,
             type='float',
             digits=(10, 6),
-            string='Стоимость в валюте счета'
+            string='Стоимость в валюте счета',
+            readonly=True,
+            multi='account'
         ),
-        'price_ye': fields.related(
-            'invoice_line_id',
-            'price_unit',
+        'price_ye': fields.function(
+            _get_pay_ids,
+            method=True,
             type='float',
             digits=(10, 6),
-            string='Стоимость в $'
+            string='Стоимость в $',
+            readonly=True,
+            multi='account'
         ),
-        'paid': fields.related(
-            'invoice_line_id',
-            'paid',
+        'paid': fields.function(
+            _get_pay_ids,
+            method=True,
             type='float',
             digits=(10, 6),
-            string='Оплачено'
+            string='Оплачено',
+            readonly=True,
+            multi='account'
         ),
-        'pay_ids': fields.related(
-            'account_id',
-            'pay_ids',
-            type='one2many',
-            relation='account.invoice.pay',
-            string='Платежи'
-        ),
-
         'invoice_pay_ids': fields.function(
             _get_pay_ids,
             method=True,
             string='Платежи',
             type='one2many',
             relation='account.invoice.pay.line',
-            readonly=True
+            readonly=True,
+            multi='account'
         ),
 
         'direction': fields.related(
@@ -361,13 +371,6 @@ class ProcessLaunch(Model):
                 'agreement': [('readonly', False)]
             }
         ),
-
-        #'rep_file_id': fields.one2many(
-        #    'attach.files',
-        #    'obj_id',
-        #    'Медиаплан/коммерческое предложение',
-        #    domain=[('object', '=', 'process.launch')],
-        #    readonly=True),
         'rep_file_id': fields.function(
             _attach,
             relation='attach.files',
@@ -460,25 +463,22 @@ class ProcessLaunch(Model):
         if service_id:
             vals['direction'], vals['service_head_id'] = self._get_service_info(cr, 1, service_id)
             if account_id:
-                vals['invoice_line_id'], vals['price'], vals['price_ye'], vals['paid'], line_ids = \
+                vals['price'], vals['price_ye'], vals['paid'], line_ids = \
                     self._get_account_info(cr, 1, account_id, service_id)
         return super(ProcessLaunch, self).create(cr, user, vals, context)
 
     @notify.msg_send(_name)
     def write(self, cr, uid, ids, values, context=None):
         error = ''
-        for record in self.read(cr, uid, ids, ['state', 'comment', 'account_file_id', 'account_id', 'contract_file_id', 'contract_id']):
+        for record in self.read(cr, uid, ids, ['state', 'comment', 'account_file_id', 'account_ids', 'contract_file_id', 'contract_id']):
             next_state = values.get('state', False)
             state = record['state']
-
-            print record
-            print values
 
             if next_state and next_state != state:
                 if next_state == 'revision' and (not values.get('comment', False) and not record['comment']):
                     error += 'Необходимо ввести комментарий по доработке'
                 if next_state == 'agreement':
-                    if not values.get('account_file_id', False) and not record['account_file_id'] and not values.get('account_id', False) and not record['account_id']:
+                    if not values.get('account_file_id', False) and not record['account_file_id'] and not values.get('account_ids', False) and not record['account_ids']:
                         error += 'Необходимо выбрать счет или прикрепить платежное поручение'
 
                     if not values.get('contract_file_id', False) and not record.get('contract_file_id') and not values.get('contract_id', False) and not record.get('contract_id'):
@@ -579,6 +579,7 @@ class ProcessBase(AbstractModel):
             relation='brief.contract',
             type='many2one',
             string='Договор',
+            domain="[('partner_id', '=', partner_id)]",
             store=False
         ),
         'contract_file': fields.related(
@@ -588,12 +589,14 @@ class ProcessBase(AbstractModel):
             relation='attach.files',
             string='Файл утвержденого договора'
         ),
-        'account_id': fields.related(
+        'account_ids': fields.related(
             'launch_id',
-            'account_id',
+            'account_ids',
             relation='account.invoice',
-            type='many2one',
-            string='Счет'),
+            type='many2many',
+            domain="[('partner_id', '=', partner_id), ('invoice_line.service_id', 'in', [service_id]), ('type', '=', 'out_invoice')]",
+            string='Счет',
+            readonly=True),
         'account_file_id': fields.related(
             'launch_id',
             'account_file_id',
@@ -607,12 +610,6 @@ class ProcessBase(AbstractModel):
             type='datetime',
             readonly=True,
             string='Дата платежного поручения'),
-        'invoice_line_id': fields.related(
-            'launch_id',
-            'invoice_line_id',
-            relation='account.invoice.line',
-            type='many2one',
-            string='Позиция счета'),
         'price': fields.related(
             'launch_id',
             'price',
@@ -633,13 +630,6 @@ class ProcessBase(AbstractModel):
             type='float',
             digits=(10, 6),
             string='Оплачено'
-        ),
-        'pay_ids': fields.related(
-            'launch_id',
-            'pay_ids',
-            type='one2many',
-            relation='account.invoice.pay',
-            string='Платежи'
         ),
         'invoice_pay_ids': fields.related(
             'launch_id',
@@ -877,4 +867,32 @@ class ProcessSlaLine(Model):
         'type': lambda cr, u, i, ctx: ctx.get('type', 'call').lower()
     }
 ProcessSlaLine()
+
+
+class ProcessCosts(Model):
+    _name = 'process.costs'
+    _inherit = 'process.base.staff'
+    _description = u'Процессы - Затраты на партнера'
+    _order = 'period_name desc'
+
+    _columns = {
+        'name': fields.float('Сумма'),
+        'type': fields.selection(
+            (
+                ('href', 'Cсылки'),
+                ('copyright', 'Копирайтинг'),
+                ('tech', 'Техподдержка'),
+            ),
+            string='Тип затрат', required=True
+        ),
+        'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')], required=True),
+        'period_name': fields.related(
+            'period_id',
+            'name',
+            type='char',
+            size=7,
+            store=True
+        ),
+    }
+ProcessCosts()
 

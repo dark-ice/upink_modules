@@ -77,9 +77,8 @@
                         <field name="contract_file" readonly="True" />
                         <field name="contract_file_id" /> <newline />
 
-                        <field name="invoice_line_id" invisible="True"/>
                         <group col="6" colspan="4">
-                            <field name="account_id" on_change="onchange_account_id(account_id, service_id)"/>
+                            <field name="account_ids" nolabel="1" colspan="6" on_change="onchange_account_ids(account_ids, service_id)" />
                             <field name="account_file_id"/>
                             <field name="pay_date"/>
                             <newline/>
@@ -87,7 +86,7 @@
                             <field name="price_ye" readonly="True" />
                             <field name="paid" readonly="True" /><newline/>
                             <field name="invoice_pay_ids" mode="tree" nolabel="1" colspan="6" domain="[('service_id', '=', service_id)]">
-                                <tree>
+                                <tree string="Платежи">
                                     <field name="pay_date" />
                                     <field name="name" />
                                 </tree>

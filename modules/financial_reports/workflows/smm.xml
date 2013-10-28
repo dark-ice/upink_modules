@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_report_smm">
+            <field name="name">wkf.report.smm</field>
+            <field name="osv">financial.reports.smm</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <!-- Workflow activities -->
+        <!-- draft -->
+        <record model="workflow.activity" id="act_report_smm_draft">
+            <field name="wkf_id" ref="wkf_report_smm" />
+            <field name="flow_start">True</field>
+            <field name="name">Отчет сгенерирован</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'draft'})</field>
+        </record>
+        <!-- head -->
+        <record model="workflow.activity" id="act_report_smm_head">
+            <field name="wkf_id" ref="wkf_report_smm" />
+            <field name="name">Утвержден руководителем</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'head'})</field>
+        </record>
+        <!-- director -->
+        <record model="workflow.activity" id="act_report_smm_director">
+            <field name="wkf_id" ref="wkf_report_smm" />
+            <field name="name">Утвержден функциональным директором</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'director'})</field>
+        </record>
+        <!-- finansist -->
+        <record model="workflow.activity" id="act_report_smm_finansist">
+            <field name="wkf_id" ref="wkf_report_smm" />
+            <field name="name">Утвержден финансистом</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'finansist'})</field>
+        </record>
+
+        <!-- Workflow transition -->
+        <!-- draft -> head -->
+        <record model="workflow.transition" id="a_smm_d_h">
+            <field name="act_from" ref="act_report_smm_draft" />
+            <field name="act_to" ref="act_report_smm_head" />
+            <field name="signal">head</field>
+            <field name="condition">start_date and end_date</field>
+        </record>
+        <!-- head -> director -->
+        <record model="workflow.transition" id="a_smm_h_d">
+            <field name="act_from" ref="act_report_smm_head" />
+            <field name="act_to" ref="act_report_smm_director" />
+            <field name="signal">director</field>
+        </record>
+        <!-- director -> finansist -->
+        <record model="workflow.transition" id="a_smm_d_f">
+            <field name="act_from" ref="act_report_smm_director" />
+            <field name="act_to" ref="act_report_smm_finansist" />
+            <field name="signal">finansist</field>
+        </record>
+    </data>
+</openerp>

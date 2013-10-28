@@ -4,6 +4,7 @@
         <record model="ir.ui.view" id="view_account_invoice_filter1">
             <field name="name">account.invoice.select2</field>
             <field name="model">account.invoice</field>
+            <field name="priority" eval="1"/>
             <field name="type">search</field>
             <field name="arch" type="xml">
                 <search>
@@ -367,7 +368,7 @@
         <record model="ir.ui.view" id="view_account_request_money_form">
             <field name="name">account.invoice.form2</field>
             <field name="model">account.invoice</field>
-            <field name="priority" eval="1"/>
+            <field name="priority" eval="16"/>
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="ЗДС">
@@ -382,6 +383,7 @@
                             <field name="id" string="№ ЗДС" />
                             <field name="user_id" string="Автор" readonly="1"/>
                             <field name="division_id" string="Направление" required="1" widget="selection" on_change="change_division(division_id)"/>
+                            <field name="period_id" attrs="{'invisible': [('division_id', '=', 6)]}"/>
                             <field name="type_getter" required="1" on_change="change_getter(type_getter)"/>
                             <field name="lead_id" invisible="True"/>
                             <field name="get_division" invisible="True" />
@@ -494,7 +496,7 @@
         <record model="ir.ui.view" id="view_account_request_money_tree">
             <field name="name">account.invoice.tree.mr</field>
             <field name="model">account.invoice</field>
-            <field name="priority" eval="1"/>
+            <field name="priority" eval="16"/>
             <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree colors="orange:state=='confirm';green:state=='close';gray:state=='cancel';red:state=='proforma2'">

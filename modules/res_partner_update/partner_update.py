@@ -874,6 +874,17 @@ class res_partner(Model):
         res = self.name_get(cr, user, ids, context)
         return res
 
+    def _check_ppc(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for val in ids:
+            added_ids = self.pool.get('partner.added.services').search(cr, 1, [('partner_id', '=', val)])
+            services = self.pool.get('partner.added.services').read(cr, 1, added_ids, ['service_id'])
+            service_domain = [item['service_id'][0] for item in services if item['service_id']]
+            res[val] = False
+            if self.pool.get('brief.services.stage').search(cr, 1, [('id', 'in', service_domain), ('direction', '=', 'PPC')], count=True):
+                res[val] = True
+        return res
+
     def _get_partner_status(self, cr, uid, ids, name, arg, context=None):
         service_pool = self.pool.get('brief.services.stage')
         p_service_pool = self.pool.get('partner.added.services')
@@ -1233,8 +1244,6 @@ class res_partner(Model):
         ),
 
         'process_ids': fields.one2many('process.launch', 'partner_id', 'Процессы'),
-        'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством'),
-
         'report_payment_ids': fields.function(
             _get_report_payment,
             type="one2many",
@@ -1243,6 +1252,11 @@ class res_partner(Model):
             readonly=True,
             string=""
         )
+        'discounts_ids': fields.one2many('res.partner.ppc.discounts', 'partner_id', 'Скидки', domain=['|',('finish_date', '>=', date.today().strftime('%Y-%m-%d')), ('permanent','=', True)]),
+        'discounts_history_ids': fields.one2many('res.partner.ppc.discounts.history', 'partner_id', 'Скидки'),
+        'check_ppc': fields.function(_check_ppc, type="boolean", method=True, string=u"Маркер PPC"),
+        'old_discounts_ids': fields.one2many('res.partner.ppc.discounts', 'partner_id', 'Скидки', domain=[('finish_date', '<', date.today().strftime('%Y-%m-%d'))]),
+        'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством')
     }
 
     def _get_type(self, cr, uid, context=None):
@@ -1492,7 +1506,140 @@ class PartnerStatusHistory(Model):
         'create_date': fields.datetime('Дата', readonly=True),
         'partner_id': fields.many2one('res.partner', 'Партнер', invisible=True),
     }
-TransferHistory()
+PartnerStatusHistory()
+
+
+class PartnerPpcDiscounts(Model):
+    """
+    модель скидок для партнера и кандидата
+    """
+    _name = 'res.partner.ppc.discounts'
+    _description = u'Скидки'
+    _columns = {
+        'service_id': fields.many2one('brief.services.stage', 'Услуга'),
+        'partner_id': fields.many2one('res.partner', 'Партнер'),
+        'discount_type': fields.selection(
+            [
+                ('yandex_discount', 'Скидка Up в аккаунте Яндекс'),
+                ('google_discount', 'Скидка Up в аккаунте Google'),
+                ('partner_discount', 'Скидка Партнера'),
+                ('nds', 'НДС')
+            ], 'Тип скидки', required=True),
+        'percent': fields.float('Значение'),
+        'google': fields.boolean('4500'),
+        'start_date': fields.date('Дата начала'),
+        'finish_date': fields.date('Дата окончания'),
+        'permanent': fields.boolean('На постоянной основе'),
+        'create_uid': fields.many2one('res.users', 'Автор', readonly=True),
+        'create_date': fields.datetime('Дата', readonly=True),
+        'old_percent': fields.float('старое значение'),
+        'history_ids': fields.one2many('res.partner.ppc.discounts.history', 'discount_id', string='История')
+    }
+
+    _defaults = {
+        'partner_id': lambda self, cr, uid, context: context.get('partner_id', False),
+        'discount_type': 'nds',
+    }
+
+    def change_partner_id(self, cr, uid, ids, partner_id):
+        service_domain = []
+        if partner_id:
+            added_ids = self.pool.get('partner.added.services').search(cr, 1, [('partner_id', '=', partner_id)])
+            services = self.pool.get('partner.added.services').read(cr, 1, added_ids, ['service_id'])
+            service_domain = [item['service_id'][0] for item in services if item['service_id']]
+        return {'domain': {'service_id': [('id', 'in', service_domain), ('direction', '=', 'PPC')]}}
+
+    def onchange_google(self, cr, uid, ids, google, percent, old_percent=0.0):
+        if google:
+            return {'value': {'percent': 4500, 'old_percent': percent}}
+        else:
+            return {'value': {'percent': old_percent, 'old_percent': 4500}}
+
+    def create(self, cr, user, vals, context=None):
+        if vals.get('google', False):
+            vals['percent'] = 4500.0
+        return super(PartnerPpcDiscounts, self).create(cr, user, vals, context)
+
+    def write(self, cr, user, ids, vals, context=None):
+        if vals.get('google', False):
+            vals['percent'] = 4500.0
+        if vals.get('permanent', False):
+            vals['start_date'] = None
+            vals['finish_date'] = None
+
+        for record in self.read(cr, user, ids, ['partner_id', 'service_id', 'discount_type', 'percent', 'google', 'start_date', 'finish_date', 'permanent']):
+            if vals.get('service_id') or vals.get('discount_type') or vals.get('percent') or vals.get('google') or vals.get('finish_date') or vals.get('start_date') or vals.get('permanent'):
+                new_permanent = record['permanent']
+                if 'permanent' in vals.keys():
+                    new_permanent = vals['permanent']
+
+                new_google = record['google']
+                if 'google' in vals.keys():
+                    new_google = vals['google']
+
+                vals.update({'history_ids': [(0, 0, {
+                    'partner_id': record['partner_id'][0],
+                    'service_id': vals.get('service_id') or record['service_id'][0],
+                    'old_service_id': record['service_id'][0],
+
+                    'discount_type': vals.get('discount_type') or record['discount_type'],
+                    'old_discount_type': record['discount_type'],
+
+                    'percent': vals.get('percent') or record['percent'],
+                    'old_percent': record['percent'],
+
+                    'google': new_google,
+                    'old_google': record['google'],
+
+                    'start_date': vals.get('start_date') or record['start_date'],
+                    'old_start_date': record['start_date'],
+
+                    'finish_date': vals.get('finish_date') or record['finish_date'],
+                    'old_finish_date': record['finish_date'],
+
+                    'permanent': new_permanent,
+                    'old_permanent': record['permanent'],
+                })]})
+        return super(PartnerPpcDiscounts, self).write(cr, user, ids, vals, context)
+PartnerPpcDiscounts()
+
+
+class PartnerPpcDiscountsHistory(Model):
+    _name = 'res.partner.ppc.discounts.history'
+    _description = 'История скидок'
+    _columns = {
+        'discount_id': fields.many2one('res.partner.ppc.discounts'),
+        'partner_id': fields.many2one('res.partner', 'Партнер'),
+        'service_id': fields.many2one('brief.services.stage', 'Услуга'),
+        'discount_type': fields.selection(
+            [
+                ('yandex_discount', 'Скидка Up в аккаунте Яндекс'),
+                ('google_discount', 'Скидка Up в аккаунте Google'),
+                ('partner_discount', 'Скидка Партнера'),
+                ('nds', 'НДС')
+            ], 'Тип скидки', required=True),
+        'percent': fields.float('Значение'),
+        'google': fields.boolean('4500'),
+        'start_date': fields.date('Дата начала'),
+        'finish_date': fields.date('Дата окончания'),
+        'permanent': fields.boolean('На постоянной основе'),
+        'create_uid': fields.many2one('res.users', 'Автор', readonly=True),
+        'create_date': fields.datetime('Дата', readonly=True),
+        'old_service_id': fields.many2one('brief.services.stage', 'Предидущее Услуга'),
+        'old_discount_type': fields.selection(
+            [
+                ('yandex_discount', 'Скидка Up в аккаунте Яндекс'),
+                ('google_discount', 'Скидка Up в аккаунте Google'),
+                ('partner_discount', 'Скидка Партнера'),
+                ('nds', 'НДС')
+            ], 'Предидущий Тип скидки', required=True),
+        'old_percent': fields.float('Предидущее Значение'),
+        'old_google': fields.boolean('Предидущее 4500'),
+        'old_start_date': fields.date('Предидущая Дата начала'),
+        'old_finish_date': fields.date('Предидущая Дата окончания'),
+        'old_permanent': fields.boolean('Предидущее На постоянной основе'),
+    }
+PartnerPpcDiscountsHistory()
 
 
 class PartnerQualityControl(Model):

@@ -15,8 +15,58 @@
             <field name="name">Продажи / Супервайзеры</field>
         </record>
 
-        <!-- Правила доступа для групп -->
+        <record id="base.discount_nds" model="res.groups">
+            <field name="name">Скидки / Только НДС</field>
+        </record>
 
+        <record id="base.discount_other" model="res.groups">
+            <field name="name">Скидки / Все</field>
+        </record>
+
+        <!-- Правила доступа для групп -->
+        <record id="discount_nds_rule" model="ir.rule">
+            <field name="name">Скидки в партнерах и кандитах только ндс</field>
+            <field ref="model_res_partner_ppc_discounts" name="model_id"/>
+            <field name="domain_force">[('discount_type', '=', 'nds')]</field>
+            <field name="perm_read" eval="True" />
+            <field name="perm_create" eval="True" />
+            <field name="perm_write" eval="True" />
+            <field name="perm_unlink" eval="False" />
+            <field name="groups" eval="[(4, ref('base.discount_nds'))]"/>
+        </record>
+
+        <record id="discount_nds_history_rule" model="ir.rule">
+            <field name="name">Скидки в партнерах и кандитах только ндс</field>
+            <field ref="model_res_partner_ppc_discounts_history" name="model_id"/>
+            <field name="domain_force">['|', ('discount_type', '=', 'nds'), ('old_discount_type', '=', 'nds')]</field>
+            <field name="perm_read" eval="True" />
+            <field name="perm_create" eval="True" />
+            <field name="perm_write" eval="True" />
+            <field name="perm_unlink" eval="False" />
+            <field name="groups" eval="[(4, ref('base.discount_nds'))]"/>
+        </record>
+
+        <record id="discount_rule" model="ir.rule">
+            <field name="name">Скидки в партнерах и кандитах</field>
+            <field ref="model_res_partner_ppc_discounts" name="model_id"/>
+            <field name="domain_force">[]</field>
+            <field name="perm_read" eval="True" />
+            <field name="perm_create" eval="True" />
+            <field name="perm_write" eval="True" />
+            <field name="perm_unlink" eval="False" />
+            <field name="groups" eval="[(4, ref('base.discount_other'))]"/>
+        </record>
+
+        <record id="discount_history_rule" model="ir.rule">
+            <field name="name">Скидки в партнерах и кандитах</field>
+            <field ref="model_res_partner_ppc_discounts_history" name="model_id"/>
+            <field name="domain_force">[]</field>
+            <field name="perm_read" eval="True" />
+            <field name="perm_create" eval="True" />
+            <field name="perm_write" eval="True" />
+            <field name="perm_unlink" eval="False" />
+            <field name="groups" eval="[(4, ref('base.discount_other'))]"/>
+        </record>
         <!-- Открываем меню -->
 
     </data>

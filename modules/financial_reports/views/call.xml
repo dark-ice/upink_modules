@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_reports_call_form" model="ir.ui.view">
+            <field name="name">Финансовые отчеты - CALL</field>
+            <field name="model">financial.reports.call</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group col="6" colspan="4">
+                        <field name="check_h"/>
+                        <field name="check_d"/>
+                        <field name="check_f"/>
+                    </group>
+                    <group col="4" colspan="4">
+                        <field name="start_date" on_change="onchange_date(start_date, end_date)"/>
+                        <field name="end_date" on_change="onchange_date(start_date, end_date)"/>
+                    </group>
+                    <group colspan="4" col="4">
+                        <separator colspan="4" string="Итого" />
+                        <field name="total_period" />
+                        <field name="balance_period" />
+                        <field name="profit_period" />
+                        <field name="costs_employee_period" />
+                        <field name="costs_period" />
+                        <field name="costs_partner_period" />
+                        <field name="rollovers_income" />
+                        <field name="rollovers_outcome" />
+                        <field name="count_partners" /> <newline />
+                        <separator colspan="4" string="Статьи затрат" />
+                        <field name="costs_employee_period_tax" />
+                        <field name="costs_employee_period_tax_ye" />
+                        <field name="costs_tax_period" />
+                        <field name="costs_tx_period_ye" />
+                    </group>
+                    <field name="line_ids" readonly="1" nolabel="1" colspan="4">
+                        <tree string="Отчет" colors="green: close_date != 'Не закрыт'">
+                            <field name="partner_id" />
+                            <field name="service_id" />
+                            <field name="invoice_id" />
+                            <field name="specialist_id" />
+                            <field name="paid_type" />
+                            <field name="pay_date" />
+                            <field name="total" />
+                            <field name="rate" />
+                            <field name="close_date" />
+                            <field name="carry_over_revenue" />
+                            <field name="discount_up" />
+                            <field name="discount_partner" />
+                            <field name="discount_nds" />
+                            <field name="co_costs_partner" />
+                            <field name="costs_partner" />
+                            <field name="co_costs_employee" />
+                            <field name="costs_employee" />
+                            <field name="profit" />
+                        </tree>
+                    </field>
+
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="draft,head,director,finansist"
+                            />
+                    <!-- draft -> head -->
+                    <button string="Утверждено руководителем"
+                        name="head"
+                        type="workflow"
+                        icon="gtk-go-forward"
+                        attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_h', '=', False)]}"
+                        />
+                    <!-- head -> director -->
+                    <button string="Утверждено функциональным директором"
+                        name="director"
+                        type="workflow"
+                        icon="gtk-go-forward"
+                        attrs="{'invisible': ['|', ('state', '!=', 'head'), ('check_d', '=', False)]}"
+                        />
+                    <!-- director -> finansist -->
+                    <button string="Утверждено финансистом"
+                        name="finansist"
+                        type="workflow"
+                        icon="gtk-go-forward"
+                        attrs="{'invisible': ['|', ('state', '!=', 'director'), ('check_f', '=', False)]}"
+                        />
+                </form>
+            </field>
+        </record>
+
+        <record id="view_reports_call_tree" model="ir.ui.view">
+            <field name="name">Финансовые отчеты - CALL</field>
+            <field name="model">financial.reports.call</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Quality Wizard -->
+        <record id="action_reports_call" model="ir.actions.act_window">
+            <field name="name">CALL</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">financial.reports.call</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_reports_call_tree"/>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+            <field name="target">inline</field>
+        </record>
+
+        <menuitem id="menu_direction_report_call" parent="menu_direction_report" action="action_reports_call" name="CALL" sequence="30"/>
+    </data>
+</openerp>

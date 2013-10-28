@@ -557,7 +557,8 @@ class AccountInvoice(Model):
                 ('sur', 'Доплата'),
                 ('post', 'Пост оплата'),
             ), 'Тип счета'
-        )
+        ),
+        'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')]),
     }
 
     _defaults = {

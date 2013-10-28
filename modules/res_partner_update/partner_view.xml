@@ -61,6 +61,107 @@
             </field>
         </record>
 
+        <record id="view_discount_form" model="ir.ui.view">
+            <field name="name">view.discount.form</field>
+            <field name="model">res.partner.ppc.discounts</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Скидки">
+                    <field name="service_id" />
+                    <field name="partner_id" invisible="1"/>
+                    <field name="discount_type" />
+                    <field name="percent" />
+                    <field name='old_percent' invisible="1" />
+                    <field name="google" />
+                    <field name="start_date" />
+                    <field name="finish_date" />
+                    <field name="permanent" />
+                </form>
+            </field>
+        </record>
+
+        <record id="view_discount_tree" model="ir.ui.view">
+            <field name="name">view.discount.tree</field>
+            <field name="model">res.partner.ppc.discounts</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Скидки" editable="top">
+                    <field name="service_id" required="1"/>
+                    <field name="partner_id" invisible="1"  on_change="change_partner_id(partner_id)"/>
+                    <field name="discount_type" />
+                    <field name="percent" attrs="{'readonly': [('google', '=', True), ('discount_type', '=', 'google_discount')]}"/>
+                    <field name='old_percent' invisible="1" />
+                    <field name="google" on_change="onchange_google(google, percent, old_percent)" attrs="{'readonly': [('discount_type', '!=', 'google_discount')]}"/>
+                    <field name="start_date" attrs="{'readonly': [('permanent', '=', True)], 'required': [('permanent', '=', False)]}"/>
+                    <field name="finish_date" attrs="{'readonly': [('permanent', '=', True)], 'required': [('permanent', '=', False)]}"/>
+                    <field name="permanent" />
+                    <field name="create_uid" readonly="1"/>
+                    <field name="create_date" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_ppc_discount">
+            <field name="name">Скидки</field>
+            <field name="res_model">res.partner.ppc.discounts</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_discount_tree" />
+        </record>
+
+        <record id="view_discount_history_form" model="ir.ui.view">
+            <field name="name">view.discount.history.form</field>
+            <field name="model">res.partner.ppc.discounts.history</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Скидки">
+                    <field name="service_id" />
+                    <field name="partner_id" invisible="1"/>
+                    <field name="discount_type" />
+                    <field name="percent" />
+                    <field name='old_percent' invisible="1" />
+                    <field name="google" />
+                    <field name="start_date" />
+                    <field name="finish_date" />
+                    <field name="permanent" />
+                </form>
+            </field>
+        </record>
+
+        <record id="view_discount_history_tree" model="ir.ui.view">
+            <field name="name">view.discount.history.tree</field>
+            <field name="model">res.partner.ppc.discounts.history</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="История изменений">
+                    <field name="service_id" />
+                    <field name="old_service_id" />
+                    <field name="discount_type" />
+                    <field name="old_discount_type" />
+                    <field name="percent" />
+                    <field name='old_percent'  />
+                    <field name="google"/>
+                    <field name="old_google"/>
+                    <field name="start_date" />
+                    <field name="old_start_date" />
+                    <field name="finish_date" />
+                    <field name="old_finish_date" />
+                    <field name="permanent" />
+                    <field name="old_permanent" />
+                    <field name="create_uid" readonly="1"/>
+                    <field name="create_date" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_ppc_discount_history">
+            <field name="name">Скидки</field>
+            <field name="res_model">res.partner.ppc.discounts.history</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_discount_history_form" />
+        </record>
+
         <record id="view_provider_category_tree" model="ir.ui.view">
             <field name="name">res.provider.category tree</field>
             <field name="model">res.provider.category</field>

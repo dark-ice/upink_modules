@@ -18,8 +18,8 @@ Res.Partner Update
         'crm_lead_update',
     ],
     'update_xml': [
-        'security/ir.model.access.csv',
         'security/partner_security.xml',
+        'security/ir.model.access.csv',
         'wizard/quality_view.xml',
         'partner_view.xml',
         'partner_individual_views.xml',
