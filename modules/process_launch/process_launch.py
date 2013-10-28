@@ -126,7 +126,7 @@ class ProcessLaunch(Model):
                 price_currency += line['price_currency']
                 price_unit += line['price_unit']
                 paid += line['paid']
-            pay_line_ids = self.pool.get('account.invoice.pay.line').search(cr, uid, [('invoice_id', 'in', account_ids),
+            pay_line_ids = self.pool.get('account.invoice.pay.line').search(cr, uid, [('invoice_id', 'in', account_ids)])
 
             return price_currency, price_unit, paid, pay_line_ids
 
@@ -652,6 +652,8 @@ class ProcessBase(AbstractModel):
             relation='res.users',
             type='many2one',
             string='Руководитель направления'),
+
+        'site_url': fields.char('Сайт', size=255),
     }
 
     def close_launch(self, cr, uid, ids):

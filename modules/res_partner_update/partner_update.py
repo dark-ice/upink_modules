@@ -1251,12 +1251,12 @@ class res_partner(Model):
             store=False,
             readonly=True,
             string=""
-        )
-        'discounts_ids': fields.one2many('res.partner.ppc.discounts', 'partner_id', 'Скидки', domain=['|',('finish_date', '>=', date.today().strftime('%Y-%m-%d')), ('permanent','=', True)]),
+        ),
+        'discounts_ids': fields.one2many('res.partner.ppc.discounts', 'partner_id', 'Скидки', domain=['|', ('finish_date', '>=', date.today().strftime('%Y-%m-%d')), ('permanent', '=', True)]),
         'discounts_history_ids': fields.one2many('res.partner.ppc.discounts.history', 'partner_id', 'Скидки'),
         'check_ppc': fields.function(_check_ppc, type="boolean", method=True, string=u"Маркер PPC"),
         'old_discounts_ids': fields.one2many('res.partner.ppc.discounts', 'partner_id', 'Скидки', domain=[('finish_date', '<', date.today().strftime('%Y-%m-%d'))]),
-        'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством')
+        'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством'),
     }
 
     def _get_type(self, cr, uid, context=None):

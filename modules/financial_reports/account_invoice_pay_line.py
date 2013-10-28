@@ -24,7 +24,10 @@ class AccountInvoicePayLine(Model):
     def _get_specialist(self, cr, uid, ids, name, args, context=None):
         res = {}
         for record in self.read(cr, uid, ids, ['invoice_id', 'service_id'], context=context):
-            res[record['id']] = False
+            res[record['id']] = {
+                'specialist_id': False,
+                'site_url': '',
+            }
             if record['invoice_id']:
                 invoice = self.pool.get('account.invoice').read(cr, 1, record['invoice_id'][0], ['partner_id'])
                 if record['service_id'] and invoice['partner_id']:
