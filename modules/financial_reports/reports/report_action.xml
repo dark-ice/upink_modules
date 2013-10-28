@@ -12,7 +12,7 @@
             <field name='model'>financial.reports.ppc</field>
             <field name='type'>ir.actions.report.xml</field>
             <field name='attachment_use' eval='False'/>
-            <field name='parser_loc'>account_update/report/parser.py</field>
+            <field name='parser_loc'>financial_reports/reports/parser.py</field>
             <field name='tml_source'>file</field>
             <field name='parser_state'>loc</field>
             <field name='styles_mode'>default</field>

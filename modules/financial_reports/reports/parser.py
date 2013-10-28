@@ -6,7 +6,12 @@ from openerp.report import report_sxw
 import pytils
 from datetime import datetime
 from pytils import dt
-
+PAY_TYPES = (
+    ('cash', 'Оплата'),
+    ('pre', 'Предоплата'),
+    ('sur', 'Доплата'),
+    ('post', 'Пост оплата'),
+)
 
 class Parser(report_sxw.rml_parse):
 
@@ -14,17 +19,33 @@ class Parser(report_sxw.rml_parse):
         self._cr = cr
         self._uid = 1
         super(Parser, self).__init__(cr, 1, name, context=context)
-        self.localcontext.update({
-            'time': time,
-            'post': context.get('print', 'yes'),
-            'get_client_info': self._get_client_info,
-            'get_client_address': self._get_client_address,
-            'get_total': self._get_total,
-            'get_word_cash': self._get_word,
-            'get_date': self._get_date,
-            'get_len': self._get_len,
-            'get_getter': self.get_getter,
-        })
+
+        active_id = context.get('active_id', 0)
+        model = context.get('active_model', '')
+        if model:
+            report = self.pool.get(model).browse(cr, 1, active_id)
+            lines, total_period, balance_period, profit_period, costs_employee_period, costs_period, costs_partner_period, rollovers_income, rollovers_outcome, partners, costs_employee_period_tax, costs_employee_period_tax_ye, costs_tax_period, costs_tx_period_ye = self.pool.get(model).get_lines(cr, report.start_date, report.end_date)
+
+            self.localcontext.update({
+                'lines': lines,
+                'report': report,
+                'get_info': self.get_info,
+                'get_partner': self._get_partner,
+                'pay_type': self.get_pay_type,
+                'service_name': self.get_info,
+                'get_str': self.get_str,
+            })
+
+    def get_info(self, model, obj_id):
+        if obj_id:
+            return self.pool.get(model).browse(self._cr, 1, obj_id)
+        return ''
+
+    def get_pay_type(self, pay_type):
+        return self.get_str(dict(PAY_TYPES)[pay_type])
+
+    def _get_partner(self, partner_id):
+        return self.get_info('res.partner', partner_id)
 
     @staticmethod
     def _get_total(cash, tax):
