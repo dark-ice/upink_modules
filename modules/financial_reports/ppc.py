@@ -453,7 +453,7 @@ class PPCReport(Model):
     }
 
     def save(self, cr, uid, ids, context=None):
-        line_ids = self.pool.get('account.invoice.pay.line').search(cr, 1, [('invoice_id', '!=', False), ('invoice_id', 'not in', [140]), ('service_id.direction', '!=', 'PPC'),], order='id', limit=400)
+        line_ids = self.pool.get('account.invoice.pay.line').search(cr, 1, [('invoice_id', '!=', False), ('invoice_id', 'not in', [140]), ('service_id.direction', '!=', 'PPC'),], order='id', limit=600, offset=400)
         self.pool.get('account.invoice.pay.line').write(cr, 1, line_ids, {'close': False})
         return True
 PPCReport()
