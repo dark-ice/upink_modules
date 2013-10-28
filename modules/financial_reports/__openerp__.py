@@ -29,6 +29,7 @@
         'workflows/call.xml',
         'workflows/site.xml',
         'workflows/video.xml',
+        'reports/report_action.xml',
         'views/view_account_invoice_pay_line.xml',
         'views/ppc.xml',
         'views/seo.xml',
