@@ -86,7 +86,7 @@ class ProcessLaunch(Model):
                 'invoice_pay_ids': []
             }
             service_id = 0
-            account_id = 0
+            account_ids = 0
             if data['service_id']:
                 service_id = data['service_id'][0]
             if data['account_ids']:
