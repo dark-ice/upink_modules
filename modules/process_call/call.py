@@ -73,14 +73,14 @@ class ProcessCall(AbstractModel):
     def _get_pay_date(self, cr, uid, ids, field_name, arg, context):
         res = {}
         line_pool = self.pool.get('account.invoice.pay.line')
-        for record in self.read(cr, uid, ids, ['service_id', 'account_id', 'account_date']):
+        for record in self.read(cr, uid, ids, ['service_id', 'account_ids', 'account_date']):
             pay_date = None
-            if record['account_id']:
+            if record['account_ids']:
                 pay_line_ids = line_pool.search(
                     cr,
                     uid,
                     [
-                        ('invoice_id', '=', record['account_id'][0]),
+                        ('invoice_id', 'in', record['account_ids']),
                         ('service_id', '=', record['service_id'][0])
                     ],
                     order='pay_date')

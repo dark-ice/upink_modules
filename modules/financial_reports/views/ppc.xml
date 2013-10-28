@@ -82,8 +82,7 @@
                         attrs="{'invisible': ['|', ('state', '!=', 'director'), ('check_f', '=', False)]}"
                         />
                     <newline />
-                    <button string="Выгрузить EXCEL" type="action" name="%(action_report_ppc)d" />
-                    <button string="Обновить" type="object" name="save" />
+                    <button string="Выгрузить EXCEL" type="action" name="%(action_report_ppc)d" icon="gtk-print"/>
                 </form>
             </field>
         </record>
