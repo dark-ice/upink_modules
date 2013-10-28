@@ -451,6 +451,10 @@ class PPCReport(Model):
         'state': 'draft',
         'check_h': lambda s, c, u, cnt: u == 96 or u == 1,
     }
+
+    def save(self, cr, uid, ids, context=None):
+        line_ids = self.pool.get('account.invoice.pay.line').search(cr, 1, [('invoice_id', '!=', False)])
+        return self.pool.get('account.invoice.pay.line').write(cr, 1, line_ids, {})
 PPCReport()
 
 
