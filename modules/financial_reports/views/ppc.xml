@@ -81,6 +81,8 @@
                         icon="gtk-go-forward"
                         attrs="{'invisible': ['|', ('state', '!=', 'director'), ('check_f', '=', False)]}"
                         />
+                    <newline />
+                    <button string="Выгрузить EXCEL" type="action" name="%(action_report_ppc)d" />
                 </form>
             </field>
         </record>
