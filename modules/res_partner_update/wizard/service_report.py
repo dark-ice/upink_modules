@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-from res_partner_update.counter import Counter
+try:
+    from collections imoport Counter
+except:
+    from res_partner_update.counter import Counter
 
 from openerp.osv import fields
 from openerp.osv.orm import TransientModel
