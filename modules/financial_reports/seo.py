@@ -447,7 +447,7 @@ class ReportSeoLine(Model):
     _columns = {
         'report_id': fields.many2one('financial.reports.seo', 'Отчет SEO'),
         'partner_id': fields.many2one('res.partner', 'Партнер'),
-        'specialist_id': fields.many2one('res.users', 'Аккаунт-менеджер'),
+        'specialist_id': fields.many2one('res.users', 'Специалист'),
         'site_url': fields.char('Сайт', size=250),
         'paid_type': fields.selection(
             (

@@ -100,8 +100,10 @@ class SiteReport(Model):
                 'co_costs_partner': 0,
                 'costs_partner': 0,
                 'co_costs_employee': 0,
+                'costs_net': record['add_costs'],
                 'costs_employee': 0,
                 'profit': 0,
+                'period_id': record['period_id'][0] if record['period_id'] else False,
                 'rate': 0,
             }
             if record['close'] and record['close_date'] <= date_end:
@@ -397,6 +399,9 @@ class SiteReport(Model):
             type='boolean',
             invisible=True
         ),
+
+        'rate_rus': fields.float('Курс 1$ к руб.', readonly=True),
+        'rate_uah': fields.float('Курс 1$ к грн.', readonly=True),
     }
 
     _defaults = {
@@ -414,7 +419,7 @@ class SiteReportLine(Model):
     _columns = {
         'report_id': fields.many2one('financial.reports.site', 'Отчет SITE'),
         'partner_id': fields.many2one('res.partner', 'Партнер'),
-        'specialist_id': fields.many2one('res.users', 'Супервайзер'),
+        'specialist_id': fields.many2one('res.users', 'PM'),
         'paid_type': fields.selection(
             (
                 ('cash', 'Оплата'),
@@ -434,8 +439,10 @@ class SiteReportLine(Model):
         'co_costs_partner': fields.float('Переходящие затраты на партнера, $'),
         'costs_partner': fields.float('Затраты на Партнера, $'),
         'co_costs_employee': fields.float('Переходящие затраты на персонал, $'),
+        'costs_net': fields.float('Затраты на связь, $'),
         'costs_employee': fields.float('Затраты на персонал, $'),
         'profit': fields.float('Валовая прибыль, $'),
+        'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')]),
         'rate': fields.float('Курс'),
     }
 SiteReportLine()

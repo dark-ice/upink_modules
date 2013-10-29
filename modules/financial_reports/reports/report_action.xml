@@ -68,5 +68,39 @@
             <field name='parser_state'>loc</field>
             <field name='styles_mode'>default</field>
         </record>
+
+        <record model='ir.actions.report.xml' id='action_report_site'>
+            <field name='report_type'>aeroo</field>
+            <field name='in_format'>oo-ods</field>
+            <field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/>
+            <field name='multi' eval='False'/>
+            <field name='name'>SITE</field>
+            <field name='report_rml'>financial_reports/reports/site.ods</field>
+            <field name='report_name'>financial.site</field>
+            <field name='model'>financial.reports.site</field>
+            <field name='type'>ir.actions.report.xml</field>
+            <field name='attachment_use' eval='False'/>
+            <field name='parser_loc'>financial_reports/reports/parser.py</field>
+            <field name='tml_source'>file</field>
+            <field name='parser_state'>loc</field>
+            <field name='styles_mode'>default</field>
+        </record>
+
+        <record model='ir.actions.report.xml' id='action_report_video'>
+            <field name='report_type'>aeroo</field>
+            <field name='in_format'>oo-ods</field>
+            <field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/>
+            <field name='multi' eval='False'/>
+            <field name='name'>VIDEO</field>
+            <field name='report_rml'>financial_reports/reports/video.ods</field>
+            <field name='report_name'>financial.video</field>
+            <field name='model'>financial.reports.video</field>
+            <field name='type'>ir.actions.report.xml</field>
+            <field name='attachment_use' eval='False'/>
+            <field name='parser_loc'>financial_reports/reports/parser.py</field>
+            <field name='tml_source'>file</field>
+            <field name='parser_state'>loc</field>
+            <field name='styles_mode'>default</field>
+        </record>
     </data>
 </openerp>

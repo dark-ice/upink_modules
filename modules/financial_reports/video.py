@@ -54,7 +54,6 @@ class VideoReport(Model):
             ('close_date', '>=', date_start),
             ('partner_id', '!=', False),
             ('invoice_id', '!=', False),
-            ('specialist_id', '!=', False)
         ]
         pay_line_ids = pay_line_pool.search(cr, 1, domain, order='partner_id, service_id, invoice_date')
         lines = []
@@ -102,6 +101,7 @@ class VideoReport(Model):
                 'costs_partner': 0,
                 'co_costs_employee': 0,
                 'costs_employee': 0,
+                'costs_net': record['add_costs'],
                 'profit': 0,
                 'rate': 0,
             }
@@ -398,6 +398,8 @@ class VideoReport(Model):
             type='boolean',
             invisible=True
         ),
+        'rate_rus': fields.float('Курс 1$ к руб.', readonly=True),
+        'rate_uah': fields.float('Курс 1$ к грн.', readonly=True),
     }
 
     _defaults = {
@@ -436,6 +438,7 @@ class VideoReportLine(Model):
         'costs_partner': fields.float('Затраты на Партнера, $'),
         'co_costs_employee': fields.float('Переходящие затраты на персонал, $'),
         'costs_employee': fields.float('Затраты на персонал, $'),
+        'costs_net': fields.float('Затраты на связь, $'),
         'profit': fields.float('Валовая прибыль, $'),
         'rate': fields.float('Курс'),
     }

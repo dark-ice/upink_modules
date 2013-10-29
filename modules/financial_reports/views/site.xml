@@ -41,6 +41,7 @@
                             <field name="specialist_id" />
                             <field name="paid_type" />
                             <field name="pay_date" />
+                            <field name="period_id" />
                             <field name="total" />
                             <field name="rate" />
                             <field name="close_date" />
@@ -78,6 +79,7 @@
                         icon="gtk-go-forward"
                         attrs="{'invisible': ['|', ('state', '!=', 'director'), ('check_f', '=', False)]}"
                         />
+                    <button string="Выгрузить EXCEL" type="action" name="%(action_report_site)d" />
                 </form>
             </field>
         </record>
