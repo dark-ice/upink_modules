@@ -78,7 +78,7 @@
                         <field name="contract_file_id" /> <newline />
 
                         <group col="6" colspan="4">
-                            <separator colspan="4" string="Счет"/>
+                            <separator colspan="6" string="Счет"/>
                             <field name="account_ids" nolabel="1" colspan="6" on_change="onchange_account_ids(account_ids, service_id)" />
                             <field name="account_file_id"/>
                             <field name="pay_date"/>
