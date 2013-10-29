@@ -40,6 +40,7 @@
                             <field name="invoice_id" />
                             <field name="paid_type" />
                             <field name="pay_date" />
+                            <field name="period_id" />
                             <field name="total" />
                             <field name="rate" />
                             <field name="close_date" />
