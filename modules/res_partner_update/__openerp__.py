@@ -21,6 +21,8 @@ Res.Partner Update
         'security/partner_security.xml',
         'security/ir.model.access.csv',
         'wizard/quality_view.xml',
+        'wizard/service_view.xml',
+        'wizard/service_report_view.xml',
         'partner_view.xml',
         'partner_individual_views.xml',
         'partner_eu_view.xml',

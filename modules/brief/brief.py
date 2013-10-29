@@ -1233,12 +1233,12 @@ class brief_main(Model):
                 1,
                 [
                     ('groups_id', 'in', service_head_group),
-                    ('id', 'not in', [1, 5, 13, 18, 354, 472])
+                    ('id', 'not in', [1, 5, 13, 18, 354])
                 ],
                 order='id')
             if record.state == 'media_accept':
-                    if self.check_delta(cr, record.id) and 472 not in users:
-                        users.append(472)
+                if self.check_delta(cr, record.id) and 472 not in users:
+                    users.append(472)
             if users:
                 res[record.id] = users
         return res

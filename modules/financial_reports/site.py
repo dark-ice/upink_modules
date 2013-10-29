@@ -54,7 +54,6 @@ class SiteReport(Model):
             ('close_date', '>=', date_start),
             ('partner_id', '!=', False),
             ('invoice_id', '!=', False),
-            ('specialist_id', '!=', False)
         ]
         pay_line_ids = pay_line_pool.search(cr, 1, domain, order='partner_id, service_id, invoice_date')
         lines = []
@@ -109,33 +108,7 @@ class SiteReport(Model):
                 vals['close_date'] = record['close_date']
 
             if record['partner_id']:
-                discounts_ids = self.pool.get('res.partner.ppc.discounts').search(
-                    cr,
-                    1,
-                    [
-                        ('service_id', '=', record['service_id'][0]),
-                        ('partner_id', '=', record['partner_id'][0]),
-                        '|',
-                        '&', ('start_date', '<=', record['invoice_date']), ('finish_date', '>=', record['invoice_date']),
-                        ('permanent', '=', True),
-                    ]
-                )
-                for discount in self.pool.get('res.partner.ppc.discounts').read(cr, 1, discounts_ids, []):
-                    if discount['discount_type'] == 'nds':
-                        vals['discount_nds'] = discount['percent']
-                    elif discount['discount_type'] == 'partner_discount':
-                        vals['discount_partner'] = discount['percent']
-                    elif discount['discount_type'] == 'yandex_discount':
-                        vals['discount_up'] = discount['percent']
-                    elif discount['discount_type'] == 'google_discount':
-                        if discount['google']:
-                            vals['discount_up'] = 4500
-                            google = True
-                        else:
-                            vals['discount_up'] = discount['percent']
-
-            if vals['discount_nds'] == 0:
-                vals['discount_nds'] = 18
+                pass
             if record['invoice_id']:
                 invoice = self.pool.get('account.invoice').read(cr, 1, record['invoice_id'][0], ['rate'])
                 rate = invoice['rate']
@@ -144,13 +117,6 @@ class SiteReport(Model):
             if record['service_id'][0] in (17, 21, 22, ):
                 # 30 - курс долара у Яндекса
                 costs_partner = (1 - vals['discount_up'] / 100) * record['factor'] * rate / 30
-            elif record['service_id'][0] in (18, ):
-                if google:
-                    costs_partner = (record['factor'] - 4500 / rate) / (1 + vals['discount_nds'] / 100)
-                else:
-                    costs_partner = record['factor'] * (1 - vals['discount_up'] / 100) / (1 + vals['discount_nds'] / 100)
-            elif record['service_id'][0] in (23,):
-                costs_partner = record['factor'] * (1 - vals['discount_up'] / 100)
 
             if record['specialist_id']:
                 source_date = datetime.strptime(record['invoice_date'], '%Y-%m-%d')
@@ -207,6 +173,8 @@ class SiteReport(Model):
             elif vals['close_date'] == 'Не закрыт':
                 rollovers_income += vals['carry_over_revenue'] + vals['total']
                 rollovers_outcome += vals['co_costs_partner'] + vals['costs_partner']
+
+
 
             lines.append((0, 0, vals))
 
@@ -464,7 +432,7 @@ class SiteReportLine(Model):
     _columns = {
         'report_id': fields.many2one('financial.reports.site', 'Отчет SITE'),
         'partner_id': fields.many2one('res.partner', 'Партнер'),
-        'specialist_id': fields.many2one('res.users', 'Аккаунт-менеджер'),
+        'specialist_id': fields.many2one('res.users', 'Супервайзер'),
         'paid_type': fields.selection(
             (
                 ('cash', 'Оплата'),
@@ -480,10 +448,6 @@ class SiteReportLine(Model):
         'close_date': fields.char('Дата ЗД', size=50),
 
         'carry_over_revenue': fields.float('Переходящие доходы, $'),
-
-        'discount_up': fields.float('Скидка Up в аккаунте, %'),
-        'discount_partner': fields.float('Скидка Партнера, %'),
-        'discount_nds': fields.float('НДС, %'),
 
         'co_costs_partner': fields.float('Переходящие затраты на партнера, $'),
         'costs_partner': fields.float('Затраты на Партнера, $'),

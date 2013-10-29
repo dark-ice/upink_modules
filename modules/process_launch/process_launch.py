@@ -1,4 +1,6 @@
 # coding=utf-8
+from datetime import date
+
 __author__ = 'andrey'
 import netsvc
 from openerp.osv import fields, osv
@@ -86,7 +88,7 @@ class ProcessLaunch(Model):
                 'invoice_pay_ids': []
             }
             service_id = 0
-            account_ids = []
+            account_ids = 0
             if data['service_id']:
                 service_id = data['service_id'][0]
             if data['account_ids']:
@@ -126,8 +128,7 @@ class ProcessLaunch(Model):
                 price_currency += line['price_currency']
                 price_unit += line['price_unit']
                 paid += line['paid']
-            pay_line_ids = self.pool.get('account.invoice.pay.line').search(cr, uid, [('invoice_id', 'in', account_ids),
-                                                                                      ('service_id', '=', service_id)])
+            pay_line_ids = self.pool.get('account.invoice.pay.line').search(cr, uid, [('invoice_id', 'in', account_ids)])
 
             return price_currency, price_unit, paid, pay_line_ids
 
@@ -279,6 +280,9 @@ class ProcessLaunch(Model):
         ),
         'account_ids': fields.many2many(
             'account.invoice',
+            'account_invoice_launch_rel',
+            'launch_id',
+            'invoice_id',
             'Счет',
             readonly=False,
             domain="[('partner_id', '=', partner_id), ('invoice_line.service_id', 'in', [service_id]), ('type', '=', 'out_invoice')]",),
@@ -514,10 +518,10 @@ class ProcessLaunch(Model):
 
     def process_add(self, cr, user, ids):
         flag = True
-        for record in self.read(cr, user, ids, ['partner_id', 'service_id']):
-            as_ids = self.pool.get('partner.added.services').search(cr, user, [('partner_id', '=', record['partner_id'][0]), ('service_id', '=', record['service_id'][0])])
-            if as_ids:
-                flag = self.pool.get('partner.added.services').write(cr, user, as_ids, {'check': True})
+        service_pool = self.pool.get('partner.added.services')
+        for record in self.read(cr, user, ids, ['partner_id', 'service_id', 'account_id']):
+            if not record['account_id']:
+                flag = service_pool.connect_service(cr, record['partner_id'][0], record['service_id'][0], date.today().strftime('%Y-%m-%d'))
         return flag
 ProcessLaunch()
 
@@ -540,7 +544,6 @@ class ProcessBase(AbstractModel):
     _columns = {
         'launch_id': fields.many2one('process.launch', 'Карточка запуска'),
         'create_date': fields.datetime('Дата создания', select=True),
-        'site_url': fields.char('Сайт', size=250),
 
         'partner_id': fields.related(
             'launch_id',
@@ -654,6 +657,8 @@ class ProcessBase(AbstractModel):
             relation='res.users',
             type='many2one',
             string='Руководитель направления'),
+
+        'site_url': fields.char('Сайт', size=255),
     }
 
     def close_launch(self, cr, uid, ids):

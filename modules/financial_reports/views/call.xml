@@ -46,9 +46,11 @@
                             <field name="carry_over_revenue" />
                             <field name="co_costs_partner" />
                             <field name="costs_partner" />
+                            <field name="costs_net" />
                             <field name="co_costs_employee" />
                             <field name="costs_employee" />
                             <field name="profit" />
+                            <field name="profitability" />
                         </tree>
                     </field>
 

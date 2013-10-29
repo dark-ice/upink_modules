@@ -26,6 +26,7 @@
     'description': """
 Чистая конверсия.
 ==============================
+update web_calls set region = 'alm' where region = 'kazahstan';
     """,
     'author': 'Andrey Karbanovich',
     'website': 'http://upsale.ru',
