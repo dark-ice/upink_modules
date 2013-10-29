@@ -587,17 +587,18 @@
                         <field name="user_id">
                             <filter string="My Partners" icon="terp-personal+" domain="[('user_id','=',uid)]"/>
                         </field>
-                        <field name="partner_status" />
                         <newline/>
                         <field name="full_name_s"/>
+                        <field name="partner_status" />
+                        <field name="service"/>
                         <field name="service_s"/>
+                        <field name="service_status"/>
                         <newline/>
                         <field name="date_start_from"/>
                         <field name="date_start_to"/>
                         <field name="date_finish_from"/>
                         <field name="date_finish_to"/>
-                        <field name="service_status"/>
-                        <field name="service"/>
+
                     </group>
                     <newline/>
                     <group expand="0" string="Group By...">
