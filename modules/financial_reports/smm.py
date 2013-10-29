@@ -177,7 +177,7 @@ class SMMReport(Model):
                         try:
                             co_costs[invoice_period.id]['pay'] += p['factor']
                         except KeyError:
-                            co_costs[invoice_period.id]['pay'] = p['factor']
+                            co_costs[invoice_period.id] = {'pay': p['factor']}
 
                 #try:
                 #    costs_employee = (total * record['factor'] / current_pay) / 8.0
@@ -461,6 +461,9 @@ class SMMReport(Model):
             type='boolean',
             invisible=True
         ),
+
+        'rate_rus': fields.float('Курс 1$ к руб.', readonly=True),
+        'rate_uah': fields.float('Курс 1$ к грн.', readonly=True),
     }
 
     _defaults = {

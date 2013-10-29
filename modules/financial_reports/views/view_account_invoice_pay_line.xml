@@ -275,8 +275,8 @@
                     <field name="paid_type" />
                     <field name="name_ye" />
                     <field name="factor" string="Сумма для отчета"/>
-                    <field name="add_revenues" />
-                    <field name="add_costs" />
+                    <field name="add_revenues" string="Затраты на персонал"/>
+                    <field name="add_costs" string="Расходы на связь"/>
                     <field name="close_date" />
                     <newline />
                     <filter icon="STOCK_MEDIA_PLAY"
@@ -332,6 +332,9 @@
                     <field name="name_ye" readonly="1" />
                     <field name="factor" string="Сумма для отчета"/>
                     <field name="paid_type" />
+                    <field name="add_revenues" string="Затраты на персонал"/>
+                    <field name="add_costs"/>
+                    <field name="period_id"/>
                     <field name="close" on_change="onchange_close(close)"/>
                     <field name="close_date" attrs="{'readonly': [('close', '=', False)]}" />
                 </tree>
@@ -351,8 +354,9 @@
                     <field name="paid_type" />
                     <field name="name_ye" />
                     <field name="factor" string="Сумма для отчета"/>
-                    <field name="add_revenues" />
-                    <field name="add_costs" />
+                    <field name="add_revenues" string="Затраты на персонал"/>
+                    <field name="add_costs"/>
+                    <field name="period_id"/>
                     <field name="close_date" />
                     <newline />
                     <filter icon="STOCK_MEDIA_PLAY"
@@ -404,10 +408,10 @@
                     <field name="partner_id" string="Партнер" readonly="1"/>
                     <field name="user_id" string="Автор" readonly="1"/>
                     <field name="service_id" readonly="1"/>
-                    <field name="specialist_id" readonly="1" string="Специалист"/>
                     <field name="name_ye" readonly="1" />
                     <field name="factor" string="Сумма для отчета"/>
                     <field name="paid_type" />
+                    <field name="add_revenues" string="Затраты на персонал"/>
                     <field name="close" on_change="onchange_close(close)"/>
                     <field name="close_date" attrs="{'readonly': [('close', '=', False)]}" />
                 </tree>
@@ -422,13 +426,11 @@
                     <field name="number" />
                     <field name="partner_id" string="Партнер"/>
                     <field name="user_id" string="Автор"/>
-                    <field name="service_id" domain="[('direction', '=', 'SITE')]"/>
-                    <field name="specialist_id" string="Специалист" />
+                    <field name="service_id" domain="[('direction', '=', 'VIDEO')]"/>
                     <field name="paid_type" />
                     <field name="name_ye" />
                     <field name="factor" string="Сумма для отчета"/>
-                    <field name="add_revenues" />
-                    <field name="add_costs" />
+                    <field name="add_revenues" string="Затраты на персонал"/>
                     <field name="close_date" />
                     <newline />
                     <filter icon="STOCK_MEDIA_PLAY"
@@ -450,8 +452,6 @@
                         <filter string="Дата выставления счета" icon="terp-partner" context="{'group_by': 'invoice_date'}"/>
                         <separator orientation="vertical"/>
                         <filter string="Дата закрытия счета" icon="terp-partner" context="{'group_by': 'close_date'}"/>
-                        <separator orientation="vertical"/>
-                        <filter string="Специалист" icon="terp-partner" context="{'group_by': 'specialist_id'}"/>
                         <separator orientation="vertical"/>
                     </group>
                 </search>

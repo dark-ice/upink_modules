@@ -37,7 +37,7 @@
             <field name="priority" eval="1"/>
             <field name="type">tree</field>
             <field name="arch" type="xml">
-                <tree colors="orange:state=='proforma';#00C322:state=='paid';gray:state=='cancel'">
+                <tree colors="orange:state=='proforma';#00C322:state=='paid';gray:state=='cancel'" string="Счета">
                     <field name="reference" invisible="1"/>
                     <field name="name" invisible="1"/>
                     <field name="id" invisible="1"/>
@@ -383,7 +383,7 @@
                             <field name="id" string="№ ЗДС" />
                             <field name="user_id" string="Автор" readonly="1"/>
                             <field name="division_id" string="Направление" required="1" widget="selection" on_change="change_division(division_id)"/>
-                            <field name="period_id" attrs="{'invisible': [('division_id', '=', 6)]}"/>
+                            <field name="period_id" attrs="{'invisible': [('division_id', 'not in', (6, 9, 8))]}" string="Период"/>
                             <field name="type_getter" required="1" on_change="change_getter(type_getter)"/>
                             <field name="lead_id" invisible="True"/>
                             <field name="get_division" invisible="True" />
