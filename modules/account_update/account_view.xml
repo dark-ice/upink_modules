@@ -37,7 +37,7 @@
             <field name="priority" eval="1"/>
             <field name="type">tree</field>
             <field name="arch" type="xml">
-                <tree colors="orange:state=='proforma';#00C322:state=='paid';gray:state=='cancel'">
+                <tree colors="orange:state=='proforma';#00C322:state=='paid';gray:state=='cancel'" string="Счета">
                     <field name="reference" invisible="1"/>
                     <field name="name" invisible="1"/>
                     <field name="id" invisible="1"/>
