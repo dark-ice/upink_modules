@@ -174,8 +174,6 @@ class SiteReport(Model):
                 rollovers_income += vals['carry_over_revenue'] + vals['total']
                 rollovers_outcome += vals['co_costs_partner'] + vals['costs_partner']
 
-
-
             lines.append((0, 0, vals))
 
         costs_period = costs_employee_period + costs_partner_period
