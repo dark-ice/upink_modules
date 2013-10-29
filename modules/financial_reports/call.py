@@ -87,6 +87,7 @@ class CallReport(Model):
                 'partner_id': record['partner_id'][0] if record['partner_id'] else False,
                 'paid_type': record['paid_type'] or 'cash',
                 'invoice_id': record['invoice_id'][0] if record['invoice_id'] else False,
+                'specialist_id': record['specialist_id'][0] if record['specialist_id'] else False,
                 'pay_date': record['invoice_date'],
                 'total': record['factor'],
                 'close_date': 'Не закрыт',
