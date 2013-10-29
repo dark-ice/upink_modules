@@ -107,45 +107,29 @@ class SiteReport(Model):
             if record['close'] and record['close_date'] <= date_end:
                 vals['close_date'] = record['close_date']
 
-            if record['partner_id']:
-                pass
             if record['invoice_id']:
                 invoice = self.pool.get('account.invoice').read(cr, 1, record['invoice_id'][0], ['rate'])
                 rate = invoice['rate']
                 vals['rate'] = rate
 
-            if record['service_id'][0] in (17, 21, 22, ):
-                # 30 - курс долара у Яндекса
-                costs_partner = (1 - vals['discount_up'] / 100) * record['factor'] * rate / 30
-
-            if record['specialist_id']:
-                source_date = datetime.strptime(record['invoice_date'], '%Y-%m-%d')
-                period = self.pool.get('kpi.period').get_by_date(cr, source_date)
-                kpi_ids = self.pool.get('kpi.kpi').search(cr, 1, [('period_id', '=', period.id), ('employee_id.user_id', '=', record['specialist_id'][0])])
-                if kpi_ids:
-                    kpi_total = self.pool.get('kpi.kpi')._get_cash(cr, 1, kpi_ids, 'total', None)
-                    total = kpi_total[kpi_ids[0]]['total']
-
-                    if record['specialist_id'][0] not in employeers:
-                        employeers.add(record['specialist_id'][0])
-                        kpi_elements = self.pool.get('kpi.kpi')._get_employee_items(cr, 1, kpi_ids, 'formal_tax', None)
-                        tax = kpi_elements[kpi_ids[0]]
-                        costs_employee_period_tax += total - tax
-                        costs_employee_period_tax_ye += (total - tax) / 8.0
-                        costs_tax_period += tax
-                        costs_tx_period_ye += tax / 8.0
-
-                specialist_pay_line_ids = pay_line_pool.search(
+            if record['partner_id'] and record['period_id']:
+                zds_ids = self.pool.get('account.invoice').search(
                     cr,
                     1,
-                    domain + [('specialist_id', '=', record['specialist_id'][0])],
-                    order='partner_id, service_id, invoice_date'
-                )
-                sum_pay = sum(p['factor'] for p in pay_line_pool.read(cr, 1, specialist_pay_line_ids, ['factor']))
-                try:
-                    costs_employee = (total * record['factor'] / sum_pay) / 8.0
-                except ZeroDivisionError:
-                    costs_employee = 0
+                    [
+                        ('division_id', '=', 9),
+                        ('type', '=', 'in_invoice'),
+                        ('partner_id', '=', record['partner_id'][0]),
+                        ('period_id', '<', record['period_id'][0]),
+                    ])
+                zds = self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'period_id'])
+                for m in zds:
+                    if m['period_id'] == record['period_id']:
+                        vals['costs_partner'] += m['cash_mr_dol']
+                    else:
+                        vals['co_costs_partner'] += m['cash_mr_dol']
+
+            costs_employee = record['add_revenues']
 
             if date_end >= record['invoice_date'] >= date_start and record['close_date'] != 'Не закрыт':
                 vals['co_costs_partner'] = 0

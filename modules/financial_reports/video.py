@@ -108,78 +108,29 @@ class VideoReport(Model):
             if record['close'] and record['close_date'] <= date_end:
                 vals['close_date'] = record['close_date']
 
-            if record['partner_id']:
-                discounts_ids = self.pool.get('res.partner.ppc.discounts').search(
-                    cr,
-                    1,
-                    [
-                        ('service_id', '=', record['service_id'][0]),
-                        ('partner_id', '=', record['partner_id'][0]),
-                        '|',
-                        '&', ('start_date', '<=', record['invoice_date']), ('finish_date', '>=', record['invoice_date']),
-                        ('permanent', '=', True),
-                    ]
-                )
-                for discount in self.pool.get('res.partner.ppc.discounts').read(cr, 1, discounts_ids, []):
-                    if discount['discount_type'] == 'nds':
-                        vals['discount_nds'] = discount['percent']
-                    elif discount['discount_type'] == 'partner_discount':
-                        vals['discount_partner'] = discount['percent']
-                    elif discount['discount_type'] == 'yandex_discount':
-                        vals['discount_up'] = discount['percent']
-                    elif discount['discount_type'] == 'google_discount':
-                        if discount['google']:
-                            vals['discount_up'] = 4500
-                            google = True
-                        else:
-                            vals['discount_up'] = discount['percent']
-
-            if vals['discount_nds'] == 0:
-                vals['discount_nds'] = 18
             if record['invoice_id']:
                 invoice = self.pool.get('account.invoice').read(cr, 1, record['invoice_id'][0], ['rate'])
                 rate = invoice['rate']
                 vals['rate'] = rate
 
-            if record['service_id'][0] in (17, 21, 22, ):
-                # 30 - курс долара у Яндекса
-                costs_partner = (1 - vals['discount_up'] / 100) * record['factor'] * rate / 30
-            elif record['service_id'][0] in (18, ):
-                if google:
-                    costs_partner = (record['factor'] - 4500 / rate) / (1 + vals['discount_nds'] / 100)
-                else:
-                    costs_partner = record['factor'] * (1 - vals['discount_up'] / 100) / (1 + vals['discount_nds'] / 100)
-            elif record['service_id'][0] in (23,):
-                costs_partner = record['factor'] * (1 - vals['discount_up'] / 100)
-
-            if record['specialist_id']:
-                source_date = datetime.strptime(record['invoice_date'], '%Y-%m-%d')
-                period = self.pool.get('kpi.period').get_by_date(cr, source_date)
-                kpi_ids = self.pool.get('kpi.kpi').search(cr, 1, [('period_id', '=', period.id), ('employee_id.user_id', '=', record['specialist_id'][0])])
-                if kpi_ids:
-                    kpi_total = self.pool.get('kpi.kpi')._get_cash(cr, 1, kpi_ids, 'total', None)
-                    total = kpi_total[kpi_ids[0]]['total']
-
-                    if record['specialist_id'][0] not in employeers:
-                        employeers.add(record['specialist_id'][0])
-                        kpi_elements = self.pool.get('kpi.kpi')._get_employee_items(cr, 1, kpi_ids, 'formal_tax', None)
-                        tax = kpi_elements[kpi_ids[0]]
-                        costs_employee_period_tax += total - tax
-                        costs_employee_period_tax_ye += (total - tax) / 8.0
-                        costs_tax_period += tax
-                        costs_tx_period_ye += tax / 8.0
-
-                specialist_pay_line_ids = pay_line_pool.search(
+            if record['partner_id'] and record['period_id']:
+                zds_ids = self.pool.get('account.invoice').search(
                     cr,
                     1,
-                    domain + [('specialist_id', '=', record['specialist_id'][0])],
-                    order='partner_id, service_id, invoice_date'
-                )
-                sum_pay = sum(p['factor'] for p in pay_line_pool.read(cr, 1, specialist_pay_line_ids, ['factor']))
-                try:
-                    costs_employee = (total * record['factor'] / sum_pay) / 8.0
-                except ZeroDivisionError:
-                    costs_employee = 0
+                    [
+                        ('division_id', '=', 8),
+                        ('type', '=', 'in_invoice'),
+                        ('partner_id', '=', record['partner_id'][0]),
+                        ('period_id', '<', record['period_id'][0]),
+                    ])
+                zds = self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'period_id'])
+                for m in zds:
+                    if m['period_id'] == record['period_id']:
+                        vals['costs_partner'] += m['cash_mr_dol']
+                    else:
+                        vals['co_costs_partner'] += m['cash_mr_dol']
+
+            costs_employee = record['add_revenues']
 
             if date_end >= record['invoice_date'] >= date_start and record['close_date'] != 'Не закрыт':
                 vals['co_costs_partner'] = 0
@@ -480,10 +431,6 @@ class VideoReportLine(Model):
         'close_date': fields.char('Дата ЗД', size=50),
 
         'carry_over_revenue': fields.float('Переходящие доходы, $'),
-
-        'discount_up': fields.float('Скидка Up в аккаунте, %'),
-        'discount_partner': fields.float('Скидка Партнера, %'),
-        'discount_nds': fields.float('НДС, %'),
 
         'co_costs_partner': fields.float('Переходящие затраты на партнера, $'),
         'costs_partner': fields.float('Затраты на Партнера, $'),
