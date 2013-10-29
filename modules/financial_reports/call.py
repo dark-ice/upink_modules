@@ -97,9 +97,11 @@ class CallReport(Model):
                 'costs_partner': 0,
                 'co_costs_employee': 0,
                 'costs_employee': 0,
+                'costs_net': record['add_costs'],
                 'profit': 0,
                 'rate': 0,
-                'period_id': record['period_id'][0] if record['period_id'] else False
+                'period_id': record['period_id'][0] if record['period_id'] else False,
+                'profitability': 0,
             }
             if record['close'] and record['close_date'] <= date_end:
                 vals['close_date'] = record['close_date']
@@ -121,8 +123,6 @@ class CallReport(Model):
                         ('period_id', '<', record['period_id'][0]),
                     ])
                 zds = self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'period_id'])
-                #total_partner = sum(m['cash_mr_dol'] for m in zds)
-                #percent =
                 for m in zds:
                     if m['period_id'] == record['period_id']:
                         vals['costs_partner'] += m['cash_mr_dol']
@@ -152,6 +152,12 @@ class CallReport(Model):
             elif vals['close_date'] == 'Не закрыт':
                 rollovers_income += vals['carry_over_revenue'] + vals['total']
                 rollovers_outcome += vals['co_costs_partner'] + vals['costs_partner']
+
+            if vals['profit']:
+                try:
+                    vals['profitability'] = vals['profit'] * 100 / (vals['total'] + vals['carry_over_revenue'])
+                except ZeroDivisionError:
+                    vals['profitability'] = 0
 
             lines.append((0, 0, vals))
 
@@ -429,8 +435,12 @@ class CallReportLine(Model):
         'costs_partner': fields.float('Затраты на Партнера, $'),
         'co_costs_employee': fields.float('Переходящие затраты на персонал, $'),
         'costs_employee': fields.float('Затраты на персонал, $'),
+        'costs_net': fields.float('Затраты на связь, $'),
         'profit': fields.float('Валовая прибыль, $'),
+        'profitability': fields.float('Рентабельность, %'),
         'rate': fields.float('Курс'),
         'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')]),
+        'specialist_id': fields.many2one('res.users', 'Супервайзер'),
+
     }
 CallReportLine()
