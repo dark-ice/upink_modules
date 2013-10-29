@@ -27,6 +27,8 @@
                         <field name="rollovers_income" />
                         <field name="rollovers_outcome" />
                         <field name="count_partners" /> <newline />
+                        <field name="rate_rus"/>
+                        <field name="rate_uah"/>
                         <separator colspan="4" string="Статьи затрат" />
                         <field name="costs_employee_period_tax" />
                         <field name="costs_employee_period_tax_ye" />
@@ -78,6 +80,8 @@
                         icon="gtk-go-forward"
                         attrs="{'invisible': ['|', ('state', '!=', 'director'), ('check_f', '=', False)]}"
                         />
+                    <newline />
+                    <button string="Выгрузить EXCEL" type="action" name="%(action_report_smm)d" />
                 </form>
             </field>
         </record>

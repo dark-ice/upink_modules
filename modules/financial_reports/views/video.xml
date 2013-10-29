@@ -38,16 +38,12 @@
                             <field name="partner_id" />
                             <field name="service_id" />
                             <field name="invoice_id" />
-                            <field name="specialist_id" />
                             <field name="paid_type" />
                             <field name="pay_date" />
                             <field name="total" />
                             <field name="rate" />
                             <field name="close_date" />
                             <field name="carry_over_revenue" />
-                            <field name="discount_up" />
-                            <field name="discount_partner" />
-                            <field name="discount_nds" />
                             <field name="co_costs_partner" />
                             <field name="costs_partner" />
                             <field name="co_costs_employee" />
@@ -81,6 +77,7 @@
                         icon="gtk-go-forward"
                         attrs="{'invisible': ['|', ('state', '!=', 'director'), ('check_f', '=', False)]}"
                         />
+                    <button string="Выгрузить EXCEL" type="action" name="%(action_report_video)d" />
                 </form>
             </field>
         </record>

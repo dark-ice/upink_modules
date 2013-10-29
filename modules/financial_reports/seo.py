@@ -398,8 +398,8 @@ class ReportSeo(Model):
             readonly=True
         ),
 
-        'rate_rus': fields.float('Курс 1$ к руб.'),
-        'rate_uah': fields.float('Курс 1$ к грн.'),
+        'rate_rus': fields.float('Курс 1$ к руб.', readonly=True),
+        'rate_uah': fields.float('Курс 1$ к грн.', readonly=True),
     }
 
     _defaults = {
@@ -419,7 +419,7 @@ class ReportSeo(Model):
             currency = currency_rate_pool.read(cr, 1, currency_date_ids[0], ['rate'])
         else:
             currency = currency_pool.read(cr, 1, currency_id, ['rate'])
-        return currency
+        return currency['rate']
 
     def create(self, cr, user, vals, context=None):
         date = datetime.now().strftime('%Y-%m-%d')
@@ -447,7 +447,7 @@ class ReportSeoLine(Model):
     _columns = {
         'report_id': fields.many2one('financial.reports.seo', 'Отчет SEO'),
         'partner_id': fields.many2one('res.partner', 'Партнер'),
-        'specialist_id': fields.many2one('res.users', 'Аккаунт-менеджер'),
+        'specialist_id': fields.many2one('res.users', 'Специалист'),
         'site_url': fields.char('Сайт', size=250),
         'paid_type': fields.selection(
             (

@@ -83,7 +83,7 @@ class SMMReport(Model):
         source_date_start = datetime.strptime(date_start, '%Y-%m-%d')
         source_date_end = datetime.strptime(date_end, '%Y-%m-%d')
         td = source_date_end - source_date_start
-        rtd = relativedelta(seconds=int(td.total_seconds()),  microseconds=td.microseconds)
+        rtd = relativedelta(seconds=int((td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6),  microseconds=td.microseconds)
         months = rtd.month or 0
         for delta in range(months):
             current_periods.add(self.pool.get('kpi.period').get_by_date(cr, source_date_start + relativedelta(months=delta)).id)
@@ -177,7 +177,7 @@ class SMMReport(Model):
                         try:
                             co_costs[invoice_period.id]['pay'] += p['factor']
                         except KeyError:
-                            co_costs[invoice_period.id]['pay'] = p['factor']
+                            co_costs[invoice_period.id] = {'pay': p['factor']}
 
                 #try:
                 #    costs_employee = (total * record['factor'] / current_pay) / 8.0
@@ -461,6 +461,9 @@ class SMMReport(Model):
             type='boolean',
             invisible=True
         ),
+
+        'rate_rus': fields.float('Курс 1$ к руб.', readonly=True),
+        'rate_uah': fields.float('Курс 1$ к грн.', readonly=True),
     }
 
     _defaults = {
