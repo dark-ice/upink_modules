@@ -1417,7 +1417,7 @@ class res_partner(Model):
         'categ_id': fields.many2one(
             'crm.case.categ',
             'Тематика',
-            domain="['|',('section_id','=',section_id),('section_id','=',False),('object_id.model', '=', 'crm.lead')]",
+            domain="['|', ('section_id', '=', False), ('responsible_users', '=', user_id)]",
             help='Категория, которой принадлежит данный Партнер'
         ),
         'description': fields.text('Дополнительная информация о контактном лице'),
@@ -1683,6 +1683,12 @@ class res_partner(Model):
                 attachment[2]['res_model'] = 'res.partner'
 
         return super(res_partner, self).write(cr, user, ids, vals, context)
+
+    def create(self, cr, user, vals, context=None):
+        categ_ids = self.pool.get('crm.case.categ').search(cr, user, [('responsible_users', '=', user)])
+        if vals.get('partner_base') == 'cold' and (not vals.get('categ_id') or vals['categ_id'] not in categ_ids):
+            raise osv.except_osv("Ошибка", "Заполните поле 'Тематика' Вашей тематикой")
+        return super(res_partner, self).create(cr, user, vals, context)
 
     def _check_unique_insesitive(self, cr, uid, ids, context=None):
         for self_obj in self.browse(cr, 1, ids, context):
