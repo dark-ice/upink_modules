@@ -197,7 +197,7 @@ brief_rel_services_fields()
 class brief_part_one(Model):
     _name = 'brief.part.one'
     _description = u"Бриф. Первая часть таблицы"
-   
+
     _columns = {
         'algorithm': fields.selection(
             [
@@ -1310,6 +1310,22 @@ class brief_main(Model):
             required=True,
             domain=[('usergroup', '!=', False)],
             help='Услуга по которой составляется Бриф.'),
+        'direction': fields.function(
+            lambda *a: [],
+            type="selection",
+            method=True,
+            string='Направление',
+            help='',
+            selection=[
+                   ('PPC', 'PPC'),
+                   ('VIDEO', 'VIDEO'),
+                   ('SEO', 'SEO'),
+                   ('SMM', 'SMM'),
+                   ('CALL', 'CALL'),
+                   ('SITE', 'SITE'),
+                   ('MP', 'MP'),
+            ],
+        ),
         'state': fields.selection(
             _states,
             'Статус брифа',
@@ -1579,6 +1595,20 @@ class brief_main(Model):
          'Вам необходимо указать к кому относится данный бриф.',
          [u'Партнер']),
     ]
+
+    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
+        new_item = []
+        for item in args:
+            if item[0] == 'create_date':
+                new_item = ['create_date', '<=', '{0} 23:59:59'.format(item[2],)]
+                item[2] = '{0} 00:00:00'.format(item[2],)
+                item[1] = '>='
+            if item[0] == 'direction':
+                item[0] = "services_ids.direction"
+                item[2] = item[2].upper()
+        if new_item:
+            args.append(new_item)
+        return super(brief_main, self).search(cr, user, args, offset, limit, order, context, count)
 brief_main()
 
 
