@@ -72,8 +72,8 @@ class AccountInvoicePayLine(Model):
         'close': fields.boolean('Закрыт счет?'),
         'close_date': fields.date('Дата закрытия'),
         'invoice_date': fields.related(
-            'invoice_id',
-            'date_invoice',
+            'pay_id',
+            'date_pay',
             type='date',
             string='Дата платежа',
             store=True,
