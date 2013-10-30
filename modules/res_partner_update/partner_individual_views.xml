@@ -646,7 +646,7 @@
 
                             <field name="partner_status" />
                             <field name="next_call"/>
-                            <field name="user_id"/>
+                            <field name="user_id" attrs="{'readonly': [('lead', '=', False)]}"/>
                             <field name="categ_id" widget="selection" string="Тематика" />
                             <field name="partner_type" invisible="1"/>
 
