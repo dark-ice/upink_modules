@@ -54,7 +54,7 @@ class InvoiceDocumentWizard(TransientModel):
             self.pool.get('account.invoice').write(cr, uid, [record.invoice_id.id], {
                 'close_doc_create': record.document_date})
             total = sum([item.name for item in record.document_line_id])
-            if total > record.invoice_id.a_total:
+            if round(total, 2) > round(record.invoice_id.a_total, 2):
                 raise osv.except_osv('Warning!', 'Сумма платежа не может быть больше чем сумма счета')
             document_id = document_pool.create(cr, uid, {
                 'name': record.name,
