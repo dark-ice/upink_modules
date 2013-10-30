@@ -328,7 +328,7 @@
                     <field name="partner_id" string="Партнер" readonly="1"/>
                     <field name="user_id" string="Автор" readonly="1"/>
                     <field name="service_id" readonly="1"/>
-                    <field name="specialist_id" readonly="1" string="Специалист"/>
+                    <field name="specialist_id" readonly="1" string="PM"/>
                     <field name="name_ye" readonly="1" />
                     <field name="factor" string="Сумма для отчета"/>
                     <field name="paid_type" />
@@ -350,7 +350,7 @@
                     <field name="partner_id" string="Партнер"/>
                     <field name="user_id" string="Автор"/>
                     <field name="service_id" domain="[('direction', '=', 'SITE')]"/>
-                    <field name="specialist_id" string="Специалист" />
+                    <field name="specialist_id" string="PM" />
                     <field name="paid_type" />
                     <field name="name_ye" />
                     <field name="factor" string="Сумма для отчета"/>
@@ -379,7 +379,7 @@
                         <separator orientation="vertical"/>
                         <filter string="Дата закрытия счета" icon="terp-partner" context="{'group_by': 'close_date'}"/>
                         <separator orientation="vertical"/>
-                        <filter string="Специалист" icon="terp-partner" context="{'group_by': 'specialist_id'}"/>
+                        <filter string="PM" icon="terp-partner" context="{'group_by': 'specialist_id'}"/>
                         <separator orientation="vertical"/>
                     </group>
                 </search>

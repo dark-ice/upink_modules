@@ -27,7 +27,7 @@
         <record id="discount_nds_rule" model="ir.rule">
             <field name="name">Скидки в партнерах и кандитах только ндс</field>
             <field ref="model_res_partner_ppc_discounts" name="model_id"/>
-            <field name="domain_force">[('discount_type', '=', 'nds')]</field>
+            <field name="domain_force">[('discount_type', '=', 'partner_discount')]</field>
             <field name="perm_read" eval="True" />
             <field name="perm_create" eval="True" />
             <field name="perm_write" eval="True" />
@@ -38,7 +38,7 @@
         <record id="discount_nds_history_rule" model="ir.rule">
             <field name="name">Скидки в партнерах и кандитах только ндс</field>
             <field ref="model_res_partner_ppc_discounts_history" name="model_id"/>
-            <field name="domain_force">['|', ('discount_type', '=', 'nds'), ('old_discount_type', '=', 'nds')]</field>
+            <field name="domain_force">['|', ('discount_type', '=', 'partner_discount'), ('old_discount_type', '=', 'partner_discount')]</field>
             <field name="perm_read" eval="True" />
             <field name="perm_create" eval="True" />
             <field name="perm_write" eval="True" />
