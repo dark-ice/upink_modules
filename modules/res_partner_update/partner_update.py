@@ -910,6 +910,17 @@ class ResPartnerBankAddress(Model):
             ], 'Тип'),
         'index': fields.char("Почтовый индекс", size=6),
         'city': fields.char("Город", size=250),
+        'st_type': fields.selection(
+            [
+                ('alleya', 'Аллея'),
+                ('ylitsa', 'Улица'),
+                ('bulvar', 'Бульвар'),
+                ('naberegnaya', 'Набережная'),
+                ('pereyloc', 'Переулок'),
+                ('proezd', 'Проезд'),
+                ('prospect', 'Проспект'),
+                ('ploshad', 'Площадь'),
+            ], 'Тип улицы'),
         'street': fields.char("Улица", size=250),
         'house': fields.char("№ дома", size=50),
         'housing': fields.char("№ корпуса", size=50),
@@ -930,7 +941,8 @@ class ResPartnerBankAddress(Model):
 
     _defaults = {
         'name': lambda *a: 'ua',
-        'flat_type': lambda *a: 'flat'
+        'flat_type': lambda *a: 'flat',
+        'st_type': 'ylitsa'
     }
 ResPartnerBankAddress()
 

@@ -2052,6 +2052,7 @@
                         <field name="index"/>
 
                         <field name="city"/>
+                        <field name="st_type"/>
                         <field name="street"/>
 
                         <field name="house"/>
@@ -2076,6 +2077,7 @@
                     <field name="index"/>
 
                     <field name="city"/>
+                    <field name="st_type"/>
                     <field name="street"/>
 
                     <field name="house"/>
