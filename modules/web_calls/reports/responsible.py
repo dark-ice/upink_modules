@@ -46,11 +46,13 @@ class ResponsibleCalls(Model):
         'dnepropetrovsk': fields.integer('Днепропетровск'),
         'donetsk': fields.integer('Донецк'),
         'minsk': fields.integer('Минск'),
+        'astana': fields.integer('Астана'),
 
         'livesite': fields.integer('Продажи с Живосайта'),
         'adminpanel': fields.integer('Продажи с Админпанели'),
         'shara': fields.integer('Халява'),
         'total': fields.integer('Всего'),
+        'incoming_call': fields.integer('Входящий звонок'),
     }
 
     def init(self, cr):
@@ -89,9 +91,11 @@ class ResponsibleCalls(Model):
                     sum(case when region='dnepr' then 1 else 0 end) dnepropetrovsk,
                     sum(case when region='donetsk' then 1 else 0 end) donetsk,
                     sum(case when region='belarus' then 1 else 0 end) minsk,
+                    sum(case when region='astana' then 1 else 0 end) astana,
                     sum(case when livesite=true then 1 else 0 end) livesite,
                     sum(case when adminpanel=true then 1 else 0 end) adminpanel,
                     sum(case when shara=true then 1 else 0 end) shara,
+                    sum(case when incoming_call=true then 1 else 0 end) incoming_call,
                     sum(case when call_type='sale' then 1 else 0 end) total
                 FROM web_calls
                 WHERE call_type = 'sale'

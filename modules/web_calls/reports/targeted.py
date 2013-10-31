@@ -37,7 +37,7 @@ class TargetedCalls(Model):
                     case when call_type='sale' then 1 else 0 end sale,
                     case when call_type='consultation' then 1 else 0 end consultation,
                     case when call_type='no_product' then 1 else 0 end no_product
-                FROM web_calls WHERE call_type IN ('sale', 'consultation', 'no_product')
+                FROM web_calls WHERE call_type IN ('sale', 'consultation', 'no_product') and incoming_call = True
             )""")
 
     def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False):
