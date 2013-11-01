@@ -58,7 +58,7 @@
                         <separator orientation="vertical"/>
                         <filter string="Услуге" icon="terp-partner" context="{'group_by': 'service_id'}"/>
                         <separator orientation="vertical"/>
-                        <filter string="Дата выставления счета" icon="terp-partner" context="{'group_by': 'invoice_date'}"/>
+                        <filter string="Дата платежа" icon="terp-go-month" context="{'group_by': 'invoice_date'}"/>
                         <separator orientation="vertical"/>
                         <filter string="Дата закрытия счета" icon="terp-partner" context="{'group_by': 'close_date'}"/>
                         <separator orientation="vertical"/>
@@ -136,7 +136,7 @@
                         <separator orientation="vertical"/>
                         <filter string="Услуге" icon="terp-partner" context="{'group_by': 'service_id'}"/>
                         <separator orientation="vertical"/>
-                        <filter string="Дата выставления счета" icon="terp-partner" context="{'group_by': 'invoice_date'}"/>
+                        <filter string="Дата платежа" icon="terp-go-month" context="{'group_by': 'invoice_date'}"/>
                         <separator orientation="vertical"/>
                         <filter string="Дата закрытия счета" icon="terp-partner" context="{'group_by': 'close_date'}"/>
                         <separator orientation="vertical"/>
@@ -215,7 +215,7 @@
                         <separator orientation="vertical"/>
                         <filter string="Услуге" icon="terp-partner" context="{'group_by': 'service_id'}"/>
                         <separator orientation="vertical"/>
-                        <filter string="Дата выставления счета" icon="terp-partner" context="{'group_by': 'invoice_date'}"/>
+                        <filter string="Дата платежа" icon="terp-go-month" context="{'group_by': 'invoice_date'}"/>
                         <separator orientation="vertical"/>
                         <filter string="Дата закрытия счета" icon="terp-partner" context="{'group_by': 'close_date'}"/>
                         <separator orientation="vertical"/>
@@ -289,17 +289,17 @@
                             string="Незакрытые счета"/>
                     <newline/>
                     <group expand="0" string="Группировать по...">
-                        <filter string="Счет" icon="terp-partner" context="{'group_by': 'invoice_id'}"/>
+                        <filter string="Счет" icon="terp-dolar" context="{'group_by': 'invoice_id'}"/>
                         <separator orientation="vertical"/>
                         <filter string="Партнеру" icon="terp-partner" context="{'group_by': 'partner_id'}"/>
                         <separator orientation="vertical"/>
-                        <filter string="Услуге" icon="terp-partner" context="{'group_by': 'service_id'}"/>
+                        <filter string="Услуге" icon="gtk-index" context="{'group_by': 'service_id'}"/>
                         <separator orientation="vertical"/>
-                        <filter string="Дата выставления счета" icon="terp-partner" context="{'group_by': 'invoice_date'}"/>
+                        <filter string="Дата платежа" icon="terp-go-month" context="{'group_by': 'invoice_date'}"/>
                         <separator orientation="vertical"/>
-                        <filter string="Дата закрытия счета" icon="terp-partner" context="{'group_by': 'close_date'}"/>
+                        <filter string="Дата закрытия счета" icon="terp-go-year" context="{'group_by': 'close_date'}"/>
                         <separator orientation="vertical"/>
-                        <filter string="Специалист" icon="terp-partner" context="{'group_by': 'specialist_id'}"/>
+                        <filter string="Специалист" icon="stock_person" context="{'group_by': 'specialist_id'}"/>
                         <separator orientation="vertical"/>
                     </group>
                 </search>
@@ -375,7 +375,7 @@
                         <separator orientation="vertical"/>
                         <filter string="Услуге" icon="terp-partner" context="{'group_by': 'service_id'}"/>
                         <separator orientation="vertical"/>
-                        <filter string="Дата выставления счета" icon="terp-partner" context="{'group_by': 'invoice_date'}"/>
+                        <filter string="Дата платежа" icon="terp-go-month" context="{'group_by': 'invoice_date'}"/>
                         <separator orientation="vertical"/>
                         <filter string="Дата закрытия счета" icon="terp-partner" context="{'group_by': 'close_date'}"/>
                         <separator orientation="vertical"/>
@@ -449,7 +449,7 @@
                         <separator orientation="vertical"/>
                         <filter string="Услуге" icon="terp-partner" context="{'group_by': 'service_id'}"/>
                         <separator orientation="vertical"/>
-                        <filter string="Дата выставления счета" icon="terp-partner" context="{'group_by': 'invoice_date'}"/>
+                        <filter string="Дата платежа" icon="terp-go-month" context="{'group_by': 'invoice_date'}"/>
                         <separator orientation="vertical"/>
                         <filter string="Дата закрытия счета" icon="terp-partner" context="{'group_by': 'close_date'}"/>
                         <separator orientation="vertical"/>
