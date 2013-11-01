@@ -108,7 +108,8 @@ class SiteReport(Model):
             }
             if record['close'] and record['close_date'] <= date_end:
                 vals['close_date'] = record['close_date']
-
+            source_date = datetime.strptime(record['invoice_date'], '%Y-%m-%d')
+            period = self.pool.get('kpi.period').get_by_date(cr, source_date)
             if record['invoice_id']:
                 invoice = self.pool.get('account.invoice').read(cr, 1, record['invoice_id'][0], ['rate'])
                 rate = invoice['rate']
@@ -122,7 +123,7 @@ class SiteReport(Model):
                         ('division_id', '=', 9),
                         ('type', '=', 'in_invoice'),
                         ('partner_id', '=', record['partner_id'][0]),
-                        ('period_id', '<=', record['period_id'][0]),
+                        ('period_id', '<=', period.id),
                     ])
                 zds = self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'period_id'])
                 for m in zds:
