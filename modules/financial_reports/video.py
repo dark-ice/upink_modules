@@ -53,6 +53,7 @@ class VideoReport(Model):
             ('close_date', '=', False),
             ('close_date', '>=', date_start),
             ('partner_id', '!=', False),
+            ('partner_id', '=', 31841),
             ('invoice_id', '!=', False),
         ]
         pay_line_ids = pay_line_pool.search(cr, 1, domain, order='partner_id, service_id, invoice_date')
@@ -134,15 +135,11 @@ class VideoReport(Model):
             costs_employee = record['add_revenues']
 
             if date_end >= record['invoice_date'] >= date_start and record['close_date'] != 'Не закрыт':
-                vals['co_costs_partner'] = 0
-                vals['costs_partner'] = costs_partner
                 vals['co_costs_employee'] = 0
                 vals['costs_employee'] = costs_employee
                 costs_employee_period += costs_employee
 
             else:
-                vals['co_costs_partner'] = costs_partner
-                vals['costs_partner'] = 0
                 vals['co_costs_employee'] = costs_employee
                 vals['costs_employee'] = 0
                 vals['carry_over_revenue'] = record['factor']
