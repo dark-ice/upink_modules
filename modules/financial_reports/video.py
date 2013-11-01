@@ -112,6 +112,8 @@ class VideoReport(Model):
                 rate = invoice['rate']
                 vals['rate'] = rate
 
+            source_date = datetime.strptime(record['invoice_date'], '%Y-%m-%d')
+            period = self.pool.get('kpi.period').get_by_date(cr, source_date)
             if record['partner_id'] and record['period_id']:
                 zds_ids = self.pool.get('account.invoice').search(
                     cr,
@@ -120,7 +122,7 @@ class VideoReport(Model):
                         ('division_id', '=', 8),
                         ('type', '=', 'in_invoice'),
                         ('partner_id', '=', record['partner_id'][0]),
-                        ('period_id', '<=', record['period_id'][0]),
+                        ('period_id', '<=', period.id),
                     ])
                 zds = self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'period_id'])
                 for m in zds:
