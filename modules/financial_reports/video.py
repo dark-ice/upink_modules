@@ -126,7 +126,7 @@ class VideoReport(Model):
                     ])
                 zds = self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'period_id'])
                 for m in zds:
-                    if m['period_id'] == record['period_id']:
+                    if m['period_id'][0] == period.id:
                         vals['costs_partner'] += m['cash_mr_dol']
                     else:
                         vals['co_costs_partner'] += m['cash_mr_dol']
