@@ -61,10 +61,8 @@ class VideoReport(Model):
         lines = []
         # Итого
         total_period = 0
-        balance_period = 0
         profit_period = 0
         costs_employee_period = 0
-        costs_period = 0
         costs_partner_period = 0
         rollovers_income = 0
         rollovers_outcome = 0
@@ -74,7 +72,6 @@ class VideoReport(Model):
         costs_employee_period_tax_ye = 0
         costs_tax_period = 0
         costs_tx_period_ye = 0
-        employeers = set()
 
         co_costs = {}
         current_periods = set()
@@ -87,11 +84,7 @@ class VideoReport(Model):
             current_periods.add(self.pool.get('kpi.period').get_by_date(cr, source_date_start + relativedelta(months=delta)).id)
 
         for record in pay_line_pool.read(cr, 1, pay_line_ids, []):
-            google = False
-            rate = 1
             pay_partner = 0
-            costs_employee = 0
-            total = 0
 
             vals = {
                 'service_id': record['service_id'][0] if record['service_id'] else False,

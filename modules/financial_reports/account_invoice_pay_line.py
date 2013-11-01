@@ -34,12 +34,15 @@ class AccountInvoicePayLine(Model):
                     launch_ids = self.pool.get('process.launch').search(cr, 1, [('partner_id', '=', invoice['partner_id'][0]), ('service_id', '=', record['service_id'][0])])
                     for launch in self.pool.get('process.launch').read(cr, 1, launch_ids, ['process_id', 'process_model']):
                         if launch['process_model'] and launch['process_id']:
-                            process = self.pool.get(launch['process_model']).read(cr, 1, launch['process_id'], ['specialist_id', 'site_url'])
-                            if process and process.get('specialist_id'):
-                                res[record['id']] = {
-                                    'specialist_id': process['specialist_id'][0],
-                                    'site_url': process['site_url'],
-                                }
+                            try:
+                                process = self.pool.get(launch['process_model']).read(cr, 1, launch['process_id'], ['specialist_id', 'site_url'])
+                                if process and process.get('specialist_id'):
+                                    res[record['id']] = {
+                                        'specialist_id': process['specialist_id'][0],
+                                        'site_url': process['site_url'],
+                                    }
+                            except:
+                                pass
         return res
 
     def onchange_close(self, cr, uid, ids, close):
