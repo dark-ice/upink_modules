@@ -75,10 +75,20 @@ class VideoReport(Model):
         costs_tx_period_ye = 0
         employeers = set()
 
+        co_costs = {}
+        current_periods = set()
+        source_date_start = datetime.strptime(date_start, '%Y-%m-%d')
+        source_date_end = datetime.strptime(date_end, '%Y-%m-%d')
+        td = source_date_end - source_date_start
+        rtd = relativedelta(seconds=int((td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6),  microseconds=td.microseconds)
+        months = rtd.month or 1
+        for delta in range(months):
+            current_periods.add(self.pool.get('kpi.period').get_by_date(cr, source_date_start + relativedelta(months=delta)).id)
+
         for record in pay_line_pool.read(cr, 1, pay_line_ids, []):
             google = False
             rate = 1
-            costs_partner = 0
+            pay_partner = 0
             costs_employee = 0
             total = 0
 
@@ -130,7 +140,37 @@ class VideoReport(Model):
                     if m['period_id'][0] == period.id:
                         vals['costs_partner'] += m['cash_mr_dol']
                     else:
-                        vals['co_costs_partner'] += m['cash_mr_dol']
+                        try:
+                            co_costs[m['period_id'][0]]['partner'] += m['cash_mr_dol']
+                        except KeyError:
+                            co_costs[m['period_id'][0]] = {'partner': m['cash_mr_dol']}
+
+            partner_invoice_ids = pay_line_pool.search(
+                cr,
+                1,
+                domain + [('partner_id', '=', record['partner_id'][0])],
+                order='partner_id, service_id, invoice_date'
+            )
+            for p in pay_line_pool.read(cr, 1, partner_invoice_ids, ['factor', 'invoice_date']):
+                invoice_period = self.pool.get('kpi.period').get_by_date(cr, datetime.strptime(p['invoice_date'], '%Y-%m-%d'))
+                if invoice_period.id in current_periods and p['invoice_date'] >= date_start:
+                    pay_partner += p['factor']
+                else:
+                    try:
+                        co_costs[invoice_period.id]['pay_partner'] += p['factor']
+                    except KeyError:
+                        co_costs[invoice_period.id] = {'pay_partner': p['factor']}
+
+            for co_cost in co_costs.values():
+                try:
+                    vals['co_costs_partner'] += co_cost['partner'] / co_cost['pay_partner']
+                except KeyError:
+                    vals['co_costs_partner'] += 0
+                except ZeroDivisionError:
+                    vals['co_costs_partner'] += 0
+
+            if pay_partner and pay_partner != record['factor']:
+                vals['costs_partner'] *= record['factor'] / pay_partner
 
             costs_employee = record['add_revenues']
 

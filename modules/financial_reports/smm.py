@@ -78,7 +78,6 @@ class SMMReport(Model):
 
         co_costs = {}
         current_periods = set()
-        current_pay = 0
         source_date_start = datetime.strptime(date_start, '%Y-%m-%d')
         source_date_end = datetime.strptime(date_end, '%Y-%m-%d')
         td = source_date_end - source_date_start
