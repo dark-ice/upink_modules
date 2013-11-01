@@ -55,9 +55,7 @@ class SMMReport(Model):
             ('close_date', '=', False),
             ('close_date', '>=', date_start),
             ('partner_id', '!=', False),
-            ('partner_id', '=', ),
             ('invoice_id', '!=', False),
-            #('specialist_id', '!=', False)
         ]
         pay_line_ids = pay_line_pool.search(cr, 1, domain, order='partner_id, service_id, invoice_date')
         lines = []
