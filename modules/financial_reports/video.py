@@ -1,6 +1,6 @@
 # coding=utf-8
 from datetime import datetime
-from openerp import tools
+from dateutil.relativedelta import relativedelta
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
 

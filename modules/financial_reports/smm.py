@@ -2,7 +2,6 @@
 import calendar
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
 
