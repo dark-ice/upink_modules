@@ -55,6 +55,7 @@ class PPCReport(Model):
             ('close_date', '>=', date_start),
             ('partner_id', '!=', False),
             ('invoice_id', '!=', False),
+            ('invoice_id.user_id', '!=', 170)
         ]
         pay_line_ids = pay_line_pool.search(cr, 1, domain, order='partner_id ASC, service_id ASC, invoice_date ASC')
         lines = []
