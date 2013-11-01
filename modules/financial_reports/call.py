@@ -54,6 +54,7 @@ class CallReport(Model):
             ('close_date', '>=', date_start),
             ('partner_id', '!=', False),
             ('invoice_id', '!=', False),
+            ('invoice_id.user_id', '!=', 170)
             #('specialist_id', '!=', False)
         ]
         pay_line_ids = pay_line_pool.search(cr, 1, domain, order='partner_id, service_id, invoice_date')
