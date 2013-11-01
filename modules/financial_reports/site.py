@@ -122,7 +122,7 @@ class SiteReport(Model):
                         ('division_id', '=', 9),
                         ('type', '=', 'in_invoice'),
                         ('partner_id', '=', record['partner_id'][0]),
-                        ('period_id', '<', record['period_id'][0]),
+                        ('period_id', '<=', record['period_id'][0]),
                     ])
                 zds = self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'period_id'])
                 for m in zds:
