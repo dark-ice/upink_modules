@@ -53,7 +53,6 @@ class VideoReport(Model):
             ('close_date', '=', False),
             ('close_date', '>=', date_start),
             ('partner_id', '!=', False),
-            ('partner_id', '=', 31841),
             ('invoice_id', '!=', False),
         ]
         pay_line_ids = pay_line_pool.search(cr, 1, domain, order='partner_id, service_id, invoice_date')
