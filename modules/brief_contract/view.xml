@@ -34,6 +34,7 @@
                         <newline/>
                         <field name="service_id" on_change="onchange_service(service_id)"/>
                         <field name="service_head_id" readonly="1"/>
+                        <field name="account_id"/>
                         <separator colspan="4"/>
                     </group>
                     <group colspan="4" col="4">

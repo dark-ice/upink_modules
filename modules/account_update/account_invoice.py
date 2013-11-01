@@ -257,6 +257,7 @@ class AccountInvoice(Model):
         'bank_id': fields.many2one(
             'res.partner.bank',
             'Реквизиты',
+            domain=[('name', '!=', False)],
             help='Банковские реквизиты Партнера'
         ),
         'pay_ids': fields.one2many('account.invoice.pay', 'invoice_id', 'Платежи', help='Платежи', ondelete='cascade'),

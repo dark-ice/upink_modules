@@ -332,6 +332,14 @@ class BriefContract(Model):
         'from': fields.char('from', size=10),
 
         'wuser_ids': fields.integer("Без этих людей"),
+        'account_id': fields.many2one(
+            'account.account',
+            'Фирма',
+            domain=[('type', '!=', 'closed'), ('company_id', '=', 4)],
+            required=True,
+            help='Фирма, от лица которой создается данный счет.'
+        ),
+
     }
 
     _defaults = {
