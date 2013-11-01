@@ -59,10 +59,7 @@ class ProcessPPC(Model):
             'Аккаунт менеджер',
             select=True,
             domain="[('groups_id','in',[107])]",
-            readonly=True,
-            states={
-                'coordination': [('readonly', False), ('required', True)]
-            }),  # Специалист направления PPC
+        ),  # Специалист направления PPC
 
         'state': fields.selection(STATES, 'статус', readonly=True),
         'history_ids': fields.one2many(
