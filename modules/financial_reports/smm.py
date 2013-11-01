@@ -231,7 +231,7 @@ class SMMReport(Model):
                 partners.add(record['partner_id'][0])
                 total_period += vals['total']
 
-            if current_pay and current_pay != record['factor']:
+            if current_pay_partner and current_pay_partner != record['factor']:
                 vals['costs_partner'] *= record['factor'] / current_pay_partner
 
             if date_end >= record['close_date'] >= date_start:
