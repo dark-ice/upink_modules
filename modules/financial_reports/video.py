@@ -1,4 +1,5 @@
 # coding=utf-8
+import calendar
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from openerp.osv import fields, osv
@@ -123,26 +124,29 @@ class VideoReport(Model):
                 vals['rate'] = rate
 
             source_date = datetime.strptime(record['invoice_date'], '%Y-%m-%d')
-            period = self.pool.get('kpi.period').get_by_date(cr, source_date)
+            day_in_month = calendar.monthrange(source_date.year, source_date.month)[1]
+            last_day = '{0}{1}'.format(record['invoice_date'][:-2], day_in_month)
+
             if record['partner_id']:
                 zds_ids = self.pool.get('account.invoice').search(
                     cr,
                     1,
                     [
                         ('division_id', '=', 8),
+                        ('date_mr', '<=', last_day),
                         ('type', '=', 'in_invoice'),
-                        ('partner_id', '=', record['partner_id'][0]),
-                        ('period_id', '<=', period.id),
+                        ('partner_id', '=', record['partner_id'][0])
                     ])
-                zds = self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'period_id'])
-                for m in zds:
-                    if m['period_id'][0] == period.id:
+
+                for m in self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'date_mr']):
+                    zds_period = self.pool.get('kpi.period').get_by_date(cr, datetime.strptime(m['date_mr'], '%Y-%m-%d'))
+                    if zds_period.id in current_periods and m['date_mr'] >= date_start:
                         vals['costs_partner'] += m['cash_mr_dol']
                     else:
                         try:
-                            co_costs[m['period_id'][0]]['partner'] += m['cash_mr_dol']
+                            co_costs[zds_period.id]['partner'] += m['cash_mr_dol']
                         except KeyError:
-                            co_costs[m['period_id'][0]] = {'partner': m['cash_mr_dol']}
+                            co_costs[zds_period.id] = {'partner': m['cash_mr_dol']}
 
             partner_invoice_ids = pay_line_pool.search(
                 cr,
