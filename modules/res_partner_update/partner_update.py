@@ -1429,7 +1429,7 @@ class res_partner(Model):
         'categ_id': fields.many2one(
             'crm.case.categ',
             'Тематика',
-            domain="['|', ('section_id', '=', False), ('responsible_users', '=', user_id)]",
+            #domain="['|', ('section_id', '=', False), ('responsible_users', '=', user_id)]",
             help='Категория, которой принадлежит данный Партнер'
         ),
         'description': fields.text('Дополнительная информация о контактном лице'),
