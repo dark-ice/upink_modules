@@ -56,6 +56,7 @@ class SMMReport(Model):
             ('close_date', '>=', date_start),
             ('partner_id', '!=', False),
             ('invoice_id', '!=', False),
+            ('invoice_id', '=', 3761),
             #('specialist_id', '!=', False)
         ]
         pay_line_ids = pay_line_pool.search(cr, 1, domain, order='partner_id, service_id, invoice_date')
@@ -84,7 +85,7 @@ class SMMReport(Model):
         source_date_end = datetime.strptime(date_end, '%Y-%m-%d')
         td = source_date_end - source_date_start
         rtd = relativedelta(seconds=int((td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6),  microseconds=td.microseconds)
-        months = rtd.month or 0
+        months = rtd.month or 1
         for delta in range(months):
             current_periods.add(self.pool.get('kpi.period').get_by_date(cr, source_date_start + relativedelta(months=delta)).id)
 
@@ -93,6 +94,7 @@ class SMMReport(Model):
             costs_partner = record['add_costs']
             costs_employee = 0
             total = 0
+            current_pay = 0
 
             vals = {
                 'service_id': record['service_id'][0] if record['service_id'] else False,
@@ -132,15 +134,15 @@ class SMMReport(Model):
                     1,
                     [
                         ('division_id', '=', 2),
-                        ('date_invoice', '<=', last_day),
+                        ('date_mr', '<=', last_day),
                         ('type', '=', 'in_invoice'),
                         ('partner_id', '=', record['partner_id'][0])
                     ])
 
-                for m in self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'date_invoice']):
-                    zds_period = self.pool.get('kpi.period').get_by_date(cr, datetime.strptime(m['date_invoice'], '%Y-%m-%d'))
-                    if zds_period.id in current_periods and m['date_invoice'] >= date_start:
-                        costs_partner += m['cash_mr_dol']
+                for m in self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'date_mr']):
+                    zds_period = self.pool.get('kpi.period').get_by_date(cr, datetime.strptime(m['date_mr'], '%Y-%m-%d'))
+                    if zds_period.id in current_periods and m['date_mr'] >= date_start:
+                        vals['costs_partner'] += m['cash_mr_dol']
                     else:
                         try:
                             co_costs[zds_period.id]['partner'] += m['cash_mr_dol']
@@ -213,6 +215,9 @@ class SMMReport(Model):
             if date_end >= record['invoice_date'] >= date_start:
                 partners.add(record['partner_id'][0])
                 total_period += vals['total']
+
+            if current_pay != record['factor']:
+                vals['costs_partner'] *= record['factor'] / current_pay
 
             if date_end >= record['close_date'] >= date_start:
                 costs_partner_period += vals['co_costs_partner'] + vals['costs_partner']
