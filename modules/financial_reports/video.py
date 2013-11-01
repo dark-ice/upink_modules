@@ -114,7 +114,7 @@ class VideoReport(Model):
 
             source_date = datetime.strptime(record['invoice_date'], '%Y-%m-%d')
             period = self.pool.get('kpi.period').get_by_date(cr, source_date)
-            if record['partner_id'] and record['period_id']:
+            if record['partner_id']:
                 zds_ids = self.pool.get('account.invoice').search(
                     cr,
                     1,
