@@ -55,6 +55,7 @@ class SMMReport(Model):
             ('close_date', '=', False),
             ('close_date', '>=', date_start),
             ('partner_id', '!=', False),
+            ('partner_id', '=', ),
             ('invoice_id', '!=', False),
             #('specialist_id', '!=', False)
         ]
@@ -94,6 +95,7 @@ class SMMReport(Model):
             costs_employee = 0
             total = 0
             current_pay = 0
+            current_pay_partner = 0
 
             vals = {
                 'service_id': record['service_id'][0] if record['service_id'] else False,
@@ -176,18 +178,34 @@ class SMMReport(Model):
                         current_pay += p['factor']
                     else:
                         try:
-                            co_costs[invoice_period.id]['pay'] += p['factor']
+                            co_costs[invoice_period.id]['pay_specialist'] += p['factor']
                         except KeyError:
-                            co_costs[invoice_period.id] = {'pay': p['factor']}
+                            co_costs[invoice_period.id] = {'pay_specialist': p['factor']}
 
                 #try:
                 #    costs_employee = (total * record['factor'] / current_pay) / 8.0
                 #except ZeroDivisionError:
                 #    costs_employee = 0
 
+            partner_invoice_ids = pay_line_pool.search(
+                cr,
+                1,
+                domain + [('partner_id', '=', record['partner_id'][0])],
+                order='partner_id, service_id, invoice_date'
+            )
+            for p in pay_line_pool.read(cr, 1, partner_invoice_ids, ['factor', 'invoice_date']):
+                invoice_period = self.pool.get('kpi.period').get_by_date(cr, datetime.strptime(p['invoice_date'], '%Y-%m-%d'))
+                if invoice_period.id in current_periods and p['invoice_date'] >= date_start:
+                    current_pay_partner += p['factor']
+                else:
+                    try:
+                        co_costs[invoice_period.id]['pay_partner'] += p['factor']
+                    except KeyError:
+                        co_costs[invoice_period.id] = {'pay_partner': p['factor']}
+
             for co_cost in co_costs.values():
                 try:
-                    vals['co_costs_partner'] += co_cost['partner'] / co_cost['pay']
+                    vals['co_costs_partner'] += co_cost['partner'] / co_cost['pay_partner']
                 except KeyError:
                     vals['co_costs_partner'] += 0
                 except ZeroDivisionError:
@@ -202,7 +220,7 @@ class SMMReport(Model):
                 costs_employee_period += costs_employee
             else:
                 try:
-                    costs_employee = (total * record['factor'] / co_costs[period.id]['pay']) / 8.0
+                    costs_employee = (total * record['factor'] / co_costs[period.id]['pay_specialist']) / 8.0
                 except KeyError:
                     costs_employee = 0
                 except ZeroDivisionError:
@@ -216,7 +234,7 @@ class SMMReport(Model):
                 total_period += vals['total']
 
             if current_pay and current_pay != record['factor']:
-                vals['costs_partner'] *= record['factor'] / current_pay
+                vals['costs_partner'] *= record['factor'] / current_pay_partner
 
             if date_end >= record['close_date'] >= date_start:
                 costs_partner_period += vals['co_costs_partner'] + vals['costs_partner']
