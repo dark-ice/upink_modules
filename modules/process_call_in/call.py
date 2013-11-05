@@ -108,10 +108,14 @@ class ProcessCallIn(Model):
     @notify.msg_send(_name)
     def write(self, cr, uid, ids, values, context=None):
         error = []
+        line_ids = []
 
         for record in self.read(cr, uid, ids, []):
             next_state = values.get('state', False)
             state = record['state']
+
+            if values.get('specialist_id'):
+                line_ids += self.pool.get('process.launch')._get_pay_ids(cr, uid, record['launch_id'][0], '', {})['invoice_pay_ids']
 
             if next_state and next_state != state:
                 if next_state == 'filling_TK':
@@ -168,7 +172,10 @@ class ProcessCallIn(Model):
                             'process_model': self._name
                         })
                     ]})
-        return super(ProcessCallIn, self).write(cr, uid, ids, values, context)
+        flag = super(ProcessCallIn, self).write(cr, uid, ids, values, context)
+        if flag and line_ids and values.get('specialist_id'):
+            self.pool.get('account.invoice.pay.line').write(cr, uid, line_ids, {'specialist_id': values['specialist_id']})
+        return flag
 ProcessCallIn()
 
 

@@ -164,10 +164,13 @@ class ProcessPPC(Model):
             for item in values.get(key, []):
                 if item[0] == 0:
                     item[2]['process_model'] = self._name
-
-        for record in self.read(cr, uid, ids, ['state', 'specialist_id', 'comment', 'reason_stop_company', 'advertising_id', 'access_ids']):
+        line_ids = []
+        for record in self.read(cr, uid, ids, ['state', 'specialist_id', 'comment', 'reason_stop_company', 'advertising_id', 'access_ids', 'launch_id']):
             next_state = values.get('state', False)
             state = record['state']
+
+            if values.get('specialist_id'):
+                line_ids += self.pool.get('process.launch')._get_pay_ids(cr, uid, record['launch_id'][0], '', {})['invoice_pay_ids']
 
             if next_state and next_state != state:
                 if next_state == 'drafting' and (not values.get('specialist_id', False) and not record['specialist_id']):
@@ -192,7 +195,10 @@ class ProcessPPC(Model):
                             'process_model': self._name
                         })
                     ]})
-        return super(ProcessPPC, self).write(cr, uid, ids, values, context)
+        flag = super(ProcessPPC, self).write(cr, uid, ids, values, context)
+        if flag and line_ids and values.get('specialist_id'):
+            self.pool.get('account.invoice.pay.line').write(cr, uid, line_ids, {'specialist_id': values['specialist_id']})
+        return flag
 ProcessPPC()
 
 

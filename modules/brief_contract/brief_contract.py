@@ -2,7 +2,7 @@
 from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
-from relatorio.templates.opendocument import Template
+#from relatorio.templates.opendocument import Template
 from notify import notify
 
 
@@ -555,8 +555,8 @@ class BriefContract(Model):
         contract = self.read(cr, user, contract_id, ['contract_number', 'contract_date', 'service_id', 'partner_id'])
         service = self.pool.get('brief.services.stage').read(cr, user, contract['service_id'][0], ['template_id'])
         template = self.pool.get('ir.attachment')._data_get(cr, user, )
-        basic = Template(source=None, filepath='basic.odt')
-        file('bonham_basic.odt', 'wb').write(basic.generate(o=contract).render().getvalue())
+        #basic = Template(source=None, filepath='basic.odt')
+        #file('bonham_basic.odt', 'wb').write(basic.generate(o=contract).render().getvalue())
 BriefContract()
 
 

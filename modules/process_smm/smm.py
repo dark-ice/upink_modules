@@ -191,9 +191,13 @@ class ProcessSMM(Model):
                 if item[0] == 0:
                     item[2]['process_model'] = self._name
 
-        for record in self.read(cr, uid, ids, ['state', 'file_ids', 'commentary', 'reason_stop_work', 'specialist_id', 'sla_ids', 'report_ids']):
+        line_ids = []
+        for record in self.read(cr, uid, ids, ['state', 'file_ids', 'commentary', 'reason_stop_work', 'specialist_id', 'sla_ids', 'report_ids', 'launch_id']):
             next_state = values.get('state', False)
             state = record['state']
+
+            if values.get('specialist_id'):
+                line_ids += self.pool.get('process.launch')._get_pay_ids(cr, uid, record['launch_id'][0], '', {})['invoice_pay_ids']
 
             if next_state and next_state != state:
                 if next_state == 'creating' and (not values.get('specialist_id', False) and not record['specialist_id']):
@@ -220,7 +224,10 @@ class ProcessSMM(Model):
                             'process_model': self._name
                         })
                     ]})
-        return super(ProcessSMM, self).write(cr, uid, ids, values, context)
+        flag = super(ProcessSMM, self).write(cr, uid, ids, values, context)
+        if flag and line_ids and values.get('specialist_id'):
+            self.pool.get('account.invoice.pay.line').write(cr, uid, line_ids, {'specialist_id': values['specialist_id']})
+        return flag
 
 
 ProcessSMM()

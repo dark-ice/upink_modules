@@ -270,14 +270,19 @@ class ProcessSite(Model):
                 if item[0] == 0:
                     item[2]['process_model'] = self._name
 
+        line_ids = []
+
         if values.get('specialist_id'):
             stage_ids = self.pool.get('process.site.stage').search(cr, uid, [('site_id', 'in', ids), ('manager_id', '=', False)])
             if stage_ids:
                 self.pool.get('process.site.stage').write(cr, uid, stage_ids, {'manager_id': values['specialist_id']})
 
-        for record in self.read(cr, uid, ids, ['state', 'stage_ids', 'specialist_id', 'date_start', 'date_end']):
+        for record in self.read(cr, uid, ids, ['state', 'stage_ids', 'specialist_id', 'date_start', 'date_end', 'launch_id']):
             next_state = values.get('state', False)
             state = record['state']
+
+            if values.get('specialist_id'):
+                line_ids += self.pool.get('process.launch')._get_pay_ids(cr, uid, record['launch_id'][0], '', {})['invoice_pay_ids']
 
             if next_state and next_state != state:
                 if next_state == 'work':
@@ -296,7 +301,10 @@ class ProcessSite(Model):
                             'process_model': self._name
                         })
                     ]})
-        return super(ProcessSite, self).write(cr, uid, ids, values, context)
+        flag = super(ProcessSite, self).write(cr, uid, ids, values, context)
+        if flag and line_ids and values.get('specialist_id'):
+            self.pool.get('account.invoice.pay.line').write(cr, uid, line_ids, {'specialist_id': values['specialist_id']})
+        return flag
 
 ProcessSite()
 
