@@ -15,6 +15,7 @@
                         <field name="check_r"/>
                         <field name="check_m"/>
                         <field name="check_e"/>
+                        <field name="check_x"/>
                     </group>
                     <group colspan="4" col="6">
                         <field name="author_id" readonly="1"/>
@@ -65,7 +66,7 @@
                                 icon="gtk-cancel"
                                 attrs="{'invisible': [
                                 '&amp;', '|', ('state', 'not in', ('draft', 'revision')), ('check_a', '=', False),
-                                '|', ('state', '!=', 'agreement'), ('check_m', '=', False)
+                                '|', ('state', '!=', 'agreement'), ('check_m', '=', True)
                                 ]
                                 }"
                                 />
@@ -121,7 +122,15 @@
                                 name="action_removed"
                                 type="workflow"
                                 icon="gtk-cancel"
-                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_i', '=', False)]}"
+                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), '|', ('check_i', '=', False), ('check_x', '=', False)]}"
+                                />
+
+                        <!-- inwork -> not_done -->
+                        <button string="Не выполнена"
+                                name="action_not_done"
+                                type="workflow"
+                                icon="gtk-cancel"
+                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ]}"
                                 />
 
                         <!-- inwork -> transfer -->
@@ -129,7 +138,7 @@
                                 name="action_transfer"
                                 type="workflow"
                                 icon="terp-stock_effects-object-colorize"
-                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_i', '=', False)]}"
+                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), '|', ('check_i', '=', False), ('check_x', '=', False)]}"
                                 />
 
                         <!-- inwork -> delegated -->
@@ -258,6 +267,14 @@
                             type="workflow"
                             icon="gtk-cancel"
                             attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_i', '=', False)]}"
+                            />
+
+                    <!-- inwork -> not_done -->
+                    <button string="Не выполнена"
+                            name="action_not_done"
+                            type="workflow"
+                            icon="gtk-cancel"
+                            attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ]}"
                             />
 
                     <!-- inwork -> transfer -->

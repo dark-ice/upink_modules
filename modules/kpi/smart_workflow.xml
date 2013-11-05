@@ -66,6 +66,14 @@
             <field name="action">write({'state':'done'})</field>
         </record>
 
+        <!-- not_done -->
+        <record model="workflow.activity" id="act_not_done">
+            <field name="wkf_id" ref="wkf_kpi_smart"/>
+            <field name="name">Не выполнена</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'not_done'})</field>
+        </record>
+
         <!-- accepted -->
         <record model="workflow.activity" id="act_accepted">
             <field name="wkf_id" ref="wkf_kpi_smart"/>
@@ -201,6 +209,13 @@
             <field name="act_from" ref="act_inwork"/>
             <field name="act_to" ref="act_done"/>
             <field name="signal">action_done</field>
+        </record>
+
+        <!-- inwork -> not_done -->
+        <record model="workflow.transition" id="inwork_not_done">
+            <field name="act_from" ref="act_inwork"/>
+            <field name="act_to" ref="act_not_done"/>
+            <field name="signal">action_not_done</field>
         </record>
 
         <!-- delegated -> done -->
