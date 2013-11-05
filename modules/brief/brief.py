@@ -25,100 +25,97 @@ MODULE_IDS = (
 )
 
 
-class brief_context_adv(Model):
+class BriefContextAdv(Model):
     _name = "brief.context_adv"
     _description = u"Справочник систем размещения контекстной рекламы"
     _order = 'name'
     _columns = {
         'name': fields.char(u'Наименование системы контекстной рекламы', size=256),
     }
-brief_context_adv()
+BriefContextAdv()
 
 
-class brief_out_services(Model):
+class BriefOutServices(Model):
     _name = "brief.out_services"
     _description = u"Справочник исходящих услуг call-центра UpSale"
     _order = 'name'
     _columns = {
         'name': fields.char(u'Наименование исходящих услуг', size=256),
     }
-brief_out_services()
+BriefOutServices()
 
 
-class brief_in_services(Model):
+class BriefInServices(Model):
     _name = "brief.in_services"
     _description = u"Справочник входящих услуг call-центра UpSale"
     _order = 'name'
     _columns = {
         'name': fields.char(u'Наименование входящих услуг', size=256),
     }
-brief_in_services()
+BriefInServices()
 
 
-class brief_lang(Model):
+class BriefLang(Model):
     _name = "brief.lang"
     _description = u"Справочник иностранных языков"
     _order = 'name'
     _columns = {
         'name': fields.char(u'Иностранный язык', size=256),
     }
-brief_lang()
+BriefLang()
 
 
-class brief_tel_type(Model):
+class BriefTelType(Model):
     _name = "brief.tel_type"
     _description = u"Справочник типов номеров"
     _order = "name"
     _columns = {
         'name': fields.char(u'Тип номера партнера', size=256),
     }
-brief_tel_type()
+BriefTelType()
 
 
-class brief_database(Model):
+class BriefDatabase(Model):
     _name = "brief.database"
     _description = u"Справочник баз данных"
     _order = "name"
     _columns = {
         'name': fields.char(u'Тип базы данных', size=256),
     }
-brief_database()
+BriefDatabase()
 
 
-class brief_target_age(Model):
+class BriefTargetAge(Model):
     _name = "brief.target_age"
     _description = u"Справочник групп возраста"
     _order = "name"
     _columns = {
         'name': fields.char(u'Возрастная группа', size=256),
     }
+BriefTargetAge()
 
-brief_target_age()
 
-
-class brief_target_income(Model):
+class BriefTargetIncome(Model):
     _name = "brief.target_income"
     _description = u"Справочник групп по уровню дохода"
     _order = "name"
     _columns = {
         'name': fields.char(u'Уровень доходов', size=256),
     }
+BriefTargetIncome()
 
-brief_target_income()
 
-
-class brief_target_region(Model):
+class BriefTargetRegion(Model):
     _name = "brief.target_region"
     _description = u"Справочник возможных целевых регионов"
     _order = "name"
     _columns = {
         'name': fields.char(u'Целевой регион', size=256),
     }
+BriefTargetRegion()
 
-brief_target_region()
 
-
-class brief_services_stage(Model):
+class BriefServiceStage(Model):
     _name = "brief.services.stage"
     _description = u"Услуги"
 
@@ -140,18 +137,18 @@ class brief_services_stage(Model):
                 ('project', 'Проектная'),
                 ('process', 'Процессная'),
             ), 'Тип'
-        )
+        ),
+        'template_id': fields.many2one('ir.attachment', 'Файл шаблона договора'),
     }
 
     _defaults = {
         'in_account': True,
         'service_type': 'process'
     }
+BriefServiceStage()
 
-brief_services_stage()
 
-
-class brief_rel_services_fields(Model):
+class BriefRelServicesFields(Model):
     _name = "brief.rel_services_fields"
     _description = u"Связь между услугами и полями"
     _rec_name = 'service_id'
@@ -190,11 +187,10 @@ class brief_rel_services_fields(Model):
          'По данной услуге уже назначен список полей, измените их.',
          ['service_id']),
     ]
+BriefRelServicesFields()
 
-brief_rel_services_fields()
 
-
-class brief_part_one(Model):
+class BriefPartOne(Model):
     _name = 'brief.part.one'
     _description = u"Бриф. Первая часть таблицы"
    
@@ -251,11 +247,10 @@ class brief_part_one(Model):
             size=256,
             help=''),
     }
+BriefPartOne()
 
-brief_part_one()
 
-
-class brief_part_two(Model):
+class BriefPartTwo(Model):
     _name = "brief.part.two"
     _description = u"Бриф. Вторая часть таблицы"
     _rec_name = "add_mat"
@@ -321,11 +316,10 @@ class brief_part_two(Model):
             'lang_id', u'Знание иностранных языков',
             help='')
     }
+BriefPartTwo()
 
-brief_part_two()
 
-
-class brief_part_three(Model):
+class BriefPartThree(Model):
     _name = "brief.part.three"
     _description = u"Бриф. Третья часть таблицы"
     _rec_name = "another_lang"
@@ -383,11 +377,10 @@ class brief_part_three(Model):
             select=True,
             help=''),
     }
+BriefPartThree()
 
-brief_part_three()
 
-
-class brief_part_four(Model):
+class BriefPartFour(Model):
     _name = "brief.part.four"
     _description = u"Бриф. Четвертая часть таблицы"
     _rec_name = "exp_visit"
@@ -443,11 +436,10 @@ class brief_part_four(Model):
             size=256,
             help=''),
     }
+BriefPartFour()
 
-brief_part_four()
 
-
-class brief_part_five(Model):
+class BriefPartFive(Model):
     _name = "brief.part.five"
     _description = u"Бриф. Пятая часть таблицы"
     _rec_name = "database_type"
@@ -501,11 +493,10 @@ class brief_part_five(Model):
             size=256,
             help=''),
     }
+BriefPartFive()
 
-brief_part_five()
 
-
-class brief_part_six(Model):
+class BriefPartSix(Model):
     _name = "brief.part.six"
     _description = u"Бриф. Шестая часть таблицы"
     _rec_name = "operators_asis"
@@ -568,11 +559,10 @@ class brief_part_six(Model):
             size=256,
             help=''),
     }
+BriefPartSix()
 
-brief_part_six()
 
-
-class brief_cb_one(Model):
+class BriefCbOne(Model):
     _name = "brief.checkboxes.one"
     _description = u"Бриф. Вспомогательная часть 1"
     _rec_name = "algorithm_cb"
@@ -602,11 +592,10 @@ class brief_cb_one(Model):
         'in_services_cb': fields.boolean('23'),
         'lang_cb': fields.boolean('24'),
     }
+BriefCbOne()
 
-brief_cb_one()
 
-
-class brief_cb_two(Model):
+class BriefCbTwo(Model):
     _name = "brief.checkboxes.two"
     _description = u"Бриф. Вспомогательная часть 2"
     _rec_name = "int_mark_cb"
@@ -634,11 +623,10 @@ class brief_cb_two(Model):
         'question_par_cb': fields.boolean('45'),
         'database_type_cb': fields.boolean('46'),
     }
+BriefCbTwo()
 
-brief_cb_two()
 
-
-class brief_cb_three(Model):
+class BriefCbThree(Model):
     _name = "brief.checkboxes.three"
     _description = u"Бриф. Вспомогательная часть 3"
     _rec_name = "target_sex_cb"
@@ -696,11 +684,10 @@ class brief_cb_three(Model):
         'transfer_cb': fields.boolean('181_new'),
         'access_ids_cb': fields.boolean('182_new'),
     }
+BriefCbThree()
 
-brief_cb_three()
 
-
-class brief_cbr_one(Model):
+class BriefCbrOne(Model):
     _name = "brief.checkboxes.four"
     _description = u"Бриф. Вспомогательная часть 4"
     _rec_name = "algorithm_cbr"
@@ -730,11 +717,10 @@ class brief_cbr_one(Model):
         'in_services_cbr': fields.boolean('98'),
         'lang_cbr': fields.boolean('99'),
     }
+BriefCbrOne()
 
-brief_cbr_one()
 
-
-class brief_cbr_two(Model):
+class BriefCbrTwo(Model):
     _name = "brief.checkboxes.five"
     _description = u"Бриф. Вспомогательная часть 5"
     _rec_name = "int_mark_cbr"
@@ -762,11 +748,10 @@ class brief_cbr_two(Model):
         'question_par_cbr': fields.boolean('120'),
         'database_type_cbr': fields.boolean('121'),
     }
+BriefCbrTwo()
 
-brief_cbr_two()
 
-
-class brief_cbr_three(Model):
+class BriefCbrThree(Model):
     _name = "brief.checkboxes.six"
     _description = u"Бриф. Вспомогательная часть 6"
     _rec_name = "target_sex_cbr"
@@ -824,21 +809,19 @@ class brief_cbr_three(Model):
         'transfer_cbr': fields.boolean('181'),
         'access_ids_cbr': fields.boolean('182'),
     }
+BriefCbrThree()
 
-brief_cbr_three()
 
-
-class brief_loyality(Model):
+class BriefLoyalty(Model):
     _name = 'brief.loyality'
     _description = u"Программы лояльности"
     _columns = {
         'name': fields.char(u"Программа лояльности", size=256)
     }
+BriefLoyalty()
 
-brief_loyality()
 
-
-class res_partner(Model):
+class ResPartner(Model):
     _inherit = "res.partner"
 
     _columns = {
@@ -883,11 +866,10 @@ class res_partner(Model):
                 })
 
         return data
+ResPartner()
 
-res_partner()
 
-
-class brief_main(Model):
+class Brief(Model):
     _name = 'brief.main'
     _description = u"Бриф"
     _rec_name = 'partner_id'
@@ -1086,7 +1068,7 @@ class brief_main(Model):
             del vals['from']
         if vals.get('partner_id'):
             self.pool.get('res.partner').write(cr, user, [vals['partner_id']], {'partner_base': 'hot'})
-        return super(brief_main, self).create(cr, user, vals, context)
+        return super(Brief, self).create(cr, user, vals, context)
 
     @notify.msg_send(_name)
     def write(self, cr, uid, ids, values, context=None):
@@ -1096,7 +1078,7 @@ class brief_main(Model):
             state = values.get('state', False)
             values.update({'history_ids': [
                 (0, 0, {'us_id': uid, 'cr_date': time.strftime('%Y-%m-%d %H:%M:%S'), 'state': self.get_state(state)[1], 'state_id': state})]})
-        return super(brief_main, self).write(cr, uid, ids, values, context)
+        return super(Brief, self).write(cr, uid, ids, values, context)
 
     def action_cancel(self, cr, uid, ids):
         return self.write(cr, uid, ids, {'state': 'cancel', 'deadline': False})
@@ -1579,10 +1561,10 @@ class brief_main(Model):
          'Вам необходимо указать к кому относится данный бриф.',
          [u'Партнер']),
     ]
-brief_main()
+Brief()
 
 
-class brief_history(Model):
+class BriefHistory(Model):
     _name = 'brief.history'
     _rec_name = 'us_id'
     _columns = {
@@ -1607,11 +1589,11 @@ class brief_history(Model):
             order = "cr_date desc"
             args.append(('state', '=', 'Бриф на согласовании'))
 
-        return super(brief_history, self).search(cr, uid, args, offset, limit, order, context, count)
-brief_history()
+        return super(BriefHistory, self).search(cr, uid, args, offset, limit, order, context, count)
+BriefHistory()
 
 
-class brief_access(Model):
+class BriefAccess(Model):
     _name = 'brief.access'
     _rec_name = 'type'
     _columns = {
@@ -1627,7 +1609,7 @@ class brief_access(Model):
         'login': fields.char(u'Логин', size=250),
         'pswd': fields.char(u'Пароль', size=250),
     }
-brief_access()
+BriefAccess()
 
 
 class BriefManagerGroups(Model):

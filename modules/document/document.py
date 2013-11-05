@@ -62,7 +62,7 @@ class document_file(osv.osv):
         It also updates the  File Size for the previously created attachments.
         """
 
-        parent_id = self.pool.get('document.directory')._get_root_directory(cr,uid)
+        parent_id = self.pool.get('document.directory')._get_root_directory(cr, uid)
         if not parent_id:
             logging.getLogger('document').warning("at _attach_parent_id(), still not able to set the parent!")
             return False
@@ -96,10 +96,10 @@ class document_file(osv.osv):
         for fbro in fbrl:
             fnode = nodes.node_file(None, None, nctx, fbro)
             if not bin_size:
-                    data = fnode.get_data(cr, fbro)
-                    result[fbro.id] = base64.encodestring(data or '')
+                data = fnode.get_data(cr, fbro)
+                result[fbro.id] = base64.encodestring(data or '')
             else:
-                    result[fbro.id] = fnode.get_data_len(cr, fbro)
+                result[fbro.id] = fnode.get_data_len(cr, fbro)
 
         return result
 
@@ -124,9 +124,9 @@ class document_file(osv.osv):
     _columns = {
         # Columns from ir.attachment:
         'create_date': fields.datetime('Date Created', readonly=True),
-        'create_uid':  fields.many2one('res.users', 'Creator', readonly=True),
+        'create_uid': fields.many2one('res.users', 'Creator', readonly=True),
         'write_date': fields.datetime('Date Modified', readonly=True),
-        'write_uid':  fields.many2one('res.users', 'Last Modification User', readonly=True),
+        'write_uid': fields.many2one('res.users', 'Last Modification User', readonly=True),
         'res_model': fields.char('Attached Model', size=64, readonly=False, change_default=True),
         'res_id': fields.integer('Attached ID', readonly=False),
         'tmp_res_model': fields.char('Папка(подкатегория)', size=256),
@@ -156,8 +156,8 @@ class document_file(osv.osv):
         return dirobj._get_root_directory(cr, uid, context)
 
     _defaults = {
-        'user_id': lambda self, cr, uid, ctx:uid,
-        'file_size': lambda self, cr, uid, ctx:0,
+        'user_id': lambda self, cr, uid, ctx: uid,
+        'file_size': lambda self, cr, uid, ctx: 0,
         'parent_id': __get_def_directory,
         'name': lambda *a: random_name(),
         'res_model': lambda s, cr, u, ctx: ctx.get('res_model', False),
@@ -174,7 +174,7 @@ class document_file(osv.osv):
         res_model = vals.get('res_model', False)
         res_id = vals.get('res_id', 0)
         if op == 'write':
-            for file in self.browse(cr, uid, ids): # FIXME fields_only
+            for file in self.browse(cr, uid, ids):  # FIXME fields_only
                 if not name:
                     name = file.name
                 if not parent_id:
@@ -183,12 +183,15 @@ class document_file(osv.osv):
                     res_model = file.res_model and file.res_model or False
                 if not res_id:
                     res_id = file.res_id and file.res_id or 0
-                res = self.search(cr, uid, [('id', '<>', file.id), ('name', '=', name), ('parent_id', '=', parent_id), ('res_model', '=', res_model), ('res_id', '=', res_id)])
+                res = self.search(cr, uid, [('id', '<>', file.id), ('name', '=', name), ('parent_id', '=', parent_id),
+                                            ('res_model', '=', res_model), ('res_id', '=', res_id)])
                 if len(res) > 1:
                     return False
             if res_model or parent_id or name:
                 if op == 'create':
-                    res = self.search(cr, uid, [('name', '=', name), ('parent_id', '=', parent_id), ('res_id', '=', res_id), ('res_model', '=', res_model)])
+                    res = self.search(cr, uid,
+                                      [('name', '=', name), ('parent_id', '=', parent_id), ('res_id', '=', res_id),
+                                       ('res_model', '=', res_model)])
                     if len(res):
                         return False
         return True
@@ -200,7 +203,7 @@ class document_file(osv.osv):
         any resources they can *read*.
         """
         return super(document_file, self).check(cr, uid, ids, mode='read',
-                                            context=context, values=values)
+                                                context=context, values=values)
 
     def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=False):
         # Grab ids, bypassing 'count'
@@ -254,7 +257,7 @@ class document_file(osv.osv):
         from_node = context and context.get('__from_node', False)
         if (('parent_id' in vals) or ('name' in vals)) and not from_node:
             # perhaps this file is renaming or changing directory
-            nctx = nodes.get_node_context(cr,uid,context={})
+            nctx = nodes.get_node_context(cr, uid, context={})
             dirobj = self.pool.get('document.directory')
             if 'parent_id' in vals:
                 dbro = dirobj.browse(cr, uid, vals['parent_id'], context=context)
@@ -266,25 +269,25 @@ class document_file(osv.osv):
             for fbro in self.browse(cr, uid, ids, context=context):
                 if ('parent_id' not in vals or fbro.parent_id.id == vals['parent_id']) \
                     and ('name' not in vals or fbro.name == vals['name']):
-                        ids2.append(fbro.id)
-                        continue
+                    ids2.append(fbro.id)
+                    continue
                 fnode = nctx.get_file_node(cr, fbro)
                 res = fnode.move_to(cr, dnode or fnode.parent, vals.get('name', fbro.name), fbro, dbro, True)
                 if isinstance(res, dict):
                     vals2 = vals.copy()
                     vals2.update(res)
                     wid = res.get('id', fbro.id)
-                    result = super(document_file,self).write(cr,uid,wid,vals2,context=context)
+                    result = super(document_file, self).write(cr, uid, wid, vals2, context=context)
                     # TODO: how to handle/merge several results?
-                elif res == True:
+                elif res:
                     ids2.append(fbro.id)
-                elif res == False:
+                elif not res:
                     pass
             ids = ids2
-        if 'file_size' in vals: # only write that field using direct SQL calls
+        if 'file_size' in vals:  # only write that field using direct SQL calls
             del vals['file_size']
         if ids and vals:
-            result = super(document_file,self).write(cr, uid, ids, vals, context=context)
+            result = super(document_file, self).write(cr, uid, ids, vals, context=context)
         return result
 
     def create(self, cr, uid, vals, context=None):
@@ -292,19 +295,20 @@ class document_file(osv.osv):
             context = {}
         vals['parent_id'] = context.get('parent_id', False) or vals.get('parent_id', False)
         if not vals['parent_id']:
-            vals['parent_id'] = self.pool.get('document.directory')._get_root_directory(cr,uid, context)
+            vals['parent_id'] = self.pool.get('document.directory')._get_root_directory(cr, uid, context)
         if not vals.get('res_id', False) and context.get('default_res_id', False):
             vals['res_id'] = context.get('default_res_id', False)
         if not vals.get('res_model', False) and context.get('default_res_model', False):
             vals['res_model'] = context.get('default_res_model', False)
         if vals.get('res_id', False) and vals.get('res_model', False) \
-                and not vals.get('partner_id', False):
+            and not vals.get('partner_id', False):
             vals['partner_id'] = self.__get_partner_id(cr, uid, \
-                vals['res_model'], vals['res_id'], context)
+                                                       vals['res_model'], vals['res_id'], context)
 
         datas = None
         if vals.get('link', False):
             import urllib
+
             datas = base64.encodestring(urllib.urlopen(vals['link']).read())
         else:
             datas = vals.get('datas', False)
@@ -322,7 +326,7 @@ class document_file(osv.osv):
                 ('datas_fname', '=', vals['datas_fname']),
             ]
             attach_ids = self.search(cr, uid, domain, context=context)
-            super(document_file, self).write(cr, uid, attach_ids, 
+            super(document_file, self).write(cr, uid, attach_ids,
                                              {'datas': vals['datas']},
                                              context=context)
             result = attach_ids[0]
@@ -354,7 +358,7 @@ class document_file(osv.osv):
         # files to be unlinked, update the db (safer to do first, can be
         # rolled back) and then unlink the files. The list wouldn't exist
         # after we discard the objects
-        ids = self.search(cr, uid, [('id','in',ids)])
+        ids = self.search(cr, uid, [('id', 'in', ids)])
         for f in self.browse(cr, uid, ids, context=context):
             # TODO: update the node cache
             par = f.parent_id
@@ -364,17 +368,18 @@ class document_file(osv.osv):
                     storage_id = par.storage_id
                     break
                 par = par.parent_id
-            #assert storage_id, "Strange, found file #%s w/o storage!" % f.id #TOCHECK: after run yml, it's fail
+                #assert storage_id, "Strange, found file #%s w/o storage!" % f.id #TOCHECK: after run yml, it's fail
             if storage_id:
                 r = stor.prepare_unlink(cr, uid, storage_id, f)
                 if r:
                     unres.append(r)
             else:
                 logging.getLogger('document').warning("Unlinking attachment #%s %s that has no storage",
-                                                f.id, f.name)
+                                                      f.id, f.name)
         res = super(document_file, self).unlink(cr, uid, ids, context)
         stor.do_unlink(cr, uid, unres)
         return res
+
 
 document_file()
 
