@@ -333,7 +333,6 @@ class BriefContract(Model):
         'lawyer_id': lambda *a: 474,
         'partner_id': lambda self, cr, uid, context: context.get('partner_id', False),
         'service_id': lambda self, cr, uid, context: context.get('service_id', False),
-        'lead_id': lambda self, cr, uid, context: context.get('lead_id', False),
         'state': 'draft',
         'from': lambda self, cr, uid, context: context.get('from', False),
         'wuser_ids': 153,
