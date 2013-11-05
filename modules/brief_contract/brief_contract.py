@@ -134,6 +134,10 @@ class BriefContract(Model):
             domain="[('groups_id','in',[131])]",
             help='Заполняется при создании Брифа, указывается отетственный сотрудник за подписание договора'
         ),
+        'doc_type': fields.many2one(
+            'doc.type',
+            'действующего на основании'
+        ),
         'lawyer_id': fields.many2one(
             'res.users',
             'Юрист',
@@ -654,3 +658,13 @@ class res_partner(Model):
         return data
 
 res_partner()
+
+
+class DocType(Model):
+    _name = 'doc.type'
+    _columns = {
+        'name': fields.char(
+            "Тип документа",
+            size=256,
+            help='Тип документа'),
+    }

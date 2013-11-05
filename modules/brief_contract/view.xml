@@ -63,6 +63,7 @@
                                context="{'partner_id': partner_id}"
                                domain="[('partner_id', '=', partner_id)]"
                                 />
+                        <field name="doc_type"/>
                         <separator colspan="4"/>
                     </group>
                     <group col="4" colspan="4">
