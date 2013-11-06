@@ -115,7 +115,7 @@ class ProcessCallIn(Model):
             state = record['state']
 
             if values.get('specialist_id'):
-                line_ids += self.pool.get('process.launch')._get_pay_ids(cr, uid, [record['launch_id'][0]], '', {})['invoice_pay_ids']
+                line_ids += self.pool.get('process.launch')._get_pay_ids(cr, uid, [record['launch_id'][0]], '', {})[record['launch_id'][0]]['invoice_pay_ids']
 
             if next_state and next_state != state:
                 if next_state == 'filling_TK':
