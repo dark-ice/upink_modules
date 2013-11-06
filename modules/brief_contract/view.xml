@@ -23,7 +23,6 @@
                     </group>
                     <group colspan="4" col="4">
                         <field name="partner_id" colspan="2" on_change="onchange_partner_id(partner_id)"/>
-                        <field name="lead_id" colspan="2" invisible="True"/>
                         <field name="usr_id" colspan="2"/>
 
                         <field name="contract_number" colspan="2"/>
@@ -114,6 +113,12 @@
                         <separator colspan="4"/>
                     </group>
                     <group colspan="4" col="4">
+                        <button name="generate"
+                                string="Сгенерировать договор"
+                                icon="gtk-go-forward"
+                                type="object"
+                                />
+                        <newline />
                         <field name="state" />
 
                         <!-- draft -> cancel -->

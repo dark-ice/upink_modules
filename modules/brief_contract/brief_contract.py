@@ -1,8 +1,11 @@
 # -*- encoding: utf-8 -*-
+import os
+from odt2sphinx.odt2sphinx import convert_odt
 from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
-#from relatorio.templates.opendocument import Template
+from relatorio.templates.opendocument import Template
+from rst2pdf.createpdf import RstToPdf
 from notify import notify
 
 
@@ -326,6 +329,8 @@ class BriefContract(Model):
         'from': fields.char('from', size=10),
 
         'wuser_ids': fields.integer("Без этих людей"),
+        'doc_id': fields.many2one('ir.attachment', 'Договор(odt)'),
+        'pdf_id': fields.many2one('ir.attachment', 'Договор(pdf)', readonly=True),
     }
 
     _defaults = {
@@ -333,7 +338,6 @@ class BriefContract(Model):
         'lawyer_id': lambda *a: 474,
         'partner_id': lambda self, cr, uid, context: context.get('partner_id', False),
         'service_id': lambda self, cr, uid, context: context.get('service_id', False),
-        'lead_id': lambda self, cr, uid, context: context.get('lead_id', False),
         'state': 'draft',
         'from': lambda self, cr, uid, context: context.get('from', False),
         'wuser_ids': 153,
@@ -548,15 +552,35 @@ class BriefContract(Model):
             self.pool.get('res.partner').write(cr, user, [vals['partner_id']], {'partner_base': 'hot'})
         return super(BriefContract, self).create(cr, user, vals, context)
 
-    def generate(self, cr, user, ids):
+    def generate(self, cr, user, ids, context=None):
         contract_id = ids
         if isinstance(ids, (list, tuple)):
             contract_id = ids[0]
         contract = self.read(cr, user, contract_id, ['contract_number', 'contract_date', 'service_id', 'partner_id'])
         service = self.pool.get('brief.services.stage').read(cr, user, contract['service_id'][0], ['template_id'])
-        template = self.pool.get('ir.attachment')._data_get(cr, user, )
-        #basic = Template(source=None, filepath='basic.odt')
-        #file('bonham_basic.odt', 'wb').write(basic.generate(o=contract).render().getvalue())
+        if service['template_id']:
+            template = self.pool.get('ir.attachment').read(cr, user, service['template_id'][0], ['store_fname', 'parent_id'])
+            dbro = self.pool.get('document.directory').read(cr, user, template['parent_id'][0], ['storage_id'], context)
+            storage = self.pool.get('document.storage').read(cr, user, dbro['storage_id'][0], ['path'])
+
+            filepath = os.path.join(storage['path'], template['store_fname'])
+
+            basic = Template(source='', filepath=filepath)
+
+            o = {'name': 'test'}
+
+            filename = 'Договор № {0} {1} {2}'.format(
+                contract['contract_number'],
+                contract['partner_id'][1],
+                contract['service_id'][1],)
+
+            odt_file = os.path.join(storage['path'], '{0}.odt'.format(filename,))
+            rst_file = os.path.join(storage['path'], 'index.rst')
+            pdf_file = os.path.join(storage['path'], '{0}.pdf'.format(filename,))
+            file(odt_file, 'wb').write(basic.generate(o=o).render().getvalue())
+
+            convert_odt(odt_file, storage['path'])
+            RstToPdf().createPdf(text=open(rst_file).read(), source_path=rst_file, output=pdf_file)
 BriefContract()
 
 
