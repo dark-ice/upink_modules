@@ -991,8 +991,8 @@ class Brief(Model):
         data = self.browse(cr, uid, ids)
         for field in data:
             user_data = self.pool.get('res.users').browse(cr, uid, uid)
-            manager_groups = 142
-            specialist_groups = 46
+            manager_groups = 89
+            specialist_groups = 142
             for group in user_data.groups_id:
                 if not res:
                     if group.id == manager_groups:
