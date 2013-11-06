@@ -80,6 +80,8 @@ class ProcessLaunch(Model):
 
     def _get_pay_ids(self, cr, uid, ids, name, arg, context=None):
         res = {}
+        if not isinstance(ids, (list, tuple)):
+            ids = [ids]
         for data in self.read(cr, uid, ids, ['service_id', 'account_ids'], context):
             value = {
                 'price': 0,
