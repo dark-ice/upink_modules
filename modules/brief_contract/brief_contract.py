@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+import base64
 import os
 from odt2sphinx.odt2sphinx import convert_odt
 from openerp import tools
@@ -79,7 +80,9 @@ class BriefContract(Model):
 
                 #  Руководитель направления
                 if data.service_id:
-                    users = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', data.service_id.leader_group_id.id)], order='id')
+                    users = self.pool.get('res.users').search(cr, 1,
+                                                              [('groups_id', 'in', data.service_id.leader_group_id.id)],
+                                                              order='id')
                     users = [x for x in users if x not in [1, 5, 13, 18, 354]]
                     if uid in users:
                         access += 's'
@@ -100,7 +103,8 @@ class BriefContract(Model):
             for data in data_ids:
                 service = self.pool.get('brief.services.stage').browse(cr, user, data.service_id)
                 if service:
-                    users = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', data.leader_group_id.id)], order='id')
+                    users = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', data.leader_group_id.id)],
+                                                              order='id')
                     if users:
                         u = [x for x in users if x not in [1, 5, 13, 18, 354, 472]]
                         if u:
@@ -360,8 +364,9 @@ class BriefContract(Model):
         if isinstance(ids, (int, long)):
             ids = [ids]
 
-        return [(r['id'], tools.ustr(self._get_name(r['contract_number'], r['contract_date']))) for r in self.read(cr, user, ids,
-            ['contract_number', 'contract_date'], context, load='_classic_write')]
+        return [(r['id'], tools.ustr(self._get_name(r['contract_number'], r['contract_date']))) for r in
+                self.read(cr, user, ids,
+                          ['contract_number', 'contract_date'], context, load='_classic_write')]
 
     def onchange_service(self, cr, user, ids, service, context=None):
         res = {}
@@ -397,11 +402,37 @@ class BriefContract(Model):
         if values.get('from'):
             del values['from']
         data = self.browse(cr, user, ids)[0]
+        if values.get('doc_id'):
+            odt_file = self.pool.get('ir.attachment').read(cr, user, values['doc_id'],
+                                                           ['store_fname', 'parent_id'])
+            dbro = self.pool.get('document.directory').read(cr, user, odt_file['parent_id'][0], ['storage_id'], context)
+            storage = self.pool.get('document.storage').read(cr, user, dbro['storage_id'][0], ['path'])
+            filepath = os.path.join(storage['path'], odt_file['store_fname'])
+            filename = '{0} {1} {2}'.format(
+                data.contract_number.encode('utf-8'),
+                data.partner_id.name.encode('utf-8'),
+                data.service_id.name.encode('utf-8'), )
+
+            rst_file = os.path.join(storage['path'], 'index.rst')
+            pdf_file = os.path.join(storage['path'], 'tmp.pdf')
+
+            convert_odt(odt_file, storage['path'])
+            RstToPdf().createPdf(text=open(rst_file).read(), source_path=rst_file, output=pdf_file)
+            pdf_attachment_id = self.pool.get('ir.attachment').create(cr, user, {
+                'name': '{0}.pdf'.format(filename, ),
+                'datas': base64.b64encode(open(pdf_file, 'rb').read()),
+                'datas_fname': '{0}.pdf'.format(filename, ),
+                'res_model': self._name,
+                'res_id': data.id})
+
+            values['pdf_id'] = pdf_attachment_id
+
         if data.service_id or values.get('service_id', False):
             service_id = values['service_id'] if values.get('service_id', False) else data.service_id.id
             service = self.pool.get('brief.services.stage').browse(cr, 1, service_id)
             if service:
-                users = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', service.leader_group_id.id)], order='id')
+                users = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', service.leader_group_id.id)],
+                                                          order='id')
                 if users:
                     u = [x for x in users if x not in [1, 5, 13, 18, 354, 472]]
                     if u:
@@ -430,7 +461,8 @@ class BriefContract(Model):
                         error += " Введите сумму оплаты; "
                     if not values.get('currency', False) and not data.currency:
                         error += " Выберите Валюту оплаты; "
-                payment_schedule = values['payment_schedule'] if values.get('payment_schedule', False) else data.payment_schedule
+                payment_schedule = values['payment_schedule'] if values.get('payment_schedule',
+                                                                            False) else data.payment_schedule
                 if not payment_schedule:
                     error += " Выберите График оплаты; "
                 else:
@@ -455,44 +487,46 @@ class BriefContract(Model):
             #  draft -> cancel
             if state == 'draft' and next_state == 'cancel':
                 print values
-            #  approval -> completion
+                #  approval -> completion
             if state == 'approval' and next_state == 'completion':
                 if not values.get('comment_rework', False) and not data.comment_rework:
                     error += " Введите Комментарий по доработке брифа; "
-            #  completion -> approval
+                #  completion -> approval
             if state == 'completion' and next_state == 'approval':
                 pass
-            #  approval -> preparation
+                #  approval -> preparation
             if state == 'approval' and next_state == 'preparation':
                 pass
-            #  preparation -> contract_approval
+                #  preparation -> contract_approval
             if state == 'preparation' and next_state == 'contract_approval':
                 if not values.get('contract_file', False) and not data.contract_file:
                     error += " Необходимо вложить Проект договора; "
-            #  contract_approval -> contract_completion
+                #  contract_approval -> contract_completion
             if state == 'contract_approval' and next_state == 'contract_completion':
-                if not values.get('comment_rework_2', False) and not data.comment_rework_2 and not values.get('contract_re_file', False) and not data.contract_re_file:
+                if not values.get('comment_rework_2', False) and not data.comment_rework_2 and not values.get(
+                        'contract_re_file', False) and not data.contract_re_file:
                     error += " Введите Комментарий по доработке договора или прикрепите файл доработки; "
-            #  contract_completion -> contract_approval
+                #  contract_completion -> contract_approval
             if state == 'contract_completion' and next_state == 'contract_approval':
                 pass
-            #  contract_approval -> contract_agreed
+                #  contract_approval -> contract_agreed
             if state == 'contract_approval' and next_state == 'contract_agreed':
                 pass
-            #  contract_agreed -> approval_partner
+                #  contract_agreed -> approval_partner
             if state == 'contract_agreed' and next_state == 'approval_partner':
                 pass
-            #  approval_partner -> contract_completion
+                #  approval_partner -> contract_completion
             if state == 'approval_partner' and next_state == 'contract_completion':
-                if not values.get('comment_rework_3', False) and not data.comment_rework_3 and not values.get('contract_re_file', False) and not data.contract_re_file:
+                if not values.get('comment_rework_3', False) and not data.comment_rework_3 and not values.get(
+                        'contract_re_file', False) and not data.contract_re_file:
                     error += " Введите Комментарий по доработке перед утверждением договора или прикрепите файл доработки; "
-            #  approval_partner -> partner_cancel
+                #  approval_partner -> partner_cancel
             if state == 'approval_partner' and next_state == 'partner_cancel':
                 pass
-            #  partner_cancel -> approval_partner
+                #  partner_cancel -> approval_partner
             if state == 'partner_cancel' and next_state == 'approval_partner':
                 pass
-            #  approval_partner -> contract_approved
+                #  approval_partner -> contract_approved
             if state == 'approval_partner' and next_state == 'contract_approved':
                 if not values.get('contract_approved_file', False) and not data.contract_approved_file:
                     error += " Прикрепите утвержденный договор; "
@@ -500,36 +534,36 @@ class BriefContract(Model):
             #  contract_approved -> send_mail
             if state == 'contract_approved' and next_state == 'send_mail':
                 pass
-            #  contract_approved -> send_express
+                #  contract_approved -> send_express
             if state == 'contract_approved' and next_state == 'send_express':
                 pass
-            #  contract_approved -> send_courier
+                #  contract_approved -> send_courier
             if state == 'contract_approved' and next_state == 'send_courier':
                 pass
-            #  send_courier -> meeting_scheduled
+                #  send_courier -> meeting_scheduled
             if state == 'send_courier' and next_state == 'meeting_scheduled':
                 pass
-            #  send_mail -> waiting_receipt
+                #  send_mail -> waiting_receipt
             if state == 'send_mail' and next_state == 'waiting_receipt':
                 pass
-            #  send_express -> waiting_receipt
+                #  send_express -> waiting_receipt
             if state == 'send_express' and next_state == 'waiting_receipt':
                 pass
-            #  waiting_receipt -> meeting_scheduled
+                #  waiting_receipt -> meeting_scheduled
             if state == 'waiting_receipt' and next_state == 'meeting_scheduled':
                 pass
-            #  meeting_scheduled -> meeting_cancel
+                #  meeting_scheduled -> meeting_cancel
             if state == 'meeting_scheduled' and next_state == 'meeting_cancel':
                 pass
-            #  meeting_scheduled -> contract_signed
+                #  meeting_scheduled -> contract_signed
             if state == 'meeting_scheduled' and next_state == 'contract_signed':
                 if not data.pcontract_file and not values.get('pcontract_file', False):
                     error += " Вложите подписанный договр; "
-            #  waiting_receipt -> receipt_obtained
+                #  waiting_receipt -> receipt_obtained
             if state == 'waiting_receipt' and next_state == 'receipt_obtained':
                 if not values.get('receipt_file', False) and not data.receipt_file:
                     error += "Получена ли квитанция? Вложите копию квитанции; "
-            #  receipt_obtained -> contract_signed
+                #  receipt_obtained -> contract_signed
             if state == 'receipt_obtained' and next_state == 'contract_signed':
                 if not data.pcontract_file and not values.get('pcontract_file', False):
                     error += " Вложите подписанный договр; "
@@ -559,7 +593,8 @@ class BriefContract(Model):
         contract = self.read(cr, user, contract_id, ['contract_number', 'contract_date', 'service_id', 'partner_id'])
         service = self.pool.get('brief.services.stage').read(cr, user, contract['service_id'][0], ['template_id'])
         if service['template_id']:
-            template = self.pool.get('ir.attachment').read(cr, user, service['template_id'][0], ['store_fname', 'parent_id'])
+            template = self.pool.get('ir.attachment').read(cr, user, service['template_id'][0],
+                                                           ['store_fname', 'parent_id'])
             dbro = self.pool.get('document.directory').read(cr, user, template['parent_id'][0], ['storage_id'], context)
             storage = self.pool.get('document.storage').read(cr, user, dbro['storage_id'][0], ['path'])
 
@@ -569,18 +604,34 @@ class BriefContract(Model):
 
             o = {'name': 'test'}
 
-            filename = 'Договор № {0} {1} {2}'.format(
-                contract['contract_number'],
-                contract['partner_id'][1],
-                contract['service_id'][1],)
+            filename = '{0} {1} {2}'.format(
+                contract['contract_number'].encode('utf-8'),
+                contract['partner_id'][1].encode('utf-8'),
+                contract['service_id'][1].encode('utf-8'), )
 
-            odt_file = os.path.join(storage['path'], '{0}.odt'.format(filename,))
+            odt_file = os.path.join(storage['path'], 'tmp.odt')
             rst_file = os.path.join(storage['path'], 'index.rst')
-            pdf_file = os.path.join(storage['path'], '{0}.pdf'.format(filename,))
+            pdf_file = os.path.join(storage['path'], 'tmp.pdf')
             file(odt_file, 'wb').write(basic.generate(o=o).render().getvalue())
 
             convert_odt(odt_file, storage['path'])
             RstToPdf().createPdf(text=open(rst_file).read(), source_path=rst_file, output=pdf_file)
+
+            odt_attachment_id = self.pool.get('ir.attachment').create(cr, user, {
+                'name': '{0}.odt'.format(filename, ),
+                'datas': base64.b64encode(open(odt_file, 'rb').read()),
+                'datas_fname': '{0}.odt'.format(filename, ),
+                'res_model': self._name,
+                'res_id': contract['id']})
+            pdf_attachment_id = self.pool.get('ir.attachment').create(cr, user, {
+                'name': '{0}.pdf'.format(filename, ),
+                'datas': base64.b64encode(open(pdf_file, 'rb').read()),
+                'datas_fname': '{0}.pdf'.format(filename, ),
+                'res_model': self._name,
+                'res_id': contract['id']})
+            self.write(cr, user, [contract['id']], {'doc_id': odt_attachment_id, 'pdf_id': pdf_attachment_id})
+        return True
+
 BriefContract()
 
 
@@ -594,6 +645,8 @@ class BriefContractAmount(Model):
         'term': fields.char('Срок выставления счета на оплату', size=255),
         'contract_id': fields.many2one('brief.contract', 'Бриф на договор', invisible=True),
     }
+
+
 BriefContractAmount()
 
 
@@ -612,6 +665,8 @@ class BriefContractComments(Model):
     _defaults = {
         'usr_id': lambda self, cr, uid, context: uid,
     }
+
+
 BriefContractComments()
 
 
@@ -628,6 +683,8 @@ class BriefContractHistory(Model):
         'contract_id': fields.many2one('brief.contract', 'Бриф на встречу', invisible=True),
         'create_date': fields.datetime('Дата', readonly=True),
     }
+
+
 BriefContractHistory()
 
 
@@ -662,4 +719,6 @@ class ResPartner(Model):
                 })
 
         return data
+
+
 ResPartner()
