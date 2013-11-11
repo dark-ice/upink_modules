@@ -46,6 +46,7 @@ class ResponsibleCalls(Model):
         'dnepropetrovsk': fields.integer('Днепропетровск'),
         'donetsk': fields.integer('Донецк'),
         'minsk': fields.integer('Минск'),
+        'astana': fields.integer('Астана'),
 
         'livesite': fields.integer('Продажи с Живосайта'),
         'adminpanel': fields.integer('Продажи с Админпанели'),
@@ -89,6 +90,7 @@ class ResponsibleCalls(Model):
                     sum(case when region='dnepr' then 1 else 0 end) dnepropetrovsk,
                     sum(case when region='donetsk' then 1 else 0 end) donetsk,
                     sum(case when region='belarus' then 1 else 0 end) minsk,
+                    sum(case when region='astana' then 1 else 0 end) astana,
                     sum(case when livesite=true then 1 else 0 end) livesite,
                     sum(case when adminpanel=true then 1 else 0 end) adminpanel,
                     sum(case when shara=true then 1 else 0 end) shara,

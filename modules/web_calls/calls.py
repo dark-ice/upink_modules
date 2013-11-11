@@ -51,7 +51,8 @@ REGIONS = {
     'saratov': set(['Saratov', 'Saratov1']),
     'kharkov': set(['Kharkov', ]),
     'belarus': set(['Belarus', 'Belarus-Velcom', 'opt-belarus', 'Minsk_Velcome']),
-    'warsaw': set(['HotVarshava', 'Varshava', 'Lndn1', 'Lndn2', 'Lndn3', 'Lndn4', 'Wrszw1', 'Wrszw2', 'Wrszw3'])
+    'warsaw': set(['HotVarshava', 'Varshava', 'Lndn1', 'Lndn2', 'Lndn3', 'Lndn4', 'Wrszw1', 'Wrszw2', 'Wrszw3']),
+    'astana': set(['astana', ]),
 }
 
 CITIES = (
@@ -81,6 +82,7 @@ CITIES = (
     ('saratov', u'Саратов'),
     ('belarus', u'Минск'),
     ('warsaw', u'Варшава'),
+    ('warsaw', u'Астана'),
     ('unknown', u'Неизвестный город')
 )
 
