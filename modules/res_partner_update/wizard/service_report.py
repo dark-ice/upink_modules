@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+import pytz
+
 try:
     from collections import Counter
 except ImportError:
@@ -11,8 +14,8 @@ from openerp.osv.orm import TransientModel
 class PartnerAddedServicesHistoryWizard(TransientModel):
     _name = 'partner.added.services.history.wizard'
     _columns = {
-        'date_start': fields.date('Дата начала'),
-        'date_finish': fields.date('Дата окончания'),
+        'date_start': fields.date('Дата начала', required=1),
+        'date_finish': fields.date('Дата окончания', required=1),
         'count_ids': fields.one2many('service.count.for.partner', 'count_id', 'количество услуг'),
         'count_service_ids': fields.one2many('service.name.for.partner', 'count_service_id', 'количество по услугам'),
         'count_direction_ids': fields.one2many('direction.name.for.partner', 'count_direction_id', 'количество по направлениям')
@@ -25,28 +28,13 @@ class PartnerAddedServicesHistoryWizard(TransientModel):
         for field in self._columns.keys():
             if field in context:
                 res[field] = context[field]
+        res['date_finish'] = datetime.now(pytz.utc).strftime('%Y-%m-%d')
         return res
 
     def get_report(self, cr, uid, ids, context=None):
-        res_partner_pool = self.pool.get('res.partner')
         res_partner_service_history = self.pool.get('partner.added.services.history')
-        service_start_ids = []
-        service_finish_ids = []
-        vals = dict()
-        vals_list = list()
 
         for record in self.browse(cr, uid, ids, context):
-            #if record.date_start:
-            #    service_start_ids = res_partner_service_history.search(cr, uid, [
-            #        ('date_start', '>', record.date_start), ('check_r', '=', True)
-            #    ])
-            #
-            #if record.date_finish:
-            #    service_finish_ids = res_partner_service_history.search(cr, uid, [
-            #        ('date_start', '<', record.date_finish), ('check_r', '=', True)
-            #    ])
-            ## получаю вхождения в оба листа в common
-            #common = list(set(service_start_ids) & set(service_finish_ids))
             common = res_partner_service_history.search(cr, uid, [
                     ('date_start', '>', record.date_start), ('date_start', '<', record.date_finish), ('check_r', '=', True)
                 ])
@@ -56,14 +44,14 @@ class PartnerAddedServicesHistoryWizard(TransientModel):
             sum_parnet = Counter(partner_service_num.values())
 
             service_partner_num = [x[0] for x in set([(r['service_id'][0], r['partner_id'][0]) for r in partners])]
-            sum_parnet_service = Counter(service_partner_num)
+            sum_parnet_service = Counter(service_partner_num).most_common()
 
             direction_partner_num = [x[0] for x in set([(r['direction'], r['partner_id'][0]) for r in partners])]
-            sum_parnet_direction = Counter(direction_partner_num)
+            sum_parnet_direction = Counter(direction_partner_num).most_common()
 
             count_ids = [(0, 0, {'count_services': k, 'count_partners': sum_parnet[k]}) for k in sum_parnet.iterkeys()]
-            count_service_ids = [(0, 0, {'service_id': k, 'count_partners': sum_parnet_service[k]}) for k in sum_parnet_service.iterkeys()]
-            count_direction_ids = [(0, 0, {'direction_name': k, 'count_partners': sum_parnet_direction[k]}) for k in sum_parnet_direction.iterkeys()]
+            count_service_ids = [(0, 0, {'service_id': k[0], 'count_partners': k[1]}) for k in sum_parnet_service]
+            count_direction_ids = [(0, 0, {'direction_name': k[0], 'count_partners': k[1]}) for k in sum_parnet_direction]
 
             action_pool = self.pool.get('ir.actions.act_window')
             action_id = action_pool.search(cr, uid, [('name', '=', 'Комплексный отчет по услугам')], context=context)
