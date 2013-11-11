@@ -135,6 +135,10 @@ class BriefContract(Model):
             domain="[('groups_id','in',[131])]",
             help='Заполняется при создании Брифа, указывается отетственный сотрудник за подписание договора'
         ),
+        'doc_type': fields.many2one(
+            'doc.type',
+            'действующего на основании'
+        ),
         'lawyer_id': fields.many2one(
             'res.users',
             'Юрист',
@@ -335,6 +339,14 @@ class BriefContract(Model):
         'wuser_ids': fields.integer("Без этих людей"),
         'doc_id': fields.many2one('ir.attachment', 'Договор(odt)'),
         'pdf_id': fields.many2one('ir.attachment', 'Договор(pdf)', readonly=True),
+        'account_id': fields.many2one(
+            'account.account',
+            'Фирма',
+            domain=[('type', '!=', 'closed'), ('company_id', '=', 4)],
+            required=True,
+            help='Фирма, от лица которой создается данный счет.'
+        ),
+
     }
 
     _defaults = {
@@ -501,32 +513,32 @@ class BriefContract(Model):
             if state == 'preparation' and next_state == 'contract_approval':
                 if not values.get('contract_file', False) and not data.contract_file:
                     error += " Необходимо вложить Проект договора; "
-                #  contract_approval -> contract_completion
+            #  contract_approval -> contract_completion
             if state == 'contract_approval' and next_state == 'contract_completion':
                 if not values.get('comment_rework_2', False) and not data.comment_rework_2 and not values.get(
                         'contract_re_file', False) and not data.contract_re_file:
                     error += " Введите Комментарий по доработке договора или прикрепите файл доработки; "
-                #  contract_completion -> contract_approval
+            #  contract_completion -> contract_approval
             if state == 'contract_completion' and next_state == 'contract_approval':
                 pass
-                #  contract_approval -> contract_agreed
+            #  contract_approval -> contract_agreed
             if state == 'contract_approval' and next_state == 'contract_agreed':
                 pass
-                #  contract_agreed -> approval_partner
+            #  contract_agreed -> approval_partner
             if state == 'contract_agreed' and next_state == 'approval_partner':
                 pass
-                #  approval_partner -> contract_completion
+            #  approval_partner -> contract_completion
             if state == 'approval_partner' and next_state == 'contract_completion':
                 if not values.get('comment_rework_3', False) and not data.comment_rework_3 and not values.get(
                         'contract_re_file', False) and not data.contract_re_file:
                     error += " Введите Комментарий по доработке перед утверждением договора или прикрепите файл доработки; "
-                #  approval_partner -> partner_cancel
+            #  approval_partner -> partner_cancel
             if state == 'approval_partner' and next_state == 'partner_cancel':
                 pass
-                #  partner_cancel -> approval_partner
+            #  partner_cancel -> approval_partner
             if state == 'partner_cancel' and next_state == 'approval_partner':
                 pass
-                #  approval_partner -> contract_approved
+            #  approval_partner -> contract_approved
             if state == 'approval_partner' and next_state == 'contract_approved':
                 if not values.get('contract_approved_file', False) and not data.contract_approved_file:
                     error += " Прикрепите утвержденный договор; "
@@ -534,36 +546,36 @@ class BriefContract(Model):
             #  contract_approved -> send_mail
             if state == 'contract_approved' and next_state == 'send_mail':
                 pass
-                #  contract_approved -> send_express
+            #  contract_approved -> send_express
             if state == 'contract_approved' and next_state == 'send_express':
                 pass
-                #  contract_approved -> send_courier
+            #  contract_approved -> send_courier
             if state == 'contract_approved' and next_state == 'send_courier':
                 pass
-                #  send_courier -> meeting_scheduled
+            #  send_courier -> meeting_scheduled
             if state == 'send_courier' and next_state == 'meeting_scheduled':
                 pass
-                #  send_mail -> waiting_receipt
+            #  send_mail -> waiting_receipt
             if state == 'send_mail' and next_state == 'waiting_receipt':
                 pass
-                #  send_express -> waiting_receipt
+            #  send_express -> waiting_receipt
             if state == 'send_express' and next_state == 'waiting_receipt':
                 pass
-                #  waiting_receipt -> meeting_scheduled
+            #  waiting_receipt -> meeting_scheduled
             if state == 'waiting_receipt' and next_state == 'meeting_scheduled':
                 pass
-                #  meeting_scheduled -> meeting_cancel
+            #  meeting_scheduled -> meeting_cancel
             if state == 'meeting_scheduled' and next_state == 'meeting_cancel':
                 pass
-                #  meeting_scheduled -> contract_signed
+            #  meeting_scheduled -> contract_signed
             if state == 'meeting_scheduled' and next_state == 'contract_signed':
                 if not data.pcontract_file and not values.get('pcontract_file', False):
                     error += " Вложите подписанный договр; "
-                #  waiting_receipt -> receipt_obtained
+            #  waiting_receipt -> receipt_obtained
             if state == 'waiting_receipt' and next_state == 'receipt_obtained':
                 if not values.get('receipt_file', False) and not data.receipt_file:
                     error += "Получена ли квитанция? Вложите копию квитанции; "
-                #  receipt_obtained -> contract_signed
+            #  receipt_obtained -> contract_signed
             if state == 'receipt_obtained' and next_state == 'contract_signed':
                 if not data.pcontract_file and not values.get('pcontract_file', False):
                     error += " Вложите подписанный договр; "

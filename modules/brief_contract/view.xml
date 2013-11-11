@@ -33,6 +33,7 @@
                         <newline/>
                         <field name="service_id" on_change="onchange_service(service_id)"/>
                         <field name="service_head_id" readonly="1"/>
+                        <field name="account_id"/>
                         <separator colspan="4"/>
                     </group>
                     <group colspan="4" col="4">
@@ -61,6 +62,7 @@
                                context="{'partner_id': partner_id}"
                                domain="[('partner_id', '=', partner_id)]"
                                 />
+                        <field name="doc_type"/>
                         <separator colspan="4"/>
                     </group>
                     <group col="4" colspan="4">
