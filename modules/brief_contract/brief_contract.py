@@ -725,3 +725,15 @@ class ResPartner(Model):
 
         return data
 ResPartner()
+
+
+class DocType(Model):
+    _name = 'doc.type'
+    _columns = {
+        'name': fields.char(
+            "Тип документа",
+            size=256,
+            help='Тип документа'),
+    }
+
+DocType()
