@@ -668,3 +668,5 @@ class DocType(Model):
             size=256,
             help='Тип документа'),
     }
+
+DocType()
