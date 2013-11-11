@@ -76,12 +76,6 @@ class CallReport(Model):
         employeers = set()
 
         for record in pay_line_pool.read(cr, 1, pay_line_ids, []):
-            google = False
-            rate = 1
-            costs_partner = 0
-            costs_employee = 0
-            total = 0
-
             vals = {
                 'service_id': record['service_id'][0] if record['service_id'] else False,
                 'partner_id': record['partner_id'][0] if record['partner_id'] else False,

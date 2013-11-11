@@ -39,14 +39,22 @@ class ReportPlanning(Model):
             l = zip(*[(r['plan_total'], r['fact_total']) for r in self.read(cr, uid, f_ids, ['plan_total', 'fact_total'], context)])
             plan = sum(l[0])
             fact = sum(l[1])
+
             try:
-                fact_per = 365000 / fact
+                period = self.pool.get('kpi.period').get_by_date(cr, start_date)
+                kpi_ids = self.pool.get('kpi.kpi').search(cr, 1, [('employee_id', '=', 10), ('period_id', '=', period.id)])
+                mbo_ids = self.pool.get('kpi.mbo').search(cr, 1, [('kpi_id', 'in', kpi_ids), ('name', '=', 347)])
+                mbo = self.pool.get('kpi.mbo').read(cr, 1, mbo_ids[0], ['plan'])
+                plan_per = (plan / mbo['plan']) * 100
+                fact_per = (fact / mbo['plan']) * 100
             except:
+                plan_per = 0.0
                 fact_per = 0.0
+
             res[record['id']] = {
                 'plan': plan,
                 'fact': fact,
-                'plan_per': (plan / 365000) * 100,
+                'plan_per': plan_per,
                 'fact_per': fact_per,
             }
         return res
@@ -181,7 +189,6 @@ class ReportPlanning(Model):
                   r.plan_dev,
                   r.plan_dev_account,
                   r.plan_work + r.plan_calling + r.plan_dev plan_total,
-                  (r.plan_work + r.plan_calling + r.plan_dev)/365000 plan_per,
                   fact_work,
                   fact_calling,
                   fact_dev,
@@ -207,6 +214,7 @@ class ReportPlanning(Model):
                         sum(case when u.context_section_id=9 or i.user_id=14 then i.total_ye else 0 end) plan_dev_account
                       FROM account_invoice i
                       LEFT JOIN res_users u on (u.id=i.user_id)
+                      WHERE i.user_id <> 170
                       GROUP BY i.plan_paid_date
                     ) i on (r.date=i.plan_paid_date)
                     LEFT JOIN (

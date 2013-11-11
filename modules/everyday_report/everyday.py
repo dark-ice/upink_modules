@@ -34,7 +34,6 @@ class DayReportPlan(Model):
         'section_id': lambda s, cr, u, ctxt: ctxt.get('context_section_id', False),
         'date': lambda *a: fields.date.today(),
     }
-
 DayReportPlan()
 
 
@@ -70,7 +69,6 @@ class DayReportBriefPlan(Model):
         'uid': lambda s, cr, u, ctxt: u,
         'date': lambda *a: fields.date.today(),
     }
-
 DayReportBriefPlan()
 
 
@@ -184,3 +182,21 @@ class AccountInvoicePayLine(Model):
                 vals['factor'] = vals['name'] / invoice['rate']
         return super(AccountInvoicePayLine, self).create(cr, user, vals, context)
 AccountInvoicePayLine()
+
+
+class DayReportPlanMonth(Model):
+    _name = 'day.report.plan.month'
+    _description = u'Ежедневные отчеты - Планы на месяц'
+    _rec_name = 'section_id'
+    _order = 'date desc, section_id'
+
+    _columns = {
+        'uid': fields.many2one(
+            'res.users',
+            'Автор',
+            readonly=True
+        ),
+        'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')]),
+        'plan': fields.float('План'),
+    }
+DayReportPlanMonth()

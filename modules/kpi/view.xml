@@ -55,12 +55,12 @@
                                 />
                         <separator orientation="vertical"/>
                         <filter icon="terp-go-year"
-                                domain="[('year','=', time.strftime('%%Y'))]"
+                                domain="[('year','=', time.localtime()[0])]"
                                 name="year"
                                 string="Текущий год"
                                 />
                         <filter icon="terp-go-month"
-                                domain="[('year','=', time.strftime('%%Y')), ('month','=', int(time.strftime('%%m')))]"
+                                domain="[('year','=', time.localtime()[0]), ('month','=', time.localtime()[1])]"
                                 name="month"
                                 string="Текущий месяц"
                                 />
