@@ -240,8 +240,9 @@
             <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree string="Брифы: Список услуг">
-                    <field name="name" colspan="4"/>
+                    <field name="name"/>
                     <field name="usergroup"/>
+                    <field name="template_id"/>
                 </tree>
             </field>
         </record>
@@ -260,6 +261,7 @@
                     <field name="in_account"/>
                     <newline />
                     <field name="service_type" colspan="4"/>
+                    <field name="template_id" colspan="4"/>
 
                 </form>
             </field>

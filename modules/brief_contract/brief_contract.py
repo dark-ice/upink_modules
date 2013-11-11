@@ -2,6 +2,7 @@
 from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
+#from relatorio.templates.opendocument import Template
 from notify import notify
 
 
@@ -13,30 +14,28 @@ class BriefContract(Model):
     _order = 'id desc'
     _table = 'brief_contract'
 
-    workflow_name = 'brief.contract'
-
-    _states = {
-        'draft': 'Черновик',
-        'approval': 'Бриф на согласовании',
-        'completion': 'Бриф на доработке',
-        'preparation': 'Подготовка договора',
-        'contract_approval': 'Согласование договора с обслуживающим направлением',
-        'contract_completion': 'Доработка договора',
-        'contract_agreed': 'Договор согласован',
-        'approval_partner': 'Утверждение договора с партнером',
-        'partner_cancel': 'Отмена',
-        'contract_approved': 'Договор утвержден',
-        'send_mail': 'Отправление договора по почте России',
-        'send_express': 'Отправление договора экспресс-почтой',
-        'send_courier': 'Отправка договора курьером',
-        'waiting_receipt': 'Ожидание квитанции об возврате договора',
-        'receipt_obtained': 'Квитанция получена',
-        'meeting_scheduled': 'Встреча назначена',
-        'meeting_cancel': 'Отмена встречи',
-        'contract_signed': 'Оригинал договора',
-        'cancel': 'Отмена',
-        'cancel_2': 'Отмена',
-    }
+    _states = (
+        ('draft', 'Черновик'),
+        ('approval', 'Бриф на согласовании'),
+        ('completion', 'Бриф на доработке'),
+        ('preparation', 'Подготовка договора'),
+        ('contract_approval', 'Согласование договора с обслуживающим направлением'),
+        ('contract_completion', 'Доработка договора'),
+        ('contract_agreed', 'Договор согласован'),
+        ('approval_partner', 'Утверждение договора с партнером'),
+        ('partner_cancel', 'Отмена'),
+        ('contract_approved', 'Договор утвержден'),
+        ('send_mail', 'Отправление договора по почте России'),
+        ('send_express', 'Отправление договора экспресс-почтой'),
+        ('send_courier', 'Отправка договора курьером'),
+        ('waiting_receipt', 'Ожидание квитанции об возврате договора'),
+        ('receipt_obtained', 'Квитанция получена'),
+        ('meeting_scheduled', 'Встреча назначена'),
+        ('meeting_cancel', 'Отмена встречи'),
+        ('contract_signed', 'Оригинал договора'),
+        ('cancel', 'Отмена'),
+        ('cancel_2', 'Отмена'),
+    )
 
     def _check_access(self, cr, uid, ids, name, arg, context=None):
         """
@@ -107,7 +106,7 @@ class BriefContract(Model):
 
     _columns = {
         'state': fields.selection(
-            zip(_states.keys(), _states.values()),
+            _states,
             'Статус',
             readonly=True,
             help='Поле отображает текущий этап Брифа.'),
@@ -122,11 +121,6 @@ class BriefContract(Model):
             'Партнер',
             select=True,
             help='Партнер, по которому создан Бриф. Заполняется на этапе "Черновик". Обязательное к заполнению'),
-        'lead_id': fields.many2one(
-            'crm.lead',
-            'Кандидат',
-            select=True,
-            help=''),
         'responsible_id': fields.many2one(
             'res.users',
             'Ответственный за подписание',
@@ -339,7 +333,6 @@ class BriefContract(Model):
         'lawyer_id': lambda *a: 474,
         'partner_id': lambda self, cr, uid, context: context.get('partner_id', False),
         'service_id': lambda self, cr, uid, context: context.get('service_id', False),
-        'lead_id': lambda self, cr, uid, context: context.get('lead_id', False),
         'state': 'draft',
         'from': lambda self, cr, uid, context: context.get('from', False),
         'wuser_ids': 153,
@@ -415,8 +408,6 @@ class BriefContract(Model):
         if next_state and next_state != state:
             #  draft -> approval
             if state == 'draft' and next_state == 'approval':
-                #if (not values.get('partner_id', False) and not data.partner_id) or (not values.get('lead_id', False) and not data.lead_id):
-                #    error += " Выберите Партнера или Кандидата; "
                 if not values.get('contract_number', False) and not data.contract_number:
                     error += " Введите Номер договора; "
                 if not values.get('contract_date', False) and not data.contract_date:
@@ -543,7 +534,7 @@ class BriefContract(Model):
 
             values.update({'history_ids': [(0, 0, {
                 'usr_id': user,
-                'state': self._states[next_state]
+                'state': dict(self._states)[next_state]
             })]})
 
         return super(BriefContract, self).write(cr, user, ids, values, context)
@@ -556,7 +547,15 @@ class BriefContract(Model):
             self.pool.get('res.partner').write(cr, user, [vals['partner_id']], {'partner_base': 'hot'})
         return super(BriefContract, self).create(cr, user, vals, context)
 
-
+    def generate(self, cr, user, ids):
+        contract_id = ids
+        if isinstance(ids, (list, tuple)):
+            contract_id = ids[0]
+        contract = self.read(cr, user, contract_id, ['contract_number', 'contract_date', 'service_id', 'partner_id'])
+        service = self.pool.get('brief.services.stage').read(cr, user, contract['service_id'][0], ['template_id'])
+        template = self.pool.get('ir.attachment')._data_get(cr, user, )
+        #basic = Template(source=None, filepath='basic.odt')
+        #file('bonham_basic.odt', 'wb').write(basic.generate(o=contract).render().getvalue())
 BriefContract()
 
 
@@ -570,8 +569,6 @@ class BriefContractAmount(Model):
         'term': fields.char('Срок выставления счета на оплату', size=255),
         'contract_id': fields.many2one('brief.contract', 'Бриф на договор', invisible=True),
     }
-
-
 BriefContractAmount()
 
 
@@ -590,8 +587,6 @@ class BriefContractComments(Model):
     _defaults = {
         'usr_id': lambda self, cr, uid, context: uid,
     }
-
-
 BriefContractComments()
 
 
@@ -608,12 +603,10 @@ class BriefContractHistory(Model):
         'contract_id': fields.many2one('brief.contract', 'Бриф на встречу', invisible=True),
         'create_date': fields.datetime('Дата', readonly=True),
     }
-
-
 BriefContractHistory()
 
 
-class res_partner(Model):
+class ResPartner(Model):
     _inherit = "res.partner"
 
     _columns = {
@@ -644,5 +637,4 @@ class res_partner(Model):
                 })
 
         return data
-
-res_partner()
+ResPartner()

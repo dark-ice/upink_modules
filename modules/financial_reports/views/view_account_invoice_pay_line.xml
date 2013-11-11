@@ -76,7 +76,7 @@
             <field name="view_mode">tree</field>
             <field name="view_id" ref="view_account_invoice_factor_tree"/>
             <field name="search_view_id" ref="view_account_invoice_factor_search"/>
-            <field name="domain">[('service_id.direction', '=', 'PPC')]</field>
+            <field name="domain">[('service_id.direction', '=', 'PPC'), ('invoice_id.user_id', '!=', 170)]</field>
             <field name="context">{'report': True}</field>
         </record>
         <menuitem action="window_account_invoice_factor_ppc" id="menu_daccount_invoice_factor_ppc" parent="menu_direction_report_settings" sequence="1"/>
@@ -153,7 +153,7 @@
             <field name="view_mode">tree</field>
             <field name="view_id" ref="view_account_invoice_factor_tree_seo"/>
             <field name="search_view_id" ref="view_account_invoice_factor_search_seo"/>
-            <field name="domain">[('service_id.direction', '=', 'SEO')]</field>
+            <field name="domain">[('service_id.direction', '=', 'SEO'), ('invoice_id.user_id', '!=', 170)]</field>
             <field name="context">{'report': True}</field>
         </record>
         <menuitem action="window_account_invoice_factor_seo" id="menu_daccount_invoice_factor_seo" parent="menu_direction_report_settings" sequence="10"/>
@@ -232,7 +232,7 @@
             <field name="view_mode">tree</field>
             <field name="view_id" ref="view_account_invoice_factor_tree_smm"/>
             <field name="search_view_id" ref="view_account_invoice_factor_search_smm"/>
-            <field name="domain">[('service_id.direction', '=', 'SMM')]</field>
+            <field name="domain">[('service_id.direction', '=', 'SMM'), ('invoice_id.user_id', '!=', 170)]</field>
             <field name="context">{'report': True}</field>
         </record>
         <menuitem action="window_account_invoice_factor_smm" id="menu_daccount_invoice_factor_smm" parent="menu_direction_report_settings" sequence="20"/>
@@ -312,7 +312,7 @@
             <field name="view_mode">tree</field>
             <field name="view_id" ref="view_account_invoice_factor_tree_call"/>
             <field name="search_view_id" ref="view_account_invoice_factor_search_call"/>
-            <field name="domain">[('service_id.direction', '=', 'CALL')]</field>
+            <field name="domain">[('service_id.direction', '=', 'CALL'), ('invoice_id.user_id', '!=', 170)]</field>
         </record>
         <menuitem action="window_account_invoice_factor_call" id="menu_daccount_invoice_factor_call" parent="menu_direction_report_settings" sequence="30"/>
 
@@ -392,7 +392,7 @@
             <field name="view_mode">tree</field>
             <field name="view_id" ref="view_account_invoice_factor_tree_site"/>
             <field name="search_view_id" ref="view_account_invoice_factor_search_site"/>
-            <field name="domain">[('service_id.direction', '=', 'SITE')]</field>
+            <field name="domain">[('service_id.direction', '=', 'SITE'), ('invoice_id.user_id', '!=', 170)]</field>
         </record>
         <menuitem action="window_account_invoice_factor_site" id="menu_daccount_invoice_factor_site" parent="menu_direction_report_settings" sequence="40"/>
 
@@ -464,7 +464,7 @@
             <field name="view_mode">tree</field>
             <field name="view_id" ref="view_account_invoice_factor_tree_video"/>
             <field name="search_view_id" ref="view_account_invoice_factor_search_video"/>
-            <field name="domain">[('service_id.direction', '=', 'VIDEO')]</field>
+            <field name="domain">[('service_id.direction', '=', 'VIDEO'), ('invoice_id.user_id', '!=', 170)]</field>
         </record>
         <menuitem action="window_account_invoice_factor_video" id="menu_daccount_invoice_factor_video" parent="menu_direction_report_settings" sequence="50"/>
     </data>

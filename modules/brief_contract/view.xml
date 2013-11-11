@@ -23,7 +23,6 @@
                     </group>
                     <group colspan="4" col="4">
                         <field name="partner_id" colspan="2" on_change="onchange_partner_id(partner_id)"/>
-                        <field name="lead_id" colspan="2" invisible="True"/>
                         <field name="usr_id" colspan="2"/>
 
                         <field name="contract_number" colspan="2"/>

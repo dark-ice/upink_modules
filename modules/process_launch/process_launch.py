@@ -80,6 +80,8 @@ class ProcessLaunch(Model):
 
     def _get_pay_ids(self, cr, uid, ids, name, arg, context=None):
         res = {}
+        if not isinstance(ids, (list, tuple)):
+            ids = [ids]
         for data in self.read(cr, uid, ids, ['service_id', 'account_ids'], context):
             value = {
                 'price': 0,
@@ -477,9 +479,18 @@ class ProcessLaunch(Model):
     @notify.msg_send(_name)
     def write(self, cr, uid, ids, values, context=None):
         error = ''
-        for record in self.read(cr, uid, ids, ['state', 'comment', 'account_file_id', 'account_ids', 'contract_file_id', 'contract_id']):
+        for record in self.read(cr, uid, ids, ['state', 'comment', 'account_file_id', 'account_ids', 'contract_file_id', 'contract_id', 'process_model', 'process_id']):
             next_state = values.get('state', False)
             state = record['state']
+
+            if values.get('account_ids'):
+                line_ids = self._get_pay_ids(cr, uid, record['id'], '', {})['invoice_pay_ids']
+                try:
+                    process = self.pool.get(record['process_model']).read(cr, uid, record['process_id'], ['specialist_id'])
+                    if process['specialist_id']:
+                        self.pool.get('account.invoice.pay.line').write(cr, 1, line_ids, {'specialist_id': process['specialist_id'][0]})
+                except:
+                    pass
 
             if next_state and next_state != state:
                 if next_state == 'revision' and (not values.get('comment', False) and not record['comment']):

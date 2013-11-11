@@ -34,13 +34,25 @@ class AccountInvoicePayLine(Model):
                     launch_ids = self.pool.get('process.launch').search(cr, 1, [('partner_id', '=', invoice['partner_id'][0]), ('service_id', '=', record['service_id'][0])])
                     for launch in self.pool.get('process.launch').read(cr, 1, launch_ids, ['process_id', 'process_model']):
                         if launch['process_model'] and launch['process_id']:
-                            process = self.pool.get(launch['process_model']).read(cr, 1, launch['process_id'], ['specialist_id', 'site_url'])
-                            if process and process.get('specialist_id'):
-                                res[record['id']] = {
-                                    'specialist_id': process['specialist_id'][0],
-                                    'site_url': process['site_url'],
-                                }
+                            try:
+                                process = self.pool.get(launch['process_model']).read(cr, 1, launch['process_id'], ['specialist_id', 'site_url'])
+                                if process and process.get('specialist_id'):
+                                    res[record['id']] = {
+                                        'specialist_id': process['specialist_id'][0],
+                                        'site_url': process['site_url'],
+                                    }
+                                    #self.write(cr, 1, [record['id']], {'specialist_id': process['specialist_id'][0], 'site_url': process['site_url']})
+                            except:
+                                pass
         return res
+
+    def _search_specialist(self, cr, uid, obj, name, args, context):
+        ids = self.search(cr, uid, [])
+        res = self._get_specialist(cr, uid, ids, '', {})
+        line_ids = [k for k, v in res.iteritems() if v['specialist_id'] == args[0][2]]
+        if line_ids:
+            return [('id', 'in', line_ids)]
+        return [('id', '=', '0')]
 
     def onchange_close(self, cr, uid, ids, close):
         if close:
@@ -60,7 +72,8 @@ class AccountInvoicePayLine(Model):
             relation='res.users',
             string='Аккаунт-менеджер',
             store=True,
-            multi='process'
+            multi='process',
+            fnct_search=_search_specialist
         ),
         'site_url': fields.function(
             _get_specialist,
@@ -89,6 +102,7 @@ class AccountInvoicePayLine(Model):
         'add_revenues': fields.float('Доп. доходы'),
         'add_costs': fields.float('Доп. расходы'),
         'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')]),
+        'save': fields.boolean('Save')
     }
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):

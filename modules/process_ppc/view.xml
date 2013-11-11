@@ -87,7 +87,7 @@
                             <group colspan="4" col="2">
                                 <group colspan="4" col="2">
                                     <separator string="Аккаунт менеджер" colspan="4"/>
-                                    <field name="specialist_id" nolabel="1"/>
+                                    <field name="specialist_id" nolabel="1" attrs="{'readonly': [('check_m', '=', False)]}"/>
                                 </group>
                                 <group colspan="4" col="2">
                                     <separator string="Доступы" colspan="4"/>

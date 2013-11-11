@@ -2,7 +2,6 @@
 import calendar
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
 
@@ -56,6 +55,7 @@ class SMMReport(Model):
             ('close_date', '>=', date_start),
             ('partner_id', '!=', False),
             ('invoice_id', '!=', False),
+            ('invoice_id.user_id', '!=', 170)
         ]
         pay_line_ids = pay_line_pool.search(cr, 1, domain, order='partner_id, service_id, invoice_date')
         lines = []
@@ -78,7 +78,6 @@ class SMMReport(Model):
 
         co_costs = {}
         current_periods = set()
-        current_pay = 0
         source_date_start = datetime.strptime(date_start, '%Y-%m-%d')
         source_date_end = datetime.strptime(date_end, '%Y-%m-%d')
         td = source_date_end - source_date_start

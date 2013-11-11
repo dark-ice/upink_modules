@@ -1,6 +1,7 @@
 # coding=utf-8
+import calendar
 from datetime import datetime
-from openerp import tools
+from dateutil.relativedelta import relativedelta
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
 
@@ -53,17 +54,15 @@ class VideoReport(Model):
             ('close_date', '=', False),
             ('close_date', '>=', date_start),
             ('partner_id', '!=', False),
-            ('partner_id', '=', 31841),
             ('invoice_id', '!=', False),
+            ('invoice_id.user_id', '!=', 170)
         ]
         pay_line_ids = pay_line_pool.search(cr, 1, domain, order='partner_id, service_id, invoice_date')
         lines = []
         # Итого
         total_period = 0
-        balance_period = 0
         profit_period = 0
         costs_employee_period = 0
-        costs_period = 0
         costs_partner_period = 0
         rollovers_income = 0
         rollovers_outcome = 0
@@ -73,14 +72,19 @@ class VideoReport(Model):
         costs_employee_period_tax_ye = 0
         costs_tax_period = 0
         costs_tx_period_ye = 0
-        employeers = set()
+
+        co_costs = {}
+        current_periods = set()
+        source_date_start = datetime.strptime(date_start, '%Y-%m-%d')
+        source_date_end = datetime.strptime(date_end, '%Y-%m-%d')
+        td = source_date_end - source_date_start
+        rtd = relativedelta(seconds=int((td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6),  microseconds=td.microseconds)
+        months = rtd.month or 1
+        for delta in range(months):
+            current_periods.add(self.pool.get('kpi.period').get_by_date(cr, source_date_start + relativedelta(months=delta)).id)
 
         for record in pay_line_pool.read(cr, 1, pay_line_ids, []):
-            google = False
-            rate = 1
-            costs_partner = 0
-            costs_employee = 0
-            total = 0
+            pay_partner = 0
 
             vals = {
                 'service_id': record['service_id'][0] if record['service_id'] else False,
@@ -114,23 +118,56 @@ class VideoReport(Model):
                 vals['rate'] = rate
 
             source_date = datetime.strptime(record['invoice_date'], '%Y-%m-%d')
-            period = self.pool.get('kpi.period').get_by_date(cr, source_date)
+            day_in_month = calendar.monthrange(source_date.year, source_date.month)[1]
+            last_day = '{0}{1}'.format(record['invoice_date'][:-2], day_in_month)
+
             if record['partner_id']:
                 zds_ids = self.pool.get('account.invoice').search(
                     cr,
                     1,
                     [
                         ('division_id', '=', 8),
+                        ('date_mr', '<=', last_day),
                         ('type', '=', 'in_invoice'),
-                        ('partner_id', '=', record['partner_id'][0]),
-                        ('period_id', '<=', period.id),
+                        ('partner_id', '=', record['partner_id'][0])
                     ])
-                zds = self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'period_id'])
-                for m in zds:
-                    if m['period_id'][0] == period.id:
+
+                for m in self.pool.get('account.invoice').read(cr, 1, zds_ids, ['cash_mr_dol', 'date_mr']):
+                    zds_period = self.pool.get('kpi.period').get_by_date(cr, datetime.strptime(m['date_mr'], '%Y-%m-%d'))
+                    if zds_period.id in current_periods and m['date_mr'] >= date_start:
                         vals['costs_partner'] += m['cash_mr_dol']
                     else:
-                        vals['co_costs_partner'] += m['cash_mr_dol']
+                        try:
+                            co_costs[zds_period.id]['partner'] += m['cash_mr_dol']
+                        except KeyError:
+                            co_costs[zds_period.id] = {'partner': m['cash_mr_dol']}
+
+            partner_invoice_ids = pay_line_pool.search(
+                cr,
+                1,
+                domain + [('partner_id', '=', record['partner_id'][0])],
+                order='partner_id, service_id, invoice_date'
+            )
+            for p in pay_line_pool.read(cr, 1, partner_invoice_ids, ['factor', 'invoice_date']):
+                invoice_period = self.pool.get('kpi.period').get_by_date(cr, datetime.strptime(p['invoice_date'], '%Y-%m-%d'))
+                if invoice_period.id in current_periods and p['invoice_date'] >= date_start:
+                    pay_partner += p['factor']
+                else:
+                    try:
+                        co_costs[invoice_period.id]['pay_partner'] += p['factor']
+                    except KeyError:
+                        co_costs[invoice_period.id] = {'pay_partner': p['factor']}
+
+            for co_cost in co_costs.values():
+                try:
+                    vals['co_costs_partner'] += co_cost['partner'] / co_cost['pay_partner']
+                except KeyError:
+                    vals['co_costs_partner'] += 0
+                except ZeroDivisionError:
+                    vals['co_costs_partner'] += 0
+
+            if pay_partner and pay_partner != record['factor']:
+                vals['costs_partner'] *= record['factor'] / pay_partner
 
             costs_employee = record['add_revenues']
 
