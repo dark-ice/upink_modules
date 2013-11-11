@@ -82,7 +82,7 @@ CITIES = (
     ('saratov', u'Саратов'),
     ('belarus', u'Минск'),
     ('warsaw', u'Варшава'),
-    ('warsaw', u'Астана'),
+    ('astana', u'Астана'),
     ('unknown', u'Неизвестный город')
 )
 
