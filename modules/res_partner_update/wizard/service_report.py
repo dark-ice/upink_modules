@@ -55,10 +55,10 @@ class PartnerAddedServicesHistoryWizard(TransientModel):
             partner_service_num = Counter([r['partner_id'][0] for r in partners])
             sum_parnet = Counter(partner_service_num.values())
 
-            service_partner_num = set([(r['service_id'][0], r['partner_id'][0]) for r in partners])
+            service_partner_num = [x[0] for x in set([(r['service_id'][0], r['partner_id'][0]) for r in partners])]
             sum_parnet_service = Counter(service_partner_num)
 
-            direction_partner_num = set([(r['direction'], r['partner_id'][0]) for r in partners])
+            direction_partner_num = [x[0] for x in set([(r['direction'], r['partner_id'][0]) for r in partners])]
             sum_parnet_direction = Counter(direction_partner_num)
 
             count_ids = [(0, 0, {'count_services': k, 'count_partners': sum_parnet[k]}) for k in sum_parnet.iterkeys()]
