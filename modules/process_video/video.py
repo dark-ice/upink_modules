@@ -27,6 +27,7 @@ class ProcessVideo(Model):
     _name = 'process.video'
     _inherit = 'process.base'
     _description = u'Процессы - Video'
+    _rec_name = 'name'
 
     def _check_access(self, cr, uid, ids, name, arg, context=None):
         """
@@ -58,6 +59,13 @@ class ProcessVideo(Model):
 
     def onchange_work_state(self, cr, uid, ids, work_state, context=None):
         return {'value': {work_state: True}}
+
+    def name_get(self, cr, user, ids, context=None):
+        return [
+            (
+                r['id'],
+                "{0}".format(r['name'][1].encode('utf8'),)
+            ) for r in self.read(cr, user, ids, ['name'])]
 
     _columns = {
         'name': fields.char("Рабочее название проекта", size=100),
