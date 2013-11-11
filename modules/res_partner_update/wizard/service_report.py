@@ -36,26 +36,30 @@ class PartnerAddedServicesHistoryWizard(TransientModel):
         vals_list = list()
 
         for record in self.browse(cr, uid, ids, context):
-            if record.date_start:
-                service_start_ids = res_partner_service_history.search(cr, uid, [
-                    ('date_start', '>', record.date_start), ('check_r', '=', True)
+            #if record.date_start:
+            #    service_start_ids = res_partner_service_history.search(cr, uid, [
+            #        ('date_start', '>', record.date_start), ('check_r', '=', True)
+            #    ])
+            #
+            #if record.date_finish:
+            #    service_finish_ids = res_partner_service_history.search(cr, uid, [
+            #        ('date_start', '<', record.date_finish), ('check_r', '=', True)
+            #    ])
+            ## получаю вхождения в оба листа в common
+            #common = list(set(service_start_ids) & set(service_finish_ids))
+            common = res_partner_service_history.search(cr, uid, [
+                    ('date_start', '>', record.date_start), ('date_start', '<', record.date_finish), ('check_r', '=', True)
                 ])
 
-            if record.date_finish:
-                service_finish_ids = res_partner_service_history.search(cr, uid, [
-                    ('date_finish', '<', record.date_finish), ('check_r', '=', True)
-                ])
-            # получаю вхождения в оба листа в common
-            common = list(set(service_start_ids) & set(service_finish_ids))
-
-            partner_service_num = Counter([r['partner_id'][0] for r in res_partner_service_history.read(cr, 1, common, ['partner_id'])])
+            partners = res_partner_service_history.read(cr, 1, common, ['partner_id', 'service_id', 'direction'])
+            partner_service_num = Counter([r['partner_id'][0] for r in partners])
             sum_parnet = Counter(partner_service_num.values())
 
-            service_partner_num = dict(set([(r['service_id'][0], r['partner_id'][0]) for r in res_partner_service_history.read(cr, 1, common, ['partner_id', 'service_id'])]))
-            sum_parnet_service = Counter(service_partner_num.keys())
+            service_partner_num = set([(r['service_id'][0], r['partner_id'][0]) for r in partners])
+            sum_parnet_service = Counter(service_partner_num)
 
-            direction_partner_num = dict(set([(r['direction'], r['partner_id'][0]) for r in res_partner_service_history.read(cr, 1, common, ['partner_id', 'direction'])]))
-            sum_parnet_direction = Counter(direction_partner_num.keys())
+            direction_partner_num = set([(r['direction'], r['partner_id'][0]) for r in partners])
+            sum_parnet_direction = Counter(direction_partner_num)
 
             count_ids = [(0, 0, {'count_services': k, 'count_partners': sum_parnet[k]}) for k in sum_parnet.iterkeys()]
             count_service_ids = [(0, 0, {'service_id': k, 'count_partners': sum_parnet_service[k]}) for k in sum_parnet_service.iterkeys()]
