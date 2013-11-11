@@ -414,7 +414,7 @@ class BriefContract(Model):
         if values.get('from'):
             del values['from']
         data = self.browse(cr, user, ids)[0]
-        if values.get('doc_id'):
+        if values.get('doc_id') and not values.get('pdf_id'):
             odt_file = self.pool.get('ir.attachment').read(cr, user, values['doc_id'],
                                                            ['store_fname', 'parent_id'])
             dbro = self.pool.get('document.directory').read(cr, user, odt_file['parent_id'][0], ['storage_id'], context)
@@ -428,7 +428,7 @@ class BriefContract(Model):
             rst_file = os.path.join(storage['path'], 'index.rst')
             pdf_file = os.path.join(storage['path'], 'tmp.pdf')
 
-            convert_odt(odt_file, storage['path'])
+            convert_odt(filepath, storage['path'])
             RstToPdf().createPdf(text=open(rst_file).read(), source_path=rst_file, output=pdf_file)
             pdf_attachment_id = self.pool.get('ir.attachment').create(cr, user, {
                 'name': '{0}.pdf'.format(filename, ),
@@ -499,17 +499,17 @@ class BriefContract(Model):
             #  draft -> cancel
             if state == 'draft' and next_state == 'cancel':
                 print values
-                #  approval -> completion
+            #  approval -> completion
             if state == 'approval' and next_state == 'completion':
                 if not values.get('comment_rework', False) and not data.comment_rework:
                     error += " Введите Комментарий по доработке брифа; "
-                #  completion -> approval
+            #  completion -> approval
             if state == 'completion' and next_state == 'approval':
                 pass
-                #  approval -> preparation
+            #  approval -> preparation
             if state == 'approval' and next_state == 'preparation':
                 pass
-                #  preparation -> contract_approval
+            #  preparation -> contract_approval
             if state == 'preparation' and next_state == 'contract_approval':
                 if not values.get('contract_file', False) and not data.contract_file:
                     error += " Необходимо вложить Проект договора; "
