@@ -592,7 +592,7 @@ class BriefContract(Model):
 
     def create(self, cr, user, vals, context=None):
         if vals.get('from'):
-            vals['from'] = None
+            del vals['from']
 
         if vals.get('partner_id'):
             self.pool.get('res.partner').write(cr, user, [vals['partner_id']], {'partner_base': 'hot'})
@@ -643,7 +643,6 @@ class BriefContract(Model):
                 'res_id': contract['id']})
             self.write(cr, user, [contract['id']], {'doc_id': odt_attachment_id, 'pdf_id': pdf_attachment_id})
         return True
-
 BriefContract()
 
 
@@ -657,8 +656,6 @@ class BriefContractAmount(Model):
         'term': fields.char('Срок выставления счета на оплату', size=255),
         'contract_id': fields.many2one('brief.contract', 'Бриф на договор', invisible=True),
     }
-
-
 BriefContractAmount()
 
 
@@ -677,8 +674,6 @@ class BriefContractComments(Model):
     _defaults = {
         'usr_id': lambda self, cr, uid, context: uid,
     }
-
-
 BriefContractComments()
 
 
@@ -695,8 +690,6 @@ class BriefContractHistory(Model):
         'contract_id': fields.many2one('brief.contract', 'Бриф на встречу', invisible=True),
         'create_date': fields.datetime('Дата', readonly=True),
     }
-
-
 BriefContractHistory()
 
 
@@ -731,6 +724,4 @@ class ResPartner(Model):
                 })
 
         return data
-
-
 ResPartner()
