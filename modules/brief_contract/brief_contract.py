@@ -22,9 +22,9 @@ class BriefContract(Model):
 
     _states = (
         ('draft', 'Черновик'),
-        ('approval', 'Бриф на согласовании'),
+        #('approval', 'Бриф на согласовании'),
         ('completion', 'Бриф на доработке'),
-        ('preparation', 'Подготовка договора'),
+        #('preparation', 'Подготовка договора'),
         ('contract_approval', 'Согласование договора с обслуживающим направлением'),
         ('contract_completion', 'Доработка договора'),
         ('contract_agreed', 'Договор согласован'),
@@ -48,54 +48,51 @@ class BriefContract(Model):
             Динамически определяет роли на форме
         """
         res = {}
-        if ids:
-            data_ids = self.browse(cr, uid, ids, context)
+        for data in self.browse(cr, uid, ids, context):
+            access = str()
 
-            for data in data_ids:
-                access = str()
+            #  Менеджеры 2 и 3
+            group_work = self.pool.get('res.groups').search(
+                cr,
+                1,
+                [
+                    ('name', 'in', (
+                        'Продажи / Менеджер по работе с партнерами',
+                        'Продажи / Менеджер по развитию партнеров',
+                        'Продажи / Руководитель по развитию партнеров',
+                        'Продажи / Руководитель по работе с партнерами',
+                        'Продажи / Менеджер по привлечению партнеров',
+                        'Продажи / Руководитель по привлечению партнеров',
+                    ))
+                ])
+            users_work = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', group_work)], order='id')
+            if uid in users_work:
+                access += 'm'
 
-                #  Менеджеры 2 и 3
-                group_work = self.pool.get('res.groups').search(
-                    cr,
-                    1,
-                    [
-                        ('name', 'in', (
-                            'Продажи / Менеджер по работе с партнерами',
-                            'Продажи / Менеджер по развитию партнеров',
-                            'Продажи / Руководитель по развитию партнеров',
-                            'Продажи / Руководитель по работе с партнерами',
-                            'Продажи / Менеджер по привлечению партнеров',
-                            'Продажи / Руководитель по привлечению партнеров',
-                        ))
-                    ])
-                users_work = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', group_work)], order='id')
-                if uid in users_work:
-                    access += 'm'
+            #  Менеджер Москвы
+            if data.responsible_id.id == uid:
+                access += 'r'
 
-                #  Менеджер Москвы
-                if data.responsible_id.id == uid:
-                    access += 'r'
+            #  Юрист
+            if data.lawyer_id.id == uid:
+                access += 'l'
 
-                #  Юрист
-                if data.lawyer_id.id == uid:
-                    access += 'l'
+            #  Руководитель направления
+            if data.service_id:
+                users = self.pool.get('res.users').search(cr, 1,
+                                                          [('groups_id', 'in', data.service_id.leader_group_id.id)],
+                                                          order='id')
+                users = [x for x in users if x not in [1, 5, 13, 18, 354]]
+                if uid in users:
+                    access += 's'
 
-                #  Руководитель направления
-                if data.service_id:
-                    users = self.pool.get('res.users').search(cr, 1,
-                                                              [('groups_id', 'in', data.service_id.leader_group_id.id)],
-                                                              order='id')
-                    users = [x for x in users if x not in [1, 5, 13, 18, 354]]
-                    if uid in users:
-                        access += 's'
+            val = False
 
-                val = False
+            letter = name[6]
 
-                letter = name[6]
-
-                if letter in access:
-                    val = True
-                res[data.id] = val
+            if letter in access:
+                val = True
+            res[data.id] = val
         return res
 
     def _get_head(self, cr, user, ids, name, arg, context=None):
@@ -701,8 +698,8 @@ class BriefContract(Model):
                 o.update({
                     'partner_mail': bank['email'],
                     'partner_firm_name': bank['fullname'],
-                    'partner_address': '-',
-                    'partner_fact_address': '-',
+                    'partner_address': self.pool.get('res.partner.bank.address').get_address(cr, contract['bank_id'][0]),
+                    'partner_fact_address': self.pool.get('res.partner.bank.address').get_address(cr, contract['bank_id'][0], 'fa'),
                     'partner_inn': bank['inn'],
                     'partner_ogrn': bank['ogrn'],
                     'partner_okpo': bank['okpo'],

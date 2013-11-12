@@ -940,10 +940,40 @@ class ResPartnerBankAddress(Model):
     }
 
     _defaults = {
-        'name': lambda *a: 'ua',
-        'flat_type': lambda *a: 'flat',
+        'name': 'ua',
+        'flat_type': 'flat',
         'st_type': 'ylitsa'
     }
+
+    def get_address(self, cr, bank_id, address_type='ua'):
+        address_ids = self.search(cr, 1, [('bank_id', '=', bank_id), ('name', '=', address_type)])
+        address_list = []
+        if address_ids:
+            address = self.read(cr, 1, address_ids[0], [])
+            if address['index']:
+                address_list.append(address['index'])
+            if address['city']:
+                address_list.append(address['city'])
+            if address['street']:
+                st = u'ул.'
+                if address['st_type'] == 'alleya':
+                    st = u'ал.'
+                if address['st_type'] == 'bulvar':
+                    st = u'бул.'
+                if address['st_type'] == 'naberegnaya':
+                    st = u'наб.'
+                if address['st_type'] == 'pereyloc':
+                    st = u'пр.'
+                if address['st_type'] == 'proezd':
+                    st = u'проезд.'
+                if address['st_type'] == 'prospect':
+                    st = u'просп.'
+                if address['st_type'] == 'ploshad':
+                    st = u'пл.'
+                address_list.append(u"{st_type}. {street}".format(street=address['street'], st_type=st))
+            if address['house']:
+                address_list.append(u"д. {house}".format(house=address['house']))
+        return ','.join(address_list) or '-'
 
 
 ResPartnerBankAddress()
