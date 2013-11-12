@@ -108,7 +108,7 @@ class AccountInvoice(Model):
                 'get_division': obj['division']
             },
             'domain': {
-                'categ_id': [('parent_id', '!=', False), ('division_id', '=', division_id)]
+                'categ_id': [('division_id', '=', division_id)]
             }
         }
 
