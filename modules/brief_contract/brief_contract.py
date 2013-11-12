@@ -1,12 +1,14 @@
 # -*- encoding: utf-8 -*-
 import base64
 import os
+from datetime import datetime
 from odt2sphinx.odt2sphinx import convert_odt
 from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
 from relatorio.templates.opendocument import Template
 from rst2pdf.createpdf import RstToPdf
+from pytils import dt
 from notify import notify
 
 
@@ -135,7 +137,7 @@ class BriefContract(Model):
             domain="[('groups_id','in',[131])]",
             help='Заполняется при создании Брифа, указывается отетственный сотрудник за подписание договора'
         ),
-        'doc_type': fields.many2one(
+        'doc_type_id': fields.many2one(
             'doc.type',
             'действующего на основании'
         ),
@@ -346,6 +348,7 @@ class BriefContract(Model):
             required=True,
             help='Фирма, от лица которой создается данный счет.'
         ),
+        'web': fields.char('Название баннерной или тизерной сети', size=250),
 
     }
 
@@ -414,9 +417,12 @@ class BriefContract(Model):
         if values.get('from'):
             del values['from']
         data = self.browse(cr, user, ids)[0]
+
+        #  генерим pdf
         if values.get('doc_id') and not values.get('pdf_id'):
             odt_file = self.pool.get('ir.attachment').read(cr, user, values['doc_id'],
                                                            ['store_fname', 'parent_id'])
+
             dbro = self.pool.get('document.directory').read(cr, user, odt_file['parent_id'][0], ['storage_id'], context)
             storage = self.pool.get('document.storage').read(cr, user, dbro['storage_id'][0], ['path'])
             filepath = os.path.join(storage['path'], odt_file['store_fname'])
@@ -430,14 +436,13 @@ class BriefContract(Model):
 
             convert_odt(filepath, storage['path'])
             RstToPdf().createPdf(text=open(rst_file).read(), source_path=rst_file, output=pdf_file)
-            pdf_attachment_id = self.pool.get('ir.attachment').create(cr, user, {
+
+            values['pdf_id'] = ((0, 0, {
                 'name': '{0}.pdf'.format(filename, ),
                 'datas': base64.b64encode(open(pdf_file, 'rb').read()),
                 'datas_fname': '{0}.pdf'.format(filename, ),
                 'res_model': self._name,
-                'res_id': data.id})
-
-            values['pdf_id'] = pdf_attachment_id
+                'res_id': data.id}),)
 
         if data.service_id or values.get('service_id', False):
             service_id = values['service_id'] if values.get('service_id', False) else data.service_id.id
@@ -497,18 +502,18 @@ class BriefContract(Model):
                     error += " Выберите Способ доставки закрывающих документов; "
 
             #  draft -> cancel
-            if state == 'draft' and next_state == 'cancel':
-                print values
+            #if state == 'draft' and next_state == 'cancel':
+            #    print values
             #  approval -> completion
             if state == 'approval' and next_state == 'completion':
                 if not values.get('comment_rework', False) and not data.comment_rework:
                     error += " Введите Комментарий по доработке брифа; "
             #  completion -> approval
-            if state == 'completion' and next_state == 'approval':
-                pass
+            #if state == 'completion' and next_state == 'approval':
+            #    pass
             #  approval -> preparation
-            if state == 'approval' and next_state == 'preparation':
-                pass
+            #if state == 'approval' and next_state == 'preparation':
+            #    pass
             #  preparation -> contract_approval
             if state == 'preparation' and next_state == 'contract_approval':
                 if not values.get('contract_file', False) and not data.contract_file:
@@ -519,54 +524,54 @@ class BriefContract(Model):
                         'contract_re_file', False) and not data.contract_re_file:
                     error += " Введите Комментарий по доработке договора или прикрепите файл доработки; "
             #  contract_completion -> contract_approval
-            if state == 'contract_completion' and next_state == 'contract_approval':
-                pass
+            #if state == 'contract_completion' and next_state == 'contract_approval':
+            #    pass
             #  contract_approval -> contract_agreed
-            if state == 'contract_approval' and next_state == 'contract_agreed':
-                pass
+            #if state == 'contract_approval' and next_state == 'contract_agreed':
+            #    pass
             #  contract_agreed -> approval_partner
-            if state == 'contract_agreed' and next_state == 'approval_partner':
-                pass
+            #if state == 'contract_agreed' and next_state == 'approval_partner':
+            #    pass
             #  approval_partner -> contract_completion
             if state == 'approval_partner' and next_state == 'contract_completion':
                 if not values.get('comment_rework_3', False) and not data.comment_rework_3 and not values.get(
                         'contract_re_file', False) and not data.contract_re_file:
                     error += " Введите Комментарий по доработке перед утверждением договора или прикрепите файл доработки; "
             #  approval_partner -> partner_cancel
-            if state == 'approval_partner' and next_state == 'partner_cancel':
-                pass
+            #if state == 'approval_partner' and next_state == 'partner_cancel':
+            #    pass
             #  partner_cancel -> approval_partner
-            if state == 'partner_cancel' and next_state == 'approval_partner':
-                pass
+            #if state == 'partner_cancel' and next_state == 'approval_partner':
+            #    pass
             #  approval_partner -> contract_approved
             if state == 'approval_partner' and next_state == 'contract_approved':
                 if not values.get('contract_approved_file', False) and not data.contract_approved_file:
                     error += " Прикрепите утвержденный договор; "
 
             #  contract_approved -> send_mail
-            if state == 'contract_approved' and next_state == 'send_mail':
-                pass
+            #if state == 'contract_approved' and next_state == 'send_mail':
+            #    pass
             #  contract_approved -> send_express
-            if state == 'contract_approved' and next_state == 'send_express':
-                pass
+            #if state == 'contract_approved' and next_state == 'send_express':
+            #    pass
             #  contract_approved -> send_courier
-            if state == 'contract_approved' and next_state == 'send_courier':
-                pass
+            #if state == 'contract_approved' and next_state == 'send_courier':
+            #    pass
             #  send_courier -> meeting_scheduled
-            if state == 'send_courier' and next_state == 'meeting_scheduled':
-                pass
+            #if state == 'send_courier' and next_state == 'meeting_scheduled':
+            #    pass
             #  send_mail -> waiting_receipt
-            if state == 'send_mail' and next_state == 'waiting_receipt':
-                pass
+            #if state == 'send_mail' and next_state == 'waiting_receipt':
+            #    pass
             #  send_express -> waiting_receipt
-            if state == 'send_express' and next_state == 'waiting_receipt':
-                pass
+            #if state == 'send_express' and next_state == 'waiting_receipt':
+            #    pass
             #  waiting_receipt -> meeting_scheduled
-            if state == 'waiting_receipt' and next_state == 'meeting_scheduled':
-                pass
+            #if state == 'waiting_receipt' and next_state == 'meeting_scheduled':
+            #    pass
             #  meeting_scheduled -> meeting_cancel
-            if state == 'meeting_scheduled' and next_state == 'meeting_cancel':
-                pass
+            #if state == 'meeting_scheduled' and next_state == 'meeting_cancel':
+            #    pass
             #  meeting_scheduled -> contract_signed
             if state == 'meeting_scheduled' and next_state == 'contract_signed':
                 if not data.pcontract_file and not values.get('pcontract_file', False):
@@ -598,11 +603,13 @@ class BriefContract(Model):
             self.pool.get('res.partner').write(cr, user, [vals['partner_id']], {'partner_base': 'hot'})
         return super(BriefContract, self).create(cr, user, vals, context)
 
+    #  генерим odt
     def generate(self, cr, user, ids, context=None):
         contract_id = ids
         if isinstance(ids, (list, tuple)):
             contract_id = ids[0]
-        contract = self.read(cr, user, contract_id, ['contract_number', 'contract_date', 'service_id', 'partner_id'])
+        contract = self.read(cr, user, contract_id, ['contract_number', 'contract_date', 'responsible_id', 'doc_type_id', 'bank_id', 'account_id'])
+
         service = self.pool.get('brief.services.stage').read(cr, user, contract['service_id'][0], ['template_id'])
         if service['template_id']:
             template = self.pool.get('ir.attachment').read(cr, user, service['template_id'][0],
@@ -614,7 +621,115 @@ class BriefContract(Model):
 
             basic = Template(source='', filepath=filepath)
 
-            o = {'name': 'test'}
+            d = datetime.strptime(contract['contract_date'], '%Y-%m-%d')
+            date_str = dt.ru_strftime(u"%d %B %Y", d, inflected=True)
+
+            o = {
+                'contract_number': contract['contract_number'],
+                'contract_date': date_str,
+                'doc_type': contract['doc_type_id'][1],
+                'responsible_id': contract['responsible_id'][1],
+                #  Название баннерной или тизерной сети
+                'web': 'test',
+
+                #  стоимость услуг цифры
+                'cost_num': 'test',
+                #  стоимость услуг слова
+                'cost_word': 'test',
+
+                #  срок предоставления услуги в фомате 30 (тридцать)
+                'term': 'test',
+
+
+                #  наш генеральный директор
+                'our_gen_dir': '-',
+                #  название фирмы
+                'our_firm_name': '-',
+                #  наш Юридический адрес
+                'our_address': '-',
+                #  Фактический адрес,адрес почтовой корреспонденции наш
+                'our_fact_address': '-',
+                #  ИНН / КПП наш
+                'our_inn': '-',
+                #  ОГРН наш
+                'our_ogrn': '-',
+                #  Код ОКПО наш
+                'our_okpo': '-',
+                #  банк наш
+                'our_bank': '-',
+                #  к/с наш
+                'our_ks': '-',
+                #  р/с наш
+                'our_rs': '-',
+                #  бик наш
+                'our_bik': '-',
+                #  Тел/факс наш
+                'our_phone': '-',
+                #  Web сайт почта наш
+                'our_site': '-',
+
+                #  заказчика e-mail
+                'partner_mail': '-',
+                #  название фирмы заказчика
+                'partner_firm_name': '-',
+                #  Юридический адрес партнера
+                'partner_address': '-',
+                #  Фактический адрес,адрес почтовой корреспонденции партнера
+                'partner_fact_address': '-',
+                #  ИНН / КПП партнера
+                'partner_inn': '-',
+                #  ОГРН партнера
+                'partner_ogrn': '-',
+                #  Код ОКПО партнера
+                'partner_okpo': '-',
+                #  банк партнера
+                'partner_bank': '-',
+                #  к/с партнера
+                'partner_ks': '-',
+                #  р/с партнера
+                'partner_rs': '-',
+                #  бик партнера
+                'partner_bik': '-',
+                #  Тел/факс партнера
+                'partner_phone': '-',
+                #  Web сайт почта партнера
+                'partner_site': '-',
+            }
+
+            if contract['bank_id']:
+                bank = self.pool.get('res.partner.bank').read(cr, 1, contract['bank_id'][0], [])
+                o.update({
+                    'partner_mail': bank['email'],
+                    'partner_firm_name': bank['fullname'],
+                    'partner_address': '-',
+                    'partner_fact_address': '-',
+                    'partner_inn': bank['inn'],
+                    'partner_ogrn': bank['ogrn'],
+                    'partner_okpo': bank['okpo'],
+                    'partner_bank': bank['bank'],
+                    'partner_ks': bank['correspondent_account'],
+                    'partner_rs': bank['current_account'],
+                    'partner_bik': bank['bik'],
+                    'partner_phone': bank['phone'],
+                })
+
+            if contract['account_id']:
+                account = self.pool.get('account.account').read(cr, 1, contract['account_id'][0], [])
+                o.update({
+                    'our_gen_dir': account['responsible'],
+                    'our_firm_name': account['full'],
+                    'our_address': account['address'],
+                    'our_fact_address': account['address'],
+                    'our_inn': account['inn'],
+                    'our_ogrn': '1127747081406',
+                    'our_okpo': '13183255',
+                    'our_bank': account['bank'],
+                    'our_ks': account['bank_number'],
+                    'our_rs': account['account_number'],
+                    'our_bik': account['bik'],
+                    'our_phone': account['phone'],
+                    'our_site': 'UpSale.ru,  Fortune@UpSale.ru',
+                })
 
             filename = '{0} {1} {2}'.format(
                 contract['contract_number'].encode('utf-8'),
@@ -622,27 +737,17 @@ class BriefContract(Model):
                 contract['service_id'][1].encode('utf-8'), )
 
             odt_file = os.path.join(storage['path'], 'tmp.odt')
-            rst_file = os.path.join(storage['path'], 'index.rst')
-            pdf_file = os.path.join(storage['path'], 'tmp.pdf')
             file(odt_file, 'wb').write(basic.generate(o=o).render().getvalue())
 
-            convert_odt(odt_file, storage['path'])
-            RstToPdf().createPdf(text=open(rst_file).read(), source_path=rst_file, output=pdf_file)
-
-            odt_attachment_id = self.pool.get('ir.attachment').create(cr, user, {
+            self.write(cr, user, [contract['id']], {'doc_id': ((0, 0, {
                 'name': '{0}.odt'.format(filename, ),
                 'datas': base64.b64encode(open(odt_file, 'rb').read()),
                 'datas_fname': '{0}.odt'.format(filename, ),
                 'res_model': self._name,
-                'res_id': contract['id']})
-            pdf_attachment_id = self.pool.get('ir.attachment').create(cr, user, {
-                'name': '{0}.pdf'.format(filename, ),
-                'datas': base64.b64encode(open(pdf_file, 'rb').read()),
-                'datas_fname': '{0}.pdf'.format(filename, ),
-                'res_model': self._name,
-                'res_id': contract['id']})
-            self.write(cr, user, [contract['id']], {'doc_id': odt_attachment_id, 'pdf_id': pdf_attachment_id})
+                'res_id': contract['id']}))})
         return True
+
+
 BriefContract()
 
 
@@ -656,6 +761,8 @@ class BriefContractAmount(Model):
         'term': fields.char('Срок выставления счета на оплату', size=255),
         'contract_id': fields.many2one('brief.contract', 'Бриф на договор', invisible=True),
     }
+
+
 BriefContractAmount()
 
 
@@ -674,6 +781,8 @@ class BriefContractComments(Model):
     _defaults = {
         'usr_id': lambda self, cr, uid, context: uid,
     }
+
+
 BriefContractComments()
 
 
@@ -690,6 +799,8 @@ class BriefContractHistory(Model):
         'contract_id': fields.many2one('brief.contract', 'Бриф на встречу', invisible=True),
         'create_date': fields.datetime('Дата', readonly=True),
     }
+
+
 BriefContractHistory()
 
 
@@ -724,6 +835,8 @@ class ResPartner(Model):
                 })
 
         return data
+
+
 ResPartner()
 
 
@@ -735,5 +848,6 @@ class DocType(Model):
             size=256,
             help='Тип документа'),
     }
+
 
 DocType()

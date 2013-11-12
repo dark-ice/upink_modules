@@ -932,6 +932,8 @@ class ResPartnerBankAddress(Model):
         'name': lambda *a: 'ua',
         'flat_type': lambda *a: 'flat'
     }
+
+
 ResPartnerBankAddress()
 
 
