@@ -417,7 +417,7 @@
                         <field name="next_call"/>
 
                         <field name="user_id"/>
-                        <field name="categ_id" string="Тематика" />
+                        <field name="categ_id" widget="selection" string="Тематика" />
                         <field name="partner_type" invisible="1"/>
                     </group>
                     <notebook colspan="4">
@@ -623,7 +623,7 @@
                     <field name="partner_name" />
                     <field name="next_call"/>
                     <field name="user_id"/>
-                    <field name="categ_id" string="Тематика" />
+                    <field name="categ_id" widget="selection" string="Тематика" />
                 </tree>
             </field>
         </record>
@@ -646,8 +646,8 @@
 
                             <field name="partner_status" />
                             <field name="next_call"/>
-                            <field name="user_id"/>
-                            <field name="categ_id" string="Тематика" />
+                            <field name="user_id" attrs="{'readonly': [('lead', '=', False)]}"/>
+                            <field name="categ_id" widget="selection" string="Тематика" />
                             <field name="partner_type" invisible="1"/>
 
                         </group>
@@ -2052,6 +2052,7 @@
                         <field name="index"/>
 
                         <field name="city"/>
+                        <field name="st_type"/>
                         <field name="street"/>
 
                         <field name="house"/>
@@ -2076,6 +2077,7 @@
                     <field name="index"/>
 
                     <field name="city"/>
+                    <field name="st_type"/>
                     <field name="street"/>
 
                     <field name="house"/>
