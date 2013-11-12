@@ -70,14 +70,14 @@ class ReportPlanning(Model):
             type='float',
             digits=(10, 2),
             multi="calc_planning",
-            string='План'
+            string='Планы: % плана'
         ),
         'plan_f': fields.function(
             _sum,
             type='float',
             digits=(10, 2),
             multi="calc_planning",
-            string='Планы: % плана'
+            string='План'
         ),
 
         'fact_work': fields.float('Работа'),
