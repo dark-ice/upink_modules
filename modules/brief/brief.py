@@ -873,7 +873,6 @@ class Brief(Model):
     _name = 'brief.main'
     _description = u"Бриф"
     _rec_name = 'partner_id'
-    #_log_create = True
 
     _inherits = {
         'brief.part.one': 'brief_part_one_id',
@@ -1392,7 +1391,6 @@ class Brief(Model):
         'tender': fields.text(
             'Тендер/Условия тендера',
             help=''),
-        #'tender_file_id': fields.one2many('attach.files', 'obj_id', 'Тендерная документация'),
         'planned_works': fields.text(
             'Планирование дальнейших работ',
             help="Планируют ли заказывать у нас внедрение изменений по результатам"
@@ -1552,7 +1550,6 @@ class Brief(Model):
     _defaults = {
         'state': 'draft',
         'user_id': lambda self, cr, uid, context: uid,
-        #'cand_id': lambda self, cr, uid, context: context.get('cand_id', False),
         'partner_id': lambda self, cr, uid, context: context.get('partner_id', False),
         'partner_name': lambda self, cr, uid, context: context.get('partner_name', False),
         'name': lambda self, cr, uid, context: context.get('name', False),
@@ -1597,6 +1594,7 @@ Brief()
 class BriefHistory(Model):
     _name = 'brief.history'
     _rec_name = 'us_id'
+
     _columns = {
         'us_id': fields.many2one('res.users', u'Перевел'),
         'cr_date': fields.datetime(u'Дата и время'),
@@ -1646,12 +1644,12 @@ class BriefManagerGroups(Model):
     _name = 'brief.manager.groups'
     _description = u"Рабочие команды менеджеров по привлечению и работе с партнерами"
 
-    def _check_upwork_manager(self, cr, uid, id):
+    def _check_upwork_manager(self, cr, uid, ids):
 
-        for record in self.browse(cr, uid, id):
+        for record in self.read(cr, uid, ids, ['manager_second_lvl_id']):
             another_ids = self.search(cr, uid, [
-                ('manager_second_lvl_id', '=', record.manager_second_lvl_id.id),
-                ('id', '!=', record.id)
+                ('manager_second_lvl_id', '=', record['manager_second_lvl_id'][0]),
+                ('id', '!=', record['id'])
             ])
 
             if another_ids:
