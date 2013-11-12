@@ -1590,7 +1590,7 @@ class Brief(Model):
                 item[2] = item[2].upper()
         if new_item:
             args.append(new_item)
-        return super(brief_main, self).search(cr, user, args, offset, limit, order, context, count)
+        return super(Brief, self).search(cr, user, args, offset, limit, order, context, count)
 Brief()
 
 
