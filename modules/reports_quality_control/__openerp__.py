@@ -15,7 +15,7 @@
     'installable': True,
     'auto_install': False,
     'update_xml': [
-        'view.xml',
+        'report_quality_control_manager_view.xml',
     ],
 
     'js': [],
