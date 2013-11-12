@@ -63,7 +63,7 @@ class ReportPlanning(Model):
             _sum,
             type='float',
             multi="calc_planning",
-            string='Планы: всего получение'
+            string='Планы: Итого поступлений'
         ),
         'plan_per': fields.function(
             _sum,
@@ -95,7 +95,7 @@ class ReportPlanning(Model):
             _sum,
             type='float',
             multi="calc_planning",
-            string='Факты: всего получение'
+            string='Факты: Итого поступлений'
         ),
     }
 
