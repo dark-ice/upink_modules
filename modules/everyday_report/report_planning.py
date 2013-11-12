@@ -12,25 +12,6 @@ class ReportPlanning(Model):
     _auto = False
     _order = 'date'
 
-    def _fact_per(self, cr, uid, ids, name, arg, context=None):
-        res = {}
-        for record in self.read(cr, uid, ids, ['fact_total'], context):
-            result = 0
-            try:
-                result = 365000 / record['fact_total']
-            except:
-                pass
-
-            res[record['id']] = result
-        return res
-
-    def _per(self, cr, uid, ids, name, arg, context=None):
-        res = {}
-        field = name[:-4]
-        for record in self.read(cr, uid, ids, [field], context):
-            res[record['id']] = (record[field] / 365000) * 100
-        return res
-
     def _sum(self, cr, uid, ids, name, arg, context=None):
         res = {}
         for record in self.read(cr, uid, ids, ['date'], context):
@@ -39,79 +20,26 @@ class ReportPlanning(Model):
             l = zip(*[(r['plan_total'], r['fact_total']) for r in self.read(cr, uid, f_ids, ['plan_total', 'fact_total'], context)])
             plan = sum(l[0])
             fact = sum(l[1])
+
             try:
-                fact_per = 365000 / fact
+                period = self.pool.get('kpi.period').get_by_date(cr, start_date)
+                kpi_ids = self.pool.get('kpi.kpi').search(cr, 1, [('employee_id', '=', 10), ('period_id', '=', period.id)])
+                mbo_ids = self.pool.get('kpi.mbo').search(cr, 1, [('kpi_id', 'in', kpi_ids), ('name', '=', 347)])
+                mbo = self.pool.get('kpi.mbo').read(cr, 1, mbo_ids[0], ['plan'])
+                plan_per = (plan / mbo['plan']) * 100
+                fact_per = (fact / mbo['plan']) * 100
+                plan_f = mbo['plan']
             except:
+                plan_per = 0.0
                 fact_per = 0.0
+                plan_f = 0.0
+
             res[record['id']] = {
                 'plan': plan,
                 'fact': fact,
-                'plan_per': (plan / 365000) * 100,
+                'plan_per': plan_per,
                 'fact_per': fact_per,
-            }
-        return res
-
-    def _calc(self, cr, uid, ids, name, arg, context=None):
-        res = {}
-        line_pool = self.pool.get('account.invoice.line')
-        pay_pool = self.pool.get('account.invoice.pay')
-        for record in self.read(cr, uid, ids, ['date'], context):
-            plan_per = 0.0
-            work_ids = []
-            calling_ids = []
-            dev_ids = []
-
-            invoice_full_ids = self.pool.get('account.invoice').search(cr, 1, [('type', '=', 'out_invoice'), ('paid_date', '=', record['date'])])
-            for invoice in self.pool.get('account.invoice').read(cr, 1, invoice_full_ids, ['user_id']):
-                section_id = self.pool.get('res.users').read(cr, 1, invoice['user_id'][0], ['context_section_id'])['context_section_id'][0]
-                if section_id == 8:
-                    work_ids.append(invoice['id'])
-                elif section_id == 7:
-                    calling_ids.append(invoice['id'])
-                elif section_id == 9:
-                    dev_ids.append(invoice['id'])
-
-            work_line_ids = line_pool.search(cr, 1, [('invoice_id', 'in', work_ids)])
-            fact_work = sum(l['factor'] for l in line_pool.read(cr, 1, work_line_ids, ['factor']))
-            calling_line_ids = line_pool.search(cr, 1, [('invoice_id', 'in', calling_ids)])
-            fact_calling = sum(l['factor'] for l in line_pool.read(cr, 1, calling_line_ids, ['factor']))
-            dev_line_ids = line_pool.search(cr, 1, [('invoice_id', 'in', dev_ids)])
-            fact_dev = sum(l['factor'] for l in line_pool.read(cr, 1, dev_line_ids, ['factor']))
-
-            work_pay_ids = []
-            calling_pay_ids = []
-            dev_pay_ids = []
-
-            pay_ids = pay_pool.search(cr, 1, [('invoice_id', '!=', False), ('invoice_id', 'not in', invoice_full_ids), ('date_pay', '=', record['date'])])
-            for pay in pay_pool.read(cr, 1, pay_ids, ['invoice_id']):
-                section_id = self.pool.get('res.users').read(cr, 1, self.pool.get('account.invoice').read(cr, 1, pay['invoice_id'][0], ['user_id'])['user_id'][0], ['context_section_id'])['context_section_id'][0]
-                if section_id == 8:
-                    work_pay_ids.append(pay['id'])
-                elif section_id == 7:
-                    calling_pay_ids.append(pay['id'])
-                elif section_id == 9:
-                    dev_pay_ids.append(pay['id'])
-
-            work_pay_line_ids = pay_pool.search(cr, 1, [('invoice_id', 'in', work_pay_ids)])
-            fact_work += sum(l['name'] for l in pay_pool.read(cr, 1, work_pay_line_ids, ['name']))
-            calling_pay_line_ids = pay_pool.search(cr, 1, [('invoice_id', 'in', calling_pay_ids)])
-            fact_calling += sum(l['name'] for l in pay_pool.read(cr, 1, calling_pay_line_ids, ['name']))
-            dev_pay_line_ids = pay_pool.search(cr, 1, [('invoice_id', 'in', dev_pay_ids)])
-            fact_dev += sum(l['name'] for l in pay_pool.read(cr, 1, dev_pay_line_ids, ['name']))
-
-            fact_total = fact_work + fact_calling + fact_dev
-
-            try:
-                fact_per = 365000 / fact_total
-            except:
-                fact_per = 0.0
-
-            res[record['id']] = {
-                'fact_work': fact_work,
-                'fact_calling': fact_calling,
-                'fact_dev': fact_dev,
-                'fact_per': fact_per,
-                'fact_total': fact_total,
+                'plan_f': plan_f
             }
         return res
 
@@ -135,7 +63,7 @@ class ReportPlanning(Model):
             _sum,
             type='float',
             multi="calc_planning",
-            string='Планы: всего получение'
+            string='Планы: Итого поступлений'
         ),
         'plan_per': fields.function(
             _sum,
@@ -143,6 +71,13 @@ class ReportPlanning(Model):
             digits=(10, 2),
             multi="calc_planning",
             string='Планы: % плана'
+        ),
+        'plan_f': fields.function(
+            _sum,
+            type='float',
+            digits=(10, 2),
+            multi="calc_planning",
+            string='План'
         ),
 
         'fact_work': fields.float('Работа'),
@@ -160,7 +95,7 @@ class ReportPlanning(Model):
             _sum,
             type='float',
             multi="calc_planning",
-            string='Факты: всего получение'
+            string='Факты: Итого поступлений'
         ),
     }
 
@@ -181,7 +116,6 @@ class ReportPlanning(Model):
                   r.plan_dev,
                   r.plan_dev_account,
                   r.plan_work + r.plan_calling + r.plan_dev plan_total,
-                  (r.plan_work + r.plan_calling + r.plan_dev)/365000 plan_per,
                   fact_work,
                   fact_calling,
                   fact_dev,
@@ -207,6 +141,7 @@ class ReportPlanning(Model):
                         sum(case when u.context_section_id=9 or i.user_id=14 then i.total_ye else 0 end) plan_dev_account
                       FROM account_invoice i
                       LEFT JOIN res_users u on (u.id=i.user_id)
+                      WHERE i.user_id <> 170
                       GROUP BY i.plan_paid_date
                     ) i on (r.date=i.plan_paid_date)
                     LEFT JOIN (

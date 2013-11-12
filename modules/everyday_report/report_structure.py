@@ -279,6 +279,8 @@ class ReportStructure(Model):
                     WHERE p.calendar='rus'
                     GROUP BY s.kpi_id, p.name
                   ) y on (y.name=to_char(ip.date_pay, 'YYYY/MM'))
+                  LEFT JOIN account_invoice i on (i.id=ip.invoice_id)
+                  WHERE i.user_id <> 170
                   GROUP BY date_pay
             )""")
 

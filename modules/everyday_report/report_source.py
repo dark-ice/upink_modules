@@ -274,6 +274,7 @@ class ReportSource(Model):
                     GROUP BY r.period_month, r.period_year
                   ) r on (r.period_month::int=EXTRACT(MONTH FROM ip.date_pay)
                     AND r.period_year::int=EXTRACT(YEAR FROM ip.date_pay))
+                  WHERE i.user_id <> 170
                   GROUP BY ip.date_pay
             )""")
 

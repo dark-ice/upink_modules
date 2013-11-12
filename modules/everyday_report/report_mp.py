@@ -93,7 +93,7 @@ class ReportMP(Model):
 
                 FROM
                   day_report_brief_plan r
-                  LEFT JOIN brief_history h on (h.cr_date::date=r.date AND h.state_id='media_approved')
+                  LEFT JOIN brief_history h on (h.cr_date::date=r.date AND h.state_id='media_approval')
                   LEFT JOIN brief_main b on (h.brief_id=b.id)
                   LEFT JOIN brief_services_stage bss on (bss.id=b.services_ids)
                 GROUP BY r.date::date

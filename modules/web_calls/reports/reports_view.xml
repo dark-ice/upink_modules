@@ -170,6 +170,7 @@
                     <field name="dnepropetrovsk" sum="Сумма"/>
                     <field name="donetsk" sum="Сумма"/>
                     <field name="minsk" sum="Сумма"/>
+                    <field name="astana" sum="Сумма"/>
                     <field name="total" sum="Сумма"/>
                     <field name="livesite" sum="Сумма"/>
                     <field name="adminpanel" sum="Сумма"/>
