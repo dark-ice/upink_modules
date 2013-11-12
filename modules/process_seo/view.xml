@@ -125,6 +125,25 @@
                                 </tree>
                             </field>
                         </page>
+                        <page string="SLA">
+                            <button type="action"
+                                name="%(process_launch.action_process_sla)d"
+                                string="Создать"
+                                context="{'process_id': id, 'process_model': 'process.call.in', 'type': direction}"
+                                icon="gtk-ok"/>
+                            <field name="sla_ids" nolabel="1" colspan="4" readonly="1">
+                                <tree string="SLA">
+                                    <field name="id" invisible="1"/>
+                                    <field name="period_id" domain="[('calendar', '=', 'rus')]"/>
+                                    <field name="avg_mbo" sum="Сумма"/>
+                                    <button type="object"
+                                        name="change_sla"
+                                        string="Изменить"
+                                        context="{'sla_id': id}"
+                                        icon="gtk-ok"/>
+                                </tree>
+                            </field>
+                        </page>
                         <page string="Отчеты">
                             <separator string="Ежемесячные отчеты" colspan="4"/>
                             <field name="report_ids" nolabel="1">

@@ -244,6 +244,12 @@ class ProcessSite(Model):
             type='boolean',
             invisible=True
         ),
+        'sla_ids': fields.one2many(
+            'process.sla',
+            'process_id',
+            'SLA',
+            domain=[('process_model', '=', _name)],
+            context={'type': 'site', 'process_model': _name}),
     }
 
     def create(self, cr, user, vals, context=None):
