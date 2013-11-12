@@ -142,13 +142,6 @@
                                 attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_m', '=', False)]}"
                                 />
 
-                        <!-- approval -> completion -->
-                        <button name="action_a_c"
-                                string="Отправить бриф на доработку"
-                                icon="gtk-go-back"
-                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_l', '=', False)]}"
-                                />
-
                         <!-- completion -> approval -->
                         <button name="action_c_a"
                                 string="Отправить брифна согласование"

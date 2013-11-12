@@ -34,28 +34,12 @@
             <field name="action">workflow_setter(state='cancel_2')</field>
         </record>
 
-        <!-- approval -->
-        <record model="workflow.activity" id="act_approval">
-            <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">approval</field>
-            <field name="kind">function</field>
-            <field name="action">workflow_setter(state='approval')</field>
-        </record>
-
         <!-- completion -->
         <record model="workflow.activity" id="act_completion">
             <field name="wkf_id" ref="wkf_brief_contract"/>
             <field name="name">completion</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='completion')</field>
-        </record>
-
-        <!-- preparation -->
-        <record model="workflow.activity" id="act_preparation">
-            <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">preparation</field>
-            <field name="kind">function</field>
-            <field name="action">workflow_setter(state='preparation')</field>
         </record>
 
         <!-- contract_approval -->
@@ -72,14 +56,6 @@
             <field name="name">contract_completion</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='contract_completion')</field>
-        </record>
-
-        <!-- contract_agreed -->
-        <record model="workflow.activity" id="act_contract_agreed">
-            <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">contract_agreed</field>
-            <field name="kind">function</field>
-            <field name="action">workflow_setter(state='contract_agreed')</field>
         </record>
 
         <!-- approval_partner -->
@@ -181,39 +157,18 @@
         </record>
 
         <!-- draft -> approval -->
-        <record model="workflow.transition" id="d_a">
-            <field name="act_from" ref="act_draft"/>
-            <field name="act_to" ref="act_approval"/>
-            <field name="signal">action_d_a</field>
-        </record>
-
-        <!-- approval -> completion -->
-        <record model="workflow.transition" id="a_c">
-            <field name="act_from" ref="act_approval"/>
-            <field name="act_to" ref="act_completion"/>
-            <field name="signal">action_a_c</field>
-        </record>
-
-        <!-- completion -> approval -->
-        <record model="workflow.transition" id="c_a">
-            <field name="act_from" ref="act_completion"/>
-            <field name="act_to" ref="act_approval"/>
-            <field name="signal">action_c_a</field>
-        </record>
-
-        <!-- approval -> preparation -->
-        <record model="workflow.transition" id="a_p">
-            <field name="act_from" ref="act_approval"/>
-            <field name="act_to" ref="act_preparation"/>
-            <field name="signal">action_a_p</field>
-        </record>
+        <!--<record model="workflow.transition" id="d_a">-->
+            <!--<field name="act_from" ref="act_draft"/>-->
+            <!--<field name="act_to" ref="act_approval"/>-->
+            <!--<field name="signal">action_d_a</field>-->
+        <!--</record>-->
 
         <!-- preparation -> contract_approval -->
-        <record model="workflow.transition" id="p_ca">
-            <field name="act_from" ref="act_preparation"/>
-            <field name="act_to" ref="act_contract_approval"/>
-            <field name="signal">action_p_ca</field>
-        </record>
+        <!--<record model="workflow.transition" id="p_ca">-->
+            <!--<field name="act_from" ref="act_preparation"/>-->
+            <!--<field name="act_to" ref="act_contract_approval"/>-->
+            <!--<field name="signal">action_p_ca</field>-->
+        <!--</record>-->
 
         <!-- contract_approval -> contract_completion -->
         <record model="workflow.transition" id="ca_cc">
@@ -243,18 +198,12 @@
             <field name="signal">action_c2_cc</field>
         </record>
 
-        <!-- contract_approval -> contract_agreed -->
-        <record model="workflow.transition" id="ca_cagr">
-            <field name="act_from" ref="act_contract_approval"/>
-            <field name="act_to" ref="act_contract_agreed"/>
-            <field name="signal">action_ca_cagr</field>
-        </record>
 
-        <!-- contract_agreed -> approval_partner -->
-        <record model="workflow.transition" id="cagr_ap">
-            <field name="act_from" ref="act_contract_agreed"/>
+        <!-- contract_approval -> approval_partner -->
+        <record model="workflow.transition" id="ca_ap">
+            <field name="act_from" ref="act_contract_approval"/>
             <field name="act_to" ref="act_approval_partner"/>
-            <field name="signal">action_cagr_ap</field>
+            <field name="signal">action_ca_ap</field>
         </record>
 
         <!-- approval_partner -> contract_completion -->
