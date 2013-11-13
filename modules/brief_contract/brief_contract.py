@@ -330,7 +330,7 @@ class BriefContract(Model):
 
     _defaults = {
         'usr_id': lambda self, cr, uid, context: uid,
-        'lawyer_id': lambda *a: 474,
+        'lawyer_id': lambda *a: 18,
         'partner_id': lambda self, cr, uid, context: context.get('partner_id', False),
         'service_id': lambda self, cr, uid, context: context.get('service_id', False),
         'state': 'draft',
