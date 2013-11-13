@@ -351,7 +351,7 @@ class BriefContract(Model):
 
     _defaults = {
         'usr_id': lambda self, cr, uid, context: uid,
-        'lawyer_id': lambda *a: 474,
+        'lawyer_id': lambda *a: 18,
         'partner_id': lambda self, cr, uid, context: context.get('partner_id', False),
         'service_id': lambda self, cr, uid, context: context.get('service_id', False),
         'state': 'draft',
@@ -418,11 +418,11 @@ class BriefContract(Model):
         #  генерим pdf
         if values.get('doc_id') and not values.get('pdf_id'):
             odt_file = self.pool.get('ir.attachment').read(cr, user, values['doc_id'],
-                                                           ['store_fname', 'parent_id'])
-
+                                                       ['store_fname', 'parent_id'])
             dbro = self.pool.get('document.directory').read(cr, user, odt_file['parent_id'][0], ['storage_id'], context)
             storage = self.pool.get('document.storage').read(cr, user, dbro['storage_id'][0], ['path'])
             filepath = os.path.join(storage['path'], odt_file['store_fname'])
+
             filename = '{0} {1} {2}'.format(
                 data.contract_number.encode('utf-8'),
                 data.partner_id.name.encode('utf-8'),
@@ -434,12 +434,12 @@ class BriefContract(Model):
             convert_odt(filepath, storage['path'])
             RstToPdf().createPdf(text=open(rst_file).read(), source_path=rst_file, output=pdf_file)
 
-            values['pdf_id'] = ((0, 0, {
+            values['pdf_id'] = self.pool.get('ir.attachment').create(cr, user, {
                 'name': '{0}.pdf'.format(filename, ),
                 'datas': base64.b64encode(open(pdf_file, 'rb').read()),
                 'datas_fname': '{0}.pdf'.format(filename, ),
                 'res_model': self._name,
-                'res_id': data.id}),)
+                'res_id': data.id})
 
         if data.service_id or values.get('service_id', False):
             service_id = values['service_id'] if values.get('service_id', False) else data.service_id.id
@@ -605,7 +605,7 @@ class BriefContract(Model):
         contract_id = ids
         if isinstance(ids, (list, tuple)):
             contract_id = ids[0]
-        contract = self.read(cr, user, contract_id, ['contract_number', 'contract_date', 'responsible_id', 'doc_type_id', 'bank_id', 'account_id'])
+        contract = self.read(cr, user, contract_id, ['contract_number', 'contract_date', 'responsible_id', 'doc_type_id', 'bank_id', 'account_id', 'service_id', 'partner_id'])
 
         service = self.pool.get('brief.services.stage').read(cr, user, contract['service_id'][0], ['template_id'])
         if service['template_id']:
@@ -622,10 +622,11 @@ class BriefContract(Model):
             date_str = dt.ru_strftime(u"%d %B %Y", d, inflected=True)
 
             o = {
+                'name': '=',
                 'contract_number': contract['contract_number'],
                 'contract_date': date_str,
-                'doc_type': contract['doc_type_id'][1],
-                'responsible_id': contract['responsible_id'][1],
+                'doc_type': contract['doc_type_id'][1] if contract['doc_type_id'] else '-',
+                'responsible_id': contract['responsible_id'][1] if contract['responsible_id'] else '-',
                 #  Название баннерной или тизерной сети
                 'web': 'test',
 
@@ -735,13 +736,14 @@ class BriefContract(Model):
 
             odt_file = os.path.join(storage['path'], 'tmp.odt')
             file(odt_file, 'wb').write(basic.generate(o=o).render().getvalue())
-
-            self.write(cr, user, [contract['id']], {'doc_id': ((0, 0, {
+            doc_id = self.pool.get('ir.attachment').create(cr, user, {
                 'name': '{0}.odt'.format(filename, ),
                 'datas': base64.b64encode(open(odt_file, 'rb').read()),
                 'datas_fname': '{0}.odt'.format(filename, ),
                 'res_model': self._name,
-                'res_id': contract['id']}))})
+                'res_id': contract['id']
+            })
+            self.write(cr, user, [contract['id']], {'doc_id': doc_id})
         return True
 
 
