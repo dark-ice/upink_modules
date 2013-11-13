@@ -102,9 +102,15 @@ class AccountInvoice(Model):
         return {'value': {'card_id': None}}
 
     def change_division(self, cr, uid, ids, division_id, context=None):
-        pool = self.pool.get('account.invoice.division')
-        obj = pool.browse(cr, uid, division_id)
-        return {'value': {'get_division': obj.division}}
+        obj = self.pool.get('account.invoice.division').read(cr, uid, division_id, ['division'])
+        return {
+            'value': {
+                'get_division': obj['division']
+            },
+            'domain': {
+                'categ_id': [('division_id', '=', division_id)]
+            }
+        }
 
     def change_bank(self, cr, uid, ids, bank_id, context=None):
         account_pool = self.pool.get('res.partner.bank')
@@ -393,7 +399,7 @@ class AccountInvoice(Model):
             'account.invoice.category',
             'Статья расходов',
             required=False,
-            domain=[('parent_id', '!=', False)],
+            domain="[('parent_id', '!=', False), ('division_id', '=', division_id)]",
             states={'close': [('readonly', True)]},
             help='Статья расходов, по которой необходимы денежные средства.'),
         'card_id': fields.many2one(
@@ -1102,6 +1108,10 @@ class AccountInvoiceCategory(Model):
         'name': fields.char('Статья расходов', size=250),
         'parent_id': fields.many2one('account.invoice.category', 'Категория', select=True),
         'child_ids': fields.one2many('account.invoice.category', 'parent_id', 'Child Companies', invisible=True),
+        'division_id': fields.many2one(
+            'account.invoice.division',
+            'Направление',
+            help='Направление, для которого будут выданы денежные средства.'),
     }
 AccountInvoiceCategory()
 

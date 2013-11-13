@@ -27,6 +27,7 @@ class ProcessVideo(Model):
     _name = 'process.video'
     _inherit = 'process.base'
     _description = u'Процессы - Video'
+    _rec_name = 'name'
 
     def _check_access(self, cr, uid, ids, name, arg, context=None):
         """

@@ -18,6 +18,7 @@
                     <field name="plan_total" sum="" />
                     <field name="plan" sum="" />
                     <field name="plan_per" sum="" />
+                    <field name="plan_f" sum="" />
                     <field name="fact_per" sum=""/>
                     <field name="fact_total" sum="" />
                     <field name="fact" sum="" />
