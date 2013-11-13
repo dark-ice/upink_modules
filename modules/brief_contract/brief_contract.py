@@ -8,7 +8,7 @@ from openerp.osv import fields, osv
 from openerp.osv.orm import Model
 from relatorio.templates.opendocument import Template
 from rst2pdf.createpdf import RstToPdf
-from pytils import dt
+from pytils import dt, numeral
 from notify import notify
 
 
@@ -605,7 +605,7 @@ class BriefContract(Model):
         contract_id = ids
         if isinstance(ids, (list, tuple)):
             contract_id = ids[0]
-        contract = self.read(cr, user, contract_id, ['contract_number', 'contract_date', 'responsible_id', 'doc_type_id', 'bank_id', 'account_id', 'service_id', 'partner_id'])
+        contract = self.read(cr, user, contract_id, [])
 
         service = self.pool.get('brief.services.stage').read(cr, user, contract['service_id'][0], ['template_id'])
         if service['template_id']:
@@ -631,9 +631,9 @@ class BriefContract(Model):
                 'web': 'test',
 
                 #  стоимость услуг цифры
-                'cost_num': 'test',
+                'cost_num': contract['amount'],
                 #  стоимость услуг слова
-                'cost_word': 'test',
+                'cost_word': numeral.in_words(contract['amount']),
 
                 #  срок предоставления услуги в фомате 30 (тридцать)
                 'term': 'test',
