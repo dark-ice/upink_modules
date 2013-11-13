@@ -90,7 +90,7 @@ class BriefContract(Model):
 
             letter = name[6]
 
-            if letter in access:
+            if letter in access or uid == 1:
                 val = True
             res[data.id] = val
         return res
