@@ -22,7 +22,7 @@ class BriefContract(Model):
 
     _states = (
         ('draft', 'Черновик'),
-        #('approval', 'Бриф на согласовании'),
+        ('approval', 'Договор на корректировке'),
         #('completion', 'Бриф на доработке'),
         #('preparation', 'Подготовка договора'),
         ('contract_approval', 'Согласование договора с обслуживающим направлением'),

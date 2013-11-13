@@ -142,25 +142,19 @@
                                 attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_m', '=', False)]}"
                                 />
 
-                        <!-- completion -> approval -->
-                        <button name="action_c_a"
-                                string="Отправить брифна согласование"
-                                icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'completion'), ('check_m', '=', False)]}"
-                                />
-
-                        <!-- approval -> preparation -->
-                        <button name="action_a_p"
-                                string="Подготовка договора"
-                                icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_l', '=', False)]}"
-                                />
-
-                        <!-- preparation -> contract_approval -->
-                        <button name="action_p_ca"
+                        <!-- draft -> contract_approval -->
+                        <button name="action_d_ca"
                                 string="Отправить договор на согласование"
                                 icon="gtk-go-forward"
                                 attrs="{'invisible': ['|', ('state', '!=', 'preparation'), ('check_l', '=', False)]}"
+                                />
+
+
+                        <!-- approval -> contract_approval -->
+                        <button name="action_a_ca"
+                                string="Отправить договор на согласование"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_l', '=', False)]}"
                                 />
 
                         <!-- contract_approval -> contract_completion -->
