@@ -768,14 +768,14 @@ class BriefContract(Model):
                 transport.connect(username=ssh_user, password=secret)
                 sftp = paramiko.SFTPClient.from_transport(transport)
                 remoteurl = 'http://publish.upsale.ru/'
-                remotefile = slugify(pdf['name'])
-                remotepath = '/var/www/publish/files/{file}'.format(file=remotefile,)
-                url = "{url}{file}".format(url=remoteurl, file=remotefile)
+                remotefile = slugify(pdf['name'][:-4])
+                remotefile = remotefile[:32]
+                remotepath = '/var/www/publish/files/{file}.pdf'.format(file=remotefile,)
+                url = "{url}{file}.pdf".format(url=remoteurl, file=remotefile)
                 sftp.put(filepath, remotepath)
 
                 sftp.close()
                 transport.close()
-                print url
 
                 client = paramiko.SSHClient()
                 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -785,7 +785,7 @@ class BriefContract(Model):
 
                 client.close()
 
-                vals = {'url': url, 'login': 'erp', 'password': '1'}
+                self.write(cr, 1, [record['id']], {'url': url, 'login': 'erp', 'pass': '1'})
             else:
                 raise osv.except_osv('Договор', "Сначала надо сгенерировать pdf!")
         return True
