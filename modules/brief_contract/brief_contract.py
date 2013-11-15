@@ -349,7 +349,9 @@ class BriefContract(Model):
             help='Фирма, от лица которой создается данный счет.'
         ),
         'web': fields.char('Название баннерной или тизерной сети', size=250),
-
+        'url': fields.char('URL', size=250),
+        'login': fields.char('Логин', size=10),
+        'pass': fields.char('Пароль', size=10),
     }
 
     _defaults = {
@@ -753,20 +755,20 @@ class BriefContract(Model):
     def send(self, cr, user, ids, context=None):
         host = '46.28.66.55'
         port = 22
-        user = 'erpub'
+        ssh_user = 'erpub'
         secret = 'VeY4cgrQ9C9MN4M0'
         for record in self.read(cr, user, ids, ['pdf_id', 'partner_id', 'service_id']):
             if record['pdf_id']:
                 pdf = self.pool.get('ir.attachment').read(cr, 1, record['pdf_id'][0], ['name', 'store_fname', 'parent_id'])
-                dbro = self.pool.get('document.directory').read(cr, user, odt_file['parent_id'][0], ['storage_id'], context)
+                dbro = self.pool.get('document.directory').read(cr, user, pdf['parent_id'][0], ['storage_id'], context)
                 storage = self.pool.get('document.storage').read(cr, user, dbro['storage_id'][0], ['path'])
                 filepath = os.path.join(storage['path'], pdf['store_fname'])
 
                 transport = paramiko.Transport((host, port))
-                transport.connect(username=user, password=secret)
+                transport.connect(username=ssh_user, password=secret)
                 sftp = paramiko.SFTPClient.from_transport(transport)
                 remoteurl = 'http://publish.upsale.ru/'
-                remotefile = slugify(pdf['name'].decode('utf-8'))
+                remotefile = slugify(pdf['name'])
                 remotepath = '/var/www/publish/files/{file}'.format(file=remotefile,)
                 url = "{url}{file}".format(url=remoteurl, file=remotefile)
                 sftp.put(filepath, remotepath)
@@ -777,7 +779,7 @@ class BriefContract(Model):
 
                 client = paramiko.SSHClient()
                 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                client.connect(hostname=host, username=user, password=secret, port=port)
+                client.connect(hostname=host, username=ssh_user, password=secret, port=port)
                 command = 'htpasswd -b /var/www/publish/.htpasswd {user} {password}'.format(user='erp', password='1')
                 stdin, stdout, stderr = client.exec_command(command)
 

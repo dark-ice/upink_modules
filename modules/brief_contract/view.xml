@@ -115,6 +115,7 @@
                         <separator colspan="4"/>
                     </group>
                     <group colspan="4" col="4">
+                        <separator string="Договор"/>
                         <button name="generate"
                                 string="Сгенерировать договор"
                                 icon="gtk-go-forward"
@@ -124,8 +125,19 @@
                         <newline />
                         <field name="doc_id" />
                         <field name="pdf_id" />
+                        <separator string="Доступ к серверу"/>
+                        <button name="send"
+                                string="Отправить на сервер"
+                                icon="gtk-go-forward"
+                                type="object"
+                                colspan="4"
+                                />
+                        <field name="url" widget="url" colspan="4"/>
+                        <field name="login"/>
+                        <field name="pass"/>
                     </group>
                     <group colspan="4" col="4">
+                        <separator colspan="4" />
                         <field name="state"
                                widget="statusbar"
                                statusbar_visible="draft,contract_approval,approval_partner,contract_approved,contract_signed"
