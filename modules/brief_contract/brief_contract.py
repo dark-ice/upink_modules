@@ -2,6 +2,8 @@
 import base64
 import os
 from datetime import datetime
+import random
+import string
 from odt2sphinx.odt2sphinx import convert_odt
 from openerp import tools
 from openerp.osv import fields, osv
@@ -13,6 +15,13 @@ from pytils import dt, numeral
 import paramiko
 from pytils.translit import slugify
 from notify import notify
+
+
+def random_name(n=10):
+    random.seed()
+    d = [random.choice(string.ascii_letters) for x in xrange(n)]
+    name = "".join(d)
+    return name
 
 
 class BriefContract(Model):
@@ -780,7 +789,9 @@ class BriefContract(Model):
                 client = paramiko.SSHClient()
                 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
                 client.connect(hostname=host, username=ssh_user, password=secret, port=port)
-                command = 'htpasswd -b /var/www/publish/.htpasswd {user} {password}'.format(user='erp', password='1')
+                partner_user = random_name(7)
+                partner_pass = random_name(10)
+                command = 'htpasswd -b /var/www/publish/.htpasswd {user} {password}'.format(user=partner_user, password=partner_pass)
                 stdin, stdout, stderr = client.exec_command(command)
 
                 client.close()
