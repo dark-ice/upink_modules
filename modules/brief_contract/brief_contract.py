@@ -6,9 +6,12 @@ from odt2sphinx.odt2sphinx import convert_odt
 from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
+import re
 from relatorio.templates.opendocument import Template
 from rst2pdf.createpdf import RstToPdf
 from pytils import dt, numeral
+import paramiko
+from pytils.translit import slugify
 from notify import notify
 
 
@@ -746,6 +749,44 @@ class BriefContract(Model):
             self.write(cr, user, [contract['id']], {'doc_id': doc_id})
         return True
 
+    #  отправляем pdf на сервер
+    def send(self, cr, user, ids, context=None):
+        host = '46.28.66.55'
+        port = 22
+        user = 'erpub'
+        secret = 'VeY4cgrQ9C9MN4M0'
+        for record in self.read(cr, user, ids, ['pdf_id', 'partner_id', 'service_id']):
+            if record['pdf_id']:
+                pdf = self.pool.get('ir.attachment').read(cr, 1, record['pdf_id'][0], ['name', 'store_fname', 'parent_id'])
+                dbro = self.pool.get('document.directory').read(cr, user, odt_file['parent_id'][0], ['storage_id'], context)
+                storage = self.pool.get('document.storage').read(cr, user, dbro['storage_id'][0], ['path'])
+                filepath = os.path.join(storage['path'], pdf['store_fname'])
+
+                transport = paramiko.Transport((host, port))
+                transport.connect(username=user, password=secret)
+                sftp = paramiko.SFTPClient.from_transport(transport)
+                remoteurl = 'http://publish.upsale.ru/'
+                remotefile = slugify(pdf['name'].decode('utf-8'))
+                remotepath = '/var/www/publish/files/{file}'.format(file=remotefile,)
+                url = "{url}{file}".format(url=remoteurl, file=remotefile)
+                sftp.put(filepath, remotepath)
+
+                sftp.close()
+                transport.close()
+                print url
+
+                client = paramiko.SSHClient()
+                client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                client.connect(hostname=host, username=user, password=secret, port=port)
+                command = 'htpasswd -b /var/www/publish/.htpasswd {user} {password}'.format(user='erp', password='1')
+                stdin, stdout, stderr = client.exec_command(command)
+
+                client.close()
+
+                vals = {'url': url, 'login': 'erp', 'password': '1'}
+            else:
+                raise osv.except_osv('Договор', "Сначала надо сгенерировать pdf!")
+        return True
 
 BriefContract()
 
