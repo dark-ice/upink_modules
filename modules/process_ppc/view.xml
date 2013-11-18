@@ -89,6 +89,13 @@
                                     <separator string="Аккаунт менеджер" colspan="4"/>
                                     <field name="specialist_id" nolabel="1" attrs="{'readonly': [('check_m', '=', False)]}"/>
                                 </group>
+                                <group colspan="4" col="4">
+                                    <separator colspan="4" />
+                                    <field name="date_start" />
+                                    <field name="date_end" />
+                                    <field name="domain_zone" />
+                                    <field name="campaign" />
+                                </group>
                                 <group colspan="4" col="2">
                                     <separator string="Доступы" colspan="4"/>
                                     <field name="access_ids" nolabel="1" colspan="4" mode="tree">
