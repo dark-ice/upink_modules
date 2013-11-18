@@ -2,6 +2,8 @@
 import base64
 import os
 from datetime import datetime
+import random
+import string
 from odt2sphinx.odt2sphinx import convert_odt
 from openerp import tools
 from openerp.osv import fields, osv
@@ -13,6 +15,13 @@ from pytils import dt, numeral
 import paramiko
 from pytils.translit import slugify
 from notify import notify
+
+
+def random_name(n=10):
+    random.seed()
+    d = [random.choice(string.ascii_letters) for x in xrange(n)]
+    name = "".join(d)
+    return name
 
 
 class BriefContract(Model):
@@ -349,7 +358,9 @@ class BriefContract(Model):
             help='Фирма, от лица которой создается данный счет.'
         ),
         'web': fields.char('Название баннерной или тизерной сети', size=250),
-
+        'url': fields.char('URL', size=250),
+        'login': fields.char('Логин', size=10),
+        'pass': fields.char('Пароль', size=10),
     }
 
     _defaults = {
@@ -753,37 +764,39 @@ class BriefContract(Model):
     def send(self, cr, user, ids, context=None):
         host = '46.28.66.55'
         port = 22
-        user = 'erpub'
+        ssh_user = 'erpub'
         secret = 'VeY4cgrQ9C9MN4M0'
         for record in self.read(cr, user, ids, ['pdf_id', 'partner_id', 'service_id']):
             if record['pdf_id']:
                 pdf = self.pool.get('ir.attachment').read(cr, 1, record['pdf_id'][0], ['name', 'store_fname', 'parent_id'])
-                dbro = self.pool.get('document.directory').read(cr, user, odt_file['parent_id'][0], ['storage_id'], context)
+                dbro = self.pool.get('document.directory').read(cr, user, pdf['parent_id'][0], ['storage_id'], context)
                 storage = self.pool.get('document.storage').read(cr, user, dbro['storage_id'][0], ['path'])
                 filepath = os.path.join(storage['path'], pdf['store_fname'])
 
                 transport = paramiko.Transport((host, port))
-                transport.connect(username=user, password=secret)
+                transport.connect(username=ssh_user, password=secret)
                 sftp = paramiko.SFTPClient.from_transport(transport)
                 remoteurl = 'http://publish.upsale.ru/'
-                remotefile = slugify(pdf['name'].decode('utf-8'))
-                remotepath = '/var/www/publish/files/{file}'.format(file=remotefile,)
-                url = "{url}{file}".format(url=remoteurl, file=remotefile)
+                remotefile = slugify(pdf['name'][:-4])
+                remotefile = remotefile[:32]
+                remotepath = '/var/www/publish/files/{file}.pdf'.format(file=remotefile,)
+                url = "{url}{file}.pdf".format(url=remoteurl, file=remotefile)
                 sftp.put(filepath, remotepath)
 
                 sftp.close()
                 transport.close()
-                print url
 
                 client = paramiko.SSHClient()
                 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                client.connect(hostname=host, username=user, password=secret, port=port)
-                command = 'htpasswd -b /var/www/publish/.htpasswd {user} {password}'.format(user='erp', password='1')
+                client.connect(hostname=host, username=ssh_user, password=secret, port=port)
+                partner_user = random_name(7)
+                partner_pass = random_name(10)
+                command = 'htpasswd -b /var/www/publish/.htpasswd {user} {password}'.format(user=partner_user, password=partner_pass)
                 stdin, stdout, stderr = client.exec_command(command)
 
                 client.close()
 
-                vals = {'url': url, 'login': 'erp', 'password': '1'}
+                self.write(cr, 1, [record['id']], {'url': url, 'login': 'erp', 'pass': '1'})
             else:
                 raise osv.except_osv('Договор', "Сначала надо сгенерировать pdf!")
         return True
