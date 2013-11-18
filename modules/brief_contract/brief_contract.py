@@ -636,7 +636,7 @@ class BriefContract(Model):
                 #  стоимость услуг цифры
                 'cost_num': contract['amount'],
                 #  стоимость услуг слова
-                'cost_word': numeral.in_words(contract['amount']),
+                'cost_word': numeral.in_words(float(contract['amount'])),
 
                 #  срок предоставления услуги в фомате 30 (тридцать)
                 'term': 'test',
