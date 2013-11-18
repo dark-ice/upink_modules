@@ -82,6 +82,21 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="view_report_day_ppc_wizard">
+            <field name="name">PPC</field>
+            <field name="model">report.day.ppc.statistic</field>
+            <field name="type">form</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <form>
+                    <label string="Получение новых записей от Яндекс.Директ"/>
+                    <newline/>
+                    <button string="Cancel" special="cancel" icon="gtk-cancel"/>
+                    <button string="Получить" name="update" type="object" />
+                </form>
+            </field>
+        </record>
+
         <record id="window_report_day_ppc_statistic" model="ir.actions.act_window">
             <field name="name">PPC</field>
             <field name="res_model">report.day.ppc.statistic</field>
@@ -92,9 +107,20 @@
             <field name="context">{}</field>
         </record>
 
-        <menuitem id="menu_report_day_direction" parent="process_launch.menu_process" name="Ежедневные отчеты направлений" sequence="10"/>
+        <record id="window_report_day_ppc_wizard" model="ir.actions.act_window">
+            <field name="name">Получить данные для PPC</field>
+            <field name="res_model">report.day.ppc.statistic</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_report_day_ppc_wizard"/>
+            <field name="context">{}</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_report_day_direction" parent="process_launch.menu_process" name="Ежедневные отчеты направлений" sequence="100"/>
         <menuitem action="window_report_day_ppc" id="menu_report_day_ppc" parent="menu_report_day_direction" sequence="1"/>
         <menuitem id="menu_report_day_direction_settings" name="Настройки" parent="menu_report_day_direction" sequence="99"/>
-        <menuitem id="menu_report_day_settings_ppc" action="window_report_day_ppc_statistic" name="Доп. модель PPC" parent="menu_report_day_direction_settings" sequence="99"/>
+        <menuitem id="menu_report_day_settings_ppc" action="window_report_day_ppc_statistic" name="Доп. модель PPC" parent="menu_report_day_direction_settings" sequence="1"/>
+        <menuitem id="menu_report_day_settings_ppc_wizard" action="window_report_day_ppc_wizard" name="Получить данные для PPC" parent="menu_report_day_direction_settings" sequence="2"/>
     </data>
 </openerp>
