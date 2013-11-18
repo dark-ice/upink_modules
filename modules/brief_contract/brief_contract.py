@@ -634,6 +634,10 @@ class BriefContract(Model):
 
             d = datetime.strptime(contract['contract_date'], '%Y-%m-%d')
             date_str = dt.ru_strftime(u"%d %B %Y", d, inflected=True)
+            if not contract['contract_number']:
+                raise osv.except_osv('Договор', 'Необходимо ввести номер договора')
+            if not contract['amount']:
+                raise osv.except_osv('Договор', 'Необходимо ввести сумму договора')
 
             o = {
                 'name': '=',
