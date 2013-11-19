@@ -37,7 +37,7 @@ class ReportQualityControlGeneral(Model):
     _columns = {
         'partner_id': fields.many2one('res.partner', 'Партнеры'),
         'direction': fields.char('Услуга', size=128),
-        'specialist': fields.many2one('res.users', 'Менеджеры'),
+        'specialist_id': fields.many2one('res.users', 'Менеджеры'),
         'manager_id': fields.many2one('res.users', 'Аккаует-Менеджер'),
         'terms_of_service': fields.float('Срок предоставления услуги'),
         'terms_of_service_anket': fields.char('Анкета', size=128),
@@ -47,7 +47,7 @@ class ReportQualityControlGeneral(Model):
         'quality_feedback_anket': fields.char('Анкета', size=128),
         'completeness_of_reporting': fields.float('Полнота отчетов и соболюдение сроков их предоставления'),
         'completeness_of_reporting_anket': fields.char('Анкета', size=128),
-        'comment': fields.char('Комментарий', size=512),
+        'comentariy': fields.char('Комментарий', size=512),
         'quality_point': fields.function(
             _get_date,
             type='float',
@@ -83,13 +83,32 @@ class ReportQualityControlGeneral(Model):
             create or replace view report_quality_control_general as (
                 SELECT
                   row_number() over() as id,
+                  r.specialist_id,
+                  r.manager_id,
+                  r.period_id,
+                  r.period_name,
+                  max(r.direction) direction,
+                  r.partner_id,
+                  r.process_id,
+                  max(r.terms_of_service) terms_of_service,
+                  max(r.conformity) conformity,
+                  max(r.quality_feedback) quality_feedback,
+                  max(r.completeness_of_reporting) completeness_of_reporting,
+                  max(r.terms_of_service_anket) terms_of_service_anket,
+                  max(r.conformity_anket) conformity_anket,
+                  max(r.quality_feedback_anket) quality_feedback_anket,
+                  max(r.completeness_of_reporting_anket) completeness_of_reporting_anket,
+                  max(r.comment) comentariy,
+                  array_agg(r.quality_id) quality_ids
+                FROM (
+                SELECT
                     CASE WHEN ppc.specialist_id IS NOT null THEN ppc.specialist_id
                     ELSE
                       CASE WHEN site.specialist_id IS NOT null THEN site.specialist_id
                       ELSE
                         CASE WHEN smm.specialist_id IS NOT null THEN smm.specialist_id
                         ELSE
-                          CASE WHEN seo.specialist_id IS NOT null THEN seo.specialist_id END END END END specialist,
+                          CASE WHEN seo.specialist_id IS NOT null THEN seo.specialist_id END END END END specialist_id,
 
                   CASE WHEN crit.name = 'terms_of_service' THEN crit.value END terms_of_service,
                   CASE WHEN crit.name = 'conformity' THEN crit.value END conformity,
@@ -97,10 +116,10 @@ class ReportQualityControlGeneral(Model):
                   CASE WHEN crit.name = 'completeness_of_reporting' THEN crit.value END completeness_of_reporting,
                   case when th.name is null then p.user_id else th.name end manager_id,
                   bss.direction,
+                  rpqc.service_id,
                   pl.partner_id,
-                  rpqc.mbo,
-                  irp.payment_sum,
-                  array_agg(rpqc.id) quality_ids,
+                  pl.process_id,
+                  rpqc.id quality_id,
                   k.name period_name,
                   k.id period_id,
                   p.terms_of_service terms_of_service_anket,
@@ -109,10 +128,10 @@ class ReportQualityControlGeneral(Model):
                   p.completeness_of_reporting completeness_of_reporting_anket,
                   crit.comment
                 FROM res_partner_quality_control AS rpqc
-                JOIN res_partner_quality_criteria as crit
+                LEFT JOIN res_partner_quality_criteria as crit
                   ON (crit.quality_id = rpqc.id)
                 JOIN process_launch pl
-                  ON (rpqc.partner_id = pl.partner_id AND rpqc.service_id = pl.service_id)
+                  ON (rpqc.partner_id = pl.partner_id AND rpqc.service_id = pl.service_id AND state='in_process')
                 LEFT JOIN res_partner p
                   ON (p.id=rpqc.partner_id)
                 JOIN brief_services_stage as bss
@@ -131,29 +150,14 @@ class ReportQualityControlGeneral(Model):
                   ON (th.partner_id = rpqc.partner_id AND (k.name>=to_char(th.create_date, 'YYYY/MM')) AND k.name<(SELECT to_char(th2.create_date, 'YYYY/MM') FROM transfer_history th2 WHERE th2.partner_id = rpqc.partner_id AND th2.create_date > th.create_date LIMIT 1))
                 LEFT JOIN res_users u on (u.id=th.name)
                 LEFT JOIN invoice_reporting_period irp
-                  ON (irp.partner_id = p.id AND irp.period_id = rpqc.period_id)
-                GROUP BY
-                  pl.partner_id,
-                  rpqc.id,
-                  quality_id,
-                  manager_id,
-                  ppc.specialist_id,
-                  site.specialist_id,
-                  smm.specialist_id,
-                  seo.specialist_id,
-                  bss.direction,
-                  k.name,
-                  k.id,
-                  th.name,
-                  p.user_id,
-                  p.terms_of_service,
-                  p.conformity,
-                  p.quality_feedback,
-                  p.completeness_of_reporting,
-                  crit.comment,
-                  crit.value,
-                  crit.name,
-                  irp.payment_sum
+                  ON (irp.partner_id = p.id AND irp.period_id = rpqc.period_id)) r
+GROUP BY
+  r.service_id,
+  r.partner_id,
+  r.period_id, r.period_name,
+  r.specialist_id,
+  r.manager_id,
+  r.process_id
             )
         """)
 

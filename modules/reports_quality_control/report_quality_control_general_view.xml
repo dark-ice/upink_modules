@@ -10,7 +10,7 @@
                 <tree string="Сводный отчет по уровню удовлетворённости" editable="top" >
                     <field name="partner_id" readonly="1"/>
                     <field name="direction" readonly="1"/>
-                    <field name="specialist" readonly="1"/>
+                    <field name="specialist_id" readonly="1"/>
                     <field name="manager_id" readonly="1"/>
                     <field name="terms_of_service" readonly="1"/>
                     <field name="terms_of_service_anket" readonly="1"/>
@@ -20,7 +20,7 @@
                     <field name="quality_feedback_anket" readonly="1"/>
                     <field name="completeness_of_reporting" readonly="1"/>
                     <field name="completeness_of_reporting_anket" readonly="1"/>
-                    <field name="comment" readonly="1"/>
+                    <field name="comentariy" readonly="1"/>
                     <field name="quality_point" readonly="1"/>
                     <field name="mbo" readonly="1"/>
                     <field name="quality_index" readonly="1"/>
