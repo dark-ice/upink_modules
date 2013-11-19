@@ -2014,14 +2014,15 @@ class PartnerQualityControl(Model):
                 'level_ydolit': 0.0,
                 'index_ydolit': 0.0,
             }
-            process_launch_ids = self.pool.get('process.launch').search(cr, 1, [('partner_id', '=', record['partner_id'][0]), ('service_id', '=', record['service_id'][0])])
-            if process_launch_ids:
-                data = self.pool.get('process.launch').read(cr, 1, process_launch_ids,  ['process_model', 'process_id'])
-                if data:
-                    sla_ids = self.pool.get('process.sla').search(cr, 1, [('process_model', '=', data[0]['process_model']), ('process_id', '=', data[0]['process_id']), ('period_id', '=', record['period_id'][0])])
-                    if sla_ids:
-                        mbo_list = self.pool.get('process.sla').read(cr, 1, sla_ids, ['avg_mbo'])
-                        mbo = mbo_list[0]['avg_mbo']
+            if record['partner_id'] and record['service_id']:
+                process_launch_ids = self.pool.get('process.launch').search(cr, 1, [('partner_id', '=', record['partner_id'][0]), ('service_id', '=', record['service_id'][0])])
+                if process_launch_ids:
+                    data = self.pool.get('process.launch').read(cr, 1, process_launch_ids,  ['process_model', 'process_id'])
+                    if data:
+                        sla_ids = self.pool.get('process.sla').search(cr, 1, [('process_model', '=', data[0]['process_model']), ('process_id', '=', data[0]['process_id']), ('period_id', '=', record['period_id'][0])])
+                        if sla_ids:
+                            mbo_list = self.pool.get('process.sla').read(cr, 1, sla_ids[0], ['avg_mbo'])
+                            mbo = mbo_list['avg_mbo']
             partner = self.pool.get('res.partner').read(cr, 1, record['partner_id'][0], ['terms_of_service', 'conformity', 'quality_feedback', 'completeness_of_reporting'])
             level = sum(c['value']*float(partner[c['name']])/100 for c in self.pool.get('res.partner.quality.criteria').read(cr, 1, record['criteria_ids'], ['name', 'value']))
 
