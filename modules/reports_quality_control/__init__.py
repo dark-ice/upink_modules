@@ -1,2 +1,6 @@
 __author__ = 'Dmitriy Skripnik'
 import report_quality_control_manager
+import report_quality_control_specialist
+import report_quality_control_direction
+import report_quality_control_partner
+import report_quality_control_general
