@@ -182,9 +182,8 @@ class BriefContract(Model):
             ],
             'Условия для расчета',
             help='Выпадающий список условий. Обязательное к заполнению.'),
-        'amount': fields.char(
+        'amount': fields.float(
             'Сумма',
-            size=50,
             help='Денежная сумма, на которую заключается договор.'),
         'currency': fields.many2one(
             'partner.currency',
@@ -358,9 +357,9 @@ class BriefContract(Model):
             help='Фирма, от лица которой создается данный счет.'
         ),
         'web': fields.char('Название баннерной или тизерной сети', size=250),
-        'url': fields.char('URL', size=250),
-        'login': fields.char('Логин', size=10),
-        'pass': fields.char('Пароль', size=10),
+        'url': fields.char('URL', size=250, readonly=True),
+        'login': fields.char('Логин', size=10, readonly=True),
+        'pass': fields.char('Пароль', size=10, readonly=True),
     }
 
     _defaults = {
@@ -446,7 +445,17 @@ class BriefContract(Model):
             pdf_file = os.path.join(storage['path'], 'tmp.pdf')
 
             convert_odt(filepath, storage['path'])
-            RstToPdf().createPdf(text=open(rst_file).read(), source_path=rst_file, output=pdf_file)
+            text = open(rst_file).read()
+            style = {
+                "embeddedFonts": [["DejaVuSans.ttf", "DejaVuSans-Bold.ttf", "DejaVuSans-Oblique.ttf", "DejaVuSans-BoldOblique.ttf"]],
+                "fontsAlias": {
+                    "stdFont": "DejaVuSans",
+                    "stdBold": "DejaVuSans-Bold",
+                    "stdItalic": "DejaVuSans-Oblique",
+                    "stdBoldItalic": "DejaVuSans-BoldOblique",
+                }
+            }
+            RstToPdf(language='ru', stylesheets=style).createPdf(text=text, source_path=rst_file, output=pdf_file)
 
             values['pdf_id'] = self.pool.get('ir.attachment').create(cr, user, {
                 'name': '{0}.pdf'.format(filename, ),
@@ -640,7 +649,7 @@ class BriefContract(Model):
                 raise osv.except_osv('Договор', 'Необходимо ввести сумму договора')
 
             o = {
-                'name': '=',
+                'name': u'=',
                 'contract_number': contract['contract_number'],
                 'contract_date': date_str,
                 'doc_type': contract['doc_type_id'][1] if contract['doc_type_id'] else '-',
@@ -654,98 +663,100 @@ class BriefContract(Model):
                 'cost_word': numeral.in_words(float(contract['amount'])),
 
                 #  срок предоставления услуги в фомате 30 (тридцать)
-                'term': 'test',
+                'term': u'test',
 
 
                 #  наш генеральный директор
-                'our_gen_dir': '-',
+                'our_gen_dir': u'-',
                 #  название фирмы
-                'our_firm_name': '-',
+                'our_firm_name': u'-',
                 #  наш Юридический адрес
-                'our_address': '-',
+                'our_address': u'-',
                 #  Фактический адрес,адрес почтовой корреспонденции наш
-                'our_fact_address': '-',
+                'our_fact_address': u'-',
                 #  ИНН / КПП наш
-                'our_inn': '-',
+                'our_inn': u'-',
                 #  ОГРН наш
-                'our_ogrn': '-',
+                'our_ogrn': u'-',
                 #  Код ОКПО наш
-                'our_okpo': '-',
+                'our_okpo': u'-',
                 #  банк наш
-                'our_bank': '-',
+                'our_bank': u'-',
                 #  к/с наш
-                'our_ks': '-',
+                'our_ks': u'-',
                 #  р/с наш
-                'our_rs': '-',
+                'our_rs': u'-',
                 #  бик наш
-                'our_bik': '-',
+                'our_bik': u'-',
                 #  Тел/факс наш
-                'our_phone': '-',
+                'our_phone': u'-',
                 #  Web сайт почта наш
-                'our_site': '-',
+                'our_site': u'-',
 
                 #  заказчика e-mail
-                'partner_mail': '-',
+                'partner_mail': u'-',
                 #  название фирмы заказчика
-                'partner_firm_name': '-',
+                'partner_firm_name': u'-',
                 #  Юридический адрес партнера
-                'partner_address': '-',
+                'partner_address': u'-',
                 #  Фактический адрес,адрес почтовой корреспонденции партнера
-                'partner_fact_address': '-',
+                'partner_fact_address': u'-',
                 #  ИНН / КПП партнера
-                'partner_inn': '-',
+                'partner_inn': u'-',
                 #  ОГРН партнера
-                'partner_ogrn': '-',
+                'partner_ogrn': u'-',
                 #  Код ОКПО партнера
-                'partner_okpo': '-',
+                'partner_okpo': u'-',
                 #  банк партнера
-                'partner_bank': '-',
+                'partner_bank': u'-',
                 #  к/с партнера
-                'partner_ks': '-',
+                'partner_ks': u'-',
                 #  р/с партнера
-                'partner_rs': '-',
+                'partner_rs': u'-',
                 #  бик партнера
-                'partner_bik': '-',
+                'partner_bik': u'-',
                 #  Тел/факс партнера
-                'partner_phone': '-',
+                'partner_phone': u'-',
                 #  Web сайт почта партнера
-                'partner_site': '-',
+                'partner_site': u'-',
             }
 
             if contract['bank_id']:
                 bank = self.pool.get('res.partner.bank').read(cr, 1, contract['bank_id'][0], [])
                 o.update({
-                    'partner_mail': bank['email'],
-                    'partner_firm_name': bank['fullname'],
-                    'partner_address': self.pool.get('res.partner.bank.address').get_address(cr, contract['bank_id'][0]),
-                    'partner_fact_address': self.pool.get('res.partner.bank.address').get_address(cr, contract['bank_id'][0], 'fa'),
-                    'partner_inn': bank['inn'],
-                    'partner_ogrn': bank['ogrn'],
-                    'partner_okpo': bank['okpo'],
-                    'partner_bank': bank['bank'],
-                    'partner_ks': bank['correspondent_account'],
-                    'partner_rs': bank['current_account'],
-                    'partner_bik': bank['bik'],
-                    'partner_phone': bank['phone'],
+                    'partner_mail': bank['email'] or u'-',
+                    'partner_firm_name': bank['fullname'] or u'-',
+                    'partner_address': self.pool.get('res.partner.bank.address').get_address(cr, contract['bank_id'][0]) or u'-',
+                    'partner_fact_address': self.pool.get('res.partner.bank.address').get_address(cr, contract['bank_id'][0], 'fa') or u'-',
+                    'partner_inn': bank['inn'] or u'-',
+                    'partner_ogrn': bank['ogrn'] or u'-',
+                    'partner_okpo': bank['okpo'] or u'-',
+                    'partner_bank': bank['bank'] or u'-',
+                    'partner_ks': bank['correspondent_account'] or u'-',
+                    'partner_rs': bank['current_account'] or u'-',
+                    'partner_bik': bank['bik'] or u'-',
+                    'partner_phone': bank['phone'] or u'-',
                 })
 
             if contract['account_id']:
                 account = self.pool.get('account.account').read(cr, 1, contract['account_id'][0], [])
                 o.update({
-                    'our_gen_dir': account['responsible'],
-                    'our_firm_name': account['full'],
-                    'our_address': account['address'],
-                    'our_fact_address': account['address'],
-                    'our_inn': account['inn'],
-                    'our_ogrn': '1127747081406',
-                    'our_okpo': '13183255',
-                    'our_bank': account['bank'],
-                    'our_ks': account['bank_number'],
-                    'our_rs': account['account_number'],
-                    'our_bik': account['bik'],
-                    'our_phone': account['phone'],
-                    'our_site': 'UpSale.ru,  Fortune@UpSale.ru',
+                    'our_gen_dir': account['responsible'] or u'-',
+                    'our_firm_name': account['full'] or u'-',
+                    'our_address': account['address'] or u'-',
+                    'our_fact_address': account['address'] or u'-',
+                    'our_inn': account['inn'] or u'-',
+                    'our_ogrn': u'1127747081406',
+                    'our_okpo': u'13183255',
+                    'our_bank': account['bank'] or u'-',
+                    'our_ks': account['bank_number'] or u'-',
+                    'our_rs': account['account_number'] or u'-',
+                    'our_bik': account['bik'] or u'-',
+                    'our_phone': account['phone'] or u'-',
+                    'our_site': u'UpSale.ru,  Fortune@UpSale.ru',
                 })
+
+            #o = [(k, v.encode('utf-8')) for k, v in o.iteritems() if isinstance(v, str)]
 
             filename = '{0} {1} {2}'.format(
                 contract['contract_number'].encode('utf-8'),

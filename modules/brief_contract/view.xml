@@ -115,7 +115,7 @@
                         <separator colspan="4"/>
                     </group>
                     <group colspan="4" col="4">
-                        <separator string="Договор"/>
+                        <separator string="Договор" colspan="4"/>
                         <button name="generate"
                                 string="Сгенерировать договор"
                                 icon="gtk-go-forward"
@@ -125,7 +125,7 @@
                         <newline />
                         <field name="doc_id" />
                         <field name="pdf_id" />
-                        <separator string="Доступ к серверу"/>
+                        <separator string="Доступ к серверу" colspan="4"/>
                         <button name="send"
                                 string="Отправить на сервер"
                                 icon="gtk-go-forward"

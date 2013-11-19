@@ -973,7 +973,7 @@ class ResPartnerBankAddress(Model):
                 address_list.append(u"{st_type}. {street}".format(street=address['street'], st_type=st))
             if address['house']:
                 address_list.append(u"д. {house}".format(house=address['house']))
-        return ','.join(address_list) or '-'
+        return ','.join(address_list) or u'-'
 
 
 ResPartnerBankAddress()
@@ -986,10 +986,9 @@ class SkkNotes(Model):
 SkkNotes()
 
 
-class res_partner(Model):
-    _description = u'Partner'
-    _name = "res.partner"
+class ResPartner(Model):
     _inherit = "res.partner"
+    _description = u'Partner'
     _order = "priority, create_date desc"
 
     def change_name(self, cr, uid, ids, ur_name='', site='', context=None):
@@ -1619,7 +1618,7 @@ class res_partner(Model):
 
     def default_get(self, cr, uid, fields_list, context=None):
         pass
-        return super(res_partner, self).default_get(cr, uid, fields_list, context)
+        return super(ResPartner, self).default_get(cr, uid, fields_list, context)
 
     def add_note(self, cr, uid, ids, context=None):
         view_id = self.pool.get('ir.ui.view').search(cr, uid,
@@ -1704,7 +1703,7 @@ class res_partner(Model):
             for indx in date_indx:
                 del args[indx]
 
-        return super(res_partner, self).search(cr, uid, args, offset, limit, order, context, count)
+        return super(ResPartner, self).search(cr, uid, args, offset, limit, order, context, count)
 
     def write(self, cr, user, ids, vals, context=None):
         next_partner_status = vals.get('partner_status', False)
@@ -1726,13 +1725,13 @@ class res_partner(Model):
             if attachment[0] == 0:
                 attachment[2]['res_model'] = 'res.partner'
 
-        return super(res_partner, self).write(cr, user, ids, vals, context)
+        return super(ResPartner, self).write(cr, user, ids, vals, context)
 
     def create(self, cr, user, vals, context=None):
         categ_ids = self.pool.get('crm.case.categ').search(cr, user, [('responsible_users', '=', user)])
         if vals.get('partner_base') == 'cold' and (not vals.get('categ_id') or vals['categ_id'] not in categ_ids):
             raise osv.except_osv("Ошибка", "Заполните поле 'Тематика' Вашей тематикой")
-        return super(res_partner, self).create(cr, user, vals, context)
+        return super(ResPartner, self).create(cr, user, vals, context)
 
     def _check_unique_insesitive(self, cr, uid, ids, context=None):
         for self_obj in self.browse(cr, 1, ids, context):
@@ -1865,7 +1864,7 @@ class res_partner(Model):
         #    []
         #),
     ]
-res_partner()
+ResPartner()
 
 
 class TransferHistory(Model):
