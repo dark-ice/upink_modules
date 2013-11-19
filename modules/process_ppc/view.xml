@@ -128,7 +128,7 @@
                             <button type="action"
                                 name="%(process_launch.action_process_sla)d"
                                 string="Создать"
-                                context="{'process_id': id, 'process_model': 'process.call.in', 'type': direction}"
+                                context="{'process_id': id, 'process_model': 'process.ppc', 'type': direction}"
                                 icon="gtk-ok"/>
                             <field name="sla_ids" nolabel="1" colspan="4" readonly="1">
                                 <tree string="SLA">

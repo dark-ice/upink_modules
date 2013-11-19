@@ -45,12 +45,14 @@ class ReportQualityControlManager(Model):
             type='float',
             multi='need_date',
             string='Уровень удовлетворенности',
+            group_operator='avg'
         ),
         'quality_index': fields.function(
             _get_date,
             type='float',
             multi='need_date',
             string='Индекс удовлетворенности',
+            group_operator='avg'
         ),
         'mbo': fields.function(
             _get_date,
