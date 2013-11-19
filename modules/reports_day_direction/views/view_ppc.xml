@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <openerp>
     <data>
+        <menuitem id="menu_report_day_direction" parent="process_launch.menu_process" name="Ежедневные отчеты направлений" sequence="100"/>
+        <menuitem id="menu_report_day_direction_settings" name="Настройки" parent="menu_report_day_direction" sequence="99"/>
+
+
         <record model="ir.ui.view" id="view_report_day_ppc_tree">
             <field name="name">Ежедневный отчет направлений - PPC</field>
             <field name="model">report.day.ppc</field>
@@ -92,10 +96,7 @@
             <field name="context">{}</field>
         </record>
 
-
-        <menuitem id="menu_report_day_direction" parent="process_launch.menu_process" name="Ежедневные отчеты направлений" sequence="100"/>
         <menuitem action="window_report_day_ppc" id="menu_report_day_ppc" parent="menu_report_day_direction" sequence="1"/>
-        <menuitem id="menu_report_day_direction_settings" name="Настройки" parent="menu_report_day_direction" sequence="99"/>
         <menuitem id="menu_report_day_settings_ppc" action="window_report_day_ppc_statistic" name="Доп. модель PPC" parent="menu_report_day_direction_settings" sequence="1"/>
     </data>
 </openerp>
