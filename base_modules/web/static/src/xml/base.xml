@@ -38,13 +38,13 @@
             </table>
         </td>
     </tr>
-    <tr>
-        <td colspan="2">
-            <div id="oe_footer" class="oe_footer">
-                <!--<p class="oe_footer_powered"> Powered by <a href="http://www.openerp.com">OpenERP</a></p>-->
-            </div>
-        </td>
-    </tr>
+    <!--<tr>-->
+        <!--<td colspan="2">-->
+            <!--<div id="oe_footer" class="oe_footer">-->
+                <!--&lt;!&ndash;<p class="oe_footer_powered"> Powered by <a href="http://www.openerp.com">OpenERP</a></p>&ndash;&gt;-->
+            <!--</div>-->
+        <!--</td>-->
+    <!--</tr>-->
     </table>
 </t>
 <t t-name="Loading">
