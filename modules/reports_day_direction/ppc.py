@@ -21,7 +21,7 @@ class ReportDayPPCStatistic(Model):
         'campaign': fields.char('ID кампании', size=100)
     }
 
-    def update(self, cr, uid, ids, context=None):
+    def update(self, cr, uid):
         yandex_campaign = []
         date_start = date_end = date.today().strftime("%Y-%m-%d")
 
@@ -57,8 +57,7 @@ class ReportDayPPCStatistic(Model):
                             'cash': item['SumSearch'],
                             'name': 'direct'
                         })
-            self.unlink(cr, 1, ids)
-        return {'type': 'ir.actions.act_window_close'}
+        return True
 
 
 ReportDayPPCStatistic()

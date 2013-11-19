@@ -11,7 +11,7 @@
     """,
     'author': 'Andrey Karbanovich',
     'website': 'http://upsale.ru',
-    'depends': ['base', 'process_launch', 'process_ppc'],
+    'depends': ['base', 'web', 'process_launch', 'process_ppc'],
     'data': [],
     'installable': True,
     'auto_install': False,
@@ -21,8 +21,11 @@
         #'workflow.xml',
     ],
 
-    'js': [],
-    'css': [],
-    'qweb': [],
+    'js': [
+        'static/js/web_direction.js',
+    ],
+    'qweb': [
+        "static/xml/base.xml",
+    ],
     'images': [],
 }
