@@ -212,7 +212,7 @@
         </record>
 
         <menuitem action="window_process_ppc" id="menu_process_ppc" sequence="1" parent="process_launch.menu_process" name="PPC кампания"/>
-        <menuitem action="window_process_ppc" id="menu_process_ppc_dev" parent="menu_process_ppc"/>
+        <menuitem action="window_process_ppc" id="menu_process_ppc_dev" parent="menu_process_ppc" sequence="1"/>
 
     </data>
 </openerp>
