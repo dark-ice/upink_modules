@@ -76,7 +76,7 @@ class ReportQualityControlSpecialist(Model):
                   r.specialist,
                   r.period_name,
                   r.period_id,
-                  array_agg(r.quality_id) quality_id,
+                  array_agg(r.quality_id) quality_id
                 FROM (SELECT
                         CASE WHEN ppc.specialist_id IS NOT null THEN ppc.specialist_id
                         ELSE
