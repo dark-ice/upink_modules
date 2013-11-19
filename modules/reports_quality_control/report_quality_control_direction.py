@@ -64,7 +64,6 @@ class ReportQualityControlDirection(Model):
                 SELECT
                   row_number() over() as id,
                   bss.direction,
-                  AVG(rpqc.mbo) mbo,
                   k.name period_name,
                   k.id period_id,
                   count(pl.id),

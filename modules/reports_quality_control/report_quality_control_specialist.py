@@ -77,7 +77,6 @@ class ReportQualityControlSpecialist(Model):
                   r.period_name,
                   r.period_id,
                   array_agg(r.quality_id) quality_id,
-                  AVG(r.mbo) mbo
                 FROM (SELECT
                         CASE WHEN ppc.specialist_id IS NOT null THEN ppc.specialist_id
                         ELSE
@@ -87,7 +86,6 @@ class ReportQualityControlSpecialist(Model):
                             ELSE
                               CASE WHEN seo.specialist_id IS NOT null THEN seo.specialist_id END END END END specialist,
                         rpqc.id quality_id,
-                        rpqc.mbo,
                         k.name period_name,
                         k.id period_id
 
