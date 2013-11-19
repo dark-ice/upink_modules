@@ -100,6 +100,7 @@ class ReportDayPPC(Model):
                   process_ppc p
                   LEFT JOIN process_launch l on (l.id=p.launch_id)
                   LEFT JOIN report_day_ppc_statistic s on (p.campaign=s.campaign)
+                WHERE p.state='implementation'
             )""")
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
