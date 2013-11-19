@@ -74,14 +74,12 @@ class ReportQualityControlManager(Model):
                   r.manager_id,
                   r.period_id,
                   r.period_name,
-                  avg(r.mbo) mbo,
                   array_agg(r.quality_id) quality_ids
                 FROM (
                   SELECT
                     rpqc.period_id,
                     k.name period_name,
                     case when th.name is null then p.user_id else th.name end manager_id,
-                    rpqc.mbo,
                     rpqc.id quality_id
                     FROM res_partner_quality_control AS rpqc
                     LEFT JOIN res_partner p on (p.id=rpqc.partner_id)
