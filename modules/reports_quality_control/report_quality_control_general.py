@@ -17,16 +17,19 @@ class ReportQualityControlGeneral(Model):
                                                                               context=None)
             points = []
             indexes = []
+            mbo = []
 
             for k, val in ydolit.iteritems():
                 points.append(val['level_ydolit'])
                 indexes.append(val['index_ydolit'])
+                mbo.append(val['mbo'])
 
             money_sum = self.pool.get('res.partner')._get_report_payment(cr, uid, [record['partner_id'][0],], name, arg, context=None)
 
             res[record['id']] = {
                 'quality_point': numpy.mean(points),
                 'quality_index': numpy.mean(indexes),
+                'mbo': numpy.mean(mbo),
                 'payment_sum': money_sum[record['partner_id'][0]][0][2]['payment_sum']
             }
         return res
@@ -51,7 +54,12 @@ class ReportQualityControlGeneral(Model):
             multi='need_date',
             string='Уровень удовлетворенности по анкетк %',
         ),
-        'mbo': fields.float('MBO по услуге %'),
+        'mbo': fields.function(
+            _get_date,
+            type='float',
+            multi='need_date',
+            string='MBO по услуге',
+        ),
         'quality_index': fields.function(
             _get_date,
             type='float',

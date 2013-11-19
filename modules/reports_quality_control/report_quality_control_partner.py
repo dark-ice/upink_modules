@@ -17,12 +17,15 @@ class ReportQualityControlPartner(Model):
                                                                               context=None)
             points = []
             indexes = []
+            mbo = []
             for k, val in ydolit.iteritems():
                 points.append(val['level_ydolit'])
                 indexes.append(val['index_ydolit'])
+                mbo.append(val['mbo'])
             res[record['id']] = {
                 'quality_point': numpy.mean(points),
                 'quality_index': numpy.mean(indexes),
+                'mbo': numpy.mean(mbo),
             }
         return res
 
@@ -44,7 +47,12 @@ class ReportQualityControlPartner(Model):
             group_operator='avg'
         ),
         'count': fields.integer('Количество проектов'),
-        'mbo': fields.float('MBO по услуге'),
+        'mbo': fields.function(
+            _get_date,
+            type='float',
+            multi='need_date',
+            string='MBO по услуге',
+        ),
         'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')]),
         'period_name': fields.char('Период', size=10),
         'quality_ids': fields.char('массив', size=256),

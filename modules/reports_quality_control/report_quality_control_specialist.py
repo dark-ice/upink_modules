@@ -18,14 +18,17 @@ class ReportQualityControlSpecialist(Model):
             ydolit = self.pool.get('res.partner.quality.control')._get_ydolit(cr, uid, record['quality_id'], '', {}, context=None)
             points = []
             indexes = []
+            mbo = []
             for k, val in ydolit.iteritems():
                 points.append(val['level_ydolit'])
                 indexes.append(val['index_ydolit'])
+                mbo.append(val['mbo'])
 
             res[record['id']] = {
                 'quality_point': numpy.mean(points),
                 'quality_index': numpy.mean(indexes),
                 'partner_cnt': len(record['quality_id']),
+                'mbo': numpy.mean(mbo),
             }
         return res
 
@@ -51,7 +54,12 @@ class ReportQualityControlSpecialist(Model):
             multi='need_date',
             string='Количество партнеров',
         ),
-        'mbo': fields.float('MBO по услуге'),
+        'mbo': fields.function(
+            _get_date,
+            type='float',
+            multi='need_date',
+            string='MBO по услуге',
+        ),
         'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')]),
         'period_name': fields.char('Период', size=10),
         #'partner_id': fields.many2one('res.partner', 'Партнер'),
