@@ -645,28 +645,28 @@ class KpiSmart(Model):
             method=True,
             string='Проверка на автора',
             type='boolean',
-            invisible=True
+            #invisible=True
         ),
         'check_i': fields.function(
             _check_access,
             method=True,
             string='Проверка на инициатора',
             type='boolean',
-            invisible=True
+            #invisible=True
         ),
         'check_r': fields.function(
             _check_access,
             method=True,
             string='Проверка на ответственного',
             type='boolean',
-            invisible=True
+            #invisible=True
         ),
         'check_m': fields.function(
             _check_access,
             method=True,
             string='Проверка на руководителя ответственного',
             type='boolean',
-            invisible=True
+            #invisible=True
         ),
 
         'check_e': fields.function(
@@ -674,7 +674,7 @@ class KpiSmart(Model):
             method=True,
             string='Проверка на равенство автора и руководителя',
             type='boolean',
-            invisible=True
+            #invisible=True
         ),
 
         'check_x': fields.function(
@@ -682,7 +682,7 @@ class KpiSmart(Model):
             method=True,
             string='Проверка на наличие руководителя в родительской',
             type='boolean',
-            invisible=True
+            #invisible=True
         ),
 
         'color': fields.function(
