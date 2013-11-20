@@ -642,7 +642,7 @@
                             <field name="name" string="Основной сайт"/>
                             <field name="ur_name"/>
                             <field name="lead" groups="base.partner_extended" />
-                            <field name="active" groups="base.partner_extended" />
+                            <field name="active" attrs="{'invisible': [('check', '=', False)]}" />
                             <newline/>
 
                             <field name="partner_status" />
@@ -1319,7 +1319,7 @@
                             <field name="ur_name" colspan="8"/>
                             <button name="to_partner" type="object" string="Создать партнера" icon="gtk-ok" />
                             <newline />
-                            <field name="active" groups="base.partner_extended" />
+                            <field name="active" attrs="{'invisible': [('check', '=', False)]}" />
                         </group>
                         <notebook colspan="4">
                             <page string="Контакты">

@@ -986,13 +986,10 @@ class res_partner(Model):
         return res
 
     def _check_access(self, cr, uid, ids, name, arg, context=None):
-        res = {}
-        for record in self.browse(cr, uid, ids):
-            if uid in (14, 284):
-                res[record.id] = True
-            else:
-                res[record.id] = False
-        return res
+        flag = False
+        if uid in (1, 14):
+            flag = True
+        return dict([(record_id, flag) for record_id in ids])
 
     def _get_service(self, cr, uid, ids, name, arg, context=None):
         res = {}
