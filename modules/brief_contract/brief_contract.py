@@ -14,7 +14,7 @@ from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
 
-#from relatorio.templates.opendocument import Template
+#from relatorio.templates.opendocument import Template1
 from aeroolib.plugins.opendocument import Template, OOSerializer
 from pytils import dt, numeral
 import paramiko
@@ -638,7 +638,8 @@ class BriefContract(Model):
             filepath = os.path.join(storage['path'], template['store_fname'])
             template_io = StringIO()
             template_io.write(filepath)
-            basic = Template(source=template_io)
+            serializer = OOSerializer(template_io)
+            basic = Template(source=template_io, serializer=serializer)
 
             d = datetime.strptime(contract['contract_date'], '%Y-%m-%d')
             date_str = dt.ru_strftime(u"%d %B %Y", d, inflected=True)
