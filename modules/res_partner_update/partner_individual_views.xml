@@ -642,11 +642,12 @@
                             <field name="name" string="Основной сайт"/>
                             <field name="ur_name"/>
                             <field name="lead" groups="base.partner_extended" />
+                            <field name="active" groups="base.partner_extended" />
                             <newline/>
 
                             <field name="partner_status" />
                             <field name="next_call"/>
-                            <field name="user_id" attrs="{'readonly': [('lead', '=', False)]}"/>
+                            <field name="user_id" readonly="1"/>
                             <field name="categ_id" widget="selection" string="Тематика" />
                             <field name="partner_type" invisible="1"/>
 
@@ -1302,7 +1303,7 @@
                             <field name="next_call"/>
                             <field name="next_call_comment"/>
 
-                            <field name="user_id"/>
+                            <field name="user_id" readonly="1"/>
                             <field name="priority"/>
 
                             <field name="categ_id" string="Тематика" />
@@ -1318,7 +1319,7 @@
                             <field name="ur_name" colspan="8"/>
                             <button name="to_partner" type="object" string="Создать партнера" icon="gtk-ok" />
                             <newline />
-                            <field name="active" attrs="{'invisible': [('check', '=', False)]}" />
+                            <field name="active" groups="base.partner_extended" />
                         </group>
                         <notebook colspan="4">
                             <page string="Контакты">

@@ -122,7 +122,7 @@
                                 name="action_removed"
                                 type="workflow"
                                 icon="gtk-cancel"
-                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), '|', ('check_i', '=', False), ('check_x', '=', False)]}"
+                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), '|', ('check_i', '=', False), '|', ('check_x', '=', False), ('check_m', '=', False)]}"
                                 />
 
                         <!-- inwork -> not_done -->
@@ -130,7 +130,7 @@
                                 name="action_not_done"
                                 type="workflow"
                                 icon="gtk-cancel"
-                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ]}"
+                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_r', '=', False)]}"
                                 />
 
                         <!-- inwork -> transfer -->
@@ -138,7 +138,7 @@
                                 name="action_transfer"
                                 type="workflow"
                                 icon="terp-stock_effects-object-colorize"
-                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), '|', ('check_i', '=', False), ('check_x', '=', False)]}"
+                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), '|', ('check_i', '=', False), '|', ('check_x', '=', False), ('check_x', '=', False)]}"
                                 />
 
                         <!-- inwork -> delegated -->

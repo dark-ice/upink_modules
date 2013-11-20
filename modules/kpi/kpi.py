@@ -245,7 +245,7 @@ class KpiIndicatorsReference(Model):
 KpiIndicatorsReference()
 
 
-class iKpiStaff(AbstractModel):
+class KpiStaff(AbstractModel):
     _name = "kpi.staff"
     _rec_name = "employee_id"
     _order = "period_id, employee_id"
