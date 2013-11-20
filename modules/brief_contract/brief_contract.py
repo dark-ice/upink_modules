@@ -1,4 +1,8 @@
 # -*- encoding: utf-8 -*-
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 import base64
 import subprocess
 import os
@@ -631,8 +635,9 @@ class BriefContract(Model):
             storage = self.pool.get('document.storage').read(cr, user, dbro['storage_id'][0], ['path'])
 
             filepath = os.path.join(storage['path'], template['store_fname'])
-
-            basic = Template(source=base64.decodestring(filepath))
+            template_io = StringIO()
+            template_io.write(filepath)
+            basic = Template(source=template_io)
 
             d = datetime.strptime(contract['contract_date'], '%Y-%m-%d')
             date_str = dt.ru_strftime(u"%d %B %Y", d, inflected=True)
