@@ -765,7 +765,8 @@ class BriefContract(Model):
 
             odt_file = os.path.join(storage['path'], 'tmp.odt')
             #basic = Report(filepath, 'application/vnd.oasis.opendocument.text')
-            file(odt_file, 'wb').write(basic(o=o).render().getvalue())
+            file(odt_file, 'wb').write(basic.generate(o=o).render().getvalue())
+            #file(odt_file, 'wb').write(basic(o=o).render().getvalue())
             #file(odt_file, 'wb').write(basic.generate(o=o).render().getvalue())
 
             #basic_generated = basic.generate(o=o).render()
