@@ -92,7 +92,7 @@
                             <option value="reorder">Дозаказ(отмена заказа)</option>
                             <option value="exchange">Обмен(возврат)</option>
                             <option value="reserve">Резерв</option>
-                            <option value="other">ДругоеК</option>
+                            <option value="other">Другое</option>
                         </select>
                     </p>
                 </div>

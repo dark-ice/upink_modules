@@ -167,7 +167,7 @@ class WebCalls(Model):
                    ('adminpanel', 'Админ-панель'),
                    ('shara', 'Халява'),
             ],
-            fnct_search= search_check_box_type
+            fnct_search=search_check_box_type
         ),
         'consultation': fields.char('Вопрос консультации', size=250),
         'no_product': fields.char('Запрос на отсутствующий товар', size=250),
@@ -383,7 +383,8 @@ class calls_create(openerpweb.Controller):
                 'consultation': consultation,
                 'no_product': no_product,
                 'sale_type': sale_type,
-                'set_order': set_order
+                'set_order': set_order,
+                'incoming_call': True
             }
         )
         state = True if create_id else False
