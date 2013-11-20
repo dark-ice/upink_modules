@@ -301,7 +301,7 @@ class KpiStaff(AbstractModel):
             if need_period_ids:
                 args.remove(period[0])
                 args.append(('period_id', 'in', need_period_ids))
-        return super(iKpiStaff, self).search(cr, user, args, offset, limit, order, context, count)
+        return super(KpiStaff, self).search(cr, user, args, offset, limit, order, context, count)
 
 
 class KpiEnrollmentFormal(Model):
