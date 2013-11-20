@@ -462,7 +462,7 @@ class KpiSmart(Model):
         """
         empl_pool = self.pool.get('hr.employee')
         res = {}
-        for data in self.browse(cr, uid, ids, context):
+        for data in self.browse(cr, 1, ids, context):
             access = str()
 
             #  Автор
