@@ -813,7 +813,7 @@ class BriefContract(Model):
 
                 client.close()
 
-                self.write(cr, 1, [record['id']], {'url': url, 'login': 'erp', 'pass': '1'})
+                self.write(cr, 1, [record['id']], {'url': url, 'login': partner_user, 'pass': partner_pass})
             else:
                 raise osv.except_osv('Договор', "Сначала надо сгенерировать pdf!")
         return True
