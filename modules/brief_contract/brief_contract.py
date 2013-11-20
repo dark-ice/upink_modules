@@ -638,7 +638,7 @@ class BriefContract(Model):
             filepath = os.path.join(storage['path'], template['store_fname'])
             template_io = StringIO()
             template_io.write(filepath)
-            serializer = OOSerializer(filepath)
+            serializer = OOSerializer(base64.b64encode(open(filepath, 'rb').read()))
             basic = Template(source=template_io, serializer=serializer)
 
             d = datetime.strptime(contract['contract_date'], '%Y-%m-%d')
@@ -756,22 +756,16 @@ class BriefContract(Model):
                     'our_site': u'UpSale.ru,  Fortune@UpSale.ru',
                 })
 
-            #o = [(k, v.encode('utf-8')) for k, v in o.iteritems() if isinstance(v, str)]
-
             filename = '{0} {1} {2}'.format(
                 contract['contract_number'].encode('utf-8'),
                 contract['partner_id'][1].encode('utf-8'),
                 contract['service_id'][1].encode('utf-8'), )
 
             odt_file = os.path.join(storage['path'], 'tmp.odt')
-            #basic = Report(filepath, 'application/vnd.oasis.opendocument.text')
             file(odt_file, 'wb').write(basic.generate(o=o).render().getvalue())
             #file(odt_file, 'wb').write(basic(o=o).render().getvalue())
             #file(odt_file, 'wb').write(basic.generate(o=o).render().getvalue())
 
-            #basic_generated = basic.generate(o=o).render()
-            #file('bonham_basic.odt', 'wb').write(basic_generated.getvalue())
-            #
             doc_id = self.pool.get('ir.attachment').create(cr, user, {
                 'name': '{0}.odt'.format(filename, ),
                 'datas': base64.b64encode(open(odt_file, 'rb').read()),
