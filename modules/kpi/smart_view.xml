@@ -138,7 +138,9 @@
                                 name="action_transfer"
                                 type="workflow"
                                 icon="terp-stock_effects-object-colorize"
-                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), '|', ('check_i', '=', False), '|', ('check_x', '=', False), ('check_m', '=', False)]}"
+                                attrs="{'invisible': ['&amp;',
+                                '|', ('state', '!=', 'inwork'), ('check_i', '=', False),
+                                '|', ('state', '!=', 'delegated'), '|', ('check_x', '=', False), ('check_m', '=', False)]}"
                                 />
 
                         <!-- inwork -> delegated -->
