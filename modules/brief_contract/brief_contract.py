@@ -754,7 +754,7 @@ class BriefContract(Model):
                     'our_rs': account['account_number'] or u'-',
                     'our_bik': account['bik'] or u'-',
                     'our_phone': account['phone'] or u'-',
-                    'our_site': u'UpSale.ru,  Fortune@UpSale.ru',
+                    'our_site': u'UpSale.ru, Fortune@UpSale.ru',
                 })
 
             filename = '{0} {1} {2}'.format(
@@ -762,12 +762,10 @@ class BriefContract(Model):
                 contract['partner_id'][1].encode('utf-8'),
                 contract['service_id'][1].encode('utf-8'), )
 
-            data = [(k, str(v)) for k, v in o.iteritems()]
+            #data = [(k, v.encode('cp1251')) for k, v in o.iteritems() if isinstance(v, unicode)]
 
             odt_file = os.path.join(storage['path'], 'tmp.odt')
-            file(odt_file, 'wb').write(basic.generate(o=dict(data)).render().getvalue())
-            #file(odt_file, 'wb').write(basic(o=o).render().getvalue())
-            #file(odt_file, 'wb').write(basic.generate(o=o).render().getvalue())
+            file(odt_file, 'wb').write(basic.generate(o=o).render().getvalue())
 
             doc_id = self.pool.get('ir.attachment').create(cr, user, {
                 'name': '{0}.odt'.format(filename, ),
