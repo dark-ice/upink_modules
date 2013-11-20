@@ -636,8 +636,10 @@ class BriefContract(Model):
             storage = self.pool.get('document.storage').read(cr, user, dbro['storage_id'][0], ['path'])
 
             filepath = os.path.join(storage['path'], template['store_fname'])
+            file_data = open(filepath, 'rb').read()
+            raise osv.except_osv('File data', file_data)
             template_io = StringIO()
-            template_io.write(open(filepath, 'rb').read().decode('ascii'))
+            template_io.write(file_data)
             serializer = OOSerializer(template_io)
             basic = Template(source=template_io, serializer=serializer)
 
