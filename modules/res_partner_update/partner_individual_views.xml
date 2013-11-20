@@ -641,7 +641,7 @@
                         <group colspan="4" col="8">
                             <field name="name" string="Основной сайт"/>
                             <field name="ur_name"/>
-                            <field name="lead" groups="base.partner_extended" />
+                            <field name="lead" attrs="{'invisible': [('check', '=', False)]}" />
                             <field name="active" attrs="{'invisible': [('check', '=', False)]}" />
                             <newline/>
 
