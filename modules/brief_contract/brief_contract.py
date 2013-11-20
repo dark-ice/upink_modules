@@ -637,7 +637,6 @@ class BriefContract(Model):
 
             filepath = os.path.join(storage['path'], template['store_fname'])
             file_data = open(filepath, 'rb').read()
-            raise osv.except_osv('File data', file_data)
             template_io = StringIO()
             template_io.write(file_data)
             serializer = OOSerializer(template_io)
@@ -763,8 +762,10 @@ class BriefContract(Model):
                 contract['partner_id'][1].encode('utf-8'),
                 contract['service_id'][1].encode('utf-8'), )
 
+            data = [(k, str(v)) for k, v in o.iteritems()]
+
             odt_file = os.path.join(storage['path'], 'tmp.odt')
-            file(odt_file, 'wb').write(basic.generate(o=o).render().getvalue())
+            file(odt_file, 'wb').write(basic.generate(o=dict(data)).render().getvalue())
             #file(odt_file, 'wb').write(basic(o=o).render().getvalue())
             #file(odt_file, 'wb').write(basic.generate(o=o).render().getvalue())
 
