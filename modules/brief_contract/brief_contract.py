@@ -638,7 +638,7 @@ class BriefContract(Model):
             filepath = os.path.join(storage['path'], template['store_fname'])
             template_io = StringIO()
             template_io.write(filepath)
-            serializer = OOSerializer(template_io)
+            serializer = OOSerializer(filepath)
             basic = Template(source=template_io, serializer=serializer)
 
             d = datetime.strptime(contract['contract_date'], '%Y-%m-%d')
