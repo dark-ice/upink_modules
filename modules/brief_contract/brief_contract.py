@@ -448,7 +448,7 @@ class BriefContract(Model):
 
             convert_odt(filepath, storage['path'])
 
-            status = subprocess.call(['rst2html.py', rst_file, html_file], stderr=subprocess.PIPE)
+            status = subprocess.call(['rst2html', rst_file, html_file], stderr=subprocess.PIPE)
             status = subprocess.call(['/usr/bin/wkhtmltopdf', html_file, pdf_file], stderr=subprocess.PIPE)
 
             values['pdf_id'] = self.pool.get('ir.attachment').create(cr, user, {
