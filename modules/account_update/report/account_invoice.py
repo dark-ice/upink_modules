@@ -90,7 +90,7 @@ class AccountInvoiceDocument(report_sxw.rml_parse):
                         st = u'Просп.'
                     if item['st_type'] == 'ploshad':
                         st = u'Пл.'
-                    result_list.append(u"{st_type}. {street}".format(street=item['street'], st_type=st))
+                    result_list.append(u"{st_type} {street}".format(street=item['street'], st_type=st))
                 if item['house']:
                     result_list.append(u"д. {house}".format(house=item['house']))
                 if item['housing']:
