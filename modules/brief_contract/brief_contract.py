@@ -13,8 +13,9 @@ from odt2sphinx.odt2sphinx import convert_odt
 from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
-from relatorio import Report
-from relatorio.templates.opendocument import Template
+
+#from relatorio.templates.opendocument import Template
+from aeroolib.plugins.opendocument import Template, OOSerializer
 from pytils import dt, numeral
 import paramiko
 from pytils.translit import slugify
