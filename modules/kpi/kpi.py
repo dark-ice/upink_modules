@@ -486,7 +486,7 @@ class KpiSmart(Model):
             if data.responsible_head_id and data.author_id and data.responsible_head_id == data.author_id:
                 access += 'e'
 
-            if data.parent_id and data.parent_id.responsible_head_id and data.parent_id.responsible_head_id.id == uid:
+            if data.parent_id and data.parent_id.responsible_head_id and data.parent_id.responsible_head_id.user_id.id == uid:
                 access += 'x'
 
             val = False
