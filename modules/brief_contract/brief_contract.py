@@ -632,7 +632,7 @@ class BriefContract(Model):
 
             filepath = os.path.join(storage['path'], template['store_fname'])
 
-            #basic = Template(source=None, filepath=filepath)
+            basic = Template(source=base64.decodestring(filepath))
 
             d = datetime.strptime(contract['contract_date'], '%Y-%m-%d')
             date_str = dt.ru_strftime(u"%d %B %Y", d, inflected=True)
@@ -757,7 +757,7 @@ class BriefContract(Model):
                 contract['service_id'][1].encode('utf-8'), )
 
             odt_file = os.path.join(storage['path'], 'tmp.odt')
-            basic = Report(filepath, 'application/vnd.oasis.opendocument.text')
+            #basic = Report(filepath, 'application/vnd.oasis.opendocument.text')
             file(odt_file, 'wb').write(basic(o=o).render().getvalue())
             #file(odt_file, 'wb').write(basic.generate(o=o).render().getvalue())
 
