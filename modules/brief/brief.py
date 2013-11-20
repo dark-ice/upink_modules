@@ -1577,7 +1577,6 @@ class Brief(Model):
          'Вам необходимо указать к кому относится данный бриф.',
          [u'Партнер']),
     ]
-Brief()
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
         new_item = []
@@ -1591,8 +1590,8 @@ Brief()
                 item[2] = item[2].upper()
         if new_item:
             args.append(new_item)
-        return super(brief_main, self).search(cr, user, args, offset, limit, order, context, count)
-brief_main()
+        return super(Brief, self).search(cr, user, args, offset, limit, order, context, count)
+Brief()
 
 
 class BriefHistory(Model):
