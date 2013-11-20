@@ -117,12 +117,15 @@
                                  ]}"
                                 />
 
-                        <!-- inwork -> removed -->
+                        <!-- inwork, delegated -> removed -->
                         <button string="Задача снята"
                                 name="action_removed"
                                 type="workflow"
                                 icon="gtk-cancel"
-                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), '|', ('check_i', '=', False), '|', ('check_x', '=', False), ('check_m', '=', False)]}"
+                                attrs="{'invisible': ['&amp;',
+                                '|', ('state', '!=', 'inwork'), '|', ('check_i', '=', False), '|', ('check_x', '=', False),
+                                '|', ('state', '!=', 'delegated'), ('check_m', '=', False)
+                                ]}"
                                 />
 
                         <!-- inwork -> not_done -->
@@ -133,13 +136,13 @@
                                 attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_r', '=', False)]}"
                                 />
 
-                        <!-- inwork -> transfer -->
+                        <!-- inwork, delegated -> transfer -->
                         <button string="Задача перенесена"
                                 name="action_transfer"
                                 type="workflow"
                                 icon="terp-stock_effects-object-colorize"
                                 attrs="{'invisible': ['&amp;',
-                                '|', ('state', '!=', 'inwork'), ('check_i', '=', False),
+                                '|', ('state', '!=', 'inwork'), '|', ('check_x', '=', False), ('check_i', '=', False),
                                 '|', ('state', '!=', 'delegated'), ('check_m', '=', False)]}"
                                 />
 

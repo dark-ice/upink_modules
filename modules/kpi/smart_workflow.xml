@@ -225,6 +225,20 @@
             <field name="signal">action_done</field>
         </record>
 
+        <!-- delegated -> transfer -->
+        <record model="workflow.transition" id="delegated_transfer">
+            <field name="act_from" ref="act_delegated"/>
+            <field name="act_to" ref="act_transfer"/>
+            <field name="signal">action_transfer</field>
+        </record>
+
+        <!-- delegated -> removed -->
+        <record model="workflow.transition" id="delegated_removed">
+            <field name="act_from" ref="act_delegated"/>
+            <field name="act_to" ref="act_removed"/>
+            <field name="signal">action_removed</field>
+        </record>
+
         <!-- done -> accepted -->
         <record model="workflow.transition" id="done_accepted">
             <field name="act_from" ref="act_done"/>
