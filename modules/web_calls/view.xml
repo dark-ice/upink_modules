@@ -32,9 +32,9 @@
                     <field name="responsible_id"/>
                     <field name="call_date"/>
                     <field name="sale_type" />
-                    <field name="set_order"/>
-                    <field name="check_box_type"/>
                     <field name="call_type"/>
+                    <field name="check_box_type" string="Категория"/>
+                    <field name="set_order"/>
 
                     <newline />
                     <filter icon="STOCK_MEDIA_PLAY"
