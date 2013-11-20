@@ -206,6 +206,7 @@
                     <field name="check_r" invisible="1" />
                     <field name="check_m" invisible="1" />
                     <field name="check_e" invisible="1" />
+                    <field name="check_x" invisible="1" />
 
                     <field name="name" />
                     <field name="author_id"/>
