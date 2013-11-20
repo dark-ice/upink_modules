@@ -910,6 +910,17 @@ class ResPartnerBankAddress(Model):
             ], 'Тип'),
         'index': fields.char("Почтовый индекс", size=6),
         'city': fields.char("Город", size=250),
+        'st_type': fields.selection(
+            [
+                ('alleya', 'Аллея'),
+                ('ylitsa', 'Улица'),
+                ('bulvar', 'Бульвар'),
+                ('naberegnaya', 'Набережная'),
+                ('pereyloc', 'Переулок'),
+                ('proezd', 'Проезд'),
+                ('prospect', 'Проспект'),
+                ('ploshad', 'Площадь'),
+            ], 'Тип улицы'),
         'street': fields.char("Улица", size=250),
         'house': fields.char("№ дома", size=50),
         'housing': fields.char("№ корпуса", size=50),
@@ -930,7 +941,8 @@ class ResPartnerBankAddress(Model):
 
     _defaults = {
         'name': lambda *a: 'ua',
-        'flat_type': lambda *a: 'flat'
+        'flat_type': lambda *a: 'flat',
+        'st_type': 'ylitsa'
     }
 ResPartnerBankAddress()
 
@@ -974,13 +986,10 @@ class res_partner(Model):
         return res
 
     def _check_access(self, cr, uid, ids, name, arg, context=None):
-        res = {}
-        for record in self.browse(cr, uid, ids):
-            if uid in (14, 284):
-                res[record.id] = True
-            else:
-                res[record.id] = False
-        return res
+        flag = False
+        if uid in (1, 14):
+            flag = True
+        return dict([(record_id, flag) for record_id in ids])
 
     def _get_service(self, cr, uid, ids, name, arg, context=None):
         res = {}
@@ -1417,7 +1426,7 @@ class res_partner(Model):
         'categ_id': fields.many2one(
             'crm.case.categ',
             'Тематика',
-            domain="['|',('section_id','=',section_id),('section_id','=',False),('object_id.model', '=', 'crm.lead')]",
+            #domain="['|', ('section_id', '=', False), ('responsible_users', '=', user_id)]",
             help='Категория, которой принадлежит данный Партнер'
         ),
         'description': fields.text('Дополнительная информация о контактном лице'),
@@ -1683,6 +1692,12 @@ class res_partner(Model):
                 attachment[2]['res_model'] = 'res.partner'
 
         return super(res_partner, self).write(cr, user, ids, vals, context)
+
+    def create(self, cr, user, vals, context=None):
+        categ_ids = self.pool.get('crm.case.categ').search(cr, user, [('responsible_users', '=', user)])
+        if vals.get('partner_base') == 'cold' and (not vals.get('categ_id') or vals['categ_id'] not in categ_ids):
+            raise osv.except_osv("Ошибка", "Заполните поле 'Тематика' Вашей тематикой")
+        return super(res_partner, self).create(cr, user, vals, context)
 
     def _check_unique_insesitive(self, cr, uid, ids, context=None):
         for self_obj in self.browse(cr, 1, ids, context):

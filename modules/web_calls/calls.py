@@ -81,6 +81,7 @@ CITIES = (
     ('kharkov', u'Харьков'),
     ('saratov', u'Саратов'),
     ('belarus', u'Минск'),
+    ('astana', u'Астана'),
     ('warsaw', u'Варшава'),
     ('astana', u'Астана'),
     ('unknown', u'Неизвестный город')
@@ -98,6 +99,12 @@ def format_date_tz(date, tz=None):
 class WebCalls(Model):
     _name = 'web.calls'
     _order = 'id DESC'
+
+    def search_check_box_type(self, cr, uid, obj, name, args, context):
+        check_ids = self.search(cr, 1, [(args[0][2], '=', True)])
+        if check_ids:
+            return [('id', 'in', check_ids)]
+        return [('id', '=', '0')]
 
     _columns = {
         'name': fields.char('Номер входящего звонка', size=10),
@@ -118,7 +125,16 @@ class WebCalls(Model):
                 ('order', 'Уточнения по оформленному заказу'),
                 ('atc', 'Проблема с АТС'),
                 ('number', 'Ошиблись номером'),
-            ), 'Тип звонка'
+            ), 'Тип заявки'
+        ),
+        'set_order': fields.selection(
+            (
+                ('income', 'Доставка'),
+                ('reorder', 'Дозаказ(отмена заказа)'),
+                ('exchange', 'Обмен(возврат)'),
+                ('reserve', 'Резерв'),
+                ('other', 'Другое'),
+            ), 'Тип уточняющего заказа'
         ),
         'account': fields.char('Счет', size=250),
         'po': fields.char('ПО', size=250),
@@ -127,6 +143,7 @@ class WebCalls(Model):
         'livesite': fields.boolean('Продажи с Живосайта'),
         'adminpanel': fields.boolean('Продажи с Админпанели'),
         'shara': fields.boolean('Халява'),
+        'incoming_call': fields.boolean('Входящий звонок'),
         'sale_type': fields.selection(
             (
                 ('-', '-'),
@@ -137,7 +154,20 @@ class WebCalls(Model):
 
             ), 'Тип продажи'
         ),
-
+        'check_box_type': fields.function(
+            lambda *a: [],
+            type="selection",
+            method=True,
+            string='Тип заявки',
+            help='',
+            selection=[
+                   ('incoming_call', 'Входящий звонок'),
+                   ('livesite', 'Живосайт'),
+                   ('adminpanel', 'Админ-панель'),
+                   ('shara', 'Халява'),
+            ],
+            fnct_search= search_check_box_type
+        ),
         'consultation': fields.char('Вопрос консультации', size=250),
         'no_product': fields.char('Запрос на отсутствующий товар', size=250),
 
@@ -331,7 +361,7 @@ class calls_create(openerpweb.Controller):
 
     @openerpweb.jsonrequest
     def create(self, req, city, region, phone, call_time, call_date, call_type, responsible_id, account, po, invoice,
-               consultation, no_product, sale_type):
+               consultation, no_product, sale_type, set_order):
         call_datetime = datetime.strptime("{date} {time}:00".format(date=call_date, time=call_time.replace('.', ':')),
                                           "%d/%m/%Y %H:%M:%S") - timedelta(hours=3)
 
@@ -351,7 +381,8 @@ class calls_create(openerpweb.Controller):
                 'invoice': invoice,
                 'consultation': consultation,
                 'no_product': no_product,
-                'sale_type': sale_type
+                'sale_type': sale_type,
+                'set_order': set_order
             }
         )
         state = True if create_id else False

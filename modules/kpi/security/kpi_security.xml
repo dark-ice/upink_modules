@@ -10,7 +10,7 @@
         <record id="kpi_smart_rule" model="ir.rule">
             <field name="name">KPI SMART: Видят там где являются: автором, инициатором, ответственным, руководителем ответственного</field>
             <field ref="model_kpi_smart" name="model_id"/>
-            <field name="domain_force">['|', '|', '|', ('author_id.user_id.id', '=', user.id), ('initiator_id.user_id.id', '=', user.id), ('responsible_id.user_id.id', '=', user.id), ('responsible_head_id.user_id.id', '=', user.id)]</field>
+            <field name="domain_force">['|', '|', '|', '|', ('author_id.user_id.id', '=', user.id), ('initiator_id.user_id.id', '=', user.id), ('responsible_id.user_id.id', '=', user.id), ('responsible_head_id.user_id.id', '=', user.id), ('parent_id.responsible_head_id.user_id.id', '=', user.id)]</field>
             <field name="perm_read" eval="True" />
             <field name="perm_create" eval="True" />
             <field name="perm_write" eval="True" />
