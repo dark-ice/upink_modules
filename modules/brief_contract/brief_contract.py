@@ -9,9 +9,7 @@ from odt2sphinx.odt2sphinx import convert_odt
 from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
-import re
 from relatorio.templates.opendocument import Template
-from rst2pdf.createpdf import RstToPdf
 from pytils import dt, numeral
 import paramiko
 from pytils.translit import slugify
@@ -633,7 +631,7 @@ class BriefContract(Model):
 
             filepath = os.path.join(storage['path'], template['store_fname'])
 
-            basic = Template(source='', filepath=filepath)
+            basic = Template(source=None, filepath=filepath)
 
             d = datetime.strptime(contract['contract_date'], '%Y-%m-%d')
             date_str = dt.ru_strftime(u"%d %B %Y", d, inflected=True)
@@ -759,6 +757,10 @@ class BriefContract(Model):
 
             odt_file = os.path.join(storage['path'], 'tmp.odt')
             file(odt_file, 'wb').write(basic.generate(o=o).render().getvalue())
+
+            #basic_generated = basic.generate(o=o).render()
+            #file('bonham_basic.odt', 'wb').write(basic_generated.getvalue())
+            #
             doc_id = self.pool.get('ir.attachment').create(cr, user, {
                 'name': '{0}.odt'.format(filename, ),
                 'datas': base64.b64encode(open(odt_file, 'rb').read()),
