@@ -140,7 +140,7 @@
                                 icon="terp-stock_effects-object-colorize"
                                 attrs="{'invisible': ['&amp;',
                                 '|', ('state', '!=', 'inwork'), ('check_i', '=', False),
-                                '|', ('state', '!=', 'delegated'), '|', ('check_x', '=', False), ('check_m', '=', False)]}"
+                                '|', ('state', '!=', 'delegated'), ('check_x', '=', False)]}"
                                 />
 
                         <!-- inwork -> delegated -->
