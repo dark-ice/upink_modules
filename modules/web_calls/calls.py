@@ -129,6 +129,7 @@ class WebCalls(Model):
         ),
         'set_order': fields.selection(
             (
+                ('-', '-'),
                 ('income', 'Доставка'),
                 ('reorder', 'Дозаказ(отмена заказа)'),
                 ('exchange', 'Обмен(возврат)'),
