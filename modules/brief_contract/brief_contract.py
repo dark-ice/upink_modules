@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 import base64
+import subprocess
 import os
 from datetime import datetime
 import random
@@ -442,20 +443,13 @@ class BriefContract(Model):
                 data.service_id.name.encode('utf-8'), )
 
             rst_file = os.path.join(storage['path'], 'index.rst')
+            html_file = os.path.join(storage['path'], 'index.html')
             pdf_file = os.path.join(storage['path'], 'tmp.pdf')
 
             convert_odt(filepath, storage['path'])
-            text = open(rst_file).read()
-            style = {
-                "embeddedFonts": [["DejaVuSans.ttf", "DejaVuSans-Bold.ttf", "DejaVuSans-Oblique.ttf", "DejaVuSans-BoldOblique.ttf"]],
-                "fontsAlias": {
-                    "stdFont": "DejaVuSans",
-                    "stdBold": "DejaVuSans-Bold",
-                    "stdItalic": "DejaVuSans-Oblique",
-                    "stdBoldItalic": "DejaVuSans-BoldOblique",
-                }
-            }
-            RstToPdf(language='ru', stylesheets=style).createPdf(text=text, source_path=rst_file, output=pdf_file)
+
+            status = subprocess.call(['rst2html.py', rst_file, html_file], stderr=subprocess.PIPE)
+            status = subprocess.call(['/usr/bin/wkhtmltopdf', html_file, pdf_file], stderr=subprocess.PIPE)
 
             values['pdf_id'] = self.pool.get('ir.attachment').create(cr, user, {
                 'name': '{0}.pdf'.format(filename, ),
