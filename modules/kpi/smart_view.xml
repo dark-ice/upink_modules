@@ -123,8 +123,8 @@
                                 type="workflow"
                                 icon="gtk-cancel"
                                 attrs="{'invisible': ['&amp;',
-                                '|', ('state', '!=', 'inwork'), '|', ('check_i', '=', False), ('check_x', '=', False),
-                                '|', ('state', '!=', 'delegated'), ('check_m', '=', False)
+                                '|', ('state', '!=', 'inwork'), ('check_i', '=', False),
+                                '|', ('state', 'not in', ('delegated', 'inwork')), ('check_m', '=', False)
                                 ]}"
                                 />
 
@@ -142,8 +142,8 @@
                                 type="workflow"
                                 icon="terp-stock_effects-object-colorize"
                                 attrs="{'invisible': ['&amp;',
-                                '|', '|', ('state', '!=', 'inwork'), ('check_x', '=', False), ('check_i', '=', False),
-                                '|', ('state', '!=', 'delegated'), ('check_m', '=', False)
+                                '|', ('state', '!=', 'inwork'), ('check_i', '=', False),
+                                '|', ('state', 'not in', ('delegated', 'inwork')), ('check_m', '=', False)
                                 ]}"
                                 />
 
