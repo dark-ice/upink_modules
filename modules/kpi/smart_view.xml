@@ -142,7 +142,7 @@
                                 type="workflow"
                                 icon="terp-stock_effects-object-colorize"
                                 attrs="{'invisible': ['&amp;',
-                                '|', ('state', '!=', 'inwork'), '|', ('check_i', '=', False), ('check_x', '=', False),
+                                ('state', '!=', 'inwork'),
                                 '|', ('state', '!=', 'delegated'), ('check_m', '=', False)
                                 ]}"
                                 />
