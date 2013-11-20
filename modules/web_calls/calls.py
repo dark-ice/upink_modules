@@ -28,7 +28,7 @@ REGIONS = {
     'spb': set(['yandexmarket_SPB', 'SEO_SPB', 'kont_google_SPB', 'kont_yandex_SPB', 'smm_SPB', 'catalog_SPB', 'seo_SPB',
             'St_Piter', 'SPb-78124948862',  'service-Russia', 'kont_yandex_SPB']),
     'kiev': set(['yandexmarket_KIEV', 'SEO_KIEV', 'kont_google_Kiev', 'kont_yandex_KIEV', 'smm_KIEV', 'catalog_KIEV',
-             'seo_KIEV', 'Kiev', 'Kiev_region', 'Kiev-service', 'SEO_KIEV']),
+             'seo_KIEV', 'Kiev', 'Kiev_region', 'Kiev-service', 'SEO_KIEV', 'LuckyPrint']),
     'ekb': set(['Ekatirenburg', 'EKT-reg']),
     'novosibirsk': set(['Novosibirsk', 'Novosibirsk-new']),
     'chelyabinsk': set(['Chelyabinsk', 'Chel_region']),
