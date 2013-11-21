@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-from shutil import copyfile
+from shutil import copy2
 
 try:
     from cStringIO import StringIO
@@ -445,11 +445,12 @@ class BriefContract(Model):
                 data.contract_number.encode('utf-8'),
                 data.partner_id.name.encode('utf-8'),
                 data.service_id.name.encode('utf-8'), )
-            copyfile(filepath, os.path.join(storage['path'], 'tmp.odt'))
+
+            copy2(filepath, os.path.join(storage['path'], 'tmp.odt'))
             odt = os.path.join(storage['path'], 'tmp.odt')
             pdf_file = os.path.join(storage['path'], 'tmp.pdf')
 
-            status = subprocess.call(['libreoffice', '--headless', '--convert-to', 'pdf', odt], stderr=subprocess.PIPE)
+            status = subprocess.call(['libreoffice', '--headless', '--convert-to', 'pdf', '-outdir', storage['path'], '/home/andrey/erp/filestorage/tmp.odt'], stderr=subprocess.PIPE)
 
             values['pdf_id'] = self.pool.get('ir.attachment').create(cr, user, {
                 'name': '{0}.pdf'.format(filename, ),
