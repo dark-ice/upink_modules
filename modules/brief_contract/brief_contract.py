@@ -653,7 +653,7 @@ class BriefContract(Model):
             else:
                 term = 0
             o = {
-                'name': u'=',
+                'name': u'-',
                 'contract_number': contract['contract_number'],
                 'contract_date': date_str,
                 'doc_type': contract['doc_type_id'][1] if contract['doc_type_id'] else '-',
