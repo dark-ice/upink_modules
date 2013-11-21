@@ -445,7 +445,8 @@ class BriefContract(Model):
                 data.contract_number.encode('utf-8'),
                 data.partner_id.name.encode('utf-8'),
                 data.service_id.name.encode('utf-8'), )
-            odt = copyfile(filepath, os.path.join(storage['path'], 'tmp.odt'))
+            copyfile(filepath, os.path.join(storage['path'], 'tmp.odt'))
+            odt = os.path.join(storage['path'], 'tmp.odt')
             pdf_file = os.path.join(storage['path'], 'tmp.pdf')
 
             status = subprocess.call(['libreoffice', '--headless', '--convert-to', 'pdf', odt], stderr=subprocess.PIPE)
