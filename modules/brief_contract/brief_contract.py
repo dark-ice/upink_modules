@@ -645,6 +645,13 @@ class BriefContract(Model):
             if not contract['amount']:
                 raise osv.except_osv('Договор', 'Необходимо ввести сумму договора')
 
+            term = 7
+            if contract['term'] == 'mounth':
+                term = 30
+            elif contract['term'] == 'year':
+                term = 365
+            else:
+                term = 0
             o = {
                 'name': u'=',
                 'contract_number': contract['contract_number'],
@@ -660,7 +667,7 @@ class BriefContract(Model):
                 'cost_word': numeral.in_words(float(contract['amount'])),
 
                 #  срок предоставления услуги в фомате 30 (тридцать)
-                'term': u'test',
+                'term': term,
 
 
                 #  наш генеральный директор
