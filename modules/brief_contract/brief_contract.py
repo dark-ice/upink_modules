@@ -458,6 +458,9 @@ class BriefContract(Model):
                 'res_model': self._name,
                 'res_id': data.id})
 
+            os.remove(odt)
+            os.remove(pdf_file)
+
         if data.service_id or values.get('service_id', False):
             service_id = values['service_id'] if values.get('service_id', False) else data.service_id.id
             service = self.pool.get('brief.services.stage').browse(cr, 1, service_id)
