@@ -59,44 +59,69 @@ class ReportMP(Model):
         cr.execute("""
             create or replace view day_report_mp as (
                 SELECT
-                  row_number() over() as id,
-                  to_char(max(r.date), 'YYYY-MM-DD') date_end,
-                  to_char(max(r.date), 'YYYY-MM-DD') date_start,
-                  extract(week FROM max(r.date)) week_number,
+                  row_number()
+                  OVER () AS id,
+                  to_char(r.date, 'YYYY-MM-DD') date_end,
+                  to_char(r.date, 'YYYY-MM-DD') date_start,
+                  extract(WEEK FROM r.date) week_number,
 
-                  max(r.date) date,
-                  sum(case when bss.direction in ('PPC', 'SEO', 'SMM', 'CALL', 'SITE', 'VIDEO', 'MP', 'MOSCOW') IS NOT NULL then 1 else 0 end) total_fact,
-                  sum(case when bss.direction='PPC' then 1 else 0 end) ppc_fact,
-                  sum(case when bss.direction='PPC' then b.sum_mediaplan else 0 end) ppc_cash,
-                  sum(case when r.direction='PPC' then r.plan else 0 end) ppc_plan,
-                  sum(case when bss.direction='SMM' then 1 else 0 end) smm_fact,
-                  sum(case when bss.direction='SMM' then b.sum_mediaplan else 0 end) smm_cash,
-                  sum(case when r.direction='SMM' then r.plan else 0 end) smm_plan,
-                  sum(case when bss.direction='SEO' then 1 else 0 end) seo_fact,
-                  sum(case when bss.direction='SEO' then b.sum_mediaplan else 0 end) seo_cash,
-                  sum(case when r.direction='SEO' then r.plan else 0 end) seo_plan,
-                  sum(case when bss.direction='CALL' then 1 else 0 end) call_fact,
-                  sum(case when bss.direction='CALL' then b.sum_mediaplan else 0 end) call_cash,
-                  sum(case when r.direction='CALL' then r.plan else 0 end) call_plan,
-                  sum(case when bss.direction='SITE' then 1 else 0 end) web_fact,
-                  sum(case when bss.direction='SITE' then b.sum_mediaplan else 0 end) web_cash,
-                  sum(case when r.direction='SITE' then r.plan else 0 end) web_plan,
-                  sum(case when bss.direction='VIDEO' then 1 else 0 end) video_fact,
-                  sum(case when bss.direction='VIDEO' then b.sum_mediaplan else 0 end) video_cash,
-                  sum(case when r.direction='VIDEO' then r.plan else 0 end) video_plan,
-                  sum(case when bss.direction='MP' then 1 else 0 end) mp_fact,
-                  sum(case when bss.direction='MP' then b.sum_mediaplan else 0 end) mp_cash,
-                  sum(case when r.direction='MP' then r.plan else 0 end) mp_plan,
-                  sum(case when bss.direction='MOSCOW' then 1 else 0 end) moscow_fact,
-                  sum(case when bss.direction='MOSCOW' then b.sum_mediaplan else 0 end) moscow_cash,
-                  sum(case when r.direction='MOSCOW' then r.plan else 0 end) moscow_plan
-
+                  r.date date,
+                  max(total_fact),
+                  max(CASE WHEN r.direction = 'PPC' THEN r.plan ELSE 0 END) ppc_plan,
+                  max(ppc_fact),
+                  max(ppc_cash),
+                  max(CASE WHEN r.direction = 'SMM' THEN r.plan ELSE 0 END) smm_plan,
+                  max(smm_fact),
+                  max(smm_cash),
+                  max(CASE WHEN r.direction = 'SEO' THEN r.plan ELSE 0 END) seo_plan,
+                  max(seo_fact),
+                  max(seo_cash),
+                  max(CASE WHEN r.direction = 'CALL' THEN r.plan ELSE 0 END) call_plan,
+                  max(call_fact),
+                  max(call_cash),
+                  max(CASE WHEN r.direction = 'SITE' THEN r.plan ELSE 0 END) web_plan,
+                  max(web_fact),
+                  max(web_cash),
+                  max(CASE WHEN r.direction = 'VIDEO' THEN r.plan ELSE 0 END) video_plan,
+                  max(video_fact),
+                  max(video_cash),
+                  max(CASE WHEN r.direction = 'MP' THEN r.plan ELSE 0 END) mp_plan,
+                  max(mp_fact),
+                  max(mp_cash),
+                  max(CASE WHEN r.direction = 'MOSCOW' THEN r.plan ELSE 0 END) moscow_plan,
+                  max(moscow_fact),
+                  max(moscow_cash)
                 FROM
-                  day_report_brief_plan r
-                  LEFT JOIN brief_history h on (h.cr_date::date=r.date AND h.state_id='media_approval')
-                  LEFT JOIN brief_main b on (h.brief_id=b.id)
-                  LEFT JOIN brief_services_stage bss on (bss.id=b.services_ids)
-                GROUP BY r.date::date
+                    day_report_brief_plan r
+                    LEFT JOIN (
+                      SELECT
+                        h.cr_date::DATE date,
+                        sum(CASE WHEN bss.direction IN ('PPC', 'SEO', 'SMM', 'CALL', 'SITE', 'VIDEO', 'MP', 'MOSCOW') IS NOT NULL THEN 1 ELSE 0 END) total_fact,
+                        sum(CASE WHEN bss.direction = 'PPC' THEN 1 ELSE 0 END) ppc_fact,
+                        sum(CASE WHEN bss.direction = 'PPC' THEN b.sum_mediaplan ELSE 0 END) ppc_cash,
+                        sum(CASE WHEN bss.direction = 'SMM' THEN 1 ELSE 0 END) smm_fact,
+                        sum(CASE WHEN bss.direction = 'SMM' THEN b.sum_mediaplan ELSE 0 END) smm_cash,
+                        sum(CASE WHEN bss.direction = 'SEO' THEN 1 ELSE 0 END) seo_fact,
+                        sum(CASE WHEN bss.direction = 'SEO' THEN b.sum_mediaplan ELSE 0 END) seo_cash,
+                        sum(CASE WHEN bss.direction = 'CALL' THEN 1 ELSE 0 END) call_fact,
+                        sum(CASE WHEN bss.direction = 'CALL' THEN b.sum_mediaplan ELSE 0 END) call_cash,
+                        sum(CASE WHEN bss.direction = 'SITE' THEN 1 ELSE 0 END) web_fact,
+                        sum(CASE WHEN bss.direction = 'SITE' THEN b.sum_mediaplan ELSE 0 END) web_cash,
+                        sum(CASE WHEN bss.direction = 'VIDEO' THEN 1 ELSE 0 END) video_fact,
+                        sum(CASE WHEN bss.direction = 'VIDEO' THEN b.sum_mediaplan ELSE 0 END) video_cash,
+                        sum(CASE WHEN bss.direction = 'MP' THEN 1 ELSE 0 END) mp_fact,
+                        sum(CASE WHEN bss.direction = 'MP' THEN b.sum_mediaplan ELSE 0 END) mp_cash,
+                        sum(CASE WHEN bss.direction = 'MOSCOW' THEN 1 ELSE 0 END) moscow_fact,
+                        sum(CASE WHEN bss.direction = 'MOSCOW' THEN b.sum_mediaplan ELSE 0 END) moscow_cash
+                      FROM brief_history h
+                      LEFT JOIN brief_main b
+                        ON (h.brief_id = b.id)
+                      LEFT JOIN brief_services_stage bss
+                        ON (bss.id = b.services_ids)
+                      WHERE h.state_id = 'media_approval'
+                      GROUP BY h.cr_date::DATE
+                    ) b on (b.date=r.date)
+                GROUP BY r.date
             )""")
 
     def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False):
