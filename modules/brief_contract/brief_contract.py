@@ -398,7 +398,7 @@ class BriefContract(Model):
             if service:
                 users = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', service.leader_group_id.id)], order='id')
                 if users:
-                    u = [x for x in users if x not in [1, 5, 13, 18, 354, 472]]
+                    u = [x for x in users if x not in [1, 5, 13, 18, 354]]
                     if u:
                         values['service_head_id'] = u[0]
         next_state = values.get('state', False)
