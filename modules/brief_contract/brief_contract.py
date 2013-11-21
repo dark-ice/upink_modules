@@ -1,4 +1,6 @@
 # -*- encoding: utf-8 -*-
+from shutil import copyfile
+
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -9,12 +11,10 @@ import os
 from datetime import datetime
 import random
 import string
-from odt2sphinx.odt2sphinx import convert_odt
 from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
 
-#from relatorio.templates.opendocument import Template1
 from aeroolib.plugins.opendocument import Template, OOSerializer
 from pytils import dt, numeral
 import paramiko
@@ -445,15 +445,10 @@ class BriefContract(Model):
                 data.contract_number.encode('utf-8'),
                 data.partner_id.name.encode('utf-8'),
                 data.service_id.name.encode('utf-8'), )
-
-            rst_file = os.path.join(storage['path'], 'index.rst')
-            html_file = os.path.join(storage['path'], 'index.html')
+            odt = copyfile(filepath, os.path.join(storage['path'], 'tmp.odt'))
             pdf_file = os.path.join(storage['path'], 'tmp.pdf')
 
-            convert_odt(filepath, storage['path'])
-
-            status = subprocess.call(['rst2html', rst_file, html_file], stderr=subprocess.PIPE)
-            status = subprocess.call(['/usr/bin/wkhtmltopdf', html_file, pdf_file], stderr=subprocess.PIPE)
+            status = subprocess.call(['libreoffice', '--headless', '--convert-to', 'pdf', odt], stderr=subprocess.PIPE)
 
             values['pdf_id'] = self.pool.get('ir.attachment').create(cr, user, {
                 'name': '{0}.pdf'.format(filename, ),
@@ -469,7 +464,7 @@ class BriefContract(Model):
                 users = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', service.leader_group_id.id)],
                                                           order='id')
                 if users:
-                    u = [x for x in users if x not in [1, 5, 13, 18, 354, 472]]
+                    u = [x for x in users if x not in [1, 5, 13, 18, 354]]
                     if u:
                         values['service_head_id'] = u[0]
         next_state = values.get('state', False)
