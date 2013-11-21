@@ -7,7 +7,7 @@ from openerp.osv.orm import Model
 
 class ReportDaySEOStatistic(Model):
     _name = 'report.day.seo.statistic'
-    _description = u'Ежедневный отчет направлений - PPC - значения статистики'
+    _description = u'Ежедневный отчет направлений - SEO - значения статистики'
     _order = 'date DESC'
     
     _columns = {

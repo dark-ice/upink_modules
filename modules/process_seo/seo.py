@@ -137,6 +137,17 @@ class ProcessSeo(Model):
             type='boolean',
             invisible=True
         ),
+
+        'date_start': fields.date('Дата запуска проекта'),
+        'date_end': fields.date('Дата окончания проекта'),
+        'process_type': fields.selection(
+            (
+                ('top', 'Продвижение в топ'),
+                ('trafik', 'Трафик'),
+                ('optim', 'Внутрення оптимизация'),
+                ('support', 'Поддержка'),
+            ), 'Тип проекта'),
+        'campaign': fields.char('ID кампании', size=200),
     }
 
     _defaults = {
