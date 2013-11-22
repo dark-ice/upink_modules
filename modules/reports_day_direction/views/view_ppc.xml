@@ -53,6 +53,8 @@
             <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree editable="top">
+                    <field name="ppc_id" />
+                    <field name="specialist_id" readonly="1"/>
                     <field name="name" />
                     <field name="campaign" />
                     <field name="date" />

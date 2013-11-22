@@ -31,7 +31,7 @@ class ReportDayPPCStatistic(Model):
     def update(self, cr, uid):
         yandex_campaign = []
         date_start = date_end = date.today().strftime("%Y-%m-%d")
-
+        ppc_dict = {}
         ppc_pool = self.pool.get('process.ppc')
         ppc_ids = ppc_pool.search(cr, 1, [])
         records = ppc_pool.read(cr, 1, ppc_ids, ['campaign', 'advertising_id', 'partner_id', 'specialist_id', 'domain_zone', 'date_start'])
@@ -40,6 +40,7 @@ class ReportDayPPCStatistic(Model):
                 date_start = record['date_start']
             if record['advertising_id'] and record['advertising_id'][0] == 1 and record['campaign']:
                 yandex_campaign.append(int(record['campaign']))
+                ppc_dict[int(record['campaign'])] = record['id']
 
         yandex = YandexDirect()
         if yandex_campaign:
@@ -64,7 +65,7 @@ class ReportDayPPCStatistic(Model):
                             'date': item['StatDate'],
                             'cash': item['SumSearch'],
                             'name': 'direct',
-                            'ppc_id':
+                            'ppc_id': ppc_dict[item['CampaignID']]
                         })
         return True
 
