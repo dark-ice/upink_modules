@@ -88,16 +88,7 @@
                         </page>
                         <page string="Данные по стратегии">
                             <group colspan="4" col="4">
-                                <field name="date_start" />
-                                <field name="process_type" />
-                                <field name="campaign"/>
-                                <newline/>
-                                <field name="fact_ids" colspan="4" nolabel="1" context="{'campaign': campaign}" attrs="{'invisible': [('process_type', '=', 'traffic')]}">
-                                    <tree editable="top" string="Факты">
-                                        <field name="date" />
-                                        <field name="fact" />
-                                    </tree>
-                                </field>
+
                                 <separator colspan="4" />
                                 <field name="strategy_ids" nolabel="1" colspan="4">
                                     <tree string="Стратегия">
@@ -118,6 +109,32 @@
                                 <separator colspan="4" string="Причина остановки работ" />
                                 <field name="reason_stop_work" colspan="4" nolabel="1"/>
                                 </group>
+                        </page>
+                        <page string="Проект на allposition">
+                            <field name="date_start" />
+                            <field name="process_type" />
+                            <field name="campaign"/>
+                            <button
+                                    string="Запросить данные с AllPositions.ru"
+                                    attrs="{'invisible': [('process_type', '=', 'traffic')]}"
+                                    type="object"
+                                    name="update" />
+                            <newline/>
+                            <field name="plan_ids" colspan="4" nolabel="1">
+                                <tree string="Планы" editable="top">
+                                    <field name="period_id" />
+                                    <field name="name" />
+                                </tree>
+                            </field>
+                            <newline/>
+                            <field name="fact_ids" colspan="4" nolabel="1" context="{'campaign': campaign}" attrs="{'readonly': [('process_type', '!=', 'traffic')]}">
+                                <tree editable="top" string="Факты">
+                                    <field name="date" />
+                                    <field name="top3" />
+                                    <field name="top10" />
+                                    <field name="fact" />
+                                </tree>
+                            </field>
                         </page>
                         <page string="Переписка по проекту">
                             <field name="message_ids" nolabel="1" colspan="4" mode="tree">

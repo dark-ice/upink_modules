@@ -149,6 +149,7 @@ class ProcessSeo(Model):
             ), 'Тип проекта'),
         'campaign': fields.char('ID кампании', size=200),
         'fact_ids': fields.one2many('report.day.seo.statistic', 'seo_id', 'Факты'),
+        'plan_ids': fields.one2many('process.seo.plan', 'seo_id', 'Планы'),
     }
 
     _defaults = {
@@ -199,6 +200,9 @@ class ProcessSeo(Model):
         if flag and line_ids and values.get('specialist_id'):
             self.pool.get('account.invoice.pay.line').write(cr, uid, line_ids, {'specialist_id': values['specialist_id']})
         return flag
+
+    def update(self, cr, uid, ids, context=None):
+        return self.pool.get('report.day.seo.statistic').update_positions(cr, ids)
 ProcessSeo()
 
 
@@ -230,5 +234,6 @@ class ProcessSeoPlan(Model):
             size=7,
             store=True
         ),
+        'seo_id': fields.many2one('process.seo', 'SEO'),
     }
 ProcessSeoPlan()

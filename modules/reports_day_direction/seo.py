@@ -13,7 +13,7 @@ class ReportDaySEOStatistic(Model):
     
     _columns = {
         'date': fields.date('Дата'),
-        'fact': fields.float('Факт'),
+        'fact': fields.float('Трафик'),
         'top3': fields.float('ТОП 3'),
         'top10': fields.float('ТОП 10'),
         'campaign': fields.char('ID кампании', size=100),
@@ -42,9 +42,10 @@ class ReportDaySEOStatistic(Model):
             else:
                 seo_id = False
         return {'value': {'campaign': campaign, 'seo_id': seo_id}}
-    
-    def update(self, cr, uid):
-        seo_ids = self.pool.get('process.seo').search(cr, 1, [('campaign', '!=', False)])
+
+    def update_positions(self, cr, seo_ids=[]):
+        if isinstance(seo_ids, (int, long)):
+            seo_ids = [seo_ids]
         for record in self.pool.get('process.seo').read(cr, 1, seo_ids, ['campaign', 'process_type']):
             dates = proxy.get_report_dates(int(record['campaign']))
             for report_date in dates.values():
@@ -62,6 +63,11 @@ class ReportDaySEOStatistic(Model):
                             'seo_id': record['id'],
                         })
         return True
+    
+    def update(self, cr, uid):
+        seo_ids = self.pool.get('process.seo').search(cr, 1, [('campaign', '!=', False)])
+        return self.update_positions(cr, seo_ids)
+
 ReportDaySEOStatistic()
 
 
@@ -73,14 +79,16 @@ class ReportDaySEO(Model):
     _columns = {
         'date_start': fields.date('Дата начала'),
         'date_end': fields.date('Дата конца'),
+        'week_number': fields.integer('Номер недели', group_operator="avg"),
 
         'partner_id': fields.many2one('res.partner', 'Партнер'),
         'service_id': fields.many2one('brief.services.stage', 'Услуга'),
         'specialist_id': fields.many2one('res.users', 'Специалист'),
         'campaign': fields.char('ID кампании', size=200),
-        'fact': fields.float('Сумма'),
-        'top3': fields.float('Топ 3'),
-        'top10': fields.float('Топ 10'),
+        'plan': fields.float('План', group_operator="max"),
+        'fact': fields.float('Трафик', group_operator="max"),
+        'top3': fields.float('Топ 3', group_operator="max"),
+        'top10': fields.float('Топ 10', group_operator="max"),
         'date': fields.date('Дата'),
         'process_type': fields.selection(
             (
@@ -99,6 +107,7 @@ class ReportDaySEO(Model):
                   row_number() over() as id,
                   p.date_start,
                   p.date_start date_end,
+                  extract(week FROM s.date) week_number,
                   l.partner_id,
                   l.service_id,
                   p.specialist_id,
@@ -107,12 +116,15 @@ class ReportDaySEO(Model):
                   s.top3,
                   s.top10,
                   s.fact,
-                  s.date
+                  s.date,
+                  pl.name plan
                 FROM
                   process_seo p
                   LEFT JOIN process_launch l on (l.id=p.launch_id)
                   LEFT JOIN report_day_seo_statistic s on (p.campaign=s.campaign)
-                WHERE p.state='implementation'
+                  LEFT JOIN kpi_period k on (k.name=to_char(s.date, 'YYYY/MM') and calendar='rus')
+                  LEFT JOIN process_seo_plan pl on (pl.period_id=k.id)
+                WHERE p.state='implementation' and p.campaign is not null
             )""")
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
