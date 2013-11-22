@@ -143,11 +143,12 @@ class ProcessSeo(Model):
         'process_type': fields.selection(
             (
                 ('top', 'Продвижение в топ'),
-                ('trafik', 'Трафик'),
+                ('traffic', 'Трафик'),
                 ('optim', 'Внутрення оптимизация'),
                 ('support', 'Поддержка'),
             ), 'Тип проекта'),
         'campaign': fields.char('ID кампании', size=200),
+        'fact_ids': fields.one2many('report.day.seo.statistic', 'seo_id', 'Факты'),
     }
 
     _defaults = {

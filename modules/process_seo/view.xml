@@ -88,6 +88,17 @@
                         </page>
                         <page string="Данные по стратегии">
                             <group colspan="4" col="4">
+                                <field name="date_start" />
+                                <field name="process_type" />
+                                <field name="campaign"/>
+                                <newline/>
+                                <field name="fact_ids" colspan="4" nolabel="1" context="{'campaign': campaign}" attrs="{'invisible': [('process_type', '=', 'traffic')]}">
+                                    <tree editable="top" string="Факты">
+                                        <field name="date" />
+                                        <field name="fact" />
+                                    </tree>
+                                </field>
+                                <separator colspan="4" />
                                 <field name="strategy_ids" nolabel="1" colspan="4">
                                     <tree string="Стратегия">
                                         <field name="name"/>

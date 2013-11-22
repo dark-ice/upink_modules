@@ -8,6 +8,7 @@
 Ежедневные отчеты направлений.
 ==============================
 - PPC
+- SEO
     """,
     'author': 'Andrey Karbanovich',
     'website': 'http://upsale.ru',
@@ -18,6 +19,7 @@
     'update_xml': [
         #'security/ir.model.access.csv',
         'views/view_ppc.xml',
+        'views/view_seo.xml',
         #'workflow.xml',
     ],
 
