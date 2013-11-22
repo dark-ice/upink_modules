@@ -743,6 +743,7 @@ class BriefContract(Model):
                 bank = self.pool.get('res.partner.bank').read(cr, 1, contract['bank_id'][0], [])
                 o.update({
                     'partner_mail': bank['email'] or u'-',
+                    'partner_site': bank['site'] or u'-',
                     'partner_firm_name': bank['fullname'] or u'-',
                     'partner_address': self.pool.get('res.partner.bank.address').get_address(cr, contract['bank_id'][0]) or u'-',
                     'partner_fact_address': self.pool.get('res.partner.bank.address').get_address(cr, contract['bank_id'][0], 'fa') or u'-',
