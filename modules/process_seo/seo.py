@@ -213,3 +213,22 @@ class ProcessSeoTasks(Model):
         'process_id': fields.many2one('process.seo', 'SEO', invisible=True),
     }
 ProcessSeoTasks()
+
+
+class ProcessSeoPlan(Model):
+    _name = 'process.seo.plan'
+    _description = u'Процессы - SEO - Планы ТОП 10'
+    _order = 'period_name desc'
+
+    _columns = {
+        'name': fields.float('План'),
+        'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')], required=True),
+        'period_name': fields.related(
+            'period_id',
+            'name',
+            type='char',
+            size=7,
+            store=True
+        ),
+    }
+ProcessSeoPlan()
