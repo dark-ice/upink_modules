@@ -206,7 +206,7 @@
                                 />
 
                         <!-- contract_approval -> approval_partner -->
-                        <button name="ca_ap"
+                        <button name="action_ca_ap"
                                 string="Отправить договор на утвеждение партнеру"
                                 icon="gtk-go-forward"
                                 attrs="{'invisible': ['|', ('state', '!=', 'contract_approval'), ('check_s', '=', False)]}"
