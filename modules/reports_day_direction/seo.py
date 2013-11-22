@@ -13,9 +13,9 @@ class ReportDaySEOStatistic(Model):
     
     _columns = {
         'date': fields.date('Дата'),
-        'fact': fields.float('Трафик'),
-        'top3': fields.float('ТОП 3'),
-        'top10': fields.float('ТОП 10'),
+        'fact': fields.integer('Трафик'),
+        'top3': fields.integer('ТОП 3'),
+        'top10': fields.integer('ТОП 10'),
         'campaign': fields.char('ID кампании', size=100),
         'seo_id': fields.many2one('process.seo', 'SEO'),
         'process_type': fields.selection(
@@ -32,16 +32,18 @@ class ReportDaySEOStatistic(Model):
     }
 
     def onchange_seo(self, cr, uid, ids, seo_id='', campaign='', context=None):
-        if seo_id:
-            seo = self.pool.get('process.seo').read(cr, 1, seo_id, ['campaign'])
-            campaign = seo['campaign']
-        elif not seo_id and campaign:
+        process_type = ''
+        if campaign:
             seo_ids = self.pool.get('process.seo').search(cr, 1, [('campaign', '=', campaign)])
             if seo_ids:
                 seo_id = seo_ids[0]
             else:
                 seo_id = False
-        return {'value': {'campaign': campaign, 'seo_id': seo_id}}
+        if seo_id:
+            seo = self.pool.get('process.seo').read(cr, 1, seo_id, ['campaign', 'process_type'])
+            campaign = seo['campaign']
+            process_type = seo['process_type']
+        return {'value': {'campaign': campaign, 'seo_id': seo_id, 'process_type': process_type}}
 
     def update_positions(self, cr, seo_ids=[]):
         if isinstance(seo_ids, (int, long)):
@@ -85,10 +87,10 @@ class ReportDaySEO(Model):
         'service_id': fields.many2one('brief.services.stage', 'Услуга'),
         'specialist_id': fields.many2one('res.users', 'Специалист'),
         'campaign': fields.char('ID кампании', size=200),
-        'plan': fields.float('План', group_operator="max"),
-        'fact': fields.float('Трафик', group_operator="max"),
-        'top3': fields.float('Топ 3', group_operator="max"),
-        'top10': fields.float('Топ 10', group_operator="max"),
+        'plan': fields.integer('План', group_operator="max"),
+        'fact': fields.integer('Трафик', group_operator="max"),
+        'top3': fields.integer('Топ 3', group_operator="max"),
+        'top10': fields.integer('Топ 10', group_operator="max"),
         'date': fields.date('Дата'),
         'process_type': fields.selection(
             (
@@ -139,5 +141,17 @@ class ReportDaySEO(Model):
                 item[0] = 'date'
                 item[1] = '<='
         return super(ReportDaySEO, self).search(cr, user, args, offset, limit, order, context, count)
+
+    def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False):
+        for item in domain:
+            if item[0] == 'date_start':
+                item[0] = 'date'
+                item[1] = '>='
+
+            if item[0] == 'date_end':
+                item[0] = 'date'
+                item[1] = '<='
+
+        return super(ReportDaySEO, self).read_group(cr, uid, domain, fields, groupby, offset, limit, context, orderby)
 
 ReportDaySEO()

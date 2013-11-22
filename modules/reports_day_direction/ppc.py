@@ -18,7 +18,14 @@ class ReportDayPPCStatistic(Model):
         ),
         'date': fields.date('Дата'),
         'cash': fields.float('Сумма'),
-        'campaign': fields.char('ID кампании', size=100)
+        'campaign': fields.char('ID кампании', size=100),
+        'ppc_id': fields.char('process.ppc', 'Проект'),
+        'specialist_id': fields.related(
+            'ppc_id',
+            'specialist_id',
+            type='many2one',
+            relation='res.users',
+            string='Аккаунт-менеджер')
     }
 
     def update(self, cr, uid):
@@ -47,6 +54,7 @@ class ReportDayPPCStatistic(Model):
                     )
 
             for item in yandex_result:
+
                 if not self.search(cr, 1, [('campaign', '=', item['CampaignID']), ('date', '=', item['StatDate'])]):
                     self.create(
                         cr,
@@ -55,7 +63,8 @@ class ReportDayPPCStatistic(Model):
                             'campaign': item['CampaignID'],
                             'date': item['StatDate'],
                             'cash': item['SumSearch'],
-                            'name': 'direct'
+                            'name': 'direct',
+                            'ppc_id':
                         })
         return True
 
@@ -100,7 +109,7 @@ class ReportDayPPC(Model):
                   process_ppc p
                   LEFT JOIN process_launch l on (l.id=p.launch_id)
                   LEFT JOIN report_day_ppc_statistic s on (p.campaign=s.campaign)
-                WHERE p.state='implementation'
+                WHERE p.state='implementation' and p.campaign is not null
             )""")
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
@@ -113,6 +122,18 @@ class ReportDayPPC(Model):
                 item[0] = 'date'
                 item[1] = '<='
         return super(ReportDayPPC, self).search(cr, user, args, offset, limit, order, context, count)
+
+    def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False):
+        for item in domain:
+            if item[0] == 'date_start':
+                item[0] = 'date'
+                item[1] = '>='
+
+            if item[0] == 'date_end':
+                item[0] = 'date'
+                item[1] = '<='
+
+        return super(ReportDayPPC, self).read_group(cr, uid, domain, fields, groupby, offset, limit, context, orderby)
 
 ReportDayPPC()
 
