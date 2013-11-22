@@ -157,7 +157,7 @@
 
                         <!-- draft -> approval -->
                         <button name="action_d_a"
-                                string="Отправить бриф на согласование"
+                                string="Отправить бриф на корректировку"
                                 icon="gtk-go-forward"
                                 attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_m', '=', False)]}"
                                 />
@@ -205,18 +205,11 @@
                                 attrs="{'invisible': ['|', ('state', '!=', 'cancel_2'), ('check_l', '=', False)]}"
                                 />
 
-                        <!-- contract_approval -> contract_agreed -->
-                        <button name="action_ca_cagr"
-                                string="Договор согласован"
+                        <!-- contract_approval -> approval_partner -->
+                        <button name="ca_ap"
+                                string="Отправить договор на утвеждение партнеру"
                                 icon="gtk-go-forward"
                                 attrs="{'invisible': ['|', ('state', '!=', 'contract_approval'), ('check_s', '=', False)]}"
-                                />
-
-                        <!-- contract_agreed -> approval_partner -->
-                        <button name="action_cagr_ap"
-                                string="Отправить договор на утвеждение"
-                                icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'contract_agreed'), ('check_l', '=', False)]}"
                                 />
 
                         <!-- approval_partner -> contract_completion -->

@@ -974,8 +974,6 @@ class ResPartnerBankAddress(Model):
             if address['house']:
                 address_list.append(u"д. {house}".format(house=address['house']))
         return ','.join(address_list) or u'-'
-
-
 ResPartnerBankAddress()
 
 
