@@ -965,12 +965,12 @@ class ResPartnerBankAddress(Model):
                 if address['st_type'] == 'pereyloc':
                     st = u'пр.'
                 if address['st_type'] == 'proezd':
-                    st = u'проезд.'
+                    st = u'проезд'
                 if address['st_type'] == 'prospect':
                     st = u'просп.'
                 if address['st_type'] == 'ploshad':
                     st = u'пл.'
-                address_list.append(u"{st_type}. {street}".format(street=address['street'], st_type=st))
+                address_list.append(u"{st_type} {street}".format(street=address['street'], st_type=st))
             if address['house']:
                 address_list.append(u"д. {house}".format(house=address['house']))
         return ','.join(address_list) or u'-'
