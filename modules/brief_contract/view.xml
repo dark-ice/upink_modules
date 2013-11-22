@@ -13,6 +13,7 @@
                         <field name="check_r"/>
                         <field name="check_l"/>
                         <field name="check_s"/>
+                        <field name="check_b"/>
                         <field name="from" invisible="True"/>
                         <field name="wuser_ids" invisible="True"/>
                     </group>
@@ -114,22 +115,24 @@
                         </field>
                         <separator colspan="4"/>
                     </group>
-                    <group colspan="4" col="4">
+                    <group colspan="4" col="4" attrs="{'invisible': [('check_b', '=', False)]}">
                         <separator string="Договор" colspan="4"/>
                         <button name="generate"
                                 string="Сгенерировать договор"
                                 icon="gtk-go-forward"
                                 type="object"
+                                states="draft,approval,contract_completion"
                                 colspan="4"
                                 />
                         <newline />
-                        <field name="doc_id" />
+                        <field name="doc_id" attrs="{'invisible': [('check_b', '=', False)]}"/>
                         <field name="pdf_id" />
                         <separator string="Доступ к серверу" colspan="4"/>
                         <button name="send"
                                 string="Отправить на сервер"
                                 icon="gtk-go-forward"
                                 type="object"
+                                attrs="{'invisible': ['|', '|', ('state', '!=', 'approval_partner'), ('check_m', '=', False), ('check_b', '=', False)]}"
                                 colspan="4"
                                 />
                         <field name="url" widget="url" colspan="4"/>

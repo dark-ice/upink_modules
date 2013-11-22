@@ -40,11 +40,11 @@ class BriefContract(Model):
     _states = (
         ('draft', 'Черновик'),
         ('approval', 'Договор на корректировке'),
-        #('completion', 'Бриф на доработке'),
-        #('preparation', 'Подготовка договора'),
+        #('completion', 'Бриф на доработке'), approval
+        #('preparation', 'Подготовка договора'), approval
         ('contract_approval', 'Согласование договора с обслуживающим направлением'),
         ('contract_completion', 'Доработка договора'),
-        #('contract_agreed', 'Договор согласован'),
+        #('contract_agreed', 'Договор согласован'), approval_partner
         ('approval_partner', 'Утверждение договора с партнером'),
         ('partner_cancel', 'Отмена'),
         ('contract_approved', 'Договор утвержден'),
@@ -102,6 +102,10 @@ class BriefContract(Model):
                 users = [x for x in users if x not in [1, 5, 13, 18, 354]]
                 if uid in users:
                     access += 's'
+
+            #  БЕНЯ
+            if uid == 18:
+                access += 'b'
 
             val = False
 
@@ -343,6 +347,12 @@ class BriefContract(Model):
             _check_access,
             method=True,
             string="Руковолитель направления",
+            type="boolean",
+            invisible=True),
+        'check_b': fields.function(
+            _check_access,
+            method=True,
+            string="Проверка на Беню",
             type="boolean",
             invisible=True),
         'create_date': fields.datetime(
