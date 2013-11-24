@@ -118,7 +118,8 @@
                                     string="Запросить данные с AllPositions.ru"
                                     attrs="{'invisible': [('process_type', '=', 'traffic')]}"
                                     type="object"
-                                    name="update" />
+                                    name="update"
+                                    colspan="2"/>
                             <newline/>
                             <field name="plan_ids" colspan="4" nolabel="1">
                                 <tree string="Планы" editable="top">

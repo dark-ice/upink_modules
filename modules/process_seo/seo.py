@@ -139,7 +139,6 @@ class ProcessSeo(Model):
         ),
 
         'date_start': fields.date('Дата запуска проекта'),
-        'date_end': fields.date('Дата окончания проекта'),
         'process_type': fields.selection(
             (
                 ('top', 'Продвижение в топ'),
@@ -225,7 +224,7 @@ class ProcessSeoPlan(Model):
     _order = 'period_name desc'
 
     _columns = {
-        'name': fields.float('План'),
+        'name': fields.integer('План'),
         'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')], required=True),
         'period_name': fields.related(
             'period_id',

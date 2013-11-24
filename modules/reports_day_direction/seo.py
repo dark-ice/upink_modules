@@ -18,13 +18,17 @@ class ReportDaySEOStatistic(Model):
         'top10': fields.integer('ТОП 10'),
         'campaign': fields.char('ID кампании', size=100),
         'seo_id': fields.many2one('process.seo', 'SEO'),
-        'process_type': fields.selection(
-            (
+        'process_type': fields.related(
+            'seo_id',
+            'process_type',
+            type='selection',
+            selection=(
                 ('top', 'Продвижение в топ'),
                 ('traffic', 'Трафик'),
                 ('optim', 'Внутрення оптимизация'),
                 ('support', 'Поддержка'),
-            ), 'Тип проекта'),
+            ),
+            string='Тип проекта'),
     }
 
     _defaults = {
@@ -77,6 +81,7 @@ class ReportDaySEO(Model):
     _name = 'report.day.seo'
     _description = u'Ежедневный отчет направлений - SEO'
     _auto = False
+    _order = 'date'
 
     _columns = {
         'date_start': fields.date('Дата начала'),

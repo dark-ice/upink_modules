@@ -19,7 +19,7 @@ class ReportDayPPCStatistic(Model):
         'date': fields.date('Дата'),
         'cash': fields.float('Сумма'),
         'campaign': fields.char('ID кампании', size=100),
-        'ppc_id': fields.char('process.ppc', 'Проект'),
+        'ppc_id': fields.many2one('process.ppc', 'Проект'),
         'specialist_id': fields.related(
             'ppc_id',
             'specialist_id',
@@ -27,6 +27,24 @@ class ReportDayPPCStatistic(Model):
             relation='res.users',
             string='Аккаунт-менеджер')
     }
+
+    _defaults = {
+        'campaign': lambda s, c, u, cntx: cntx.get('campaign'),
+    }
+
+    def onchange_ppc(self, cr, uid, ids, ppc_id='', campaign='', context=None):
+        specialist_id = False
+        if campaign:
+            ppc_ids = self.pool.get('process.ppc').search(cr, 1, [('campaign', '=', campaign)])
+            if ppc_ids:
+                ppc_id = ppc_ids[0]
+            else:
+                ppc_id = False
+        if ppc_id:
+            ppc = self.pool.get('process.ppc').read(cr, 1, ppc_id, ['campaign', 'specialist_id'])
+            campaign = ppc['campaign']
+            specialist_id = ppc['specialist_id'][0]
+        return {'value': {'campaign': campaign, 'ppc_id': ppc_id, 'specialist_id': specialist_id}}
 
     def update(self, cr, uid):
         yandex_campaign = []
@@ -77,6 +95,7 @@ class ReportDayPPC(Model):
     _name = 'report.day.ppc'
     _description = u'Ежедневный отчет направлений - PPC'
     _auto = False
+    _order = 'date DESC'
 
     _columns = {
         'date_start': fields.date('Дата начала'),
