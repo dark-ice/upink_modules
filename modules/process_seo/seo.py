@@ -137,6 +137,18 @@ class ProcessSeo(Model):
             type='boolean',
             invisible=True
         ),
+
+        'date_start': fields.date('Дата запуска проекта'),
+        'process_type': fields.selection(
+            (
+                ('top', 'Продвижение в топ'),
+                ('traffic', 'Трафик'),
+                ('optim', 'Внутрення оптимизация'),
+                ('support', 'Поддержка'),
+            ), 'Тип проекта'),
+        'campaign': fields.char('ID кампании', size=200),
+        'fact_ids': fields.one2many('report.day.seo.statistic', 'seo_id', 'Факты'),
+        'plan_ids': fields.one2many('process.seo.plan', 'seo_id', 'Планы'),
     }
 
     _defaults = {
@@ -187,6 +199,9 @@ class ProcessSeo(Model):
         if flag and line_ids and values.get('specialist_id'):
             self.pool.get('account.invoice.pay.line').write(cr, uid, line_ids, {'specialist_id': values['specialist_id']})
         return flag
+
+    def update(self, cr, uid, ids, context=None):
+        return self.pool.get('report.day.seo.statistic').update_positions(cr, ids)
 ProcessSeo()
 
 
@@ -201,3 +216,23 @@ class ProcessSeoTasks(Model):
         'process_id': fields.many2one('process.seo', 'SEO', invisible=True),
     }
 ProcessSeoTasks()
+
+
+class ProcessSeoPlan(Model):
+    _name = 'process.seo.plan'
+    _description = u'Процессы - SEO - Планы ТОП 10'
+    _order = 'period_name desc'
+
+    _columns = {
+        'name': fields.integer('План'),
+        'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')], required=True),
+        'period_name': fields.related(
+            'period_id',
+            'name',
+            type='char',
+            size=7,
+            store=True
+        ),
+        'seo_id': fields.many2one('process.seo', 'SEO'),
+    }
+ProcessSeoPlan()
