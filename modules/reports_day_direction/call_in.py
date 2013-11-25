@@ -55,21 +55,20 @@ class ReportDayCallIn(Model):
         'date_start': fields.date('Дата начала'),
         'date_end': fields.date('Дата конца'),
 
-        'partner_id': fields.many2one('res.partner', "Партнер"),
+        'partner_id': fields.many2one('res.partner', "Проект"),
         'call_in': fields.integer('Принятые', group_operator='sum'),
         'missed': fields.integer('Пропущенные', group_operator='sum'),
         'date': fields.date('дата'),
-        'procent': fields.function(
-            _get_dop_data,
-            type='float',
-            string='Процент',
-            readonly=True,
-        ),
+        'procent': fields.float('Процент', group_operator='avg'),
+        'procent_day': fields.float('Процент день', group_operator='avg'),
+        'procent_night': fields.float('Процент ночь', group_operator='avg'),
         'queue': fields.integer('Очередь'),
         'call_in_day': fields.integer('Принятые день' , group_operator='sum'),
         'call_in_night': fields.integer('Принятые ночь'),
         'missed_day': fields.integer('Пропущенные день'),
         'missed_night': fields.integer('Пропущенные ночь'),
+        'call_out': fields.integer('Исходящие', group_operator='sum'),
+        'processed_missed': fields.integer('Обработанные пропущенные', group_operator='sum'),
 
     }
 
@@ -89,7 +88,12 @@ class ReportDayCallIn(Model):
                     s.call_in_day,
                     s.call_in_night,
                     s.missed_day,
-                    s.missed_night
+                    s.missed_night,
+                    s.call_out,
+                    s.processed_missed,
+                    (cast(missed as real)/cast(call_in as real)+cast(call_in as real)) as procent,
+                    (cast(missed_day as real)/cast(call_in_day as real)+cast(call_in_day as real)) as procent_day,
+                    (cast(missed_night as real)/cast(call_in_night as real)+cast(call_in_night as real)) as procent_night
                 FROM process_call_in c
                 LEFT JOIN process_launch l on (c.launch_id=l.id)
                 LEFT JOIN report_day_call_in_static s on (s.process_call_in_id=c.id)
@@ -106,5 +110,16 @@ class ReportDayCallIn(Model):
                 item[0] = 'date'
                 item[1] = '<='
         return super(ReportDayCallIn, self).search(cr, user, args, offset, limit, order, context, count)
+
+    def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False):
+        for item in domain:
+            if item[0] == 'date_start':
+                item[0] = 'date'
+                item[1] = '>='
+
+            if item[0] == 'date_end':
+                item[0] = 'date'
+                item[1] = '<='
+        return super(ReportDayCallIn, self).read_group(cr, uid, domain, fields, groupby, offset, limit, context, orderby)
 
 ReportDayCallIn()
