@@ -112,7 +112,8 @@ class ProcessSlaWizard(TransientModel):
                                   'name': i.name.id,
                                   'units': i.units,
                                   'weight': i.weight,
-                                  'fact': i.fact
+                                  'fact': i.fact,
+                                  'plan': i.plan
                               }) for i in record.line_ids],
                 'avg_mbo': numpy.mean([i.mbo for i in record.line_ids]) or 0.0
             }

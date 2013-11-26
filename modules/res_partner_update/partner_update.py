@@ -2058,6 +2058,20 @@ class PartnerQualityControl(Model):
             readonly=True,
         ),
     }
+
+    def _check_unique(self, cr, uid, ids, context=None):
+        for self_obj in self.read(cr, 1, ids, ['period_id', 'service_id'], context):
+            if self.search(cr, 1, [('period_id', '=', self_obj['period_id'][0]), ('service_id', '=', self_obj['service_id'][0]), ('id', '!=', self_obj['id'])], context):
+                return False
+            return True
+
+    _constraints = [
+        (
+            _check_unique,
+            'оценивать одну и ту же услугу 2 раза за период!',
+            [u'Нельзя']
+        ),
+    ]
 PartnerQualityControl()
 
 
