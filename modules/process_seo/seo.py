@@ -142,18 +142,6 @@ class ProcessSeo(Model):
             type='boolean',
             invisible=True
         ),
-
-        'date_start': fields.date('Дата запуска проекта'),
-        'process_type': fields.selection(
-            (
-                ('top', 'Продвижение в топ'),
-                ('traffic', 'Трафик'),
-                ('optim', 'Внутрення оптимизация'),
-                ('support', 'Поддержка'),
-            ), 'Тип проекта'),
-        'campaign': fields.char('ID кампании', size=200),
-        'fact_ids': fields.one2many('report.day.seo.statistic', 'seo_id', 'Факты'),
-        'plan_ids': fields.one2many('process.seo.plan', 'seo_id', 'Планы'),
     }
 
     _defaults = {
