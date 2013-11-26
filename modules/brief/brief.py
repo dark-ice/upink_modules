@@ -873,7 +873,6 @@ class Brief(Model):
     _name = 'brief.main'
     _description = u"Бриф"
     _rec_name = 'partner_id'
-    #_log_create = True
 
     _inherits = {
         'brief.part.one': 'brief_part_one_id',
@@ -1292,6 +1291,22 @@ class Brief(Model):
             required=True,
             domain=[('usergroup', '!=', False)],
             help='Услуга по которой составляется Бриф.'),
+        'direction': fields.function(
+            lambda *a: [],
+            type="selection",
+            method=True,
+            string='Направление',
+            help='',
+            selection=[
+                   ('PPC', 'PPC'),
+                   ('VIDEO', 'VIDEO'),
+                   ('SEO', 'SEO'),
+                   ('SMM', 'SMM'),
+                   ('CALL', 'CALL'),
+                   ('SITE', 'SITE'),
+                   ('MP', 'MP'),
+            ],
+        ),
         'state': fields.selection(
             _states,
             'Статус брифа',
@@ -1376,7 +1391,6 @@ class Brief(Model):
         'tender': fields.text(
             'Тендер/Условия тендера',
             help=''),
-        #'tender_file_id': fields.one2many('attach.files', 'obj_id', 'Тендерная документация'),
         'planned_works': fields.text(
             'Планирование дальнейших работ',
             help="Планируют ли заказывать у нас внедрение изменений по результатам"
@@ -1536,7 +1550,6 @@ class Brief(Model):
     _defaults = {
         'state': 'draft',
         'user_id': lambda self, cr, uid, context: uid,
-        #'cand_id': lambda self, cr, uid, context: context.get('cand_id', False),
         'partner_id': lambda self, cr, uid, context: context.get('partner_id', False),
         'partner_name': lambda self, cr, uid, context: context.get('partner_name', False),
         'name': lambda self, cr, uid, context: context.get('name', False),
@@ -1561,12 +1574,27 @@ class Brief(Model):
          'Вам необходимо указать к кому относится данный бриф.',
          [u'Партнер']),
     ]
+
+    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
+        new_item = []
+        for item in args:
+            if item[0] == 'create_date':
+                new_item = ['create_date', '<=', '{0} 23:59:59'.format(item[2],)]
+                item[2] = '{0} 00:00:00'.format(item[2],)
+                item[1] = '>='
+            if item[0] == 'direction':
+                item[0] = "services_ids.direction"
+                item[2] = item[2].upper()
+        if new_item:
+            args.append(new_item)
+        return super(Brief, self).search(cr, user, args, offset, limit, order, context, count)
 Brief()
 
 
 class BriefHistory(Model):
     _name = 'brief.history'
     _rec_name = 'us_id'
+
     _columns = {
         'us_id': fields.many2one('res.users', u'Перевел'),
         'cr_date': fields.datetime(u'Дата и время'),
@@ -1616,12 +1644,12 @@ class BriefManagerGroups(Model):
     _name = 'brief.manager.groups'
     _description = u"Рабочие команды менеджеров по привлечению и работе с партнерами"
 
-    def _check_upwork_manager(self, cr, uid, id):
+    def _check_upwork_manager(self, cr, uid, ids):
 
-        for record in self.browse(cr, uid, id):
+        for record in self.read(cr, uid, ids, ['manager_second_lvl_id']):
             another_ids = self.search(cr, uid, [
-                ('manager_second_lvl_id', '=', record.manager_second_lvl_id.id),
-                ('id', '!=', record.id)
+                ('manager_second_lvl_id', '=', record['manager_second_lvl_id'][0]),
+                ('id', '!=', record['id'])
             ])
 
             if another_ids:

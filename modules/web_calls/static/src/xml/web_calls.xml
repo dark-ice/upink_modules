@@ -84,6 +84,18 @@
                 <div id="no_product" class="dop">
                     <p><label class="calls-label" for="no_product-val">Запрос на отсутствующий товар:</label><input type="text" name="no_product" id="no_product-val"/></p>
                 </div>
+                <div id="order" class="dop">
+                    <p><label class="calls-label" for="order-val">Тип уточняющего заказа:</label>
+                        <select id="order-val">
+                            <option value="-" selected="selected">-</option>
+                            <option value="income">Доставка</option>
+                            <option value="reorder">Дозаказ(отмена заказа)</option>
+                            <option value="exchange">Обмен(возврат)</option>
+                            <option value="reserve">Резерв</option>
+                            <option value="other">Другое</option>
+                        </select>
+                    </p>
+                </div>
             </div>
         </div>
     </t>

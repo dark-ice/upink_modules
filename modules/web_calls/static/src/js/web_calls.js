@@ -46,6 +46,7 @@ instance.web_calls.CallReport = instance.web.OldWidget.extend({
                                 'invoice': $("#invoice").val(),
                                 'no_product': $("#no_product-val").val(),
                                 'sale_type': $("#sale_type").val(),
+                                'set_order': $("#order-val").val(),
                                 'phone': phone,
                                 'po': $("#po").val(),
                                 'responsible_id': responsible_id

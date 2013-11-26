@@ -75,7 +75,22 @@ class AccountInvoiceDocument(report_sxw.rml_parse):
                 if item['city']:
                     result_list.append(u"г. {city}".format(city=item['city']))
                 if item['street']:
-                    result_list.append(u"ул. {street}".format(street=item['street']))
+                    st = u'ул.'
+                    if item['st_type'] == 'alleya':
+                        st = u'ал.'
+                    if item['st_type'] == 'bulvar':
+                        st = u'бул.'
+                    if item['st_type'] == 'naberegnaya':
+                        st = u'наб.'
+                    if item['st_type'] == 'pereyloc':
+                        st = u'пр.'
+                    if item['st_type'] == 'proezd':
+                        st = u'проезд'
+                    if item['st_type'] == 'prospect':
+                        st = u'просп.'
+                    if item['st_type'] == 'ploshad':
+                        st = u'пл.'
+                    result_list.append(u"{st_type} {street}".format(street=item['street'], st_type=st))
                 if item['house']:
                     result_list.append(u"д. {house}".format(house=item['house']))
                 if item['housing']:
@@ -111,7 +126,22 @@ class AccountInvoiceDocument(report_sxw.rml_parse):
         for item in data:
             if item.name == 'mk':
                 if item.street:
-                    result_first.append(u"ул. {street}".format(street=item.street))
+                    st = u'ул.'
+                    if item['st_type'] == 'alleya':
+                        st = u'Ал.'
+                    if item['st_type'] == 'bulvar':
+                        st = u'Бул.'
+                    if item['st_type'] == 'naberegnaya':
+                        st = u'Наб.'
+                    if item['st_type'] == 'pereyloc':
+                        st = u'Пр.'
+                    if item['st_type'] == 'proezd':
+                        st = u'Проезд.'
+                    if item['st_type'] == 'prospect':
+                        st = u'Просп.'
+                    if item['st_type'] == 'ploshad':
+                        st = u'Пл.'
+                    result_first.append(u"{st_type} {street}".format(street=item.street, st_type=st))
                 if item.house:
                     result_first.append(u"д. {house}".format(house=item.house))
                 if item.housing:

@@ -1,10 +1,12 @@
 ﻿# -*- encoding: utf-8 -*-
 {
     'name': 'Brief Contract',
-    'version': '1.1',
+    'version': '1.5',
     'category': 'Customer Relationship Management',
     'description': """
-    Брив на Договор
+    Брив на Договор:
+    - Генерация договора из шаблона
+    - Отправка договора на сервер
     """,
     'author': 'Karbanovich Andrey [Upsale dep IS]',
     'website': 'http://www.upsale.ru',

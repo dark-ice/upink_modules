@@ -15,6 +15,7 @@
                         <field name="check_r"/>
                         <field name="check_m"/>
                         <field name="check_e"/>
+                        <field name="check_x"/>
                     </group>
                     <group colspan="4" col="6">
                         <field name="author_id" readonly="1"/>
@@ -65,7 +66,7 @@
                                 icon="gtk-cancel"
                                 attrs="{'invisible': [
                                 '&amp;', '|', ('state', 'not in', ('draft', 'revision')), ('check_a', '=', False),
-                                '|', ('state', '!=', 'agreement'), ('check_m', '=', False)
+                                '|', ('state', '!=', 'agreement'), ('check_m', '=', True)
                                 ]
                                 }"
                                 />
@@ -116,20 +117,34 @@
                                  ]}"
                                 />
 
-                        <!-- inwork -> removed -->
+                        <!-- inwork, delegated -> removed -->
                         <button string="Задача снята"
                                 name="action_removed"
                                 type="workflow"
                                 icon="gtk-cancel"
-                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_i', '=', False)]}"
+                                attrs="{'invisible': ['&amp;',
+                                '|', ('state', '!=', 'inwork'), ('check_i', '=', False),
+                                '|', ('state', 'not in', ('delegated', 'inwork')), ('check_m', '=', False)
+                                ]}"
                                 />
 
-                        <!-- inwork -> transfer -->
+                        <!-- inwork -> not_done -->
+                        <button string="Не выполнена"
+                                name="action_not_done"
+                                type="workflow"
+                                icon="gtk-cancel"
+                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_r', '=', False)]}"
+                                />
+
+                        <!-- inwork, delegated -> transfer -->
                         <button string="Задача перенесена"
                                 name="action_transfer"
                                 type="workflow"
                                 icon="terp-stock_effects-object-colorize"
-                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_i', '=', False)]}"
+                                attrs="{'invisible': ['&amp;',
+                                '|', ('state', '!=', 'inwork'), ('check_i', '=', False),
+                                '|', ('state', 'not in', ('delegated', 'inwork')), ('check_m', '=', False)
+                                ]}"
                                 />
 
                         <!-- inwork -> delegated -->
@@ -191,6 +206,7 @@
                     <field name="check_r" invisible="1" />
                     <field name="check_m" invisible="1" />
                     <field name="check_e" invisible="1" />
+                    <field name="check_x" invisible="1" />
 
                     <field name="name" />
                     <field name="author_id"/>
@@ -202,104 +218,125 @@
                     <field name="period_id"/>
                     <field name="deadline_date"/>
                     <field name="state"/>
-                    <!-- draft, agreement, revision -> cancel -->
                     <button string="Отмена"
-                            name="action_cancel"
-                            type="workflow"
-                            icon="gtk-cancel"
-                            attrs="{'invisible': [
+                                name="action_cancel"
+                                type="workflow"
+                                icon="gtk-cancel"
+                                attrs="{'invisible': [
                                 '&amp;', '|', ('state', 'not in', ('draft', 'revision')), ('check_a', '=', False),
-                                '|', ('state', '!=', 'agreement'), ('check_m', '=', False)
+                                '|', ('state', '!=', 'agreement'), ('check_m', '=', True)
                                 ]
                                 }"
-                            />
+                                />
 
-                    <!-- cancel -> draft -->
-                    <button string="Черновик"
-                            name="action_draft"
-                            type="workflow"
-                            icon="gtk-go-forward"
-                            attrs="{'invisible': ['|', ('state', '!=', 'cancel'), ('check_a', '=', False)]}"
-                            />
+                        <!-- cancel -> draft -->
+                        <button string="Черновик"
+                                name="action_draft"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'cancel'), ('check_a', '=', False)]}"
+                                />
 
-                    <!-- draft,revision -> agreement -->
-                    <button string="На согласование"
-                            name="action_agreement"
-                            type="workflow"
-                            icon="gtk-go-forward"
-                            attrs="{'invisible': ['&amp;',
+                        <!-- draft,revision -> agreement -->
+                        <button string="На согласование"
+                                name="action_agreement"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['&amp;',
                                  '|', ('state', '!=', 'revision'), ('check_a', '=', False),
                                  '|', ('state', '!=', 'draft'), '|', ('check_e', '=', True), ('check_a', '=', False)
                                  ]}"
-                            />
+                                />
 
-                    <!-- agreement -> revision -->
-                    <button string="На доработку"
-                            name="action_revision"
-                            type="workflow"
-                            icon="gtk-go-back"
-                            attrs="{'invisible': ['|', ('state', '!=', 'agreement'), ('check_m', '=', False)]}"
-                            />
+                        <!-- agreement -> draft -->
+                        <!--button string="В черновик"
+                                name="action_draft"
+                                type="workflow"
+                                icon="gtk-go-back"
+                                states="agreement"
+                                /-->
 
-                    <!-- draft, agreement -> inwork -->
-                    <button string="Задача поставлена"
-                            name="action_inwork"
-                            type="workflow"
-                            icon="gtk-go-forward"
-                            attrs="{'invisible': ['&amp;',
+                        <!-- agreement -> revision -->
+                        <button string="На доработку"
+                                name="action_revision"
+                                type="workflow"
+                                icon="gtk-go-back"
+                                attrs="{'invisible': ['|', ('state', '!=', 'agreement'), ('check_m', '=', False)]}"
+                                />
+
+                        <!-- draft, agreement -> inwork -->
+                        <button string="Задача поставлена"
+                                name="action_inwork"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['&amp;',
                                  '|', ('state', '!=', 'agreement'), ('check_m', '=', False),
                                  '|', ('state', '!=', 'draft'), '|', ('check_e', '=', False), ('check_a', '=', False)
                                  ]}"
-                            />
+                                />
 
-                    <!-- inwork -> removed -->
-                    <button string="Задача снята"
-                            name="action_removed"
-                            type="workflow"
-                            icon="gtk-cancel"
-                            attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_i', '=', False)]}"
-                            />
+                        <!-- inwork, delegated -> removed -->
+                        <button string="Задача снята"
+                                name="action_removed"
+                                type="workflow"
+                                icon="gtk-cancel"
+                                attrs="{'invisible': ['&amp;',
+                                '|', ('state', '!=', 'inwork'), '|', ('check_i', '=', False), ('check_x', '=', False),
+                                '|', ('state', '!=', 'delegated'), ('check_m', '=', False)
+                                ]}"
+                                />
 
-                    <!-- inwork -> transfer -->
-                    <button string="Задача перенесена"
-                            name="action_transfer"
-                            type="workflow"
-                            icon="terp-stock_effects-object-colorize"
-                            attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_i', '=', False)]}"
-                            />
+                        <!-- inwork -> not_done -->
+                        <button string="Не выполнена"
+                                name="action_not_done"
+                                type="workflow"
+                                icon="gtk-cancel"
+                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_r', '=', False)]}"
+                                />
 
-                    <!-- inwork -> delegated -->
-                    <button string="Задача делегирована"
-                            name="action_delegated"
-                            type="workflow"
-                            icon="terp-personal+"
-                            context="{'delegate': True}"
-                            attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_r', '=', False)]}"
-                            />
+                        <!-- inwork, delegated -> transfer -->
+                        <button string="Задача перенесена"
+                                name="action_transfer"
+                                type="workflow"
+                                icon="terp-stock_effects-object-colorize"
+                                attrs="{'invisible': ['&amp;',
+                                '|', ('state', '!=', 'inwork'), '|', ('check_i', '=', False), ('check_x', '=', False),
+                                '|', ('state', '!=', 'delegated'), ('check_m', '=', False)
+                                ]}"
+                                />
 
-                    <!-- inwork,delegated -> done -->
-                    <button string="Задача выполнена"
-                            name="action_done"
-                            type="workflow"
-                            icon="gtk-go-forward"
-                            attrs="{'invisible': ['|', ('state', 'not in', ('inwork', 'delegated')), ('check_r', '=', False)]}"
-                            />
+                        <!-- inwork -> delegated -->
+                        <button string="Задача делегирована"
+                                name="action_delegated"
+                                type="workflow"
+                                icon="terp-personal+"
+                                context="{'delegate': True}"
+                                attrs="{'invisible': ['|', ('state', '!=', 'inwork'), ('check_r', '=', False)]}"
+                                />
 
-                    <!-- done -> accepted -->
-                    <button string="Задача принята"
-                            name="action_accepted"
-                            type="workflow"
-                            icon="gtk-yes"
-                            attrs="{'invisible': ['|', ('state', '!=', 'done'), ('check_i', '=', False)]}"
-                            />
+                        <!-- inwork,delegated -> done -->
+                        <button string="Задача выполнена"
+                                name="action_done"
+                                type="workflow"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', 'not in', ('inwork', 'delegated')), ('check_r', '=', False)]}"
+                                />
 
-                    <!-- done -> not_accepted -->
-                    <button string="Задача не принята"
-                            name="action_not_accepted"
-                            type="workflow"
-                            icon="gtk-no"
-                            attrs="{'invisible': ['|', ('state', '!=', 'done'), ('check_i', '=', False)]}"
-                            />
+                        <!-- done -> accepted -->
+                        <button string="Задача принята"
+                                name="action_accepted"
+                                type="workflow"
+                                icon="gtk-yes"
+                                attrs="{'invisible': ['|', ('state', '!=', 'done'), ('check_i', '=', False)]}"
+                                />
+
+                        <!-- done -> not_accepted -->
+                        <button string="Задача не принята"
+                                name="action_not_accepted"
+                                type="workflow"
+                                icon="gtk-no"
+                                attrs="{'invisible': ['|', ('state', '!=', 'done'), ('check_i', '=', False)]}"
+                                />
 
                 </tree>
             </field>
