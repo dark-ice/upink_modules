@@ -12,7 +12,7 @@ class ReportQualityControlGeneral(Model):
 
     def _get_date(self, cr, uid, ids, name, arg, context=None):
         res = {}
-        for record in self.read(cr, uid, ids, ['quality_ids', 'partner_id'], context):
+        for record in self.read(cr, uid, ids, ['quality_ids', 'partner_id', 'period_id'], context):
             ydolit = self.pool.get('res.partner.quality.control')._get_ydolit(cr, uid, tuple(set(record['quality_ids'])), '', {},
                                                                               context=None)
             points = []
@@ -25,12 +25,17 @@ class ReportQualityControlGeneral(Model):
                 mbo.append(val['mbo'])
 
             money_sum = self.pool.get('res.partner')._get_report_payment(cr, uid, [record['partner_id'][0],], name, arg, context=None)
+            sum = 0.0
+            for rec in money_sum[record['partner_id'][0]]:
+                record['period_id'][0]
+                if rec[2]['period_id'] == record['period_id'][0]:
+                    sum = rec[2]['payment_sum']
 
             res[record['id']] = {
                 'quality_point': numpy.mean(points),
                 'quality_index': numpy.mean(indexes),
                 'mbo': numpy.mean(mbo),
-                'payment_sum': money_sum[record['partner_id'][0]][0][2]['payment_sum']
+                'payment_sum': sum
             }
         return res
 
