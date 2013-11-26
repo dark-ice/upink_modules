@@ -2062,14 +2062,14 @@ class PartnerQualityControl(Model):
         'level_ydolit': fields.function(
             _get_ydolit,
             type='float',
-            string='Уровень удовлетворительности',
+            string='Уровень удовлетворенности',
             multi='ydolit',
             readonly=True,
         ),
         'index_ydolit': fields.function(
             _get_ydolit,
             type='float',
-            string='Индекс удовлетворительности',
+            string='Индекс удовлетворенности',
             multi='ydolit',
             readonly=True,
         ),

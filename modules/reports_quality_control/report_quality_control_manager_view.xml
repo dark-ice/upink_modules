@@ -41,7 +41,7 @@
             <field name="context">{} </field>
         </record>
 
-        <menuitem id="quality_reports" name="Отчеты по управлению качеством" parent="base.menu_base_partner" sequence="55"/>
+        <menuitem id="quality_reports" name="Отчеты по управлению качеством" parent="base.menu_base_partner" sequence="2"/>
         <menuitem action="report_quality_control_manager" id="menu_service_report_view" parent="quality_reports" sequence="10"/>
     </data>
 </openerp>
