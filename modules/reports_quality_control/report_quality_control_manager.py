@@ -59,6 +59,7 @@ class ReportQualityControlManager(Model):
             type='float',
             multi='need_date',
             string='MBO по услуге',
+            group_operator='avg'
         ),
         'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')]),
         'period_name': fields.char('Период', size=10),

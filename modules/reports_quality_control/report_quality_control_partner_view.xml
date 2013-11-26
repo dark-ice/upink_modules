@@ -9,10 +9,11 @@
             <field name="arch" type="xml">
                 <tree string="Уровень удовлетворенности по партнерам" editable="top" >
                     <field name="partner_id" readonly="1"/>
+                    <field name="period_name" readonly="1"/>
                     <field name="direction" readonly="1"/>
                     <field name="count" readonly="1"/>
                     <field name="mbo" readonly="1"/>
-                    <field name="period_name" invisible="1"/>
+
                     <field name="quality_point" readonly="1" avg=""/>
                     <field name="quality_index" readonly="1" avg=""/>
                     <field name="period_id" invisible="1"/>
