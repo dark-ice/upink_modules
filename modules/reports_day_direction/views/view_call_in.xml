@@ -98,7 +98,7 @@
         </record>
 
 
-        <menuitem id="menu_report_day_dop_call_in" action="action_window_report_day_call_in_statistic" name="Показатели по входящим проектам" parent="process_call_in.top_menu_process_call_in_dev" sequence="20"/>
-        <menuitem id="menu_day_dop_call_in" action="action_rep_call_in_statistic" name="Отчет по входящим проектам" parent="process_call_in.top_menu_process_call_in_dev" sequence="30"/>
+        <menuitem id="menu_report_day_dop_call_in" action="action_window_report_day_call_in_statistic" name="Показатели по входящим проектам" parent="process_call_in.top_menu_process_call_in_dev" sequence="30"/>
+        <menuitem id="menu_day_dop_call_in" action="action_rep_call_in_statistic" name="Отчет по входящим проектам" parent="process_call_in.top_menu_process_call_in_dev" sequence="20"/>
     </data>
 </openerp>

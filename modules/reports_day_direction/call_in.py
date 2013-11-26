@@ -10,7 +10,7 @@ class ReportDayCallInStatistic(Model):
     _order = 'date DESC'
 
     _columns = {
-        'process_call_in_id': fields.many2one('process.call.in', 'ID процесса', domain="[('state', '=', 'development')]"),
+        'process_call_in_id': fields.many2one('process.call.in', 'Проект', domain="[('state', '=', 'development')]"),
         'supervisor_id': fields.related(
             'process_call_in_id',
             'specialist_id',
@@ -41,15 +41,15 @@ class ReportDayCallIn(Model):
     _auto = False
     _order = 'date'
 
-    def _get_dop_data(self, cr, uid, ids, name, arg, context=None):
-        res = {}
-        procent = 0.0
-        for record in self.read(cr, uid, ids, ['call_in', 'missed'], context=context):
-            res[record['id']] = 0.0
-            if record['call_in']:
-                procent = float(record['missed'])/record['call_in'] + record['call_in']
-            res[record['id']] = procent
-        return res
+    #def _get_dop_data(self, cr, uid, ids, name, arg, context=None):
+    #    res = {}
+    #    procent = 0.0
+    #    for record in self.read(cr, uid, ids, ['call_in', 'missed'], context=context):
+    #        res[record['id']] = 0.0
+    #        if record['call_in']:
+    #            procent = float(record['missed'])/record['call_in'] + record['call_in']
+    #        res[record['id']] = procent
+    #    return res
 
     _columns = {
         'date_start': fields.date('Дата начала'),

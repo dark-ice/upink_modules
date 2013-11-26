@@ -20,6 +20,7 @@
         #'security/ir.model.access.csv',
         'views/view_ppc.xml',
         'views/view_call_in.xml',
+        'views/view_call_out.xml',
         #'workflow.xml',
     ],
 

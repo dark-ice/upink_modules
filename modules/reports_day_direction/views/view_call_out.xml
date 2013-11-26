@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_day_call_out_tree">
+            <field name="name">Показатели по исходящим проектам</field>
+            <field name="model">report.day.call.out.static</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree editable = 'top'>
+                    <field name="process_call_out_id" />
+                    <field name="supervisor_id" readonly="1"/>
+                    <field name="target_date_start" />
+                    <field name="target_date_end" />
+                    <field name="date" />
+                    <field name="coll_num" />
+                    <field name="contact_end_status_num" />
+                    <field name="partner_give" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_window_day_call_out_statistic" model="ir.actions.act_window">
+            <field name="name">Показатели по исходящим проектам</field>
+            <field name="res_model">report.day.call.out.static</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_day_call_out_tree"/>
+            <field name="context">{}</field>
+        </record>
+
+
+<!--отчет по исходящим проектам-->
+        <!--отчет по входящим-->
+        <record model="ir.ui.view" id="view_rep_call_out_tree">
+            <field name="name">Отчет по исходящим проектам</field>
+            <field name="model">report.call.out</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree editable = 'top'>
+                    <field name="partner_id" readonly="1" />
+                    <field name="date" readonly="1" />
+                    <field name="target_date_start" readonly="1" />
+                    <field name="target_date_end" readonly="1" />
+                    <field name="contact_num" readonly="1" sum=""/>
+                    <field name="contact_end_status_num" readonly="1" sum=""/>
+                    <field name="coll_num" readonly="1" sum=""/>
+                    <field name="conversion" readonly="1" sum=""/>
+                    <field name="current_conversion" readonly="1" sum=""/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_rep_call_out_search">
+            <field name="name">view.rep.call.out.search</field>
+            <field name="model">process.call.out</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <group>
+                        <field name="date_start" />
+                        <field name="date_end" />
+                        <field name="partner_id" />
+                    </group>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Проект" icon="terp-partner" name="Partner" context="{'group_by':'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Дата" icon="stock_calendar" name="Date" context="{'group_by':'date'}"/>
+                        <separator orientation="vertical"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_rep_call_out_statistic" model="ir.actions.act_window">
+            <field name="name">Отчет по исходящим проектам</field>
+            <field name="res_model">report.call.out</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_rep_call_out_tree"/>
+            <field name="search_view_id" ref="view_rep_call_out_search"/>
+            <field name="context">{}</field>
+        </record>
+
+        <menuitem id="menu_report_day_dop_call_out" action="action_window_day_call_out_statistic" name="Показатели по исходящим проектам" parent="process_call_out.top_menu_process_call_out_dev" sequence="30"/>
+
+        <menuitem id="menu_day_dop_call_out" action="action_rep_call_out_statistic" parent="process_call_out.top_menu_process_call_out_dev" sequence="20"/>
+    </data>
+</openerp>

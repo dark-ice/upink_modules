@@ -436,7 +436,7 @@
             <field name="search_view_id" ref="view_process_call_out_search"/>
         </record>
 
-        <menuitem action="window_process_call_out" id="menu_process_call_out_dev" parent="process_call.menu_process_call"/>
-
+        <menuitem name="Исходящей кампании" id="top_menu_process_call_out_dev" parent="process_call.menu_process_call"/>
+        <menuitem action="window_process_call_out" id="menu_process_call_out_dev" parent="process_call_out.top_menu_process_call_out_dev" sequence="10"/>
     </data>
 </openerp>
