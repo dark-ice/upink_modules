@@ -1,5 +1,6 @@
 # coding=utf-8
 from datetime import date
+import numpy
 
 __author__ = 'andrey'
 import netsvc
@@ -820,6 +821,7 @@ class ProcessSla(Model):
 
     def save(self, cr, uid, ids, context=None):
         return {'type': 'ir.actions.act_window_close'}
+
 ProcessSla()
 
 
@@ -886,6 +888,16 @@ class ProcessSlaLine(Model):
     _defaults = {
         'type': lambda cr, u, i, ctx: ctx.get('type', 'call').lower()
     }
+
+    def write(self, cr, user, ids, vals, context=None):
+        sla_pool = self.pool.get('process.sla')
+        flag = super(ProcessSlaLine, self).write(cr, user, ids, vals, context)
+
+        sla_ids = list(set(r['sla_id'][0] for r in self.read(cr, 1, ids, ['sla_id'])))
+        for sla_id in sla_ids:
+            line_ids = self.search(cr, 1, [('sla_id', '=', sla_id)])
+            sla_pool.write(cr, 1, [sla_id], {'avg_mbo': numpy.mean([i['mbo'] for i in self.read(cr, 1, line_ids, ['mbo'])]) or 0.0})
+        return flag
 ProcessSlaLine()
 
 

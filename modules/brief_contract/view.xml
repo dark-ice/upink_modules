@@ -13,6 +13,7 @@
                         <field name="check_r"/>
                         <field name="check_l"/>
                         <field name="check_s"/>
+                        <field name="check_b"/>
                         <field name="from" invisible="True"/>
                         <field name="wuser_ids" invisible="True"/>
                     </group>
@@ -33,6 +34,7 @@
                         <newline/>
                         <field name="service_id" on_change="onchange_service(service_id)"/>
                         <field name="service_head_id" readonly="1"/>
+                        <field name="account_id"/>
                         <separator colspan="4"/>
                     </group>
                     <group colspan="4" col="4">
@@ -61,6 +63,7 @@
                                context="{'partner_id': partner_id}"
                                domain="[('partner_id', '=', partner_id)]"
                                 />
+                        <field name="doc_type_id"/>
                         <separator colspan="4"/>
                     </group>
                     <group col="4" colspan="4">
@@ -112,8 +115,38 @@
                         </field>
                         <separator colspan="4"/>
                     </group>
+                    <group colspan="4" col="4" attrs="{'invisible': [('check_b', '=', False)]}">
+                        <separator string="Договор" colspan="4"/>
+                        <button name="generate"
+                                string="Сгенерировать договор"
+                                icon="gtk-go-forward"
+                                type="object"
+                                states="draft,approval,contract_completion"
+                                colspan="4"
+                                />
+                        <newline />
+                        <field name="doc_id" attrs="{'invisible': [('check_b', '=', False)]}"/>
+                        <field name="pdf_id" />
+                        <separator string="Доступ к серверу" colspan="4"/>
+                        <button name="send"
+                                string="Отправить на сервер"
+                                icon="gtk-go-forward"
+                                type="object"
+                                attrs="{'invisible': ['|', '|', ('state', '!=', 'approval_partner'), ('check_m', '=', False), ('check_b', '=', False)]}"
+                                colspan="4"
+                                />
+                        <field name="url" widget="url" colspan="4"/>
+                        <field name="login"/>
+                        <field name="pass"/>
+                    </group>
                     <group colspan="4" col="4">
-                        <field name="state" />
+                        <separator colspan="4" />
+                        <field name="state"
+                               widget="statusbar"
+                               statusbar_visible="draft,contract_approval,approval_partner,contract_approved,contract_signed"
+                               statusbar_colors='{"cancel":"gray"}'
+                                />
+                        <newline />
 
                         <!-- draft -> cancel -->
                         <button name="action_d_c"
@@ -124,37 +157,24 @@
 
                         <!-- draft -> approval -->
                         <button name="action_d_a"
-                                string="Отправить бриф на согласование"
+                                string="Отправить бриф на корректировку"
                                 icon="gtk-go-forward"
                                 attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_m', '=', False)]}"
                                 />
 
-                        <!-- approval -> completion -->
-                        <button name="action_a_c"
-                                string="Отправить бриф на доработку"
-                                icon="gtk-go-back"
-                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_l', '=', False)]}"
-                                />
-
-                        <!-- completion -> approval -->
-                        <button name="action_c_a"
-                                string="Отправить брифна согласование"
-                                icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'completion'), ('check_m', '=', False)]}"
-                                />
-
-                        <!-- approval -> preparation -->
-                        <button name="action_a_p"
-                                string="Подготовка договора"
-                                icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_l', '=', False)]}"
-                                />
-
-                        <!-- preparation -> contract_approval -->
-                        <button name="action_p_ca"
+                        <!-- draft -> contract_approval -->
+                        <button name="action_d_ca"
                                 string="Отправить договор на согласование"
                                 icon="gtk-go-forward"
                                 attrs="{'invisible': ['|', ('state', '!=', 'preparation'), ('check_l', '=', False)]}"
+                                />
+
+
+                        <!-- approval -> contract_approval -->
+                        <button name="action_a_ca"
+                                string="Отправить договор на согласование"
+                                icon="gtk-go-forward"
+                                attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_l', '=', False)]}"
                                 />
 
                         <!-- contract_approval -> contract_completion -->
@@ -185,18 +205,11 @@
                                 attrs="{'invisible': ['|', ('state', '!=', 'cancel_2'), ('check_l', '=', False)]}"
                                 />
 
-                        <!-- contract_approval -> contract_agreed -->
-                        <button name="action_ca_cagr"
-                                string="Договор согласован"
+                        <!-- contract_approval -> approval_partner -->
+                        <button name="action_ca_ap"
+                                string="Отправить договор на утвеждение партнеру"
                                 icon="gtk-go-forward"
                                 attrs="{'invisible': ['|', ('state', '!=', 'contract_approval'), ('check_s', '=', False)]}"
-                                />
-
-                        <!-- contract_agreed -> approval_partner -->
-                        <button name="action_cagr_ap"
-                                string="Отправить договор на утвеждение"
-                                icon="gtk-go-forward"
-                                attrs="{'invisible': ['|', ('state', '!=', 'contract_agreed'), ('check_l', '=', False)]}"
                                 />
 
                         <!-- approval_partner -> contract_completion -->

@@ -245,7 +245,7 @@ class KpiIndicatorsReference(Model):
 KpiIndicatorsReference()
 
 
-class iKpiStaff(AbstractModel):
+class KpiStaff(AbstractModel):
     _name = "kpi.staff"
     _rec_name = "employee_id"
     _order = "period_id, employee_id"
@@ -301,7 +301,7 @@ class iKpiStaff(AbstractModel):
             if need_period_ids:
                 args.remove(period[0])
                 args.append(('period_id', 'in', need_period_ids))
-        return super(iKpiStaff, self).search(cr, user, args, offset, limit, order, context, count)
+        return super(KpiStaff, self).search(cr, user, args, offset, limit, order, context, count)
 
 
 class KpiEnrollmentFormal(Model):
@@ -436,6 +436,7 @@ class KpiSmart(Model):
         ('cancel', u'Отмена'),
         ('removed', u'Задача снята'),
         ('transfer', u'Перенос'),
+        ('not_done', u'Не выполнена'),
     )
 
     def _get_plan(self, cr, period_id, employee_id):
@@ -461,29 +462,32 @@ class KpiSmart(Model):
         """
         empl_pool = self.pool.get('hr.employee')
         res = {}
-        for data in self.browse(cr, uid, ids, context):
+        for data in self.browse(cr, 1, ids, context):
             access = str()
 
             #  Автор
-            if data.author_id and data.author_id.user_id.id == uid:
+            if data and data.author_id and data.author_id.user_id.id == uid:
                 access += 'a'
 
             #  Инициатор
-            if data.initiator_id and \
+            if data and data.initiator_id and \
                     ((data.initiator_id.user_id.id == uid and data.state == 'inwork')
                      or (empl_pool.get_department_manager(cr, uid, data.initiator_id.id, context).user_id.id == uid and data.state == 'done')):
                 access += 'i'
 
             #  Ответственный
-            if data.responsible_id and data.responsible_id.user_id.id == uid:
+            if data and data.responsible_id and data.responsible_id.user_id.id == uid:
                 access += 'r'
 
             #  Руководитель ответственного
-            if data.responsible_head_id and data.responsible_head_id.user_id.id == uid:
+            if data and data.responsible_head_id and data.responsible_head_id.user_id.id == uid:
                 access += 'm'
 
-            if data.responsible_head_id and data.author_id and data.responsible_head_id == data.author_id:
+            if data and data.responsible_head_id and data.author_id and data.responsible_head_id == data.author_id:
                 access += 'e'
+
+            if data and data.parent_id and data.parent_id.responsible_head_id and data.parent_id.responsible_head_id.user_id.id == uid:
+                access += 'x'
 
             val = False
             letter = name[6]
@@ -552,14 +556,20 @@ class KpiSmart(Model):
             'Задача',
             size=250,
             required=True,
+            readonly=True,
+            states={'draft': [('readonly', False)], 'revision': [('readonly', False)]},
             help='Суть SMART-задачи.'),
         'author_id': fields.many2one(
             'hr.employee',
             string='Автор',
+            readonly=True,
+            states={'draft': [('readonly', False)], 'revision': [('readonly', False)]},
             help='Автор SMART-задачи.'),
         'initiator_id': fields.many2one(
             'hr.employee',
             string='Инициатор',
+            readonly=True,
+            states={'draft': [('readonly', False)], 'revision': [('readonly', False)]},
             help='Инициатор SMART-задачи.\n'
                  'Инициатор задачи на этапе "Задача поставлена" может либо снять либо'
                  ' перенести задачу. На этапе "Задача принята" может либо "Принять задачу"'
@@ -577,6 +587,8 @@ class KpiSmart(Model):
         ),
         'responsible_head_id': fields.many2one(
             'hr.employee',
+            readonly=True,
+            states={'draft': [('readonly', False)], 'revision': [('readonly', False)]},
             string='Руководитель ответственного',
             help='Поле заполняется автоматически, в зависимости от выбранного ответственного.\n'
                  'Руководитель на этапе "Согласование с руководителем ответственного" может перевести задачу'
@@ -588,14 +600,20 @@ class KpiSmart(Model):
             help='Дата создания SMART-задачи.'),
         'deadline_date': fields.datetime(
             'Срок выполнения',
+            readonly=True,
+            states={'draft': [('readonly', False)], 'revision': [('readonly', False)]},
             help='Срок выполнения SMART-задачи.'
                  ' В зависимости от установленного срока заполняется поле "Период" '),
         'deadline_check': fields.boolean(
             'Срок выполнения изменен',
+            readonly=True,
+            states={'draft': [('readonly', False)], 'revision': [('readonly', False)]},
             invisible=True),
         'note': fields.text(
             'Критерий выполнения',
             required=True,
+            readonly=True,
+            states={'draft': [('readonly', False)], 'revision': [('readonly', False)]},
             help='Параметры, по которым оценивается выполненная задача.'),
         'state': fields.selection(
             _states,
@@ -659,13 +677,21 @@ class KpiSmart(Model):
             invisible=True
         ),
 
+        'check_x': fields.function(
+            _check_access,
+            method=True,
+            string='Проверка на наличие руководителя в родительской',
+            type='boolean',
+            invisible=True
+        ),
+
         'color': fields.function(
             _check_color,
             method=True,
             string='Цвет',
             type='char',
             size=20,
-            #invisible=True
+            invisible=True
         ),
 
         'transfer_id': fields.many2one(
@@ -859,7 +885,7 @@ class KpiSmart(Model):
                 values['responsible_id'] = responsible
 
         if responsible:
-            employee = employee_pool.browse(cr, uid, responsible, context)
+            employee = employee_pool.browse(cr, 1, responsible, context)
             calendar = employee.department_id.department_time
             head = employee.parent_id
             if head:
@@ -872,7 +898,7 @@ class KpiSmart(Model):
 
         if next_state and next_state != state:
             values.update({'history_ids': [(0, 0, {
-                'usr_id': self.pool.get('hr.employee').get_employee(cr, uid, uid).id,
+                'usr_id': self.pool.get('hr.employee').get_employee(cr, 1, uid).id,
                 'state': self.get_state(next_state)[1]
             })]})
             if next_state == 'accepted':

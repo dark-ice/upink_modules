@@ -43,7 +43,7 @@
         <record id="kpi_expert_assesment_rule" model="ir.rule">
             <field name="name">KPI: ЭО</field>
             <field ref="model_kpi_expert_assesment" name="model_id"/>
-            <field name="domain_force">['|', ('expert_id.user_id.id','=',user.id), ('employee_id.user_id.id','=',user.id)]</field>
+            <field name="domain_force">['|', '|', ('expert_id.user_id.id','=',user.id), ('employee_id.user_id.id','=',user.id), ('employee_id.parent_id.user_id.id', '=', user.id)]</field>
             <field name="perm_read" eval="True" />
             <field name="perm_create" eval="True" />
             <field name="perm_write" eval="True" />

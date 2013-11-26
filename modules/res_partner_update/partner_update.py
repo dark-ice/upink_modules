@@ -910,6 +910,17 @@ class ResPartnerBankAddress(Model):
             ], 'Тип'),
         'index': fields.char("Почтовый индекс", size=6),
         'city': fields.char("Город", size=250),
+        'st_type': fields.selection(
+            [
+                ('alleya', 'Аллея'),
+                ('ylitsa', 'Улица'),
+                ('bulvar', 'Бульвар'),
+                ('naberegnaya', 'Набережная'),
+                ('pereyloc', 'Переулок'),
+                ('proezd', 'Проезд'),
+                ('prospect', 'Проспект'),
+                ('ploshad', 'Площадь'),
+            ], 'Тип улицы'),
         'street': fields.char("Улица", size=250),
         'house': fields.char("№ дома", size=50),
         'housing': fields.char("№ корпуса", size=50),
@@ -929,9 +940,40 @@ class ResPartnerBankAddress(Model):
     }
 
     _defaults = {
-        'name': lambda *a: 'ua',
-        'flat_type': lambda *a: 'flat'
+        'name': 'ua',
+        'flat_type': 'flat',
+        'st_type': 'ylitsa'
     }
+
+    def get_address(self, cr, bank_id, address_type='ua'):
+        address_ids = self.search(cr, 1, [('bank_id', '=', bank_id), ('name', '=', address_type)])
+        address_list = []
+        if address_ids:
+            address = self.read(cr, 1, address_ids[0], [])
+            if address['index']:
+                address_list.append(address['index'])
+            if address['city']:
+                address_list.append(address['city'])
+            if address['street']:
+                st = u'ул.'
+                if address['st_type'] == 'alleya':
+                    st = u'ал.'
+                if address['st_type'] == 'bulvar':
+                    st = u'бул.'
+                if address['st_type'] == 'naberegnaya':
+                    st = u'наб.'
+                if address['st_type'] == 'pereyloc':
+                    st = u'пр.'
+                if address['st_type'] == 'proezd':
+                    st = u'проезд'
+                if address['st_type'] == 'prospect':
+                    st = u'просп.'
+                if address['st_type'] == 'ploshad':
+                    st = u'пл.'
+                address_list.append(u"{st_type} {street}".format(street=address['street'], st_type=st))
+            if address['house']:
+                address_list.append(u"д. {house}".format(house=address['house']))
+        return ','.join(address_list) or u'-'
 ResPartnerBankAddress()
 
 
@@ -942,10 +984,9 @@ class SkkNotes(Model):
 SkkNotes()
 
 
-class res_partner(Model):
-    _description = u'Partner'
-    _name = "res.partner"
+class ResPartner(Model):
     _inherit = "res.partner"
+    _description = u'Partner'
     _order = "priority, create_date desc"
 
     def change_name(self, cr, uid, ids, ur_name='', site='', context=None):
@@ -974,13 +1015,10 @@ class res_partner(Model):
         return res
 
     def _check_access(self, cr, uid, ids, name, arg, context=None):
-        res = {}
-        for record in self.browse(cr, uid, ids):
-            if uid in (14, 284):
-                res[record.id] = True
-            else:
-                res[record.id] = False
-        return res
+        flag = False
+        if uid in (1, 14):
+            flag = True
+        return dict([(record_id, flag) for record_id in ids])
 
     def _get_service(self, cr, uid, ids, name, arg, context=None):
         res = {}
@@ -1417,7 +1455,7 @@ class res_partner(Model):
         'categ_id': fields.many2one(
             'crm.case.categ',
             'Тематика',
-            domain="['|',('section_id','=',section_id),('section_id','=',False),('object_id.model', '=', 'crm.lead')]",
+            #domain="['|', ('section_id', '=', False), ('responsible_users', '=', user_id)]",
             help='Категория, которой принадлежит данный Партнер'
         ),
         'description': fields.text('Дополнительная информация о контактном лице'),
@@ -1575,7 +1613,7 @@ class res_partner(Model):
 
     def default_get(self, cr, uid, fields_list, context=None):
         pass
-        return super(res_partner, self).default_get(cr, uid, fields_list, context)
+        return super(ResPartner, self).default_get(cr, uid, fields_list, context)
 
     def add_note(self, cr, uid, ids, context=None):
         view_id = self.pool.get('ir.ui.view').search(cr, uid,
@@ -1660,7 +1698,7 @@ class res_partner(Model):
             for indx in date_indx:
                 del args[indx]
 
-        return super(res_partner, self).search(cr, uid, args, offset, limit, order, context, count)
+        return super(ResPartner, self).search(cr, uid, args, offset, limit, order, context, count)
 
     def write(self, cr, user, ids, vals, context=None):
         next_partner_status = vals.get('partner_status', False)
@@ -1682,7 +1720,13 @@ class res_partner(Model):
             if attachment[0] == 0:
                 attachment[2]['res_model'] = 'res.partner'
 
-        return super(res_partner, self).write(cr, user, ids, vals, context)
+        return super(ResPartner, self).write(cr, user, ids, vals, context)
+
+    def create(self, cr, user, vals, context=None):
+        categ_ids = self.pool.get('crm.case.categ').search(cr, user, [('responsible_users', '=', user)])
+        if vals.get('partner_base') == 'cold' and (not vals.get('categ_id') or vals['categ_id'] not in categ_ids):
+            raise osv.except_osv("Ошибка", "Заполните поле 'Тематика' Вашей тематикой")
+        return super(ResPartner, self).create(cr, user, vals, context)
 
     def _check_unique_insesitive(self, cr, uid, ids, context=None):
         for self_obj in self.browse(cr, 1, ids, context):
@@ -1815,7 +1859,7 @@ class res_partner(Model):
         #    []
         #),
     ]
-res_partner()
+ResPartner()
 
 
 class TransferHistory(Model):
@@ -2074,6 +2118,20 @@ class PartnerQualityControl(Model):
             readonly=True,
         ),
     }
+
+    def _check_unique(self, cr, uid, ids, context=None):
+        for self_obj in self.read(cr, 1, ids, ['period_id', 'service_id'], context):
+            if self.search(cr, 1, [('period_id', '=', self_obj['period_id'][0]), ('service_id', '=', self_obj['service_id'][0]), ('id', '!=', self_obj['id'])], context):
+                return False
+            return True
+
+    _constraints = [
+        (
+            _check_unique,
+            'оценивать одну и ту же услугу 2 раза за период!',
+            [u'Нельзя']
+        ),
+    ]
 PartnerQualityControl()
 
 

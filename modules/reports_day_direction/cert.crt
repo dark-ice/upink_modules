@@ -1,0 +1,73 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 17857 (0x45c1)
+    Signature Algorithm: md5WithRSAEncryption
+        Issuer: C=RU, O=Yandex, OU=Passport, CN=Passport Issuing CA
+        Validity
+            Not Before: Nov 11 07:22:27 2013 GMT
+            Not After : Feb  9 07:22:27 2014 GMT
+        Subject: C=RU, ST=Moscow, OU=soap_direct_yandex, CN=145985503@passport.yandex.ru/emailAddress=ya-upsale-2012@yandex.ru
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (1024 bit)
+                Modulus:
+                    00:b9:62:94:2b:ef:ec:f2:e2:aa:17:cf:22:79:07:
+                    b8:f1:d3:f3:e2:bc:d2:9d:61:2a:ae:9e:d0:d7:4a:
+                    cd:85:3b:19:08:7e:87:b5:72:47:ad:b0:b8:33:32:
+                    40:19:29:35:e6:d6:50:20:9e:df:43:95:e2:05:84:
+                    e0:8e:a5:3e:47:ac:67:07:4b:13:17:44:69:af:5a:
+                    6d:7d:ce:d6:5c:67:17:6f:10:21:bd:b2:7c:00:22:
+                    c5:5d:14:77:ee:23:02:d7:b6:99:64:0a:09:19:73:
+                    60:88:c9:3d:94:59:95:b1:d8:e5:24:83:93:81:81:
+                    d2:5c:75:0e:9f:d5:2b:13:3b
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                OpenSSL Generated Certificate
+            X509v3 Subject Key Identifier: 
+                DA:AD:27:12:7B:10:C5:D9:98:3C:42:25:63:63:15:B0:71:7B:68:BD
+            X509v3 Authority Key Identifier: 
+                DirName:/C=RU/O=Yandex/OU=Passport/CN=Passport root CA
+                serial:02
+
+    Signature Algorithm: md5WithRSAEncryption
+         2a:33:bf:36:5f:e8:f1:27:bc:f4:92:8e:d7:86:d7:3c:ae:52:
+         cd:75:a5:a8:c2:18:9e:99:47:a4:a0:75:87:8e:be:b1:b2:78:
+         b0:ea:db:42:b5:90:7c:ce:5d:29:4e:99:56:cc:82:a7:e2:5e:
+         0e:7f:bd:c3:e8:a5:af:5a:55:dc:73:ac:85:a2:1a:c4:30:ae:
+         4b:3f:47:7c:2e:b6:71:f3:5c:29:0f:23:2d:26:c3:80:00:db:
+         47:a9:6b:31:39:95:58:86:b8:b6:73:7d:81:9f:e2:6e:1c:69:
+         d6:b5:2c:57:a5:29:45:30:48:cd:5c:81:3b:4e:4e:b8:9b:10:
+         53:03:24:b9:a2:47:54:b0:d3:f9:54:f6:9b:87:6b:0a:db:bf:
+         88:a3:8d:94:49:00:04:5b:a5:c9:60:cd:93:bb:cd:e1:fa:d2:
+         09:93:37:08:dc:58:38:fa:78:54:93:b1:7d:14:c1:17:13:87:
+         4d:71:43:26:28:bd:d3:4c:05:f2:4b:bf:ba:23:35:1b:17:dc:
+         d9:df:ab:ee:c5:75:62:29:29:cf:ee:40:0a:84:53:3c:22:50:
+         bb:d7:70:a1:a1:53:29:c0:1c:d4:00:6c:66:c9:da:c4:bd:62:
+         17:db:7b:c0:77:50:aa:0c:c8:01:11:e3:5b:7f:72:ba:19:79:
+         fb:a6:54:05
+-----BEGIN CERTIFICATE-----
+MIIDjzCCAnegAwIBAgICRcEwDQYJKoZIhvcNAQEEBQAwTzELMAkGA1UEBhMCUlUx
+DzANBgNVBAoTBllhbmRleDERMA8GA1UECxMIUGFzc3BvcnQxHDAaBgNVBAMTE1Bh
+c3Nwb3J0IElzc3VpbmcgQ0EwHhcNMTMxMTExMDcyMjI3WhcNMTQwMjA5MDcyMjI3
+WjCBizELMAkGA1UEBhMCUlUxDzANBgNVBAgTBk1vc2NvdzEbMBkGA1UECxQSc29h
+cF9kaXJlY3RfeWFuZGV4MSUwIwYDVQQDFBwxNDU5ODU1MDNAcGFzc3BvcnQueWFu
+ZGV4LnJ1MScwJQYJKoZIhvcNAQkBFhh5YS11cHNhbGUtMjAxMkB5YW5kZXgucnUw
+gZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALlilCvv7PLiqhfPInkHuPHT8+K8
+0p1hKq6e0NdKzYU7GQh+h7VyR62wuDMyQBkpNebWUCCe30OV4gWE4I6lPkesZwdL
+ExdEaa9abX3O1lxnF28QIb2yfAAixV0Ud+4jAte2mWQKCRlzYIjJPZRZlbHY5SSD
+k4GB0lx1Dp/VKxM7AgMBAAGjgbswgbgwCQYDVR0TBAIwADAsBglghkgBhvhCAQ0E
+HxYdT3BlblNTTCBHZW5lcmF0ZWQgQ2VydGlmaWNhdGUwHQYDVR0OBBYEFNqtJxJ7
+EMXZmDxCJWNjFbBxe2i9MF4GA1UdIwRXMFWhUKROMEwxCzAJBgNVBAYTAlJVMQ8w
+DQYDVQQKEwZZYW5kZXgxETAPBgNVBAsTCFBhc3Nwb3J0MRkwFwYDVQQDExBQYXNz
+cG9ydCByb290IENBggECMA0GCSqGSIb3DQEBBAUAA4IBAQAqM782X+jxJ7z0ko7X
+htc8rlLNdaWowhiemUekoHWHjr6xsniw6ttCtZB8zl0pTplWzIKn4l4Of73D6KWv
+WlXcc6yFohrEMK5LP0d8LrZx81wpDyMtJsOAANtHqWsxOZVYhri2c32Bn+JuHGnW
+tSxXpSlFMEjNXIE7Tk64mxBTAyS5okdUsNP5VPabh2sK27+Io42USQAEW6XJYM2T
+u83h+tIJkzcI3Fg4+nhUk7F9FMEXE4dNcUMmKL3TTAXyS7+6IzUbF9zZ36vuxXVi
+KSnP7kAKhFM8IlC713ChoVMpwBzUAGxmydrEvWIX23vAd1CqDMgBEeNbf3K6GXn7
+plQF
+-----END CERTIFICATE-----

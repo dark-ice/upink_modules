@@ -1445,6 +1445,9 @@
                     <field name="accept_date"/>
                     <field name="usergroup" domain="[('name', 'ilike', 'очередь')]" widget="selection"/>
                     <field name="work_state" />
+                    <newline/>
+                    <field name="create_date" />
+                    <field name="direction" />
                 </search>
             </field>
         </record>
