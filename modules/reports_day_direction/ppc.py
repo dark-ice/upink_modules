@@ -116,8 +116,8 @@ class ReportDayPPC(Model):
             create or replace view report_day_ppc as (
                 SELECT
                   row_number() over() as id,
-                  p.date_end,
-                  p.date_start,
+                  s.date date_end,
+                  s.date date_start,
                   l.partner_id,
                   l.service_id,
                   p.specialist_id,
