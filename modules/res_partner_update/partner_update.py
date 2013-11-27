@@ -1047,16 +1047,11 @@ class ResPartner(Model):
 
         return res
 
-    def _get_date(self, cr, uid, ids, name, arg, context=None):
-        res = {}
-        for record in self.perm_read(cr, uid, ids):
-            res[record.id] = record['create_date']
-        return res
-
     def _get_rate(self, cr, uid, ids, name, arg, context=None):
         res = {}
-        for record in self.read(cr, 1, ids, []):
-            res[record['id']] = 25.25
+        for record in self.read(cr, 1, ids, ['name']):
+            rate = 0.0
+            res[record['id']] = rate
         return res
 
     def _search_cr_date(self, cr, uid, obj, name, args, context):
@@ -1143,9 +1138,9 @@ class ResPartner(Model):
             service_ids = p_service_pool.search(cr, 1, [('partner_id', '!=', False)])
             service_statuses = p_service_pool._get_service_status(cr, 1, service_ids, '', [])
             ids = [k for k, v in service_statuses.iteritems() if get_state(PARTNER_STATUS, status)[1] == v]
-            partner_id = set([r['partner_id'][0] for r in p_service_pool.read(cr, 1, ids, ['partner_id'])])
-        if ids:
-            return [('id', 'in', tuple(partner_id))]
+            partner_ids = set([r['partner_id'][0] for r in p_service_pool.read(cr, 1, ids, ['partner_id'])])
+            if ids:
+                return [('id', 'in', tuple(partner_ids))]
         return [('id', '=', '0')]
 
     def _search_service_name(self, cr, uid, obj, name, args, context):
@@ -1502,7 +1497,7 @@ class ResPartner(Model):
             fnct_search=_search_service_name
         ),
         'site_s': fields.function(
-            lambda *a: [],
+            lambda *a: dict([(r_id, '') for r_id in a[3]]),
             method=True,
             string='Сайт',
             type='char',
@@ -1523,7 +1518,7 @@ class ResPartner(Model):
         'last_comment': fields.related('note_ids', 'title', type='char', size=128, string=u'Комментарий'),
 
         'phone_s': fields.function(
-            lambda *a: [],
+            lambda *a: dict([(r_id, '') for r_id in a[3]]),
             method=True,
             string='Телефон',
             type='char',
@@ -1531,14 +1526,14 @@ class ResPartner(Model):
         ),
 
         'email_s': fields.function(
-            lambda *a: [],
+            lambda *a: dict([(r_id, '') for r_id in a[3]]),
             method=True,
             string='Эл. почта',
             type='char',
             fnct_search=_search_email
         ),
         'full_name_s': fields.function(
-            lambda *a: [],
+            lambda *a: dict([(r_id, '') for r_id in a[3]]),
             method=True,
             string='Полное наименование партнера',
             type='char',
@@ -1547,7 +1542,7 @@ class ResPartner(Model):
         ),
 
         'service_s': fields.function(
-            lambda *a: [],
+            lambda *a: dict([(r_id, '') for r_id in a[3]]),
             method=True,
             string='Тип услуги',
             type='selection',
@@ -1555,7 +1550,7 @@ class ResPartner(Model):
             fnct_search=_search_service
         ),
         'service_status': fields.function(
-            lambda *a: [],
+            lambda *a: dict([(r_id, '') for r_id in a[3]]),
             method=True,
             string='Статус услуги',
             type='selection',
@@ -1604,8 +1599,8 @@ class ResPartner(Model):
             _get_rate,
             type='float',
             readonly=True,
-            string='Процент заполненности',
-            store=True
+            digits=(3, 2),
+            string='Процент заполненности'
         )
     }
 
