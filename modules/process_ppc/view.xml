@@ -89,12 +89,6 @@
                                     <separator string="Аккаунт менеджер" colspan="4"/>
                                     <field name="specialist_id" nolabel="1" attrs="{'readonly': [('check_m', '=', False)]}"/>
                                 </group>
-                                <group colspan="4" col="4">
-                                    <separator colspan="4" />
-                                    <field name="date_start" />
-                                    <field name="domain_zone" />
-                                    <field name="campaign" />
-                                </group>
                                 <group colspan="4" col="2">
                                     <separator string="Доступы" colspan="4"/>
                                     <field name="access_ids" nolabel="1" colspan="4" mode="tree">
@@ -112,15 +106,6 @@
                                     <field name="reason_stop_company" nolabel="1"/>
                                 </group>
                             </group>
-                        </page>
-                        <page string="Факты по каммпании" attrs="{'invisible': [('campaign', '=', False)]}">
-                            <field name="fact_ids" colspan="4" nolabel="1" context="{'campaign': campaign}">
-                                <tree string="Факты" editable="top">
-                                    <field name="name" />
-                                    <field name="date" />
-                                    <field name="cash" />
-                                </tree>
-                            </field>
                         </page>
                         <page string="Переписка по проекту">
                             <field name="message_ids" nolabel="1" colspan="4" mode="tree">
