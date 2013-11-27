@@ -1053,6 +1053,12 @@ class ResPartner(Model):
             res[record.id] = record['create_date']
         return res
 
+    def _get_rate(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.read(cr, 1, ids, []):
+            res[record['id']] = 25.25
+        return res
+
     def _search_cr_date(self, cr, uid, obj, name, args, context):
         site_ids = self.pool.get('res.partner.address.site').search(cr, uid, [('name', args[0][1], args[0][2])],
                                                                     context=context)
@@ -1593,6 +1599,14 @@ class ResPartner(Model):
         'check_ppc': fields.function(_check_ppc, type="boolean", method=True, string=u"Маркер PPC"),
         'old_discounts_ids': fields.one2many('res.partner.ppc.discounts', 'partner_id', 'Скидки', domain=[('finish_date', '<', date.today().strftime('%Y-%m-%d'))]),
         'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством'),
+
+        'rate': fields.function(
+            _get_rate,
+            type='float',
+            readonly=True,
+            string='Процент заполненности',
+            store=True
+        )
     }
 
     def _get_type(self, cr, uid, context=None):
