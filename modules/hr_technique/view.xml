@@ -32,70 +32,68 @@
                                 colspan="2"
                                 groups="base.group_sys_admin_head,base.group_sys_admin"
                                 />
-                        <group colspan="4" groups="base.group_sys_admin_head,base.group_sys_admin">
-                            <notebook colspan="4">
-                                <page string="Общие данные">
-                                    <field name="serial_number" />
-                                    <field name="inventory_number" />
-                                    <separator colspan="4"/>
-                                    <field name="date_of_purchase"/><newline />
-                                    <field name="cash"/>
-                                    <field name="currency_id" widget="selection"/>
-                                    <field name="cash_ye" />
-                                    <field name="rate" />
-                                    <separator colspan="4"/>
-                                    <field name="account_id" attrs="{'readonly': ['|', ('no_account', '=', True), ('state', '!=', 'storage')]}"/>
-                                    <field name="no_account" attrs="{'readonly': ['|', ('account_id', '!=', False), ('state', '!=', 'storage')]}"/>
-                                    <separator colspan="4"/>
-                                    <field name="stock" />
-                                </page>
-                                <page string="Ремонт">
-                                    <field name="venue_repair" colspan="4" widget="char"/>
-                                    <field name="cause_of_repair" colspan="4" />
-                                    <field name="history_repair_ids" colspan="4" nolabel="1" readonly="1">
-                                        <tree string="История ремонта">
-                                            <field name="create_date"/>
-                                            <field name="name" />
-                                            <field name="cause_of_repair" />
-                                        </tree>
-                                    </field>
-                                </page>
-                                <page string="Списание">
-                                    <field name="cancellation_act_number"/> <newline />
-                                    <field name="reason_for_cancellation" colspan="4" />
-                                    <button type="action"
-                                            name="%(action_technique_committee)d"
-                                            string="Добавить в комиссию"
-                                            context="{'technique_id': id}"
-                                            icon="gtk-convert"
-                                            colspan="4"
-                                            attrs="{'invisible': [('state', '=', 'cancellation')]}"
-                                            />
-                                    <field name="cancellation_employee_ids" colspan="4" nolabel="1" readonly="1">
-                                        <tree string="Комиссия по списанию">
-                                            <field name="check_r" invisible="1"/>
-                                            <field name="employee_id" />
-                                            <field name="agree" />
-                                            <field name="date_agree" />
-                                            <button type="object"
-                                                    name="save"
-                                                    string="Согласен"
-                                                    icon="gtk-ok"
-                                                    attrs="{'invisible': ['|', ('check_r', '=', False), ('agree', '=', True)]}"/>
-                                        </tree>
-                                    </field>
-                                </page>
-                                <page string="Дополнительно">
-                                    <field name="comment_ids" colspan="4" nolabel="1">
-                                        <tree string="Комментарии" editable="top">
-                                            <field name="create_uid" />
-                                            <field name="create_date" />
-                                            <field name="name" />
-                                        </tree>
-                                    </field>
-                                </page>
-                            </notebook>
-                        </group>
+                        <notebook colspan="4">
+                            <page string="Общие данные" attrs="{'invisible': [('check_s', '=', False)]}">
+                                <field name="serial_number" />
+                                <field name="inventory_number" />
+                                <separator colspan="4"/>
+                                <field name="date_of_purchase"/><newline />
+                                <field name="cash"/>
+                                <field name="currency_id" widget="selection"/>
+                                <field name="cash_ye" />
+                                <field name="rate" />
+                                <separator colspan="4"/>
+                                <field name="account_id" attrs="{'readonly': ['|', ('no_account', '=', True), ('state', '!=', 'storage')]}"/>
+                                <field name="no_account" attrs="{'readonly': ['|', ('account_id', '!=', False), ('state', '!=', 'storage')]}"/>
+                                <separator colspan="4"/>
+                                <field name="stock" />
+                            </page>
+                            <page string="Ремонт" attrs="{'invisible': [('check_s', '=', False)]}">
+                                <field name="venue_repair" colspan="4" widget="char"/>
+                                <field name="cause_of_repair" colspan="4" />
+                                <field name="history_repair_ids" colspan="4" nolabel="1" readonly="1">
+                                    <tree string="История ремонта">
+                                        <field name="create_date"/>
+                                        <field name="name" />
+                                        <field name="cause_of_repair" />
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Списание" attrs="{'invisible': ['|', ('check_s', '=', False), ('check_r', '=', False)]}">
+                                <field name="cancellation_act_number"/> <newline />
+                                <field name="reason_for_cancellation" colspan="4" />
+                                <button type="action"
+                                        name="%(action_technique_committee)d"
+                                        string="Добавить в комиссию"
+                                        context="{'technique_id': id}"
+                                        icon="gtk-convert"
+                                        colspan="4"
+                                        attrs="{'invisible': [('state', '=', 'cancellation')]}"
+                                        />
+                                <field name="cancellation_employee_ids" colspan="4" nolabel="1" readonly="1">
+                                    <tree string="Комиссия по списанию">
+                                        <field name="check_r" invisible="1"/>
+                                        <field name="employee_id" />
+                                        <field name="agree" />
+                                        <field name="date_agree" />
+                                        <button type="object"
+                                                name="save"
+                                                string="Согласен"
+                                                icon="gtk-ok"
+                                                attrs="{'invisible': ['|', ('check_r', '=', False), ('agree', '=', True)]}"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Дополнительно" attrs="{'invisible': [('check_s', '=', False)]}">
+                                <field name="comment_ids" colspan="4" nolabel="1">
+                                    <tree string="Комментарии" editable="top">
+                                        <field name="create_uid" />
+                                        <field name="create_date" />
+                                        <field name="name" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
                     </group>
                     <field name="state"
                            widget="statusbar"

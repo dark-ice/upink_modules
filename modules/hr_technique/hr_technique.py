@@ -35,6 +35,33 @@ class HrTechnique(Model):
     _name = 'hr.technique'
     _description = u'Учет техники'
 
+    def _check_access(self, cr, uid, ids, name, arg, context=None):
+        """
+            Динамически определяет роли на форме
+        """
+        res = {}
+        for data in self.read(cr, uid, ids, ['cancellation_employee_send_ids'], context):
+            access = str()
+            val = False
+            letter = name[6]
+
+            user_ids = [
+                u['user_id'][0]
+                for u in self.pool.get('hr.employee').read(cr, 1, data['cancellation_employee_send_ids'], ['user_id'])
+                if u['user_id']
+            ]
+            if uid in user_ids:
+                access += 'r'
+
+            if uid in self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', [195, 196])]):
+                access += 's'
+
+            if letter in access or uid == 1:
+                val = True
+
+            res[data['id']] = val
+        return res
+
     def _get_rate(self, cr, uid, ids, name, arg, context=None):
         res = {}
         currency_rate_pool = self.pool.get('res.currency.rate')
@@ -223,6 +250,20 @@ class HrTechnique(Model):
             states={
                 'storage': [('readonly', False)],
             }
+        ),
+        'check_r': fields.function(
+            _check_access,
+            method=True,
+            string='Согласование',
+            type='boolean',
+            invisible=True
+        ),
+        'check_s': fields.function(
+            _check_access,
+            method=True,
+            string='админы',
+            type='boolean',
+            invisible=True
         ),
     }
 
