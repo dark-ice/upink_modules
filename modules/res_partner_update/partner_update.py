@@ -2105,7 +2105,7 @@ class PartnerQualityControl(Model):
 
     def _check_unique(self, cr, uid, ids, context=None):
         for self_obj in self.read(cr, 1, ids, ['period_id', 'service_id', 'partner_id'], context):
-            if self.search(cr, 1, [('period_id', '=', self_obj['period_id'][0]), ('service_id', '=', self_obj['service_id'][0]), ('id', '!=', self_obj['id'], ('partner_id', '=', self_obj['partner_id'][0]))], context):
+            if self.search(cr, 1, [('period_id', '=', self_obj['period_id'][0]), ('service_id', '=', self_obj['service_id'][0]), ('id', '!=', self_obj['id']), ('partner_id', '=', self_obj['partner_id'][0])], context):
                 return False
             return True
 
