@@ -27,7 +27,6 @@ class ReportQualityControlSpecialist(Model):
             res[record['id']] = {
                 'quality_point': numpy.mean(points),
                 'quality_index': numpy.mean(indexes),
-                #'partner_cnt': len(record['quality_id']),
                 'mbo': numpy.mean(mbo),
             }
         return res
@@ -97,7 +96,7 @@ class ReportQualityControlSpecialist(Model):
                         LEFT JOIN process_smm smm
                           ON (pl.id = smm.launch_id)
                         JOIN res_partner_quality_control AS rpqc
-                          ON (rpqc.partner_id = pl.partner_id)
+                          ON (rpqc.partner_id = pl.partner_id and rpqc.service_id=pl.service_id)
                         JOIN kpi_period k
                           ON (k.id = rpqc.period_id)
                      ) r
