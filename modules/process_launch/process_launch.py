@@ -806,6 +806,11 @@ class ProcessSla(Model):
     def change_sla(self, cr, uid, ids, context=None):
         if context is None:
             context = {}
+        active_id = 0
+        if isinstance(ids, (list, tuple)) and ids:
+            active_id = ids[0]
+        if isinstance(ids, (long, int)):
+            active_id = ids
         view_id = self.pool.get('ir.ui.view').search(cr, uid, [('name', 'like', 'SLA'), ('model', '=', self._name)])
         return {
             'view_type': 'form',
@@ -813,7 +818,7 @@ class ProcessSla(Model):
             'res_model': self._name,
             'name': 'SLA',
             'view_id': view_id,
-            'res_id': context.get('sla_id', 0),
+            'res_id': active_id,
             'type': 'ir.actions.act_window',
             'target': 'new',
             'nodestroy': True,
