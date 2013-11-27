@@ -8,6 +8,8 @@
             <field name="arch" type="xml">
                 <form>
                     <field name="id" invisible="1" />
+                    <field name="check_r" invisible="1" />
+                    <field name="check_s" invisible="1" />
                     <group colspan="4">
                         <field name="name" />
                         <field name="type" />
