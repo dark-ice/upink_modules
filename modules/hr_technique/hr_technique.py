@@ -269,6 +269,7 @@ class HrTechnique(Model):
 
     _defaults = {
         'state': 'storage',
+        'check_s': True,
     }
 
     def save(self, cr, uid, ids, context=None):
