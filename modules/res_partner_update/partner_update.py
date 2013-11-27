@@ -1047,12 +1047,6 @@ class ResPartner(Model):
 
         return res
 
-    def _get_date(self, cr, uid, ids, name, arg, context=None):
-        res = {}
-        for record in self.perm_read(cr, uid, ids):
-            res[record.id] = record['create_date']
-        return res
-
     def _search_cr_date(self, cr, uid, obj, name, args, context):
         site_ids = self.pool.get('res.partner.address.site').search(cr, uid, [('name', args[0][1], args[0][2])],
                                                                     context=context)
@@ -1496,7 +1490,7 @@ class ResPartner(Model):
             fnct_search=_search_service_name
         ),
         'site_s': fields.function(
-            lambda *a: [],
+            lambda *a: dict((r_id, False) for r_id in a[3]),
             method=True,
             string='Сайт',
             type='char',
@@ -1517,7 +1511,7 @@ class ResPartner(Model):
         'last_comment': fields.related('note_ids', 'title', type='char', size=128, string=u'Комментарий'),
 
         'phone_s': fields.function(
-            lambda *a: [],
+            lambda *a: dict((r_id, False) for r_id in a[3]),
             method=True,
             string='Телефон',
             type='char',
@@ -1525,14 +1519,14 @@ class ResPartner(Model):
         ),
 
         'email_s': fields.function(
-            lambda *a: [],
+            lambda *a: dict((r_id, False) for r_id in a[3]),
             method=True,
             string='Эл. почта',
             type='char',
             fnct_search=_search_email
         ),
         'full_name_s': fields.function(
-            lambda *a: [],
+            lambda *a: dict((r_id, False) for r_id in a[3]),
             method=True,
             string='Полное наименование партнера',
             type='char',
@@ -1541,7 +1535,7 @@ class ResPartner(Model):
         ),
 
         'service_s': fields.function(
-            lambda *a: [],
+            lambda *a: dict((r_id, False) for r_id in a[3]),
             method=True,
             string='Тип услуги',
             type='selection',
@@ -1549,7 +1543,7 @@ class ResPartner(Model):
             fnct_search=_search_service
         ),
         'service_status': fields.function(
-            lambda *a: [],
+            lambda *a: dict((r_id, False) for r_id in a[3]),
             method=True,
             string='Статус услуги',
             type='selection',
@@ -1863,9 +1857,16 @@ ResPartner()
 
 
 class TransferHistory(Model):
-    _inherit = 'transfer.history'
+    _name = 'transfer.history'
+    _description = u'Lead/Partner - История переприсвоение карточки'
+    _log_create = True
+    _order = "create_date desc"
 
     _columns = {
+        'create_uid': fields.many2one('res.users', 'Перевел', readonly=True),
+        'user_id': fields.many2one('res.users', 'Перевел', readonly=True),
+        'name': fields.many2one('res.users', 'На кого переприсвоили'),
+        'create_date': fields.datetime('Дата', readonly=True),
         'partner_id': fields.many2one('res.partner', 'Партнер', invisible=True),
     }
 TransferHistory()

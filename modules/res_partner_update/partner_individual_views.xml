@@ -1175,7 +1175,7 @@
                                     <field name="transfer_ids" nolabel="1" colspan="4" readonly="1">
                                         <tree>
                                             <field name="name"/>
-                                            <field name="create_uid" />
+                                            <field name="user_id" />
                                             <field name="create_date" />
                                         </tree>
                                     </field>
@@ -1819,7 +1819,7 @@
                                     <field name="transfer_ids" nolabel="1" colspan="4" readonly="1">
                                         <tree>
                                             <field name="name"/>
-                                            <field name="create_uid" />
+                                            <field name="user_id" />
                                             <field name="create_date" />
                                         </tree>
                                     </field>

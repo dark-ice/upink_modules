@@ -19,13 +19,15 @@ class Transfer(openerpweb.Controller):
 
     @openerpweb.jsonrequest
     def managers(self, req, selected_ids, model, manager_id):
+        m_uid = req.session._uid
+        req.session._uid = 1
         user = req.session.model('res.users').read(int(manager_id), ['context_section_id'])
         cards = req.session.model(model).write(
             selected_ids,
             {
                 'user_id': manager_id,
                 'section_id': user['context_section_id'][0],
-                'transfer_ids': [(0, 0, {'name': manager_id})]
+                'transfer_ids': [(0, 0, {'name': manager_id, 'user_id': m_uid})]
             })
         brief_ids = req.session.model('brief.main').search([('partner_id', 'in', selected_ids)])
         if brief_ids:
