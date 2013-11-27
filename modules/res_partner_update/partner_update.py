@@ -2052,13 +2052,16 @@ class PartnerQualityControl(Model):
 
     def _get_ydolit(self, cr, uid, ids, name, arg, context=None):
         res = {}
-        mbo = 0.0
+
         for record in self.read(cr, uid, ids, ['partner_id', 'criteria_ids', 'period_id', 'service_id'], context=context):
             res[record['id']] = {
                 'level_ydolit': 0.0,
                 'index_ydolit': 0.0,
                 'mbo': 0.0
             }
+            partner = self.pool.get('res.partner').read(cr, 1, record['partner_id'][0], ['terms_of_service', 'conformity', 'quality_feedback', 'completeness_of_reporting'])
+            level = sum(c['value']*float(partner[c['name']])/100 for c in self.pool.get('res.partner.quality.criteria').read(cr, 1, record['criteria_ids'], ['name', 'value']))
+
             if record['partner_id'] and record['service_id']:
                 process_launch_ids = self.pool.get('process.launch').search(cr, 1, [('partner_id', '=', record['partner_id'][0]), ('service_id', '=', record['service_id'][0])])
                 if process_launch_ids:
@@ -2067,14 +2070,11 @@ class PartnerQualityControl(Model):
                         sla_ids = self.pool.get('process.sla').search(cr, 1, [('process_model', '=', data[0]['process_model']), ('process_id', '=', data[0]['process_id']), ('period_id', '=', record['period_id'][0])])
                         if sla_ids:
                             mbo_list = self.pool.get('process.sla').read(cr, 1, sla_ids[0], ['avg_mbo'])
-                            mbo = mbo_list['avg_mbo']
-
-            partner = self.pool.get('res.partner').read(cr, 1, record['partner_id'][0], ['terms_of_service', 'conformity', 'quality_feedback', 'completeness_of_reporting'])
-            level = sum(c['value']*float(partner[c['name']])/100 for c in self.pool.get('res.partner.quality.criteria').read(cr, 1, record['criteria_ids'], ['name', 'value']))
+                            res[record['id']]['mbo'] = mbo_list['avg_mbo']
 
             res[record['id']]['level_ydolit'] = level
-            res[record['id']]['index_ydolit'] = numpy.mean((level, mbo)) if mbo else level
-            res[record['id']]['mbo'] = mbo
+            res[record['id']]['index_ydolit'] = numpy.mean((level, res[record['id']]['mbo'])) if res[record['id']]['mbo'] else level
+
         return res
 
     _columns = {
