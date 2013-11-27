@@ -87,7 +87,7 @@
                                 </field>
                             </page>
                             <page string="Дополнительно" attrs="{'invisible': [('check_s', '=', False)]}">
-                                <field name="comment_ids" colspan="4" nolabel="1">
+                                <field name="comment_ids" colspan="4" nolabel="1" attrs="{'invisible': [('check_s', '=', False)]}">
                                     <tree string="Комментарии" editable="top">
                                         <field name="create_uid" />
                                         <field name="create_date" />
@@ -212,7 +212,7 @@
             <field name="inherit_id" ref="hr_update.view_employee_form1"/>
             <field name="arch" type="xml">
                 <xpath expr="//page[@string='Categories']" position="after">
-                    <page string="Техника">
+                    <page string="Техника" attrs="{'invisible': [('check_l', '=', False), ('check_e', '=', False)]}">
                         <field name="technique_ids" colspan="4" nolabel="1"/>
                     </page>
                 </xpath>

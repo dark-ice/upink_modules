@@ -19,6 +19,9 @@ class hr_employee(Model):
 
             top_users = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', [37, 14])])
 
+            if data.user_id.id == uid:
+                access += 'e'
+
             #  Руководитель
             if (data.parent_id and data.parent_id.user_id.id == uid) or uid in top_users:
                 access += 'l'
@@ -121,6 +124,13 @@ class hr_employee(Model):
             _check_access,
             method=True,
             string="Проверка на топ менеджеров + hr",
+            type="boolean",
+            invisible=True
+        ),
+        'check_e': fields.function(
+            _check_access,
+            method=True,
+            string="Проверка на сотрудника",
             type="boolean",
             invisible=True
         ),
