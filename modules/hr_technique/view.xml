@@ -17,7 +17,7 @@
                         <button type="action"
                                 name="%(action_technique_issue)d"
                                 string="В резерв"
-                                context="{'state': 'reserve', 'technique_id': id}"
+                                context="{'state': 'reserve', 'technique_id': id, 'employee_id': employee_id}"
                                 icon="gtk-save"
                                 colspan="2"
                                 attrs="{'invisible': [('state', 'in', ('on_cancellation', 'cancellation'))]}"
@@ -26,7 +26,7 @@
                         <button type="action"
                                 name="%(action_technique_issue)d"
                                 string="Выдать"
-                                context="{'state': 'issued', 'technique_id': id}"
+                                context="{'state': 'issued', 'technique_id': id, 'employee_id': employee_id}"
                                 icon="gtk-convert"
                                 attrs="{'invisible': [('state', 'in', ('on_cancellation', 'cancellation'))]}"
                                 colspan="2"
@@ -152,6 +152,7 @@
                     <field name="employee_id" />
                     <field name="department_id" />
                     <field name="date_of_issue" />
+                    <field name="cash_ye" groups="base.group_sys_admin_head,base.group_sys_admin"/>
                     <field name="state" />
                 </tree>
             </field>
@@ -168,6 +169,7 @@
                     <field name="employee_id" />
                     <field name="department_id" />
                     <field name="date_of_issue" />
+                    <field name="cash_ye" groups="base.group_sys_admin_head,base.group_sys_admin"/>
                     <field name="state" />
                 </search>
             </field>
@@ -201,5 +203,20 @@
 
         <menuitem parent="hr.menu_hr_root" name="Учет техники" sequence="1" id="menu_hr_technique_root" groups="base.group_user"/>
         <menuitem parent="menu_hr_technique_root" action="action_technique" sequence="1" id="menu_hr_technique" groups="base.group_user"/>
+
+
+        <record id="view_employee_form_inherit" model="ir.ui.view">
+            <field name="name">view.employee.form.inherit</field>
+            <field name="model">hr.employee</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="hr_update.view_employee_form1"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@string='Categories']" position="after">
+                    <page string="Техника">
+                        <field name="technique_ids" colspan="4" nolabel="1"/>
+                    </page>
+                </xpath>
+            </field>
+        </record>
     </data>
 </openerp>

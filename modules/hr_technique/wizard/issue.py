@@ -18,6 +18,7 @@ class Issue(TransientModel):
     _defaults = {
         'technique_id': lambda cr, u, i, ctx: ctx.get('technique_id'),
         'state': lambda cr, u, i, ctx: ctx.get('state'),
+        'employee_id': lambda cr, u, i, ctx: ctx.get('employee_id'),
     }
 
     def set_issue(self, cr, uid, ids, context=None):

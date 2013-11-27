@@ -141,12 +141,14 @@ class HrTechnique(Model):
             states={
                 'cancellation': [('readonly', True)],
                 'on_cancellation': [('readonly', True)],
+                'repair': [('readonly', True)],
             }),
         'venue_repair': fields.text(
             'Место проведения ремонта',
             states={
                 'cancellation': [('readonly', True)],
                 'on_cancellation': [('readonly', True)],
+                'repair': [('readonly', True)],
             }),
         'reason_for_cancellation': fields.text(
             'Причина списания',
@@ -203,24 +205,24 @@ class HrTechnique(Model):
                 ('upsale', 'UpSale'),
                 ('ink', 'Inksystem')
             ), 'Склад',
+            readonly=True,
             states={
-                'cancellation': [('readonly', True)],
-                'on_cancellation': [('readonly', True)],
+                'storage': [('readonly', False)],
             }),
         'account_id': fields.many2one(
             'account.account',
             'Состоит на балансе компании',
             domain=[('type', '!=', 'closed')],
+            readonly=True,
             states={
-                'cancellation': [('readonly', True)],
-                'on_cancellation': [('readonly', True)],
+                'storage': [('readonly', False)],
             }
         ),
         'no_account': fields.boolean(
             'Нигде',
+            readonly=True,
             states={
-                'cancellation': [('readonly', True)],
-                'on_cancellation': [('readonly', True)],
+                'storage': [('readonly', False)],
             }
         ),
     }
@@ -258,6 +260,7 @@ class HrTechnique(Model):
 
             if next_state in ('storage', 'on_cancellation', 'cancellation'):
                 vals['employee_id'] = None
+                vals['department_id'] = None
 
             if next_state != 'issued':
                 vals['date_of_issue'] = None
@@ -389,3 +392,17 @@ class HrTechniqueCancellation(Model):
     def save(self, cr, uid, ids, context=None):
         return self.write(cr, uid, ids, {'agree': True, 'date_agree': datetime.date.today().strftime("%d/%m/%y")})
 HrTechniqueCancellation()
+
+
+class HrEmployee(Model):
+    _inherit = 'hr.employee'
+
+    _columns = {
+        'technique_ids': fields.one2many(
+            'hr.technique',
+            'employee_id',
+            'Техника',
+            readonly=True,
+            domain=[('state', '=', 'issued')]
+        )
+    }
