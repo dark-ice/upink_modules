@@ -210,6 +210,7 @@
                     <group colspan="4">
                         <field name='id' invisible='1' />
                         <field name="check_l" />
+                        <field name="check_e" />
                         <field name="check_t" />
                     </group>
                     <group colspan="4" col="8">
