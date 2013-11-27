@@ -43,7 +43,8 @@ class ReportDayPPCStatistic(Model):
         if ppc_id:
             ppc = self.pool.get('process.ppc').read(cr, 1, ppc_id, ['campaign', 'specialist_id'])
             campaign = ppc['campaign']
-            specialist_id = ppc['specialist_id'][0]
+            if ppc['specialist_id']:
+                specialist_id = ppc['specialist_id'][0]
         return {'value': {'campaign': campaign, 'ppc_id': ppc_id, 'specialist_id': specialist_id}}
 
     def update(self, cr, uid):

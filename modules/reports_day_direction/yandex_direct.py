@@ -12,8 +12,8 @@ VERSIONS = {
 
 
 CURRENCY = ('RUB', 'CHF', 'EUR', 'KZT', 'TRY', 'UAH', 'USD')
-KEYFILE = '/Users/andrey/projects/upink_modules/modules/reports_day_direction/private.key'
-CERTFILE = '/Users/andrey/projects/upink_modules/modules/reports_day_direction/cert.crt'
+KEYFILE = '/home/giyyan/projects/upink_modules/modules/reports_day_direction/private.key'
+CERTFILE = '/home/giyyan/projects/upink_modules/modules/reports_day_direction/cert.crt'
 
 
 class YandexCertConnection(httplib.HTTPSConnection):
@@ -42,7 +42,10 @@ class YandexDirect(object):
             }
             response = self.urlopener.open(self.url, json.dumps(data, ensure_ascii=False).encode('utf8'))
             result = response.read().decode('utf8')
-            return json.loads(result)['data']
+            r = json.loads(result)
+            if r.get('data'):
+                return r['data']
+            raise Exception(r)
 
     def get_clients_list(self, status_arch='No'):
         params = {
