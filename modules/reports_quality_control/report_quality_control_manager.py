@@ -10,6 +10,7 @@ class ReportQualityControlManager(Model):
     _name = "report.quality.control.manager"
     _rec_name = 'partner_id'
     _auto = False
+    _order = 'period_id DESC'
 
     def _get_date(self, cr, uid, ids, name, arg, context=None):
         res = {}

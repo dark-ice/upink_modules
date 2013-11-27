@@ -32,11 +32,11 @@
                     <group>
                         <field name="period_id"/>
                     </group>
-                    <newline/>
-                    <group expand="0" string="Группировать по...">
-                        <filter string="Партнеру" icon="terp-partner" name="User" context="{'group_by':'partner_id'}"/>
-                        <separator orientation="vertical"/>
-                    </group>
+                    <!--<newline/>-->
+                    <!--<group expand="0" string="Группировать по...">-->
+                        <!--<filter string="Партнеру" icon="terp-partner" name="User" context="{'group_by':'partner_id'}"/>-->
+                        <!--<separator orientation="vertical"/>-->
+                    <!--</group>-->
                 </search>
 
             </field>

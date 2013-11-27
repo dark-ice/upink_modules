@@ -2057,6 +2057,7 @@ class PartnerQualityControl(Model):
             res[record['id']] = {
                 'level_ydolit': 0.0,
                 'index_ydolit': 0.0,
+                'mbo': 0.0
             }
             if record['partner_id'] and record['service_id']:
                 process_launch_ids = self.pool.get('process.launch').search(cr, 1, [('partner_id', '=', record['partner_id'][0]), ('service_id', '=', record['service_id'][0])])
@@ -2067,6 +2068,7 @@ class PartnerQualityControl(Model):
                         if sla_ids:
                             mbo_list = self.pool.get('process.sla').read(cr, 1, sla_ids[0], ['avg_mbo'])
                             mbo = mbo_list['avg_mbo']
+
             partner = self.pool.get('res.partner').read(cr, 1, record['partner_id'][0], ['terms_of_service', 'conformity', 'quality_feedback', 'completeness_of_reporting'])
             level = sum(c['value']*float(partner[c['name']])/100 for c in self.pool.get('res.partner.quality.criteria').read(cr, 1, record['criteria_ids'], ['name', 'value']))
 

@@ -9,6 +9,7 @@ from openerp.osv.orm import Model
 class ReportQualityControlGeneral(Model):
     _name = 'report.quality.control.general'
     _auto = False
+    _order = 'period_id DESC'
 
     def _get_date(self, cr, uid, ids, name, arg, context=None):
         res = {}
@@ -41,7 +42,8 @@ class ReportQualityControlGeneral(Model):
 
     _columns = {
         'partner_id': fields.many2one('res.partner', 'Партнеры'),
-        'direction': fields.char('Услуга', size=128),
+        'direction': fields.char('Направление', size=128),
+        'service_id': fields.many2one('brief.services.stage', 'Услуга'),
         'specialist_id': fields.many2one('res.users', 'Аккаунт-Менеджер'),
         'manager_id': fields.many2one('res.users', 'Менеджеры'),
         'terms_of_service': fields.float('Срок предоставления услуги'),
@@ -57,7 +59,7 @@ class ReportQualityControlGeneral(Model):
             _get_date,
             type='float',
             multi='need_date',
-            string='Уровень удов. по анкетк %',
+            string='Уровень удовл. по анкете %',
         ),
         'mbo': fields.function(
             _get_date,
@@ -92,6 +94,7 @@ class ReportQualityControlGeneral(Model):
                   r.manager_id,
                   r.period_id,
                   r.period_name,
+                  r.service_id,
                   max(r.direction) direction,
                   r.partner_id,
                   r.process_id,

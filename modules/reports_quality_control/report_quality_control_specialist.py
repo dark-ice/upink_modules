@@ -8,7 +8,7 @@ from openerp.osv.orm import Model
 
 class ReportQualityControlSpecialist(Model):
     _name = 'report.quality.control.specialist'
-    _order = 'period_name, specialist'
+    _order = 'period_id DESC, period_name, specialist'
     _auto = False
 
     def _get_date(self, cr, uid, ids, name, arg, context=None):
@@ -27,7 +27,7 @@ class ReportQualityControlSpecialist(Model):
             res[record['id']] = {
                 'quality_point': numpy.mean(points),
                 'quality_index': numpy.mean(indexes),
-                'partner_cnt': len(record['quality_id']),
+                #'partner_cnt': len(record['quality_id']),
                 'mbo': numpy.mean(mbo),
             }
         return res
@@ -48,12 +48,7 @@ class ReportQualityControlSpecialist(Model):
             string='Индекс удовлетворенности',
             group_operator='avg'
         ),
-        'partner_cnt': fields.function(
-            _get_date,
-            type='integer',
-            multi='need_date',
-            string='Количество партнеров',
-        ),
+        'partner_cnt': fields.integer('Количество партнеров'),
         'mbo': fields.function(
             _get_date,
             type='float',
@@ -77,7 +72,8 @@ class ReportQualityControlSpecialist(Model):
                   r.specialist,
                   r.period_name,
                   r.period_id,
-                  array_agg(r.quality_id) quality_id
+                  array_agg(r.quality_id) quality_id,
+                  count(distinct r.partner_id) partner_cnt
                 FROM (SELECT
                         CASE WHEN ppc.specialist_id IS NOT null THEN ppc.specialist_id
                         ELSE
@@ -88,7 +84,8 @@ class ReportQualityControlSpecialist(Model):
                               CASE WHEN seo.specialist_id IS NOT null THEN seo.specialist_id END END END END specialist,
                         rpqc.id quality_id,
                         k.name period_name,
-                        k.id period_id
+                        k.id period_id,
+                        rpqc.partner_id
 
                       FROM process_launch pl
                         LEFT JOIN process_ppc ppc

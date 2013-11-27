@@ -9,6 +9,7 @@ from openerp.osv.orm import Model
 class ReportQualityControlDirection(Model):
     _name = "report.quality.control.direction"
     _auto = False
+    _order = 'period_id DESC'
 
     def _get_date(self, cr, uid, ids, name, arg, context=None):
         res = {}
