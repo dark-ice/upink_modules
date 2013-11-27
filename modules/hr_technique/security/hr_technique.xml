@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data noupdate="1">
+
+    <record id="base.group_sys_admin" model="res.groups">
+        <field name="name">Сис. админ</field>
+    </record>
+    <record id="base.group_sys_admin_head" model="res.groups">
+        <field name="name">Руководитель сис. админов</field>
+    </record>
+</data>
+</openerp>

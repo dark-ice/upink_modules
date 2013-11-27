@@ -22,7 +22,17 @@ class Issue(TransientModel):
 
     def set_issue(self, cr, uid, ids, context=None):
         for record in self.read(cr, uid, ids, []):
-            self.pool.get('hr.technique').write(cr, uid, [record['technique_id'][0]], {'state': record['state'], 'employee_id': record['employee_id'][0], 'date_of_issue': datetime.date.today().strftime("%d/%m/%y")})
+            employee = self.pool.get('hr.employee').read(cr, 1, record['employee_id'][0], ['department_id'])
+            self.pool.get('hr.technique').write(
+                cr,
+                uid,
+                [record['technique_id'][0]],
+                {
+                    'state': record['state'],
+                    'employee_id': record['employee_id'][0],
+                    'date_of_issue': datetime.date.today().strftime("%d/%m/%y"),
+                    'department_id': employee['department_id'][0] if employee['department_id'] else None
+                })
         return {'type': 'ir.actions.act_window_close'}
 
 Issue()
