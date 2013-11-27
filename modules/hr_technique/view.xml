@@ -61,7 +61,7 @@
                                     </tree>
                                 </field>
                             </page>
-                            <page string="Списание" attrs="{'invisible': ['|', ('check_s', '=', False), ('check_r', '=', False)]}">
+                            <page string="Списание" attrs="{'invisible': [('check_s', '=', False), ('check_r', '=', False)]}">
                                 <field name="cancellation_act_number"/> <newline />
                                 <field name="reason_for_cancellation" colspan="4" />
                                 <button type="action"
