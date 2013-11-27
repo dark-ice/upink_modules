@@ -51,7 +51,7 @@ class HrTechnique(Model):
                 currency = currency_pool.read(cr, uid, record['currency_id'][0], ['rate'])
 
             res[record['id']] = {
-                'currency_id': currency['rate'],
+                'rate': currency['rate'],
                 'cash_ye': record['cash'] / currency['rate']
             }
         return res
@@ -105,7 +105,6 @@ class HrTechnique(Model):
         'rate': fields.function(
             _get_rate,
             method=True,
-            store=True,
             string='Курс',
             type='float',
             digits=(12, 4),

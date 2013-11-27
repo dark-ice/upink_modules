@@ -44,8 +44,8 @@
                                     <field name="cash_ye" />
                                     <field name="rate" />
                                     <separator colspan="4"/>
-                                    <field name="account_id" attrs="{'readonly': ['|', ('no_account', '=', True), ('state', 'in', ('cancellation', 'on_cancellation'))]}"/>
-                                    <field name="no_account" attrs="{'readonly': ['|', ('account_id', '!=', False), ('state', 'in', ('cancellation', 'on_cancellation'))]}"/>
+                                    <field name="account_id" attrs="{'readonly': ['|', ('no_account', '=', True), ('state', '!=', 'storage')]}"/>
+                                    <field name="no_account" attrs="{'readonly': ['|', ('account_id', '!=', False), ('state', '!=', 'storage')]}"/>
                                     <separator colspan="4"/>
                                     <field name="stock" />
                                 </page>
