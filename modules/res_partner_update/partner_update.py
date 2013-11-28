@@ -353,8 +353,8 @@ class partner_added_services(Model):
     _columns = {
         'service_id': fields.many2one('brief.services.stage', 'Услуга'),
         'comment': fields.text('Комментарий'),
-        'date_start':fields.date('Дата подключения'),
-        'date_finish':fields.date('Дата окончания'),
+        'date_start': fields.date('Дата подключения'),
+        'date_finish': fields.date('Дата окончания'),
         'partner_id': fields.many2one('res.partner', 'Партнер', inbisible=True),
         'check': fields.function(_set_check, type="boolean", method=True, string='Статус подключения'),
         'budget': fields.float('Бюджет, y.e.'),
@@ -1490,7 +1490,7 @@ class ResPartner(Model):
             fnct_search=_search_service_name
         ),
         'site_s': fields.function(
-            lambda *a: dict((r_id, False) for r_id in a[3]),
+            lambda *a: dict((r_id, '') for r_id in a[3]),
             method=True,
             string='Сайт',
             type='char',
@@ -1511,7 +1511,7 @@ class ResPartner(Model):
         'last_comment': fields.related('note_ids', 'title', type='char', size=128, string=u'Комментарий'),
 
         'phone_s': fields.function(
-            lambda *a: dict((r_id, False) for r_id in a[3]),
+            lambda *a: dict((r_id, '') for r_id in a[3]),
             method=True,
             string='Телефон',
             type='char',
@@ -1519,14 +1519,14 @@ class ResPartner(Model):
         ),
 
         'email_s': fields.function(
-            lambda *a: dict((r_id, False) for r_id in a[3]),
+            lambda *a: dict((r_id, '') for r_id in a[3]),
             method=True,
             string='Эл. почта',
             type='char',
             fnct_search=_search_email
         ),
         'full_name_s': fields.function(
-            lambda *a: dict((r_id, False) for r_id in a[3]),
+            lambda *a: dict((r_id, '') for r_id in a[3]),
             method=True,
             string='Полное наименование партнера',
             type='char',
@@ -1535,7 +1535,7 @@ class ResPartner(Model):
         ),
 
         'service_s': fields.function(
-            lambda *a: dict((r_id, False) for r_id in a[3]),
+            lambda *a: dict((r_id, '') for r_id in a[3]),
             method=True,
             string='Тип услуги',
             type='selection',
@@ -1543,7 +1543,7 @@ class ResPartner(Model):
             fnct_search=_search_service
         ),
         'service_status': fields.function(
-            lambda *a: dict((r_id, False) for r_id in a[3]),
+            lambda *a: dict((r_id, '') for r_id in a[3]),
             method=True,
             string='Статус услуги',
             type='selection',
@@ -1604,10 +1604,6 @@ class ResPartner(Model):
         'lead': _get_type,
         'partner_base': 'cold',
     }
-
-    def default_get(self, cr, uid, fields_list, context=None):
-        pass
-        return super(ResPartner, self).default_get(cr, uid, fields_list, context)
 
     def add_note(self, cr, uid, ids, context=None):
         view_id = self.pool.get('ir.ui.view').search(cr, uid,
