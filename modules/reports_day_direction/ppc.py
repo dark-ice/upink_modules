@@ -6,6 +6,18 @@ from openerp.osv.orm import Model
 from reports_day_direction.yandex_direct import YandexDirect
 
 
+class ProcessPPC(Model):
+    _inherit = 'process.ppc'
+
+    _columns = {
+        'date_start': fields.date('Дата запуска проекта'),
+        'domain_zone': fields.selection((('ru', 'ru'), ('ua', 'ua')), 'Доменная зона'),
+        'campaign': fields.char('ID кампании', size=200),
+        'fact_ids': fields.one2many('report.day.ppc.statistic', 'ppc_id', 'Факты'),
+    }
+ProcessPPC()
+
+
 class ReportDayPPCStatistic(Model):
     _name = 'report.day.ppc.statistic'
     _description = u'Ежедневный отчет направлений - PPC - значения статистики'
