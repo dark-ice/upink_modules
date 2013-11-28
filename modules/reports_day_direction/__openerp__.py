@@ -20,7 +20,6 @@
         #'security/ir.model.access.csv',
         'views/view_ppc.xml',
         'views/view_seo.xml',
-        #'workflow.xml',
     ],
 
     'js': [
