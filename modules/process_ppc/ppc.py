@@ -151,6 +151,7 @@ class ProcessPPC(Model):
             type='boolean',
             invisible=True
         ),
+
     }
 
     _defaults = {
