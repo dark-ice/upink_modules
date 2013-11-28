@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_technique_issue_form" model="ir.ui.view">
+            <field name="name">Учет техники - Выдача</field>
+            <field name="model">hr.technique.issue</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group colspan="4">
+                        <field name="employee_id" colspan="4" />
+                    </group>
+                    <separator colspan="4" />
+                    <button string="Отмена" icon="gtk-close" special="cancel" />
+                    <button type="object"
+                            name="set_issue"
+                            string="ОК"
+                            icon="gtk-execute"/>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_technique_issue" model="ir.actions.act_window">
+            <field name="name">Учет техники - Выдача</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.technique.issue</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_technique_issue_form"/>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+            <field name="target">new</field>
+        </record>
+
+        <record id="view_technique_committee_form" model="ir.ui.view">
+            <field name="name">Учет техники - Комиссия на списание</field>
+            <field name="model">hr.technique.committee</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group colspan="4">
+                        <field name="employee_id" colspan="4" />
+                    </group>
+                    <separator colspan="4" />
+                    <button string="Отмена" icon="gtk-close" special="cancel" />
+                    <button type="object"
+                            name="set_employee"
+                            string="Добавить"
+                            icon="gtk-add"/>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_technique_committee" model="ir.actions.act_window">
+            <field name="name">Учет техники - Комиссия на списание</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.technique.committee</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_technique_committee_form"/>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</openerp>

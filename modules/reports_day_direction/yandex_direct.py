@@ -12,8 +12,8 @@ VERSIONS = {
 
 
 CURRENCY = ('RUB', 'CHF', 'EUR', 'KZT', 'TRY', 'UAH', 'USD')
-KEYFILE = '/home/giyyan/projects/upink_modules/modules/reports_day_direction/private.key'
-CERTFILE = '/home/giyyan/projects/upink_modules/modules/reports_day_direction/cert.crt'
+KEYFILE = '/home/andrey/upink_modules/modules/reports_day_direction/private.key'
+CERTFILE = '/home/andrey/upink_modules/modules/reports_day_direction/cert.crt'
 
 
 class YandexCertConnection(httplib.HTTPSConnection):

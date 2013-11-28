@@ -1,0 +1,8 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_sys_admin_technique","sys_admin technique","model_hr_technique","base.group_sys_admin",1,1,1,0
+"access_sys_admin_head_technique","sys_admin_head technique","model_hr_technique","base.group_sys_admin_head",1,1,1,1
+"access_user_technique","user technique","model_hr_technique","base.group_user",1,0,0,0
+"access_user_history","user technique history","model_hr_technique_history","base.group_user",1,1,1,0
+"access_user_history_repair","user technique history repair","model_hr_technique_history_repair","base.group_user",1,1,1,0
+"access_user_comment","user technique comment","model_hr_technique_comment","base.group_user",1,1,1,0
+"access_user_cancellation","user technique cancellation","model_hr_technique_cancellation","base.group_user",1,1,1,0
