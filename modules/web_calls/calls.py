@@ -156,7 +156,7 @@ class WebCalls(Model):
             ), 'Тип продажи'
         ),
         'check_box_type': fields.function(
-            lambda *a: [],
+            lambda *a: dict((r_id, '') for r_id in a[3]),
             type="selection",
             method=True,
             string='Тип заявки',
