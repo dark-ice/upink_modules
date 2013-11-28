@@ -31,7 +31,7 @@ class Issue(TransientModel):
                 {
                     'state': record['state'],
                     'employee_id': record['employee_id'][0],
-                    'date_of_issue': datetime.date.today().strftime("%y/%m/%d"),
+                    'date_of_issue': datetime.date.today().strftime("%Y/%m/%d"),
                     'department_id': employee['department_id'][0] if employee['department_id'] else None
                 })
         return {'type': 'ir.actions.act_window_close'}
