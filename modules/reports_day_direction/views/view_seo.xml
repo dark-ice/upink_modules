@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_report_day_seo_tree">
+            <field name="name">Ежедневный отчет - SEO</field>
+            <field name="model">report.day.seo</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="week_number" invisible="1"/>
+                    <field name="partner_id" />
+                    <field name="service_id" />
+                    <field name="specialist_id" />
+                    <field name="campaign" invisible="1"/>
+                    <field name="process_type" />
+                    <field name="plan" />
+                    <field name="date" />
+                    <field name="top3" />
+                    <field name="top10" />
+                    <field name="fact" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_report_day_seo_search">
+            <field name="name">Ежедневный отчет - SEO</field>
+            <field name="model">report.day.seo</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="date_start" string="C" />
+                    <field name="date_end" string="По" />
+                    <field name="partner_id" />
+                    <field name="service_id" />
+                    <field name="specialist_id" />
+                    <field name="campaign" />
+                </search>
+            </field>
+        </record>
+
+        <record id="window_report_day_seo" model="ir.actions.act_window">
+            <field name="name">Ежедневный отчет</field>
+            <field name="res_model">report.day.seo</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_report_day_seo_tree"/>
+            <field name="search_view_id" ref="view_report_day_seo_search"/>
+            <field name="context">{'search_default_date_start': time.strftime('%Y-%m-01'), 'search_default_date_end': time.strftime('%Y-%m-%d'), 'group_by': ['campaign', 'week_number']}</field>
+        </record>
+
+
+        <record model="ir.ui.view" id="view_report_day_seo_statistic_tree">
+            <field name="name">Факты - SEO</field>
+            <field name="model">report.day.seo.statistic</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree editable="top">
+                    <field name="seo_id" on_change="onchange_seo(seo_id, '')"/>
+                    <field name="campaign" on_change="onchange_seo('', campaign)"/>
+                    <field name="process_type" />
+                    <field name="date" />
+                    <field name="top3" />
+                    <field name="top10" />
+                    <field name="fact" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_report_day_seo_statistic_search">
+            <field name="name">Факты - SEO</field>
+            <field name="model">report.day.seo.statistic</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="seo_id" />
+                    <field name="campaign" />
+                    <field name="process_type" />
+                    <field name="date" />
+                </search>
+            </field>
+        </record>
+
+        <record id="window_report_day_seo_statistic" model="ir.actions.act_window">
+            <field name="name">Факты</field>
+            <field name="res_model">report.day.seo.statistic</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_report_day_seo_statistic_tree"/>
+            <field name="search_view_id" ref="view_report_day_seo_statistic_search"/>
+            <field name="context">{}</field>
+        </record>
+
+        <menuitem action="window_report_day_seo" name="Ежедневный отчет" id="menu_report_day_seo" parent="process_seo.menu_process_seo" sequence="10"/>
+        <menuitem id="menu_report_day_settings_seo" action="window_report_day_seo_statistic" name="Факты" parent="process_seo.menu_process_seo" sequence="99"/>
+    </data>
+</openerp>
