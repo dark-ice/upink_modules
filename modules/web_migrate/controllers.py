@@ -14,6 +14,7 @@ class Transfer(openerpweb.Controller):
 
     def fields_get(self, req, model):
         Model = req.session.model(model)
+        req.session._uid = 1
         fields = Model.fields_get(False, req.session.eval_context(req.context))
         return fields
 
