@@ -54,7 +54,7 @@ class ReportQualityControlGeneral(Model):
         'quality_feedback_anket': fields.char('Анкета', size=128),
         'completeness_of_reporting': fields.float('Полнота отчетов и соблюдение сроков их предоставления'),
         'completeness_of_reporting_anket': fields.char('Анкета', size=128),
-        'comentariy': fields.char('Комментарий', size=512),
+        'comentariy': fields.text('Комментарий', size=1024),
         'quality_point': fields.function(
             _get_date,
             type='float',
@@ -106,7 +106,7 @@ class ReportQualityControlGeneral(Model):
                   max(r.conformity_anket) conformity_anket,
                   max(r.quality_feedback_anket) quality_feedback_anket,
                   max(r.completeness_of_reporting_anket) completeness_of_reporting_anket,
-                  max(r.comment) comentariy,
+                  array_to_string(array_agg(CAST(r.comment AS text)),',') as comentariy,
                   array_agg(r.quality_id) quality_ids
                 FROM (
                 SELECT
@@ -134,7 +134,7 @@ class ReportQualityControlGeneral(Model):
                   p.conformity conformity_anket,
                   p.quality_feedback quality_feedback_anket,
                   p.completeness_of_reporting completeness_of_reporting_anket,
-                  crit.comment
+                  CASE WHEN crit.comment is not NULL THEN crit.comment END as comment
                 FROM res_partner_quality_control AS rpqc
                 LEFT JOIN res_partner_quality_criteria as crit
                   ON (crit.quality_id = rpqc.id)
