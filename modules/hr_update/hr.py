@@ -29,6 +29,9 @@ class hr_employee(Model):
             if uid in top_users:
                 access += 't'
 
+            if uid in self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', [195, 196])]):
+                access += 's'
+
             val = False
             letter = name[6]
             if letter in access or uid == 1:
@@ -131,6 +134,13 @@ class hr_employee(Model):
             _check_access,
             method=True,
             string="Проверка на сотрудника",
+            type="boolean",
+            invisible=True
+        ),
+        'check_s': fields.function(
+            _check_access,
+            method=True,
+            string="Проверка на сис админов",
             type="boolean",
             invisible=True
         ),
