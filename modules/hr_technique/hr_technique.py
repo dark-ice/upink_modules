@@ -431,7 +431,7 @@ class HrTechniqueCancellation(Model):
         return flag
 
     def save(self, cr, uid, ids, context=None):
-        return self.write(cr, uid, ids, {'agree': True, 'date_agree': datetime.date.today().strftime("%d/%m/%y")})
+        return self.write(cr, uid, ids, {'agree': True, 'date_agree': datetime.date.today().strftime("%d/%m/%Y")})
 HrTechniqueCancellation()
 
 
