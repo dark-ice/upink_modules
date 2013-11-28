@@ -223,7 +223,8 @@
         </record>
 
         <menuitem action="window_process_smm" id="menu_process_smm" sequence="20" parent="process_launch.menu_process" name="SMM стратегии"/>
-        <menuitem action="window_process_smm" id="menu_process_smm_dev" parent="menu_process_smm"/>
+        <menuitem string="Разработка и реализация стратегии SMM" id="menu_process_smm_dev" parent="menu_process_smm"/>
+        <menuitem action="window_process_smm" id="menu_action_process_smm" sequence="10" parent="menu_process_smm_dev" />
 
     </data>
 </openerp>
