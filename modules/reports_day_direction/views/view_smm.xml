@@ -2,55 +2,24 @@
 <openerp>
     <data>
 
-<!--создание доп модели план-->
-        <record model="ir.ui.view" id="view_report_day_plan_smm_tree">
-            <field name="name">Показатели по smm план</field>
-            <field name="model">report.day.smm.static.plan</field>
-            <field name="type">tree</field>
-            <field name="arch" type="xml">
-                <tree editable = 'top'>
-                    <field name="process_smm_id" />
-                    <field name="supervisor_id" readonly="1"/>
-                    <field name="kpi_index" />
-                    <field name="kpi_target" />
-                    <field name="date_start" required="1"/>
-                    <field name="date_end" required="1"/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="action_window_report_day_plan_smm_statistic" model="ir.actions.act_window">
-            <field name="name">Показатели по SMM план</field>
-            <field name="res_model">report.day.smm.static.plan</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree</field>
-            <field name="view_id" ref="view_report_day_plan_smm_tree"/>
-            <field name="context">{}</field>
-        </record>
-
-
-        <menuitem action="action_window_report_day_plan_smm_statistic" id="menu_action_smm_plan" sequence="20" parent="process_smm.menu_process_smm_dev" />
-
 <!--создание доп модели факт-->
         <record model="ir.ui.view" id="view_report_day_fact_smm_tree">
-            <field name="name">Показатели по smm факт</field>
+            <field name="name">Факты</field>
             <field name="model">report.day.smm.static.fact</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree editable = 'top'>
-                    <field name="date" />
                     <field name="process_smm_id" />
                     <field name="supervisor_id" readonly="1"/>
                     <field name="kpi_index" />
+                    <field name="date" />
                     <field name="index_point" />
-                    <field name="work_start" />
-                    <field name="report" />
                 </tree>
             </field>
         </record>
 
         <record id="action_window_report_day_fact_smm_statistic" model="ir.actions.act_window">
-            <field name="name">Показатели по SMM факт</field>
+            <field name="name">Факты</field>
             <field name="res_model">report.day.smm.static.fact</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>

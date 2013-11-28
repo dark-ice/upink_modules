@@ -177,6 +177,16 @@ class ProcessSMM(Model):
             type='boolean',
             invisible=True
         ),
+        'plan_ids': fields.one2many(
+            'report.day.smm.static.plan',
+            'process_smm_id',
+            'Планы'
+        ),
+        'fact_ids': fields.one2many(
+            'report.day.smm.static.fact',
+            'process_smm_id',
+            'Факты'
+        ),
     }
 
     _defaults = {
