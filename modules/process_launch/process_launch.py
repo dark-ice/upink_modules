@@ -485,11 +485,10 @@ class ProcessLaunch(Model):
             state = record['state']
 
             if values.get('account_ids'):
-                line_ids = self._get_pay_ids(cr, uid, record['id'], '', {})['invoice_pay_ids']
                 try:
+                    line_ids = self._get_pay_ids(cr, uid, record['id'], '', {})['invoice_pay_ids']
                     process = self.pool.get(record['process_model']).read(cr, uid, record['process_id'], ['specialist_id'])
-                    if process['specialist_id']:
-                        self.pool.get('account.invoice.pay.line').write(cr, 1, line_ids, {'specialist_id': process['specialist_id'][0]})
+                    self.pool.get('account.invoice.pay.line').write(cr, 1, line_ids, {'specialist_id': process['specialist_id'][0]})
                 except:
                     pass
 
