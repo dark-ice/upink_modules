@@ -151,6 +151,7 @@ class ProcessPPC(Model):
             type='boolean',
             invisible=True
         ),
+
         'date_start': fields.date('Дата запуска проекта'),
         'domain_zone': fields.selection((('ru', 'ru'), ('ua', 'ua')), 'Доменная зона'),
         'campaign': fields.char('ID кампании', size=200),
