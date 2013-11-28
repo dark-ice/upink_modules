@@ -79,7 +79,7 @@ class HrTechnique(Model):
 
             res[record['id']] = {
                 'rate': currency['rate'],
-                'cash_ye': record['cash'] / currency['rate']
+                'cash_ye': round(record['cash'] / currency['rate'], 2)
             }
         return res
 
@@ -125,7 +125,7 @@ class HrTechnique(Model):
             store=True,
             string='Стоимость $',
             type='float',
-            digits=(12, 4),
+            digits=(12, 2),
             multi='rate',
             readonly=True,
         ),
@@ -134,7 +134,7 @@ class HrTechnique(Model):
             method=True,
             string='Курс',
             type='float',
-            digits=(12, 4),
+            digits=(12, 2),
             multi='rate',
             readonly=True,
         ),
