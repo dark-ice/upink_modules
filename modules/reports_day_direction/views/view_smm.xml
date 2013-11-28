@@ -33,18 +33,19 @@
 <!--отчет по smm-->
         <record model="ir.ui.view" id="view_rep_smm_tree">
             <field name="name">Отчет по smm</field>
-            <field name="model">report.smm</field>
+            <field name="model">report.day.smm</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree editable = 'top'>
                     <field name="partner_id" readonly="1" />
                     <field name="service_id" readonly="1"/>
+                    <field name="plan_id" invisible="1"/>
                     <field name="work_start" readonly="1"/>
                     <field name="report" readonly="1"/>
                     <field name="date_start_plan" readonly="1"/>
                     <field name="kpi_index" readonly="1"/>
                     <field name="kpi_target" readonly="1"/>
-                    <field name="old_point" readonly="1" sum=""/>
+                    <field name="old_point" readonly="1" avg=""/>
                     <field name="date" readonly="1" />
                     <field name="index_point" readonly="1" sum=""/>
                 </tree>
@@ -53,7 +54,7 @@
 
         <record model="ir.ui.view" id="view_rep_smm_search">
             <field name="name">view.rep.smm.search</field>
-            <field name="model">process.smm</field>
+            <field name="model">report.day.smm</field>
             <field name="type">search</field>
             <field name="priority" eval="1"/>
             <field name="arch" type="xml">
@@ -66,7 +67,7 @@
                     <group expand="0" string="Группировать по...">
                         <filter string="Проект" icon="terp-partner" name="Partner" context="{'group_by':'partner_id'}"/>
                         <separator orientation="vertical"/>
-                        <filter string="Дата" icon="stock_calendar" name="Date" context="{'group_by':'date'}"/>
+                        <filter string="Периоду" icon="stock_calendar" name="Period" context="{'group_by':'plan_id'}"/>
                         <separator orientation="vertical"/>
                         <filter string="Услуга" icon="stock_calendar" name="Service" context="{'group_by':'service_id'}"/>
                         <separator orientation="vertical"/>
@@ -77,7 +78,7 @@
 
         <record id="action_rep_smm_statistic" model="ir.actions.act_window">
             <field name="name">Отчет по smm</field>
-            <field name="res_model">report.smm</field>
+            <field name="res_model">report.day.smm</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
             <field name="view_id" ref="view_rep_smm_tree"/>

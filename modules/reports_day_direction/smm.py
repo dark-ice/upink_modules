@@ -7,6 +7,7 @@ from openerp.osv.orm import Model
 class ReportDaySmmStatisticPlan(Model):
     _name = "report.day.smm.static.plan"
     _description = u"доп модель отчета по направлению smm план"
+    _rec_name = 'id'
     _columns = {
         'process_smm_id': fields.many2one('process.smm', 'Проект', domain="[('state', '=', 'work')]"),
         'kpi_index': fields.many2one('process.sla.indicators', 'KPI Показатель', domain="[('type', '=', 'smm')]"),
@@ -32,6 +33,7 @@ ReportDaySmmStatisticPlan()
 class ReportDaySmmStatisticFact(Model):
     _name = "report.day.smm.static.fact"
     _description = u"доп модель отчета по направлению smm факт"
+    _rec_name = 'id'
     _columns = {
         'process_smm_id': fields.many2one('process.smm', 'Проект', domain="[('state', '=', 'work')]"),
         'date': fields.date('Дата'),
@@ -52,7 +54,7 @@ ReportDaySmmStatisticFact()
 
 
 class ReportDaySmm(Model):
-    _name = "report.smm"
+    _name = "report.day.smm"
     _description = u"Отчет по smm"
     _auto = False
 
@@ -60,6 +62,7 @@ class ReportDaySmm(Model):
         'date_start': fields.date('Дата начала'),
         'date_end': fields.date('Дата конца'),
 
+        'plan_id': fields.many2one('report.day.smm.static.plan', 'id плана'),
         'partner_id': fields.many2one('res.partner', "Проект"),
         'date': fields.date('Дата'),
         'service_id': fields.many2one('brief.services.stage', 'Услуга'),
@@ -68,36 +71,54 @@ class ReportDaySmm(Model):
         'date_start_plan': fields.date('Дата начала'),
         'kpi_index': fields.many2one('process.sla.indicators', 'Показатель KPI', domain="[('type', '=', 'smm')]"),
         'kpi_target': fields.float('Цель по KPI'),
-        'old_point': fields.float('Показатель за прошедший период', group_operator='sum'),
+        'old_point': fields.float('Показатель за прошедший период', group_operator='avg'),
         'index_point': fields.float('Значение показателя', group_operator='sum'),
     }
 
     def init(self, cr):
-        tools.drop_view_if_exists(cr, 'report_smm')
+        tools.drop_view_if_exists(cr, 'report_day_smm')
         cr.execute("""
-            create or replace view report_smm as (
+            create or replace view report_day_smm as (
                 SELECT
                     row_number() over() as id,
 
-                    sp.date_start date_start,
-                    sp.date_start date_end,
+                    sf.date date_start,
+                    sf.date date_end,
 
                     l.partner_id,
                     l.service_id,
-                    sf.work_start,
-                    sf.report,
+                    sp.work_start,
+                    sp.report,
                     sp.date_start date_start_plan,
                     sp.kpi_index,
                     sp.kpi_target,
-                    (select old.index_point from report_day_smm_static_fact old where old.work_start < sf.work_start and old.process_smm_id = sf.process_smm_id limit 1) as old_point,
+                    o.fact old_point,
                     sf.index_point,
-                    sf.date
+                    sf.date::date,
+                    sp.id plan_id
 
-            FROM process_smm s
-            LEFT JOIN process_launch l on (s.launch_id=l.id)
-            JOIN report_day_smm_static_plan sp on (sp.process_smm_id=s.id)
-            JOIN report_day_smm_static_fact sf on (sf.process_smm_id=s.id)
-            WHERE s.state in ('work')
+                FROM report_day_smm_static_plan sp
+                LEFT JOIN  process_smm s on (sp.process_smm_id=s.id)
+                LEFT JOIN process_launch l on (s.launch_id=l.id)
+                LEFT JOIN report_day_smm_static_fact sf on (sf.process_smm_id=s.id AND sp.kpi_index=sf.kpi_index AND sf.date >= sp.date_start AND sf.date <= sp.date_end)
+                LEFT JOIN (
+                SELECT
+                  p1.id,
+                  sum(f.index_point) fact
+                FROM report_day_smm_static_plan p1
+                  LEFT JOIN (
+                    SELECT
+                      f1.process_smm_id,
+                      f1.kpi_index,
+                      index_point,
+                      date,
+                      p2.id plan_id,
+                      p2.date_end
+                    FROM report_day_smm_static_fact f1
+                    LEFT JOIN report_day_smm_static_plan p2 on (p2.process_smm_id=f1.process_smm_id AND p2.kpi_index=f1.kpi_index AND f1.date >= p2.date_start AND f1.date <= p2.date_end)
+                  ) f on (f.process_smm_id = p1.process_smm_id AND f.kpi_index = p1.kpi_index AND f.date_end < p1.date_start)
+                GROUP BY p1.id) o on (o.id=sp.id)
+                WHERE s.state in ('work')
             )""")
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
