@@ -53,7 +53,7 @@ class HrTechnique(Model):
             if uid in user_ids:
                 access += 'r'
 
-            if uid in self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', [195, 196])]):
+            if uid in self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', [193, 194])]):
                 access += 's'
 
             if letter in access or uid == 1:

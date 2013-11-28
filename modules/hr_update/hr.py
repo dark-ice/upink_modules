@@ -29,7 +29,7 @@ class hr_employee(Model):
             if uid in top_users:
                 access += 't'
 
-            if uid in self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', [195, 196])]):
+            if uid in self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', [193, 194])]):
                 access += 's'
 
             val = False
