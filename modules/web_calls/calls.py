@@ -299,6 +299,7 @@ class WebCalls(Model):
                     calling_party_number = chan.get('ConnectedLineNum')
                     if chan.get('ConnectedLineName'):
                         city = chan['ConnectedLineName'][:chan['ConnectedLineName'].find(calling_party_number)].strip('()')
+                        _logger.info("City: %s" % str(city))
                     break
         except Exception, e:
             _logger.error("Error in the Status request to Asterisk server %s" % ast_server['ast_server'])
