@@ -31,7 +31,7 @@ class ReportQualityControlPartner(Model):
         return res
 
     _columns = {
-        'partner_id': fields.many2one('res.partner', 'Партнеры'),
+        'partner_id': fields.many2one('res.partner', 'Партнер'),
         'direction': fields.char('Направление', size=256),
         'quality_point': fields.function(
             _get_date,

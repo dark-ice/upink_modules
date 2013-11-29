@@ -41,11 +41,11 @@ class ReportQualityControlGeneral(Model):
         return res
 
     _columns = {
-        'partner_id': fields.many2one('res.partner', 'Партнеры'),
+        'partner_id': fields.many2one('res.partner', 'Партнер'),
         'direction': fields.char('Направление', size=128),
         'service_id': fields.many2one('brief.services.stage', 'Услуга'),
         'specialist_id': fields.many2one('res.users', 'Аккаунт-Менеджер'),
-        'manager_id': fields.many2one('res.users', 'Менеджеры'),
+        'manager_id': fields.many2one('res.users', 'Менеджер'),
         'terms_of_service': fields.float('Срок предоставления услуги'),
         'terms_of_service_anket': fields.char('Анкета', size=128),
         'conformity': fields.float('Соответствие услуги всем входным требованиям'),

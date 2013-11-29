@@ -11,9 +11,8 @@
                     <field name="specialist" readonly="1"/>
                     <field name="period_name" readonly="1"/>
                     <field name="partner_cnt" readonly="1"/>
-                    <field name="mbo" readonly="1" avg=""/>
-                    <!--<field name="partner_id" readonly="1"/>-->
                     <field name="quality_point" readonly="1" avg=""/>
+                    <field name="mbo" readonly="1" avg=""/>
                     <field name="quality_index" readonly="1" avg=""/>
                     <field name="period_id" invisible="1"/>
                     <field name="quality_id" invisible="1"/>
@@ -28,13 +27,14 @@
             <field name="type">search</field>
             <field name="arch" type="xml">
                 <search>
+                    <field name="specialist"/>
                     <field name="period_id"/>
                 </search>
             </field>
         </record>
 
         <record model="ir.actions.act_window" id="report_quality_control_specialist">
-            <field name="name">Удовлетворенности по специалистам</field>
+            <field name="name">Удовлетворенность по специалистам</field>
             <field name="res_model">report.quality.control.specialist</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>

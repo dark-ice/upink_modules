@@ -12,8 +12,8 @@
                     <field name="period_name" readonly="1"/>
                     <field name="direction" readonly="1"/>
                     <field name="service_id" readonly="1"/>
-                    <field name="specialist_id" readonly="1"/>
                     <field name="manager_id" readonly="1"/>
+                     <field name="specialist_id" readonly="1"/>
                     <field name="terms_of_service" readonly="1"/>
                     <field name="terms_of_service_anket" readonly="1"/>
                     <field name="conformity" readonly="1"/>
@@ -42,7 +42,12 @@
             <field name="arch" type="xml">
                 <search>
                     <group>
+                        <field name="partner_id"/>
                         <field name="period_id"/>
+                        <field name="direction"/>
+                        <field name="service_id"/>
+                        <field name="manager_id"/>
+                        <field name="specialist_id"/>
                     </group>
                     <newline/>
                     <group expand="0" string="Группировать по...">

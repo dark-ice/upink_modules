@@ -34,12 +34,12 @@ class ReportQualityControlManager(Model):
         return res
 
     _columns = {
-        'manager_id': fields.many2one('res.users', 'Менеджеры'),
+        'manager_id': fields.many2one('res.users', 'Менеджер'),
         'services_cnt': fields.function(
             _get_date,
             type='integer',
             multi='need_date',
-            string='Количество услуг',
+            string='Количество оцененных услуг',
         ),
         'quality_point': fields.function(
             _get_date,
