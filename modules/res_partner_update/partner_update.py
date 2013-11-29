@@ -1091,19 +1091,19 @@ class ResPartner(Model):
             if record['terms_of_service'] and record['conformity'] and record['quality_feedback'] and record['completeness_of_reporting']:
                 rate += 5.0
 
-            if record['description'].strip():
+            if record['description'] and record['description'].strip():
                 rate += 5.0
 
-            if record['key_person'].strip():
+            if record['key_person'] and record['key_person'].strip():
                 rate += 10.0
 
-            if record['key_moment'].strip():
+            if record['key_moment'] and record['key_moment'].strip():
                 rate += 10.0
 
-            if record['zone'].strip():
+            if record['zone'] and record['zone'].strip():
                 rate += 5.0
 
-            if record['another'].strip():
+            if record['another'] and record['another'].strip():
                 rate += 5.0
 
             if record['note_ids']:
@@ -1118,13 +1118,13 @@ class ResPartner(Model):
             if record['address']:
                 flag = True
                 for address in self.pool.get('res.partner.address').read(cr, 1, record['address'], ['site_ids', 'phone_ids', 'email_ids', 'name', 'function']):
-                    if not address['name'].strip() or not address['function'].strip():
+                    if not (address['name'] and address['name'].strip()) or not (address['function'] and address['function'].strip()):
                         flag = False
                         break
 
                     if address['site_ids']:
                         for site in self.pool.get('res.partner.address.site').read(cr, 1, address['site_ids'], ['name']):
-                            if not site['name'].strip():
+                            if not (site['name'] and site['name'].strip()):
                                 flag = False
                                 break
                     else:
