@@ -295,6 +295,7 @@ class WebCalls(Model):
                     _logger.info("UserCallerId: %s" % str(user.callerid))
                     _logger.info("CallerIDNum: %s" % str(chan.get('CallerIDNum')))
                     _logger.info("CallerIDName: %s" % str(chan.get('CallerIDName')))
+                    _logger.info("Chan: %s" % str(chan))
                     calling_party_number = chan.get('ConnectedLineNum')
                     if chan.get('CallerIDName'):
                         indx = chan['CallerIDName'].find(')')
