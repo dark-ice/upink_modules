@@ -1130,7 +1130,7 @@ class ResPartner(Model):
                         flag = False
                         break
 
-                    phone_ids = self.pool.get('res.partner.address.site').search(cr, 1, [('partner_address_id', '=', address['id'])])
+                    phone_ids = self.pool.get('tel.reference').search(cr, 1, [('partner_address_id', '=', address['id'])])
                     if phone_ids:
                         pe = re.compile('^\d+$', re.UNICODE)
                         for item in self.pool.get('tel.reference').read(cr, 1, phone_ids, ['phone']):
