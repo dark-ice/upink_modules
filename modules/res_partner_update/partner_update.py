@@ -1,5 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 from datetime import datetime, timedelta, date
+import re
 import numpy
 import pytz
 from openerp import tools
@@ -353,8 +354,8 @@ class partner_added_services(Model):
     _columns = {
         'service_id': fields.many2one('brief.services.stage', 'Услуга'),
         'comment': fields.text('Комментарий'),
-        'date_start':fields.date('Дата подключения'),
-        'date_finish':fields.date('Дата окончания'),
+        'date_start': fields.date('Дата подключения'),
+        'date_finish': fields.date('Дата окончания'),
         'partner_id': fields.many2one('res.partner', 'Партнер', inbisible=True),
         'check': fields.function(_set_check, type="boolean", method=True, string='Статус подключения'),
         'budget': fields.float('Бюджет, y.e.'),
@@ -1049,8 +1050,109 @@ class ResPartner(Model):
 
     def _get_rate(self, cr, uid, ids, name, arg, context=None):
         res = {}
-        for record in self.read(cr, 1, ids, ['name']):
+        fields = [
+            'description',
+            'key_person',
+            'key_moment',
+            'zone',
+            'another',
+            'terms_of_service',
+            'conformity',
+            'quality_feedback',
+            'completeness_of_reporting',
+            'access_ids',
+            'note_ids',
+            'added_services_ids',
+            'operation_deps',
+            'attachment_ids',
+            'address',
+        ]
+        for record in self.read(cr, 1, ids, fields):
             rate = 0.0
+
+            if record['operation_deps']:
+                rate += 5.0
+
+            if len(record['attachment_ids']) >= 2:
+                rate += 10.0
+
+            if record['access_ids']:
+                rate += 10.0
+
+            if record['added_services_ids']:
+                flag = True
+                for service in self.pool.get('partner.added.services').read(cr, 1, record['added_services_ids'], ['service_id', 'comment', 'budget']):
+                    if not service['service_id'] or not service['comment'] or not service['budget']:
+                        flag = False
+                        break
+                if flag:
+                    rate += 10.0
+
+            if record['terms_of_service'] and record['conformity'] and record['quality_feedback'] and record['completeness_of_reporting']:
+                rate += 5.0
+
+            if record['description']:
+                rate += 5.0
+
+            if record['key_person']:
+                rate += 10.0
+
+            if record['key_moment']:
+                rate += 10.0
+
+            if record['zone']:
+                rate += 5.0
+
+            if record['another']:
+                rate += 5.0
+
+            if record['note_ids']:
+                note_last = self.pool.get('crm.lead.notes').read(cr, 1, record['note_ids'][0], ['create_date'])
+                week_day = date.today().weekday()
+                td = 3
+                if week_day in (5, 6):
+                    td = week_day - 4
+                if date.today() - timedelta(days=td) <= datetime.strptime(note_last['create_date'], '%Y-%m-%d %H:%M:%S').date():
+                    rate += 20.0
+
+            if record['address']:
+                flag = True
+                for address in self.pool.get('res.partner.address').read(cr, 1, record['address'], ['site_ids', 'phone_ids', 'email_ids', 'name', 'function']):
+                    if not address['name'] or not address['function']:
+                        flag = False
+                        break
+
+                    if address['site_ids']:
+                        for site in self.pool.get('res.partner.address.site').read(cr, 1, address['site_ids'], ['name']):
+                            if not site['name']:
+                                flag = False
+                                break
+                    else:
+                        flag = False
+                        break
+
+                    if address['phone_ids']:
+                        pe = re.compile('^\d+$', re.UNICODE)
+                        for site in self.pool.get('tel.reference').read(cr, 1, address['phone_ids'], ['phone']):
+                            if not site['phone'] or not pe.match(site['phone']):
+                                flag = False
+                                break
+                    else:
+                        flag = False
+                        break
+
+                    if address['email_ids']:
+                        pe = re.compile("^[-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]+(?:\.[-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]+)*@(?:[a-zA-Z0-9]([-a-zA-Z0-9]{0,61}[a-zA-Z0-9])?\.)$", re.UNICODE)
+                        for site in self.pool.get('res.partner.address.email').read(cr, 1, address['email_ids'], ['name']):
+                            if not site['name'] or not pe.match(site['name']):
+                                flag = False
+                                break
+                    else:
+                        flag = False
+                        break
+
+                if flag:
+                    rate += 5.0
             res[record['id']] = rate
         return res
 
@@ -1459,7 +1561,7 @@ class ResPartner(Model):
             #domain="['|', ('section_id', '=', False), ('responsible_users', '=', user_id)]",
             help='Категория, которой принадлежит данный Партнер'
         ),
-        'description': fields.text('Дополнительная информация о контактном лице'),
+
         'access_ids': fields.one2many(
             'res.partner.access',
             'partner_id',
@@ -1594,6 +1696,12 @@ class ResPartner(Model):
         'check_ppc': fields.function(_check_ppc, type="boolean", method=True, string=u"Маркер PPC"),
         'old_discounts_ids': fields.one2many('res.partner.ppc.discounts', 'partner_id', 'Скидки', domain=[('finish_date', '<', date.today().strftime('%Y-%m-%d'))]),
         'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством'),
+
+        'description': fields.text('Описание компании', help='-специфика работы;\n-на чем они зарабатывают больше всего;\n-ключевые направления деятельность;\n-специфика иерархии в компании;\n-основные векторы дальнейшего развития и тд.'),
+        'key_person': fields.text('Характеристика ключевых лиц', help='должности, эмоциональные характеристики, их интересы и другие важные данные для работы с ними'),
+        'zone': fields.text('Зоны ответственности разных контактных лиц', help='Кто за что отвечает'),
+        'key_moment': fields.text('Ключевые моменты взаимодействия нашей компании и партнера', help='Например, партнер приезжал к нам в Харьков, конфликты с партнером и тд.'),
+        'another': fields.text('Другая', help='Любая другая полезная информация'),
 
         'rate': fields.function(
             _get_rate,
