@@ -14,14 +14,12 @@ class Transfer(openerpweb.Controller):
 
     def fields_get(self, req, model):
         Model = req.session.model(model)
-        req.session._uid = 1
         fields = Model.fields_get(False, req.session.eval_context(req.context))
         return fields
 
     @openerpweb.jsonrequest
     def managers(self, req, selected_ids, model, manager_id):
         m_uid = req.session._uid
-        req.session._uid = 1
         user = req.session.model('res.users').read(int(manager_id), ['context_section_id'])
         cards = req.session.model(model).write(
             selected_ids,
