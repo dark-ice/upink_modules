@@ -1123,8 +1123,8 @@ class ResPartner(Model):
                         break
 
                     if address['site_ids']:
-                        for site in self.pool.get('res.partner.address.site').read(cr, 1, address['site_ids'], ['name']):
-                            if not (site['name'] and site['name'].strip()):
+                        for item in self.pool.get('res.partner.address.site').read(cr, 1, address['site_ids'], ['name']):
+                            if not (item['name'] and item['name'].strip()):
                                 flag = False
                                 break
                     else:
@@ -1133,8 +1133,8 @@ class ResPartner(Model):
 
                     if address['phone_ids']:
                         pe = re.compile('^\d+$', re.UNICODE)
-                        for site in self.pool.get('tel.reference').read(cr, 1, address['phone_ids'], ['phone']):
-                            if not site['phone'] or not pe.match(site['phone']):
+                        for item in self.pool.get('tel.reference').read(cr, 1, address['phone_ids'], ['phone']):
+                            if not item['phone'] or not pe.match(item['phone']):
                                 flag = False
                                 break
                     else:
@@ -1142,9 +1142,9 @@ class ResPartner(Model):
                         break
 
                     if address['email_ids']:
-                        pe = re.compile("^[-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]+(?:\.[-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]+)*@(?:[a-zA-Z0-9]([-a-zA-Z0-9]{0,61}[a-zA-Z0-9])?\.)$", re.UNICODE)
-                        for site in self.pool.get('res.partner.address.email').read(cr, 1, address['email_ids'], ['name']):
-                            if not site['name'] or not pe.match(site['name']):
+                        pe = re.compile("[^@]+@[^@]+\.[^@]+", re.UNICODE)
+                        for item in self.pool.get('res.partner.address.email').read(cr, 1, address['email_ids'], ['name']):
+                            if not (item['name'] and pe.match(item['name'])):
                                 flag = False
                                 break
                     else:
