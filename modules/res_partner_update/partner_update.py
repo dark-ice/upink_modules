@@ -1873,8 +1873,11 @@ class ResPartner(Model):
             if (record.partner_type in ('upsale', False) and terms_of_service \
                     and conformity and quality_feedback and completeness_of_reporting):
 
-                sum_criteries = int(terms_of_service) + int(conformity) + \
-                                int(quality_feedback) + int(completeness_of_reporting)
+                try:
+                    sum_criteries = int(terms_of_service) + int(conformity) + \
+                                    int(quality_feedback) + int(completeness_of_reporting)
+                except:
+                    sum_criteries = 0
 
                 if sum_criteries != 100:
                     return False
