@@ -1,5 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 from datetime import datetime, timedelta, date
+import re
 import numpy
 import pytz
 from openerp import tools
@@ -772,10 +773,10 @@ class res_partner_access(Model):
                 ('yandexMetrica', 'Доступ в YandexMetrica'),
                 ('googleAdWords', 'Доступ в GoogleAdWords'),
                 ('yandexDirect', 'Доступ в ЯндексДирект'),
-            ], 'Доступы партнера'),
+            ], 'Доступы партнера', required=True),
         'link': fields.char('Ссылка', size=250),
-        'login': fields.char('Логин', size=250),
-        'pswd': fields.char('Пароль', size=250),
+        'login': fields.char('Логин', size=250, required=True),
+        'pswd': fields.char('Пароль', size=250, required=True),
     }
 res_partner_access()
 
@@ -1047,6 +1048,112 @@ class ResPartner(Model):
 
         return res
 
+    def _get_rate(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        fields = [
+            'description',
+            'key_person',
+            'key_moment',
+            'zone',
+            'another',
+            'terms_of_service',
+            'conformity',
+            'quality_feedback',
+            'completeness_of_reporting',
+        ]
+        for record in self.read(cr, 1, ids, fields):
+            rate = 0.0
+
+            if self.pool.get('partner.operational.departments').search(cr, 1, [('partner_id', '=', record['id'])], count=True):
+                rate += 5.0
+
+            if self.pool.get('ir.attachment').search(cr, 1, [('res_id', '=', record['id']), ('res_model', '=', 'res.partner')], count=True) >= 2:
+                rate += 10.0
+
+            if self.pool.get('res.partner.access').search(cr, 1, [('partner_id', '=', record['id'])], count=True):
+                rate += 10.0
+
+            services_ids = self.pool.get('partner.added.services').search(cr, 1, [('partner_id', '=', record['id'])])
+            if services_ids:
+
+                flag = True
+                for service in self.pool.get('partner.added.services').read(cr, 1, services_ids, ['service_id', 'comment', 'budget']):
+                    if not service['service_id'] or not (service['comment'] and service['comment'].split()) or not service['budget']:
+                        flag = False
+                        break
+                if flag:
+                    rate += 10.0
+
+            if record['terms_of_service'] and record['terms_of_service'].split() and record['conformity'] and record['conformity'].split() and record['quality_feedback'] and record['quality_feedback'].split() and record['completeness_of_reporting'] and record['completeness_of_reporting'].split():
+                rate += 5.0
+
+            if record['description'] and len(record['description'].strip()) > 25:
+                rate += 5.0
+
+            if record['key_person'] and len(record['key_person'].strip()) > 25:
+                rate += 10.0
+
+            if record['key_moment'] and len(record['key_moment'].strip()) > 25:
+                rate += 10.0
+
+            if record['zone'] and len(record['zone'].strip()) > 25:
+                rate += 5.0
+
+            if record['another'] and len(record['another'].strip()) > 25:
+                rate += 5.0
+
+            note_ids = self.pool.get('crm.lead.notes').search(cr, 1, [('partner_id', '=', record['id']), ('type', '!=', 'skk')])
+            if note_ids:
+                note_last = self.pool.get('crm.lead.notes').read(cr, 1, note_ids[0], ['create_date'])
+                week_day = date.today().weekday()
+                td = 3
+                if week_day in (5, 6):
+                    td = week_day - 4
+                if date.today() - timedelta(days=td) <= datetime.strptime(note_last['create_date'], '%Y-%m-%d %H:%M:%S').date():
+                    rate += 20.0
+
+            address_ids = self.pool.get('res.partner.address').search(cr, 1, [('partner_id', '=', record['id'])])
+            if address_ids:
+                flag = True
+                for address in self.pool.get('res.partner.address').read(cr, 1, address_ids, ['site_ids', 'phone_ids', 'email_ids', 'name', 'function']):
+                    if not (address['name'] and address['name'].strip()) or not (address['function'] and address['function'].strip()):
+                        flag = False
+                        break
+
+                    if address['site_ids']:
+                        for item in self.pool.get('res.partner.address.site').read(cr, 1, address['site_ids'], ['name']):
+                            if not (item['name'] and item['name'].strip()):
+                                flag = False
+                                break
+                    else:
+                        flag = False
+                        break
+
+                    if address['phone_ids']:
+                        pe = re.compile('^\d+$', re.UNICODE)
+                        for item in self.pool.get('tel.reference').read(cr, 1, address['phone_ids'], ['phone']):
+                            if not item['phone'] or not pe.match(item['phone']):
+                                flag = False
+                                break
+                    else:
+                        flag = False
+                        break
+
+                    if address['email_ids']:
+                        pe = re.compile("^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", re.UNICODE)
+                        for item in self.pool.get('res.partner.address.email').read(cr, 1, address['email_ids'], ['name']):
+                            if not (item['name'] and pe.match(item['name'])):
+                                flag = False
+                                break
+                    else:
+                        flag = False
+                        break
+
+                if flag:
+                    rate += 5.0
+            res[record['id']] = rate
+        return res
+
     def _search_cr_date(self, cr, uid, obj, name, args, context):
         site_ids = self.pool.get('res.partner.address.site').search(cr, uid, [('name', args[0][1], args[0][2])],
                                                                     context=context)
@@ -1131,9 +1238,9 @@ class ResPartner(Model):
             service_ids = p_service_pool.search(cr, 1, [('partner_id', '!=', False)])
             service_statuses = p_service_pool._get_service_status(cr, 1, service_ids, '', [])
             ids = [k for k, v in service_statuses.iteritems() if get_state(PARTNER_STATUS, status)[1] == v]
-            partner_id = set([r['partner_id'][0] for r in p_service_pool.read(cr, 1, ids, ['partner_id'])])
-        if ids:
-            return [('id', 'in', tuple(partner_id))]
+            partner_ids = set([r['partner_id'][0] for r in p_service_pool.read(cr, 1, ids, ['partner_id'])])
+            if ids:
+                return [('id', 'in', tuple(partner_ids))]
         return [('id', '=', '0')]
 
     def _search_service_name(self, cr, uid, obj, name, args, context):
@@ -1452,7 +1559,7 @@ class ResPartner(Model):
             #domain="['|', ('section_id', '=', False), ('responsible_users', '=', user_id)]",
             help='Категория, которой принадлежит данный Партнер'
         ),
-        'description': fields.text('Дополнительная информация о контактном лице'),
+
         'access_ids': fields.one2many(
             'res.partner.access',
             'partner_id',
@@ -1587,6 +1694,20 @@ class ResPartner(Model):
         'check_ppc': fields.function(_check_ppc, type="boolean", method=True, string=u"Маркер PPC"),
         'old_discounts_ids': fields.one2many('res.partner.ppc.discounts', 'partner_id', 'Скидки', domain=[('finish_date', '<', date.today().strftime('%Y-%m-%d'))]),
         'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством'),
+
+        'description': fields.text('Описание компании', help='-специфика работы;\n-на чем они зарабатывают больше всего;\n-ключевые направления деятельность;\n-специфика иерархии в компании;\n-основные векторы дальнейшего развития и тд.'),
+        'key_person': fields.text('Характеристика ключевых лиц', help='должности, эмоциональные характеристики, их интересы и другие важные данные для работы с ними'),
+        'zone': fields.text('Зоны ответственности разных контактных лиц', help='Кто за что отвечает'),
+        'key_moment': fields.text('Ключевые моменты взаимодействия нашей компании и партнера', help='Например, партнер приезжал к нам в Харьков, конфликты с партнером и тд.'),
+        'another': fields.text('Другая', help='Любая другая полезная информация'),
+
+        'rate': fields.function(
+            _get_rate,
+            type='float',
+            readonly=True,
+            digits=(3, 2),
+            string='Процент заполненности'
+        )
     }
 
     def _get_type(self, cr, uid, context=None):
@@ -1746,8 +1867,11 @@ class ResPartner(Model):
             if (record.partner_type in ('upsale', False) and terms_of_service \
                     and conformity and quality_feedback and completeness_of_reporting):
 
-                sum_criteries = int(terms_of_service) + int(conformity) + \
-                                int(quality_feedback) + int(completeness_of_reporting)
+                try:
+                    sum_criteries = int(terms_of_service) + int(conformity) + \
+                                    int(quality_feedback) + int(completeness_of_reporting)
+                except:
+                    sum_criteries = 0
 
                 if sum_criteries != 100:
                     return False
@@ -1840,7 +1964,7 @@ class ResPartner(Model):
         ),
         (
             _check_criteries,
-            'Сумма критериев должна равняться 100',
+            'Сумма критериев должна равняться 100 и не должно быть пустых полей',
             []
         ),
         #(
