@@ -1060,28 +1060,24 @@ class ResPartner(Model):
             'conformity',
             'quality_feedback',
             'completeness_of_reporting',
-            'access_ids',
-            'note_ids',
-            'added_services_ids',
-            'operation_deps',
-            'attachment_ids',
-            'address',
         ]
         for record in self.read(cr, 1, ids, fields):
             rate = 0.0
 
-            if record['operation_deps']:
+            if self.pool.get('partner.operational.departments').search(cr, 1, [('partner_id', '=', record['id'])], count=True):
                 rate += 5.0
 
-            if len(record['attachment_ids']) >= 2:
+            if self.pool.get('ir.attachment').search(cr, 1, [('res_id', '=', record['id']), ('res_model', '=', 'res.partner')], count=True) >= 2:
                 rate += 10.0
 
-            if record['access_ids']:
+            if self.pool.get('res.partner.access').search(cr, 1, [('partner_id', '=', record['id'])], count=True):
                 rate += 10.0
 
-            if record['added_services_ids']:
+            services_ids = self.pool.get('partner.added.services').search(cr, 1, [('partner_id', '=', record['id'])])
+            if services_ids:
+
                 flag = True
-                for service in self.pool.get('partner.added.services').read(cr, 1, record['added_services_ids'], ['service_id', 'comment', 'budget']):
+                for service in self.pool.get('partner.added.services').read(cr, 1, services_ids, ['service_id', 'comment', 'budget']):
                     if not service['service_id'] or not (service['comment'] and service['comment'].split()) or not service['budget']:
                         flag = False
                         break
@@ -1091,23 +1087,24 @@ class ResPartner(Model):
             if record['terms_of_service'] and record['terms_of_service'].split() and record['conformity'] and record['conformity'].split() and record['quality_feedback'] and record['quality_feedback'].split() and record['completeness_of_reporting'] and record['completeness_of_reporting'].split():
                 rate += 5.0
 
-            if record['description'] and record['description'].strip():
+            if record['description'] and len(record['description'].strip()) > 25:
                 rate += 5.0
 
-            if record['key_person'] and record['key_person'].strip():
+            if record['key_person'] and len(record['key_person'].strip()) > 25:
                 rate += 10.0
 
-            if record['key_moment'] and record['key_moment'].strip():
+            if record['key_moment'] and len(record['key_moment'].strip()) > 25:
                 rate += 10.0
 
-            if record['zone'] and record['zone'].strip():
+            if record['zone'] and len(record['zone'].strip()) > 25:
                 rate += 5.0
 
-            if record['another'] and record['another'].strip():
+            if record['another'] and len(record['another'].strip()) > 25:
                 rate += 5.0
 
-            if record['note_ids']:
-                note_last = self.pool.get('crm.lead.notes').read(cr, 1, record['note_ids'][0], ['create_date'])
+            note_ids = self.pool.get('crm.lead.notes').search(cr, 1, [('partner_id', '=', record['id']), ('type', '!=', 'skk')])
+            if note_ids:
+                note_last = self.pool.get('crm.lead.notes').read(cr, 1, note_ids[0], ['create_date'])
                 week_day = date.today().weekday()
                 td = 3
                 if week_day in (5, 6):
@@ -1115,9 +1112,10 @@ class ResPartner(Model):
                 if date.today() - timedelta(days=td) <= datetime.strptime(note_last['create_date'], '%Y-%m-%d %H:%M:%S').date():
                     rate += 20.0
 
-            if record['address']:
+            address_ids = self.pool.get('res.partner.address').search(cr, 1, [('partner_id', '=', record['id'])])
+            if address_ids:
                 flag = True
-                for address in self.pool.get('res.partner.address').read(cr, 1, record['address'], ['site_ids', 'phone_ids', 'email_ids', 'name', 'function']):
+                for address in self.pool.get('res.partner.address').read(cr, 1, address_ids, ['site_ids', 'phone_ids', 'email_ids', 'name', 'function']):
                     if not (address['name'] and address['name'].strip()) or not (address['function'] and address['function'].strip()):
                         flag = False
                         break
