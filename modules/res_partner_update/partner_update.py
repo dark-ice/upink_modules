@@ -1087,19 +1087,19 @@ class ResPartner(Model):
             if record['terms_of_service'] and record['terms_of_service'].split() and record['conformity'] and record['conformity'].split() and record['quality_feedback'] and record['quality_feedback'].split() and record['completeness_of_reporting'] and record['completeness_of_reporting'].split():
                 rate += 5.0
 
-            if record['description'] and len(record['description'].strip()) > 25:
+            if record['description'] and len(record['description'].strip()) > 15:
                 rate += 5.0
 
-            if record['key_person'] and len(record['key_person'].strip()) > 25:
+            if record['key_person'] and len(record['key_person'].strip()) > 15:
                 rate += 10.0
 
-            if record['key_moment'] and len(record['key_moment'].strip()) > 25:
+            if record['key_moment'] and len(record['key_moment'].strip()) > 15:
                 rate += 10.0
 
-            if record['zone'] and len(record['zone'].strip()) > 25:
+            if record['zone'] and len(record['zone'].strip()) > 15:
                 rate += 5.0
 
-            if record['another'] and len(record['another'].strip()) > 25:
+            if record['another'] and len(record['another'].strip()) > 15:
                 rate += 5.0
 
             note_ids = self.pool.get('crm.lead.notes').search(cr, 1, [('partner_id', '=', record['id']), ('type', '!=', 'skk')])
@@ -1120,8 +1120,9 @@ class ResPartner(Model):
                         flag = False
                         break
 
-                    if address['site_ids']:
-                        for item in self.pool.get('res.partner.address.site').read(cr, 1, address['site_ids'], ['name']):
+                    site_ids = self.pool.get('res.partner.address.site').search(cr, 1, [('address_id', '=', address['id'])])
+                    if site_ids:
+                        for item in self.pool.get('res.partner.address.site').read(cr, 1, site_ids, ['name']):
                             if not (item['name'] and item['name'].strip()):
                                 flag = False
                                 break
@@ -1129,9 +1130,10 @@ class ResPartner(Model):
                         flag = False
                         break
 
-                    if address['phone_ids']:
+                    phone_ids = self.pool.get('res.partner.address.site').search(cr, 1, [('partner_address_id', '=', address['id'])])
+                    if phone_ids:
                         pe = re.compile('^\d+$', re.UNICODE)
-                        for item in self.pool.get('tel.reference').read(cr, 1, address['phone_ids'], ['phone']):
+                        for item in self.pool.get('tel.reference').read(cr, 1, phone_ids, ['phone']):
                             if not item['phone'] or not pe.match(item['phone']):
                                 flag = False
                                 break
@@ -1139,9 +1141,10 @@ class ResPartner(Model):
                         flag = False
                         break
 
-                    if address['email_ids']:
+                    email_ids = self.pool.get('res.partner.address.email').search(cr, 1, [('address_id', '=', address['id'])])
+                    if email_ids:
                         pe = re.compile("^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", re.UNICODE)
-                        for item in self.pool.get('res.partner.address.email').read(cr, 1, address['email_ids'], ['name']):
+                        for item in self.pool.get('res.partner.address.email').read(cr, 1, email_ids, ['name']):
                             if not (item['name'] and pe.match(item['name'])):
                                 flag = False
                                 break
