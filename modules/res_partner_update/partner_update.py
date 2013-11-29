@@ -773,10 +773,10 @@ class res_partner_access(Model):
                 ('yandexMetrica', 'Доступ в YandexMetrica'),
                 ('googleAdWords', 'Доступ в GoogleAdWords'),
                 ('yandexDirect', 'Доступ в ЯндексДирект'),
-            ], 'Доступы партнера'),
+            ], 'Доступы партнера', required=True),
         'link': fields.char('Ссылка', size=250),
-        'login': fields.char('Логин', size=250),
-        'pswd': fields.char('Пароль', size=250),
+        'login': fields.char('Логин', size=250, required=True),
+        'pswd': fields.char('Пароль', size=250, required=True),
     }
 res_partner_access()
 
