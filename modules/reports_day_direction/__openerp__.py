@@ -8,7 +8,9 @@
 Ежедневные отчеты направлений.
 ==============================
 - PPC
-- CALL
+- CALL (call_in call_out)
+- SMM
+- SITE
     """,
     'author': 'Andrey Karbanovich',
     'website': 'http://upsale.ru',
