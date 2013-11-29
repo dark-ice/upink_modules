@@ -1082,13 +1082,13 @@ class ResPartner(Model):
             if record['added_services_ids']:
                 flag = True
                 for service in self.pool.get('partner.added.services').read(cr, 1, record['added_services_ids'], ['service_id', 'comment', 'budget']):
-                    if not service['service_id'] or not service['comment'] or not service['budget']:
+                    if not service['service_id'] or not (service['comment'] and service['comment'].split()) or not service['budget']:
                         flag = False
                         break
                 if flag:
                     rate += 10.0
 
-            if record['terms_of_service'] and record['conformity'] and record['quality_feedback'] and record['completeness_of_reporting']:
+            if record['terms_of_service'] and record['terms_of_service'].split() and record['conformity'] and record['conformity'].split() and record['quality_feedback'] and record['quality_feedback'].split() and record['completeness_of_reporting'] and record['completeness_of_reporting'].split():
                 rate += 5.0
 
             if record['description'] and record['description'].strip():
