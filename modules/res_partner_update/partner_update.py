@@ -1142,7 +1142,7 @@ class ResPartner(Model):
                         break
 
                     if address['email_ids']:
-                        pe = re.compile("[^@]+@[^@]+\.[^@]+", re.UNICODE)
+                        pe = re.compile("^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", re.UNICODE)
                         for item in self.pool.get('res.partner.address.email').read(cr, 1, address['email_ids'], ['name']):
                             if not (item['name'] and pe.match(item['name'])):
                                 flag = False
