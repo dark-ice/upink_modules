@@ -294,12 +294,12 @@ class WebCalls(Model):
                 if chan.get('CallerIDNum') == str(user.callerid):
                     _logger.info("UserCallerId: %s" % str(user.callerid))
                     _logger.info("CallerIDNum: %s" % str(chan.get('CallerIDNum')))
-                    _logger.info("ConnectedLineName: %s" % str(chan.get('ConnectedLineName')))
+                    _logger.info("CallerIDName: %s" % str(chan.get('CallerIDName')))
                     calling_party_number = chan.get('ConnectedLineNum')
-                    if chan.get('ConnectedLineName'):
-                        indx = chan['ConnectedLineName'].find(')')
+                    if chan.get('CallerIDName'):
+                        indx = chan['CallerIDName'].find(')')
                         if indx:
-                            city = chan['ConnectedLineName'][1:indx]
+                            city = chan['CallerIDName'][1:indx]
                     break
         except Exception, e:
             _logger.error("Error in the Status request to Asterisk server %s" % ast_server['ast_server'])
