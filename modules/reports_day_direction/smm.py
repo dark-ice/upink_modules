@@ -14,8 +14,8 @@ class ReportDaySmmStatisticPlan(Model):
         'kpi_target': fields.float('Цель по KPI'),
         'work_start': fields.date('Старт работы'),
         'report': fields.char('Отчет', size=256),
-        'date_start': fields.date('Дата начала проекта'),
-        'date_end': fields.date('Дата конца проекта'),
+        'date_start': fields.date('Дата начала периода'),
+        'date_end': fields.date('Дата конца периода'),
         'supervisor_id': fields.related(
             'process_smm_id',
             'specialist_id',
@@ -68,11 +68,11 @@ class ReportDaySmm(Model):
         'service_id': fields.many2one('brief.services.stage', 'Услуга'),
         'work_start': fields.date('Начало работы'),
         'report': fields.char('Отчет', size=256),
-        'date_start_plan': fields.date('Дата начала'),
+        'date_start_plan': fields.date('Дата начала периода'),
         'kpi_index': fields.many2one('process.sla.indicators', 'Показатель KPI', domain="[('type', '=', 'smm')]"),
         'kpi_target': fields.float('Цель по KPI'),
-        'old_point': fields.float('Показатель за прошедший период', group_operator='avg'),
-        'index_point': fields.float('Значение показателя', group_operator='sum'),
+        'old_point': fields.float('Показатель за предыдущий период', group_operator='avg'),
+        'index_point': fields.float('Значение показателя за текущий период', group_operator='sum'),
     }
 
     def init(self, cr):

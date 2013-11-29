@@ -28,7 +28,7 @@
         </record>
 
 
-        <menuitem action="action_window_report_day_fact_smm_statistic" id="menu_action_smm_fact" sequence="30" parent="process_smm.menu_process_smm_dev" />
+        <menuitem action="action_window_report_day_fact_smm_statistic" id="menu_action_smm_fact" sequence="40" parent="process_smm.menu_process_smm" />
 
 <!--отчет по smm-->
         <record model="ir.ui.view" id="view_rep_smm_tree">
@@ -45,9 +45,9 @@
                     <field name="date_start_plan" readonly="1"/>
                     <field name="kpi_index" readonly="1"/>
                     <field name="kpi_target" readonly="1"/>
-                    <field name="old_point" readonly="1" avg=""/>
+                    <field name="old_point" readonly="1" />
                     <field name="date" readonly="1" />
-                    <field name="index_point" readonly="1" sum=""/>
+                    <field name="index_point" readonly="1" />
                 </tree>
             </field>
         </record>
@@ -77,7 +77,7 @@
         </record>
 
         <record id="action_rep_smm_statistic" model="ir.actions.act_window">
-            <field name="name">Отчет по smm</field>
+            <field name="name">Ежедневный отчет</field>
             <field name="res_model">report.day.smm</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
@@ -87,6 +87,6 @@
         </record>
 
 
-        <menuitem action="action_rep_smm_statistic" id="menu_action_smm_report" sequence="40" parent="process_smm.menu_process_smm_dev" />
+        <menuitem action="action_rep_smm_statistic" id="menu_action_smm_report" sequence="30" parent="process_smm.menu_process_smm" />
     </data>
 </openerp>
