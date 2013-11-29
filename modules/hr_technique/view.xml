@@ -166,6 +166,7 @@
                 <search>
                     <field name="name" />
                     <field name="type" />
+                    <field name="inventory_number" />
                     <field name="employee_id" />
                     <field name="department_id" />
                     <field name="date_of_issue" />
