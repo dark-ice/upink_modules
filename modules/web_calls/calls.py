@@ -156,7 +156,7 @@ class WebCalls(Model):
             ), 'Тип продажи'
         ),
         'check_box_type': fields.function(
-            lambda *a: [],
+            lambda *a: dict((r_id, '') for r_id in a[3]),
             type="selection",
             method=True,
             string='Тип заявки',
@@ -294,12 +294,12 @@ class WebCalls(Model):
                 if chan.get('CallerIDNum') == str(user.callerid):
                     _logger.info("UserCallerId: %s" % str(user.callerid))
                     _logger.info("CallerIDNum: %s" % str(chan.get('CallerIDNum')))
-                    _logger.info("ConnectedLineName: %s" % str(chan.get('ConnectedLineName')))
+                    _logger.info("CallerIDName: %s" % str(chan.get('CallerIDName')))
+                    _logger.info("Chan: %s" % str(chan))
                     calling_party_number = chan.get('ConnectedLineNum')
                     if chan.get('ConnectedLineName'):
-                        indx = chan['ConnectedLineName'].find(')')
-                        if indx:
-                            city = chan['ConnectedLineName'][1:indx]
+                        city = chan['ConnectedLineName'][:chan['ConnectedLineName'].find(calling_party_number)].strip('()')
+                        _logger.info("City: %s" % str(city))
                     break
         except Exception, e:
             _logger.error("Error in the Status request to Asterisk server %s" % ast_server['ast_server'])

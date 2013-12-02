@@ -1292,7 +1292,7 @@ class Brief(Model):
             domain=[('usergroup', '!=', False)],
             help='Услуга по которой составляется Бриф.'),
         'direction': fields.function(
-            lambda *a: [],
+            lambda *a: dict((r_id, '') for r_id in a[3]),
             type="selection",
             method=True,
             string='Направление',
