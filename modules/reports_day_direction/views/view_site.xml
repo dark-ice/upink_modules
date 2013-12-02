@@ -10,6 +10,7 @@
                     <field name="partner_id" readonly="1" />
                     <field name="now_stage" readonly="1"/>
                     <field name="now_plan_fn" readonly="1"/>
+                    <field name="days" readonly="1"/>
                     <field name="stage" readonly="1"/>
                     <field name="plan_date_st" readonly="1"/>
                     <field name="plan_date_fn" readonly="1"/>
