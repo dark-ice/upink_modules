@@ -68,7 +68,7 @@ class ReportQualityControlDirection(Model):
                   bss.direction,
                   k.name period_name,
                   k.id period_id,
-                  count(pl.id),
+                  count(DISTINCT rpqc.id),
                   array_agg(rpqc.id) quality_ids
                 FROM process_launch as pl
                 JOIN res_partner_quality_control AS rpqc

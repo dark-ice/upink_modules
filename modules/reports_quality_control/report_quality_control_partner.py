@@ -70,7 +70,7 @@ class ReportQualityControlPartner(Model):
                   bss.direction,
                   k.name period_name,
                   k.id period_id,
-                  count(pl.id),
+                  count(DISTINCT rpqc.id),
                   pl.partner_id,
                   array_agg(rpqc.id) quality_ids
                 FROM process_launch as pl
