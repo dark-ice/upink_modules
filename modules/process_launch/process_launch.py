@@ -772,6 +772,7 @@ class ProcessIndicators(Model):
                 ('smm', 'smm'),
                 ('seo', 'seo'),
                 ('ppc', 'ppc'),
+                ('site', 'site'),
             ), "Тип показателя", required=True
         ),
     }
