@@ -58,7 +58,7 @@ class ReportDayCallIn(Model):
         'partner_id': fields.many2one('res.partner', "Проект"),
         'call_in': fields.integer('Принятые', group_operator='sum'),
         'missed': fields.integer('Пропущенные', group_operator='sum'),
-        'date': fields.date('дата'),
+        'date': fields.date('Дата'),
         'procent': fields.float('Процент', group_operator='avg'),
         'procent_day': fields.float('Процент день', group_operator='avg'),
         'procent_night': fields.float('Процент ночь', group_operator='avg'),

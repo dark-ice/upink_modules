@@ -36,24 +36,24 @@ class ReportDaySite(Model):
             process_name = '-'
             process_date = ''
             if context.get('date'):
-                if record['design_date_st'] < context['date'] < record['design_date_fn']:
-                    process_name = 'design'
+                if record['design_date_st'] <= context['date'] <= record['design_date_fn']:
+                    process_name = 'Дизайн'
                     process_date = record['design_date_fn']
 
-                if record['planning_date_st'] < context['date'] < record['planning_date_fn']:
-                    process_name = 'planning'
+                if record['planning_date_st'] <= context['date'] <= record['planning_date_fn']:
+                    process_name = 'Проектирование'
                     process_date = record['planning_date_fn']
 
-                if record['makeup_date_st'] < context['date'] < record['makeup_date_fn']:
-                    process_name = 'makeup'
+                if record['makeup_date_st'] <= context['date'] <= record['makeup_date_fn']:
+                    process_name = 'Верстка'
                     process_date = record['makeup_date_fn']
 
-                if record['developing_date_st'] < context['date'] < record['developing_date_fn']:
-                    process_name = 'developing'
+                if record['developing_date_st'] <= context['date'] <= record['developing_date_fn']:
+                    process_name = 'Программирование'
                     process_date = record['developing_date_fn']
 
-                if record['testing_date_st'] < context['date'] < record['testing_date_fn']:
-                    process_name = 'testing'
+                if record['testing_date_st'] <= context['date'] <= record['testing_date_fn']:
+                    process_name = 'Тестирование'
                     process_date = record['testing_date_fn']
 
             res[record['id']] = {

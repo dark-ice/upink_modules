@@ -46,9 +46,9 @@ class ReportDayCallOut(Model):
         'target_date_end': fields.char('Плановая дата завершения', size=1024),
         'contact_num': fields.integer('Всего контактов для прозвона', group_operator='sum'),
         'contact_end_status_num': fields.integer('С конечным статусом', group_operator='sum'),
-        'coll_num': fields.integer('Совершино звонков', group_operator='sum'),
+        'coll_num': fields.integer('Совершено звонков', group_operator='sum'),
         'conversion': fields.float('Конверсия', group_operator='sum'),
-        'current_conversion': fields.float('Текущая коныерсия', group_operator='sum')
+        'current_conversion': fields.float('Текущая конверсия', group_operator='sum')
     }
 
     def init(self, cr):

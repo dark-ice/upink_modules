@@ -66,6 +66,6 @@
         </record>
 
 
-        <menuitem action="action_rep_site_statistic" id="menu_action_site_report" sequence="20" parent="process_site.menu_process_site" />
+        <menuitem action="action_rep_site_statistic" id="menu_action_site_report" sequence="80" parent="process_site.menu_process_site" />
     </data>
 </openerp>
