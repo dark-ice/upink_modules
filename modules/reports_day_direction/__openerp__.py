@@ -24,6 +24,7 @@
         'views/view_call_in.xml',
         'views/view_call_out.xml',
         'views/view_smm.xml',
+        'views/view_site.xml',
         #'workflow.xml',
     ],
 
