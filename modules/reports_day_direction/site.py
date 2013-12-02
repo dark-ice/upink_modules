@@ -16,17 +16,97 @@ class ReportDaySite(Model):
     _name = "report.day.site"
     _description = "Отчет по сайтам"
     _auto = False
+
+    def _get_data(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.read(cr, uid, ids, [
+            'partner_id',
+            'design_date_st',
+            'design_date_fn',
+            'planning_date_st',
+            'planning_date_fn',
+            'makeup_date_st',
+            'makeup_date_fn',
+            'developing_date_st',
+            'developing_date_fn',
+            'testing_date_st',
+            'testing_date_fn',
+        ], context):
+
+            process_name = '-'
+            process_date = ''
+            if context.get('date'):
+                if record['design_date_st'] < context['date'] < record['design_date_fn']:
+                    process_name = 'design'
+                    process_date = record['design_date_fn']
+
+                if record['planning_date_st'] < context['date'] < record['planning_date_fn']:
+                    process_name = 'planning'
+                    process_date = record['planning_date_fn']
+
+                if record['makeup_date_st'] < context['date'] < record['makeup_date_fn']:
+                    process_name = 'makeup'
+                    process_date = record['makeup_date_fn']
+
+                if record['developing_date_st'] < context['date'] < record['developing_date_fn']:
+                    process_name = 'developing'
+                    process_date = record['developing_date_fn']
+
+                if record['testing_date_st'] < context['date'] < record['testing_date_fn']:
+                    process_name = 'testing'
+                    process_date = record['testing_date_fn']
+
+            res[record['id']] = {
+                'process_name': process_name,
+                'process_date': process_date,
+            }
+        return res
+
     _columns = {
+        'launch_id': fields.integer('id'),
         'partner_id': fields.many2one('res.partner', "Проект"),
-        'stage': fields.selection(STAGES, 'Этап'),
-        'now_stage': fields.selection(STAGES, 'Текущий этап'),
-        'now_plan_fn': fields.date('Дата завершения'),
-        'plan_date_st': fields.date('Планируемая дата начала'),
-        'plan_date_fn': fields.date('Планируемая дата окончания'),
-        'real_date_st': fields.date('Фактическая дата начала'),
-        'real_date_fn': fields.date('Фактическая дата окончания'),
+
+        'process_name': fields.function(
+            _get_data,
+            type='char',
+            selection=STAGES,
+            multi='need_date',
+            string='Текущий этап',
+        ),
+        'process_date': fields.function(
+            _get_data,
+            type='date',
+            multi='need_date',
+            string='Дата завершения',
+        ),
+
+        'type': fields.char('', size=8),
+        'planning_days': fields.integer('П'),
+        'design_days': fields.integer('Д'),
+        'makeup_days': fields.integer('В'),
+        'developing_days': fields.integer('П'),
+        'testing_days': fields.integer('Т'),
+
+        'design_stage': fields.selection(STAGES, 'Дизайн'),
+        'planning_stage': fields.selection(STAGES, 'Проектирование'),
+        'makeup_stage': fields.selection(STAGES, 'Верстка'),
+        'developing_stage': fields.selection(STAGES, 'Программирование'),
+        'testing_stage': fields.selection(STAGES, 'Тестирование'),
+
+        'design_date_st': fields.date('Старт'),
+        'planning_date_st': fields.date('Старт'),
+        'makeup_date_st': fields.date('Старт'),
+        'developing_date_st': fields.date('Старт'),
+        'testing_date_st': fields.date('Старт'),
+
+        'design_date_fn': fields.date('Завершение'),
+        'planning_date_fn': fields.date('Завершение'),
+        'makeup_date_fn': fields.date('Завершение'),
+        'developing_date_fn': fields.date('Завершение'),
+        'testing_date_fn': fields.date('Завершение'),
+
         'date_end': fields.date('Production'),
-        'days': fields.integer('Длительность')
+        'search_date': fields.date('Дата для поиска')
     }
 
     def init(self, cr):
@@ -35,32 +115,106 @@ class ReportDaySite(Model):
             create or replace view report_day_site as (
                 SELECT
                     row_number() over() as id,
-                        pl.partner_id,
-                        pss.stage,
-                        pss.plan_date_st,
-                        pss.plan_date_fn,
-                        pss.real_date_st,
-                        pss.real_date_fn,
-                        ps.date_end,
-                        (pss.real_date_fn - pss.real_date_st) as days,
+                       r.*
+                from (
+                    SELECT
+                      pl.id as launch_id,
+                      pl.partner_id,
+                      max(CASE when pss.stage = 'design' then 'design' else Null end) design_stage,
+                      max(CASE when pss.stage = 'design' then pss.plan_date_st else Null end) design_date_st,
+                      max(CASE when pss.stage = 'design' then pss.plan_date_fn else Null end) design_date_fn,
+                      max(CASE when pss.stage = 'design' then (pss.plan_date_fn - pss.plan_date_st) else Null end) design_days,
 
-                        asd.plan_date_fn as now_plan_fn,
-                        asd.stage as now_stage
+                      max(CASE when pss.stage = 'planning' then 'planning' else Null end) planning_stage,
+                      max(CASE when pss.stage = 'planning' then pss.plan_date_st else Null end) planning_date_st,
+                      max(CASE when pss.stage = 'planning' then pss.plan_date_fn else Null end) planning_date_fn,
+                      max(CASE when pss.stage = 'planning' then (pss.plan_date_fn - pss.plan_date_st) else Null end) planning_days,
+
+                      max(CASE when pss.stage = 'makeup' then 'makeup' else Null end) makeup_stage,
+                      max(CASE when pss.stage = 'makeup' then pss.plan_date_st else Null end) makeup_date_st,
+                      max(CASE when pss.stage = 'makeup' then pss.plan_date_fn else Null end) makeup_date_fn,
+                      max(CASE when pss.stage = 'makeup' then (pss.plan_date_fn - pss.plan_date_st) else Null end) makeup_days,
+
+                      max(CASE when pss.stage = 'developing' then 'developing' else Null end) developing_stage,
+                      max(CASE when pss.stage = 'developing' then pss.plan_date_st else Null end) developing_date_st,
+                      max(CASE when pss.stage = 'developing' then pss.plan_date_fn else Null end) developing_date_fn,
+                      max(CASE when pss.stage = 'developing' then (pss.plan_date_fn - pss.plan_date_st) else Null end) developing_days,
+
+                      max(CASE when pss.stage = 'testing' then 'testing' else Null end) testing_stage,
+                      max(CASE when pss.stage = 'testing' then pss.plan_date_st else Null end) testing_date_st,
+                      max(CASE when pss.stage = 'testing' then pss.plan_date_fn else Null end) testing_date_fn,
+                      max(CASE when pss.stage = 'testing' then (pss.plan_date_fn - pss.plan_date_st) else Null end) testing_days,
+
+                      max(ps.date_end) as date_end,
+                      max(ps.date_end) as search_date,
+                      'П' as type
+
 
                     from process_site ps
                     join process_launch pl
                       on (pl.id = ps.launch_id)
                     join process_site_stage pss
                       on (pss.site_id = ps.id)
-                    left join (
-                    SELECT
-                      s.id,
-                      ss.plan_date_fn,
-                      ss.stage
-                    FROM process_site s
-                      LEFT JOIN process_site_stage ss on (ss.site_id=s.id)
-                    WHERE ss.real_date_fn is NULL AND real_date_st is not null) asd on (asd.id=ps.id)
+
                     where ps.state = 'work' and pss.plan_date_fn is not NULL and pss.plan_date_st is not NULL and pss.real_date_st is not NULL
+                    group by pl.id
+
+                UNION
+
+                SELECT
+                      pl.id as launch_id,
+                      pl.partner_id,
+                      max(CASE when pss.stage = 'design' then 'design' else Null end) design_stage,
+                      max(CASE when pss.stage = 'design' then pss.real_date_st else Null end) design_date_st,
+                      max(CASE when pss.stage = 'design' then pss.real_date_fn else Null end) design_date_fn,
+                      max(CASE when pss.stage = 'design' then (pss.real_date_fn - pss.real_date_st) else Null end) design_days,
+
+                      max(CASE when pss.stage = 'planning' then 'planning' else Null end) planning_stage,
+                      max(CASE when pss.stage = 'planning' then pss.real_date_st else Null end) planning_date_st,
+                      max(CASE when pss.stage = 'planning' then pss.real_date_fn else Null end) planning_date_fn,
+                      max(CASE when pss.stage = 'planning' then (pss.real_date_fn - pss.real_date_st) else Null end) planning_days,
+
+                      max(CASE when pss.stage = 'makeup' then 'makeup' else Null end) makeup_stage,
+                      max(CASE when pss.stage = 'makeup' then pss.real_date_st else Null end) makeup_date_st,
+                      max(CASE when pss.stage = 'makeup' then pss.real_date_fn else Null end) makeup_date_fn,
+                      max(CASE when pss.stage = 'makeup' then (pss.real_date_fn - pss.real_date_st) else Null end) makeup_days,
+
+                      max(CASE when pss.stage = 'developing' then 'developing' else Null end) developing_stage,
+                      max(CASE when pss.stage = 'developing' then pss.real_date_st else Null end) developing_date_st,
+                      max(CASE when pss.stage = 'developing' then pss.real_date_fn else Null end) developing_date_fn,
+                      max(CASE when pss.stage = 'developing' then (pss.real_date_fn - pss.real_date_st) else Null end) developing_days,
+
+                      max(CASE when pss.stage = 'testing' then 'testing' else Null end) testing_stage,
+                      max(CASE when pss.stage = 'testing' then pss.real_date_st else Null end) testing_date_st,
+                      max(CASE when pss.stage = 'testing' then pss.real_date_fn else Null end) testing_date_fn,
+                      max(CASE when pss.stage = 'testing' then (pss.real_date_fn - pss.real_date_st) else Null end) testing_days,
+
+                      max(ps.date_end) as date_end,
+                      max(ps.date_end) as search_date,
+                      'Ф' as type
+
+                    from process_site ps
+                    join process_launch pl
+                      on (pl.id = ps.launch_id)
+                    join process_site_stage pss
+                      on (pss.site_id = ps.id)
+
+                    where ps.state = 'work' and pss.plan_date_fn is not NULL and pss.plan_date_st is not NULL and pss.real_date_st is not NULL
+                    group by pl.id) as r
             )""")
+
+    def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
+        if args:
+            if context is None:
+                context = dict()
+            i = 0
+            for record in args:
+                if record[0] == 'search_date':
+                    context['date'] = record[2]
+                    del args[i]
+                i += 1
+
+        return super(ReportDaySite, self).search(cr, user, args, offset, limit, order, context, count)
+
 
 ReportDaySite()
