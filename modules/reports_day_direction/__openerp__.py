@@ -11,6 +11,7 @@
 - CALL (call_in call_out)
 - SMM
 - SITE
+- VIDEO
     """,
     'author': 'Andrey Karbanovich',
     'website': 'http://upsale.ru',
@@ -25,6 +26,7 @@
         'views/view_call_out.xml',
         'views/view_smm.xml',
         'views/view_site.xml',
+        'views/view_video.xml',
         #'workflow.xml',
     ],
 
