@@ -106,7 +106,12 @@ class ProcessSeo(Model):
             'Переписка по проекту',
             domain=[('process_model', '=', _name)],
             context={'process_model': _name}),
-
+        'sla_ids': fields.one2many(
+            'process.sla',
+            'process_id',
+            'SLA',
+            domain=[('process_model', '=', _name)],
+            context={'type': 'seo', 'process_model': _name}),
         'costs_ids': fields.one2many(
             'process.costs',
             'process_id',

@@ -80,6 +80,12 @@ class ProcessPPC(Model):
             'Переписка по проекту',
             domain=[('process_model', '=', _name)],
             context={'process_model': _name}),
+        'sla_ids': fields.one2many(
+            'process.sla',
+            'process_id',
+            'SLA',
+            domain=[('process_model', '=', _name)],
+            context={'type': 'ppc', 'process_model': _name}),
 
         'access_ids': fields.one2many(
             'process.ppc.access',

@@ -772,6 +772,7 @@ class ProcessIndicators(Model):
                 ('smm', 'smm'),
                 ('seo', 'seo'),
                 ('ppc', 'ppc'),
+                ('site', 'site'),
             ), "Тип показателя", required=True
         ),
     }
@@ -825,6 +826,33 @@ class ProcessSla(Model):
 
     def save(self, cr, uid, ids, context=None):
         return {'type': 'ir.actions.act_window_close'}
+
+    def set_sla_data(self, cr, period_id, partner_id, service_id, avg_mbo):
+        res_partner_quality_control = self.pool.get('res.partner.quality.control')
+        ids = res_partner_quality_control.search(cr, 1, [
+            ('period_id', '=', period_id),
+            ('partner_id', '=', partner_id),
+            ('service_id', '=', service_id)
+        ])
+        if ids:
+            return res_partner_quality_control.write(cr, 1, ids, {'mbo': avg_mbo})
+
+    def create(self, cr, user, vals, context=None):
+        if vals.get('avg_mbo'):
+            if vals.get('process_model') and vals.get('process_id'):
+                data = self.pool.get(vals['process_model']).read(cr, 1, vals['process_id'], ['partner_id', 'service_id'])
+                self.set_sla_data(cr, vals['period_id'], data['partner_id'][0], data['service_id'][0], vals['avg_mbo'])
+        return super(ProcessSla, self).create(cr, user, vals, context)
+
+    def write(self, cr, user, ids, vals, context=None):
+        #self.read(cr, 1, ids, ['process_id', 'period_id', 'avg_mbo'])
+        if vals.get('avg_mbo'):
+            for record in self.read(cr, 1, ids, ['process_id', 'period_id', 'process_model']):
+                data = self.pool.get(record['process_model']).read(cr, 1, record['process_id'], ['partner_id', 'service_id'])
+                self.set_sla_data(cr, record['period_id'][0], data['partner_id'][0], data['service_id'][0], vals['avg_mbo'])
+        return super(ProcessSla, self).write(cr, user, ids, vals, context)
+
+
 
 ProcessSla()
 
