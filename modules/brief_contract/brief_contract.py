@@ -733,6 +733,7 @@ class BriefContract(Model):
                 'partner_rs': u'-',
                 #  бик партнера
                 'partner_bik': u'-',
+                'partner_kpp': u'-',
                 #  Тел/факс партнера
                 'partner_phone': u'-',
                 #  Web сайт почта партнера
