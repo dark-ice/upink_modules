@@ -41,7 +41,7 @@ class ReportDaySite(Model):
                     if record['design_date_st'] <= context['date'] <= record['design_date_fn']:
                         process_name = 'Дизайн'
                         process_date = record['design_date_fn']
-                else:
+                elif record['design_date_st']:
                     if record['design_date_st'] <= context['date']:
                         process_name = 'Дизайн'
                         process_date = record['design_date_fn']
@@ -50,7 +50,7 @@ class ReportDaySite(Model):
                     if record['planning_date_st'] <= context['date'] <= record['planning_date_fn']:
                         process_name = 'Проектирование'
                         process_date = record['planning_date_fn']
-                else:
+                elif record['planning_date_st']:
                     if record['planning_date_st'] <= context['date']:
                         process_name = 'Проектирование'
                         process_date = record['planning_date_fn']
@@ -59,7 +59,7 @@ class ReportDaySite(Model):
                     if record['makeup_date_st'] <= context['date'] <= record['makeup_date_fn']:
                         process_name = 'Верстка'
                         process_date = record['makeup_date_fn']
-                else:
+                elif record['makeup_date_st']:
                     if record['makeup_date_st'] <= context['date']:
                         process_name = 'Верстка'
                         process_date = record['makeup_date_fn']
@@ -68,7 +68,7 @@ class ReportDaySite(Model):
                     if record['developing_date_st'] <= context['date'] <= record['developing_date_fn']:
                         process_name = 'Программирование'
                         process_date = record['developing_date_fn']
-                else:
+                elif record['developing_date_st']:
                     if record['developing_date_st'] <= context['date']:
                         process_name = 'Программирование'
                         process_date = record['developing_date_fn']
@@ -77,7 +77,7 @@ class ReportDaySite(Model):
                     if record['testing_date_st'] <= context['date'] <= record['testing_date_fn']:
                         process_name = 'Тестирование'
                         process_date = record['testing_date_fn']
-                else:
+                elif record['testing_date_st']:
                     if record['testing_date_st'] <= context['date']:
                         process_name = 'Тестирование'
                         process_date = record['testing_date_fn']
