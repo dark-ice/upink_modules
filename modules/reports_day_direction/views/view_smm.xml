@@ -44,8 +44,8 @@
                     <field name="report" readonly="1"/>
                     <field name="date_start_plan" readonly="1"/>
                     <field name="kpi_index" readonly="1"/>
-                    <field name="kpi_target" readonly="1"/>
-                    <field name="old_point" readonly="1" />
+                    <field name="kpi_target" readonly="1" avg=""/>
+                    <field name="old_point" readonly="1" avg=""/>
                     <field name="date" readonly="1" />
                     <field name="index_point" readonly="1" />
                 </tree>

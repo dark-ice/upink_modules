@@ -66,12 +66,12 @@ class ReportDaySmm(Model):
         'partner_id': fields.many2one('res.partner', "Проект"),
         'date': fields.date('Дата'),
         'service_id': fields.many2one('brief.services.stage', 'Услуга'),
-        'work_start': fields.date('Начало работы'),
+        'work_start': fields.date('Старт работы'),
         'report': fields.char('Отчет', size=256),
         'date_start_plan': fields.date('Дата начала периода'),
         'kpi_index': fields.many2one('process.sla.indicators', 'Показатель KPI', domain="[('type', '=', 'smm')]"),
-        'kpi_target': fields.float('Цель по KPI'),
-        'old_point': fields.float('Показатель за предыдущий период', group_operator='avg'),
+        'kpi_target': fields.float('Цель по KPI', group_operator='avg'),
+        'old_point': fields.float('Значение показателя за предыдущий период', group_operator='avg'),
         'index_point': fields.float('Значение показателя за текущий период', group_operator='sum'),
     }
 
