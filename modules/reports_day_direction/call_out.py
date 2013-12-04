@@ -27,6 +27,7 @@ class ReportDayCallOutStatistic(Model):
         'partner_give': fields.integer('Передано Партнеру')
     }
 
+
 ReportDayCallOutStatistic()
 
 
@@ -36,6 +37,22 @@ class ReportDayCallOut(Model):
     _auto = False
     _order = 'date'
 
+    def _get_data(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.read(cr, uid, ids, ['partner_id'], context):
+            if record.get('partner_id'):
+                records_ids = self.search(cr, 1, [('partner_id', '=', record['partner_id'][0])])
+                contact_end_status_num_sum = 0.0
+                partner_give_sum = 0.0
+                for one_id in records_ids:
+                    data = self.read(cr, uid, one_id, ['partner_give', 'contact_end_status_num'])
+                    contact_end_status_num_sum += data['contact_end_status_num']
+                    partner_give_sum += data['partner_give']
+                res[record['id']] = {
+                    'current_conversion_general': (partner_give_sum / contact_end_status_num_sum),
+                }
+        return res
+
     _columns = {
         'date_start': fields.date('Дата начала'),
         'date_end': fields.date('Дата конца'),
@@ -44,11 +61,19 @@ class ReportDayCallOut(Model):
         'date': fields.date('дата'),
         'target_date_start': fields.char('Плановая дата запуска', size=1024),
         'target_date_end': fields.char('Плановая дата завершения', size=1024),
-        'contact_num': fields.integer('Всего контактов для прозвона', group_operator='sum'),
+        'contact_num': fields.integer('Всего контактов для прозвона', group_operator='avg'),
         'contact_end_status_num': fields.integer('С конечным статусом', group_operator='sum'),
         'coll_num': fields.integer('Совершено звонков', group_operator='sum'),
         'conversion': fields.float('Конверсия', group_operator='sum'),
-        'current_conversion': fields.float('Текущая конверсия', group_operator='sum')
+        'current_conversion': fields.float('Текущая конверсия'),
+        'partner_give': fields.integer('Передано Партнеру'),
+        'current_conversion_general': fields.function(
+            _get_data,
+            type='float',
+            multi='need_date',
+            string='Текущая конверсия (итого)',
+            group_operator='avg'
+        )
     }
 
     def init(self, cr):
@@ -100,6 +125,8 @@ class ReportDayCallOut(Model):
             if item[0] == 'date_end':
                 item[0] = 'date'
                 item[1] = '<='
-        return super(ReportDayCallOut, self).read_group(cr, uid, domain, fields, groupby, offset, limit, context, orderby)
+        return super(ReportDayCallOut, self).read_group(cr, uid, domain, fields, groupby, offset, limit, context,
+                                                        orderby)
+
 
 ReportDayCallOut()
