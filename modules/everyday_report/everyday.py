@@ -23,7 +23,7 @@ class DayReportPlan(Model):
         'section_id': fields.many2one(
             'crm.case.section',
             'Поднаправление',
-            domain=[('id', 'child_of', [6])]
+            domain=[('id', 'in', [8, 7, 9])]
         ),
         'date': fields.date('Дата'),
         'plan': fields.float('План'),
