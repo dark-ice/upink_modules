@@ -182,7 +182,7 @@ class ReportDaySite(Model):
                     join process_site_stage pss
                       on (pss.site_id = ps.id)
 
-                    where pss.plan_date_fn is not NULL and pss.plan_date_st is not NULL and pss.real_date_st is not NULL
+                    where pss.plan_date_fn is not NULL and pss.plan_date_st is not NULL
                     group by pl.id
 
                 UNION
@@ -225,7 +225,7 @@ class ReportDaySite(Model):
                     join process_site_stage pss
                       on (pss.site_id = ps.id)
 
-                    where pss.plan_date_fn is not NULL and pss.plan_date_st is not NULL and pss.real_date_st is not NULL
+                    where pss.plan_date_fn is not NULL and pss.plan_date_st is not NULL
                     group by pl.id) as r order by r.launch_id, r.type
             )""")
 
