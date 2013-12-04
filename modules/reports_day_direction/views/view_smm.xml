@@ -72,8 +72,8 @@
                         <!--<separator orientation="vertical"/>-->
                         <filter string="Услуга" icon="stock_calendar" name="Service" context="{'group_by':'service_id'}"/>
                         <separator orientation="vertical"/>
-                        <!--<filter string="Значения" icon="stock_calendar" name="Service" context="{'group_by': ['partner_id', 'kpi_index', 'date_start_plan']}"/>-->
-                        <!--<separator orientation="vertical"/>-->
+                        <filter string="Показатель" icon="stock_calendar" name="Service" context="{'group_by': ['kpi_index']}"/>
+                        <separator orientation="vertical"/>
                     </group>
                 </search>
             </field>

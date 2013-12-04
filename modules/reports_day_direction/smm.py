@@ -89,6 +89,7 @@ class ReportDaySmm(Model):
         'work_start': fields.date('Старт работы'),
         'report': fields.char('Отчет', size=256),
         'date_start_plan': fields.date('Дата начала периода'),
+        'date_end_plan': fields.date('Дата конца периода'),
         'kpi_index': fields.many2one('process.sla.indicators', 'Показатель KPI', domain="[('type', '=', 'smm')]"),
         'kpi_target': fields.float('Цель по KPI'),
         'old_point': fields.float('Значение показателя за предыдущий период'),
@@ -116,6 +117,7 @@ class ReportDaySmm(Model):
                     sp.work_start,
                     sp.report,
                     sp.date_start date_start_plan,
+                    sp.date_end date_end_plan,
                     sp.kpi_index,
                     sp.kpi_target,
                     o.fact old_point,
@@ -148,14 +150,27 @@ class ReportDaySmm(Model):
             )""")
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
-        for item in args:
+        index_list = list()
+        date_start = ''
+        date_end = ''
+        for k, item in enumerate(args):
             if item[0] == 'date_start':
-                item[0] = 'date'
-                item[1] = '>='
-
+                index_list.append(k)
+                date_start = item[2]
             if item[0] == 'date_end':
-                item[0] = 'date'
-                item[1] = '<='
+                index_list.append(k)
+                date_end = item[2]
+
+        for index in reversed(index_list):
+            del args[index]
+
+        if date_end:
+            args.extend(['&', ['date_start_plan', '>=', date_start], ['date_start_plan', '<=', date_end]])
+        if date_start:
+            args.extend(['&', ['date_end_plan', '>=', date_start], ['date_end_plan', '<=', date_end]])
+        if date_start and date_end:
+            args = ['|'] + args
+
         return super(ReportDaySmm, self).search(cr, user, args, offset, limit, order, context, count)
 
     def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False):
