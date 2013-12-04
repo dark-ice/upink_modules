@@ -27,6 +27,7 @@ class ReportDaySmmStatisticPlan(Model):
         ),
     }
 
+
 ReportDaySmmStatisticPlan()
 
 
@@ -50,6 +51,7 @@ class ReportDaySmmStatisticFact(Model):
         ),
     }
 
+
 ReportDaySmmStatisticFact()
 
 
@@ -57,6 +59,24 @@ class ReportDaySmm(Model):
     _name = "report.day.smm"
     _description = u"Отчет по smm"
     _auto = False
+
+    def _get_data(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        for record in self.read(cr, uid, ids, ['partner_id', 'kpi_index', 'date_start_plan'], context):
+            if record.get('partner_id') and record.get('kpi_index') and record.get('date_start_plan'):
+                records_ids = self.search(cr, 1, [
+                    ('partner_id', '=', record['partner_id'][0]),
+                    ('kpi_index', '=', record['kpi_index'][0]),
+                    ('date_start_plan', '=', record['date_start_plan'])
+                ])
+                need_sum = 0.0
+                for one_id in records_ids:
+                    point = self.read(cr, uid, one_id, ['index_point'])
+                    need_sum += point['index_point']
+                    res[record['id']] = {
+                        'index_point_for_current': need_sum,
+                    }
+        return res
 
     _columns = {
         'date_start': fields.date('Дата начала'),
@@ -70,9 +90,15 @@ class ReportDaySmm(Model):
         'report': fields.char('Отчет', size=256),
         'date_start_plan': fields.date('Дата начала периода'),
         'kpi_index': fields.many2one('process.sla.indicators', 'Показатель KPI', domain="[('type', '=', 'smm')]"),
-        'kpi_target': fields.float('Цель по KPI', group_operator='avg'),
-        'old_point': fields.float('Значение показателя за предыдущий период', group_operator='avg'),
-        'index_point': fields.float('Значение показателя за текущий период', group_operator='sum'),
+        'kpi_target': fields.float('Цель по KPI'),
+        'old_point': fields.float('Значение показателя за предыдущий период'),
+        'index_point': fields.float('Значение показателя'),
+        'index_point_for_current': fields.function(
+            _get_data,
+            type='float',
+            multi='need_date',
+            string='Значение показателя за текущий период',
+        )
     }
 
     def init(self, cr):
@@ -142,5 +168,6 @@ class ReportDaySmm(Model):
                 item[0] = 'date'
                 item[1] = '<='
         return super(ReportDaySmm, self).read_group(cr, uid, domain, fields, groupby, offset, limit, context, orderby)
+
 
 ReportDaySmm()

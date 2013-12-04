@@ -44,10 +44,11 @@
                     <field name="report" readonly="1"/>
                     <field name="date_start_plan" readonly="1"/>
                     <field name="kpi_index" readonly="1"/>
-                    <field name="kpi_target" readonly="1" avg=""/>
-                    <field name="old_point" readonly="1" avg=""/>
+                    <field name="kpi_target" readonly="1"/>
+                    <field name="old_point" readonly="1" />
+                    <field name="index_point_for_current" readonly="1" />
                     <field name="date" readonly="1" />
-                    <field name="index_point" readonly="1" sum=""/>
+                    <field name="index_point" readonly="1" />
                 </tree>
             </field>
         </record>
@@ -71,6 +72,8 @@
                         <!--<separator orientation="vertical"/>-->
                         <filter string="Услуга" icon="stock_calendar" name="Service" context="{'group_by':'service_id'}"/>
                         <separator orientation="vertical"/>
+                        <!--<filter string="Значения" icon="stock_calendar" name="Service" context="{'group_by': ['partner_id', 'kpi_index', 'date_start_plan']}"/>-->
+                        <!--<separator orientation="vertical"/>-->
                     </group>
                 </search>
             </field>
