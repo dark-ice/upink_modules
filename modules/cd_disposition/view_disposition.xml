@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_cd_disposition_form" model="ir.ui.view">
+            <field name="name">Распоряжения</field>
+            <field name="model">cd.disposition</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="check_f"/>
+                        <field name="check_a"/>
+                    </group>
+                    <group>
+                        <field name="id" string="Номер распорядения" />
+                        <field name="disposition_date" />
+                        <field name="user_id" />
+                        <field name="line" />
+                        <field name="category_id"/>
+                    </group>
+                    <group>
+                        <field name="direction_name"/>
+                        <field name="employee_id"/>
+                        <field name="job_id"/>
+                        <field name="department_id"/>
+                        <field name="next_job_id"/>
+                        <field name="next_department_id"/>
+                        <field name="remark"/>
+                        <field name="seeing"/>
+                        <field name="amount"/>
+                        <field name="from_date"/>
+                        <field name="on_date"/>
+                        <field name="from_date_second"/>
+                        <field name="on_date_second"/>
+                        <field name="to_date"/>
+
+
+                        <field name="salary"/>
+                        <field name="salary_per"/>
+                        <field name="variable"/>
+                        <field name="variable_per"/>
+                        <field name="grade_id"/>
+                        <field name="reason"/>
+                        <field name="period_id"/>
+                        <field name="at_rate"/>
+                        <field name="not_later_date"/>
+                        <field name="financier_id"/>
+                        <field name="date_ot"/>
+                        <field name="year"/>
+                        <field name="no_work"/>
+                        <field name="work_day"/>
+                        <field name="not_later_date_second"/>
+                        <field name="term"/>
+                        <field name="trip"/>
+                        <field name="trip_place"/>
+                        <field name="financing_source"/>
+                        <field name="teacher_id"/>
+                        <field name="post_probation_grade_id"/>
+                        <field name="probation_grade_id"/>
+                        <field name="duration_probation"/>
+                        <field name="next_attestation"/>
+                    </group>
+
+
+                    <field name="comments"/>
+                    <field name="on_date"/>
+                    <field name="working_off"/>
+                    <field name="working_dates"/>
+                    <field name="working_off_days"/>
+                    <field name="motive_rewarding"/>
+                    <field name="promotion_type"/>
+                    <field name="commission_ids"/>
+                    <field name="statement_date"/>
+                    <field name="instate_date"/>
+
+                </form>
+            </field>
+        </record>
+
+        <record id="view_cd_disposition_tree" model="ir.ui.view">
+            <field name="name">Распоряжения</field>
+            <field name="model">cd.disposition</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="id" string="Номер распорядения"/>
+                    <field name="disposition_date"/>
+                    <field name="line"/>
+                    <field name="category_id" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_cd_disposition" model="ir.actions.act_window">
+            <field name="name">Распоряжения</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">cd.disposition</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_cd_disposition_tree"/>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+            <field name="target">inline</field>
+        </record>
+        <menuitem action="action_cd_disposition" id="disposal_menuitem" parent="company_documents.company_notes_list"/>
+    </data>
+</openerp>

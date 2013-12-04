@@ -10,13 +10,14 @@
     """,
     'author': 'Andrey Karbanovich',
     'website': 'http://upsale.ru',
-    'depends': ['base', ],
+    'depends': ['base', 'hr', 'kpi'],
     'data': [],
     'installable': True,
     'auto_install': False,
     'update_xml': [
         #'security/ir.model.access.csv',
-        'view.xml',
+        'view_items.xml',
+        'view_disposition.xml',
     ],
 
     'js': [],

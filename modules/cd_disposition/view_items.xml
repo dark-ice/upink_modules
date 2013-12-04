@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_cd_disposition_category_form" model="ir.ui.view">
+            <field name="name">Распоряжения - Категории</field>
+            <field name="model">cd.disposition.category</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <field name="name"/>
+                    <field name="line"/>
+                    <field name="template_id" colspan="4" />
+                    <field name="field_ids" colspan="4" />
+                </form>
+            </field>
+        </record>
+
+        <record id="view_cd_disposition_category_tree" model="ir.ui.view">
+            <field name="name">Распоряжения - Категории</field>
+            <field name="model">cd.disposition.category</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="line"/>
+                    <field name="template_id" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_cd_disposition_category" model="ir.actions.act_window">
+            <field name="name">Распоряжения - Категории</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">cd.disposition.category</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_cd_disposition_category_tree"/>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+            <field name="target">inline</field>
+        </record>
+
+        <menuitem action="action_cd_disposition_category" id="menu_cd_settings_disposition_category" parent="company_documents.menu_company_notes_config"/>
+    </data>
+</openerp>
