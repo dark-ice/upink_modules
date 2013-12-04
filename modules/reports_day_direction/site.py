@@ -16,6 +16,7 @@ class ReportDaySite(Model):
     _name = "report.day.site"
     _description = u"Отчет по сайтам"
     _auto = False
+    _order = "launch_id"
 
     def _get_data(self, cr, uid, ids, name, arg, context=None):
         res = {}
