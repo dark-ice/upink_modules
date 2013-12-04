@@ -16,19 +16,19 @@
                     <field name="makeup_days" readonly="1" />
                     <field name="developing_days" readonly="1" />
                     <field name="testing_days" readonly="1" />
-                    <field name="planning_stage" readonly="1" />
+                    <!--<field name="planning_stage" readonly="1" />-->
                     <field name="planning_date_st" readonly="1" />
                     <field name="planning_date_fn" readonly="1" />
-                    <field name="design_stage" readonly="1" />
+                    <!--<field name="design_stage" readonly="1" />-->
                     <field name="design_date_st" readonly="1" />
                     <field name="design_date_fn" readonly="1" />
-                    <field name="makeup_stage" readonly="1" />
+                    <!--<field name="makeup_stage" readonly="1" />-->
                     <field name="makeup_date_st" readonly="1" />
                     <field name="makeup_date_fn" readonly="1" />
-                    <field name="developing_stage" readonly="1" />
+                    <!--<field name="developing_stage" readonly="1" />-->
                     <field name="developing_date_st" readonly="1" />
                     <field name="developing_date_fn" readonly="1" />
-                    <field name="testing_stage" readonly="1" />
+                    <!--<field name="testing_stage" readonly="1" />-->
                     <field name="testing_date_st" readonly="1" />
                     <field name="testing_date_fn" readonly="1" />
                     <field name="date_end" readonly="1" />
@@ -45,12 +45,13 @@
                 <search>
                     <group>
                         <field name="search_date" />
+                        <field name="partner_id" />
                     </group>
-                    <newline/>
-                    <group expand="0" string="Группировать по...">
-                        <filter string="Проект" icon="terp-partner" name="Partner" context="{'group_by':'partner_id'}"/>
-                        <separator orientation="vertical"/>
-                    </group>
+                    <!--<newline/>-->
+                    <!--<group expand="0" string="Группировать по...">-->
+                        <!--<filter string="Проект" icon="terp-partner" name="Partner" context="{'group_by':'partner_id'}"/>-->
+                        <!--<separator orientation="vertical"/>-->
+                    <!--</group>-->
                 </search>
             </field>
         </record>
@@ -62,7 +63,7 @@
             <field name="view_mode">tree</field>
             <field name="view_id" ref="view_rep_site"/>
             <field name="search_view_id" ref="view_rep_site_search"/>
-            <field name="context">{}</field>
+            <field name="context">{'search_default_search_date': time.strftime('%Y-%m-%d')}</field>
         </record>
 
 

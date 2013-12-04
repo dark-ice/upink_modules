@@ -36,25 +36,50 @@ class ReportDaySite(Model):
             process_name = '-'
             process_date = ''
             if context.get('date'):
-                if record['design_date_st'] <= context['date'] <= record['design_date_fn']:
-                    process_name = 'Дизайн'
-                    process_date = record['design_date_fn']
+                if record['design_date_fn']:
+                    if record['design_date_st'] <= context['date'] <= record['design_date_fn']:
+                        process_name = 'Дизайн'
+                        process_date = record['design_date_fn']
+                else:
+                    if record['design_date_st'] <= context['date']:
+                        process_name = 'Дизайн'
+                        process_date = record['design_date_fn']
 
-                if record['planning_date_st'] <= context['date'] <= record['planning_date_fn']:
-                    process_name = 'Проектирование'
-                    process_date = record['planning_date_fn']
+                if record['planning_date_fn']:
+                    if record['planning_date_st'] <= context['date'] <= record['planning_date_fn']:
+                        process_name = 'Проектирование'
+                        process_date = record['planning_date_fn']
+                else:
+                    if record['planning_date_st'] <= context['date']:
+                        process_name = 'Проектирование'
+                        process_date = record['planning_date_fn']
 
-                if record['makeup_date_st'] <= context['date'] <= record['makeup_date_fn']:
-                    process_name = 'Верстка'
-                    process_date = record['makeup_date_fn']
+                if record['makeup_date_fn']:
+                    if record['makeup_date_st'] <= context['date'] <= record['makeup_date_fn']:
+                        process_name = 'Верстка'
+                        process_date = record['makeup_date_fn']
+                else:
+                    if record['makeup_date_st'] <= context['date']:
+                        process_name = 'Верстка'
+                        process_date = record['makeup_date_fn']
 
-                if record['developing_date_st'] <= context['date'] <= record['developing_date_fn']:
-                    process_name = 'Программирование'
-                    process_date = record['developing_date_fn']
+                if record['developing_date_fn']:
+                    if record['developing_date_st'] <= context['date'] <= record['developing_date_fn']:
+                        process_name = 'Программирование'
+                        process_date = record['developing_date_fn']
+                else:
+                    if record['developing_date_st'] <= context['date']:
+                        process_name = 'Программирование'
+                        process_date = record['developing_date_fn']
 
-                if record['testing_date_st'] <= context['date'] <= record['testing_date_fn']:
-                    process_name = 'Тестирование'
-                    process_date = record['testing_date_fn']
+                if record['testing_date_fn']:
+                    if record['testing_date_st'] <= context['date'] <= record['testing_date_fn']:
+                        process_name = 'Тестирование'
+                        process_date = record['testing_date_fn']
+                else:
+                    if record['testing_date_st'] <= context['date']:
+                        process_name = 'Тестирование'
+                        process_date = record['testing_date_fn']
 
             res[record['id']] = {
                 'process_name': process_name,
@@ -93,17 +118,17 @@ class ReportDaySite(Model):
         'developing_stage': fields.selection(STAGES, 'Программирование'),
         'testing_stage': fields.selection(STAGES, 'Тестирование'),
 
-        'design_date_st': fields.date('Старт'),
-        'planning_date_st': fields.date('Старт'),
-        'makeup_date_st': fields.date('Старт'),
-        'developing_date_st': fields.date('Старт'),
-        'testing_date_st': fields.date('Старт'),
+        'design_date_st': fields.date('Дизайн старт'),
+        'planning_date_st': fields.date('Планирование старт'),
+        'makeup_date_st': fields.date('Верстка старт'),
+        'developing_date_st': fields.date('Программирование старт'),
+        'testing_date_st': fields.date('Тестирование старт'),
 
-        'design_date_fn': fields.date('Завершение'),
-        'planning_date_fn': fields.date('Завершение'),
-        'makeup_date_fn': fields.date('Завершение'),
-        'developing_date_fn': fields.date('Завершение'),
-        'testing_date_fn': fields.date('Завершение'),
+        'design_date_fn': fields.date('Дизайн завершение'),
+        'planning_date_fn': fields.date('Планирование завершение'),
+        'makeup_date_fn': fields.date('Верстка завершение'),
+        'developing_date_fn': fields.date('Программирование завершение'),
+        'testing_date_fn': fields.date('Тестирование завершение'),
 
         'date_end': fields.date('Production'),
         'search_date': fields.date('Дата для поиска')
@@ -156,7 +181,7 @@ class ReportDaySite(Model):
                     join process_site_stage pss
                       on (pss.site_id = ps.id)
 
-                    where ps.state = 'work' and pss.plan_date_fn is not NULL and pss.plan_date_st is not NULL and pss.real_date_st is not NULL
+                    where pss.plan_date_fn is not NULL and pss.plan_date_st is not NULL and pss.real_date_st is not NULL
                     group by pl.id
 
                 UNION
@@ -199,8 +224,8 @@ class ReportDaySite(Model):
                     join process_site_stage pss
                       on (pss.site_id = ps.id)
 
-                    where ps.state = 'work' and pss.plan_date_fn is not NULL and pss.plan_date_st is not NULL and pss.real_date_st is not NULL
-                    group by pl.id) as r
+                    where pss.plan_date_fn is not NULL and pss.plan_date_st is not NULL and pss.real_date_st is not NULL
+                    group by pl.id) as r order by r.launch_id, r.type
             )""")
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
