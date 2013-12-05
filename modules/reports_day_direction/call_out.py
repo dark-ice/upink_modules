@@ -101,8 +101,8 @@ class ReportDayCallOut(Model):
                     s.coll_num,
                     s.partner_give,
 
-                    (cast(s.partner_give as real)/cast(c.contact_num as real)) as conversion,
-                    (cast(s.partner_give as real)/cast(s.contact_end_status_num as real)) as current_conversion
+                    case when c.contact_num is null then 0.0 else (cast(s.partner_give as real)/cast(c.contact_num as real)) end as conversion,
+                    case when s.contact_end_status_num is null then 0.0 else (cast(s.partner_give as real)/cast(s.contact_end_status_num as real)) end as current_conversion
 
                 FROM process_call_out c
                 LEFT JOIN process_launch l on (c.launch_id=l.id)

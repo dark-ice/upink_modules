@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from openerp import tools
 from openerp.osv import fields
 from openerp.osv.orm import Model
+import pytz
 
 
 class ReportDaySmmStatisticPlan(Model):
@@ -151,6 +153,7 @@ class ReportDaySmm(Model):
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
         index_list = list()
+
         date_start = ''
         date_end = ''
         for k, item in enumerate(args):
@@ -163,6 +166,10 @@ class ReportDaySmm(Model):
 
         for index in reversed(index_list):
             del args[index]
+        if not date_start and date_end:
+            date_start = datetime.now(pytz.utc)
+        if not date_end and date_start:
+            date_end = datetime.now(pytz.utc)
 
         if date_end:
             args.extend(['&', ['date_start_plan', '>=', date_start], ['date_start_plan', '<=', date_end]])
