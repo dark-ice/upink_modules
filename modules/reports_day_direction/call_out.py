@@ -48,9 +48,18 @@ class ReportDayCallOut(Model):
                     data = self.read(cr, uid, one_id, ['partner_give', 'contact_end_status_num'])
                     contact_end_status_num_sum += data['contact_end_status_num']
                     partner_give_sum += data['partner_give']
+
+                    if contact_end_status_num_sum:
+                        current_conversion_general = partner_give_sum / contact_end_status_num_sum
+                    else:
+                        current_conversion_general = 0.0
+                    if record['contact_num']:
+                        conversion = partner_give_sum/record['contact_num']
+                    else:
+                        conversion = 0.0
                 res[record['id']] = {
-                    'current_conversion_general': (partner_give_sum / contact_end_status_num_sum),
-                    'conversion': (partner_give_sum/record['contact_num'])
+                    'current_conversion_general': current_conversion_general,
+                    'conversion': conversion
                 }
         return res
 
