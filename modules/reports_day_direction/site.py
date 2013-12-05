@@ -177,7 +177,7 @@ class ReportDaySite(Model):
                       max(CASE when pss.stage = 'testing' then pss.plan_date_fn else Null end) testing_date_fn,
                       max(CASE when pss.stage = 'testing' then (pss.plan_date_fn - pss.plan_date_st) else Null end) testing_days,
 
-                      max(ps.date_end) as date_end,
+                      max(ps.date_end::date) as date_end,
                       max(ps.date_end) as search_date,
                       'П' as type
 
@@ -221,7 +221,7 @@ class ReportDaySite(Model):
                       max(CASE when pss.stage = 'testing' then pss.real_date_fn else Null end) testing_date_fn,
                       max(CASE when pss.stage = 'testing' then (pss.real_date_fn - pss.real_date_st) else Null end) testing_days,
 
-                      max(ph.create_date) as date_end,
+                      max(ph.create_date::date) as date_end,
                       max(ps.date_end) as search_date,
                       'Ф' as type
 
