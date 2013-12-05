@@ -9,6 +9,7 @@ STAGES = (
     ('makeup', 'Верстка'),
     ('developing', 'Программирование'),
     ('testing', 'Тестирование'),
+    ('production', 'Production')
 )
 
 
@@ -32,6 +33,7 @@ class ReportDaySite(Model):
             'developing_date_fn',
             'testing_date_st',
             'testing_date_fn',
+            'date_end'
         ], context):
 
             process_name = '-'
@@ -81,6 +83,11 @@ class ReportDaySite(Model):
                     if record['testing_date_st'] <= context['date']:
                         process_name = 'Тестирование'
                         process_date = record['testing_date_fn']
+
+                else:
+                    if record['date_end'] and record['date_end'] <= context['date']:
+                        process_name = 'Production'
+                        process_date = record['date_end']
 
             res[record['id']] = {
                 'process_name': process_name,

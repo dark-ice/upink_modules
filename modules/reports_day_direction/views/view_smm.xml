@@ -63,6 +63,9 @@
                     <group>
                         <field name="date_start" />
                         <field name="date_end" />
+                        <field name="partner_id" />
+                        <field name="service_id" />
+                        <field name="kpi_index" />
                     </group>
                     <newline/>
                     <group expand="0" string="Группировать по...">
