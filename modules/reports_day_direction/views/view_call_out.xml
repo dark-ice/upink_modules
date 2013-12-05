@@ -46,7 +46,7 @@
                     <field name="coll_num" readonly="1" sum=""/>
                     <field name="partner_give" readonly="1" sum=""/>
                     <field name="conversion" readonly="1" />
-                    <field name="current_conversion" readonly="1" />
+                    <!--<field name="current_conversion" readonly="1" />-->
                     <field name="current_conversion_general" readonly="1" />
                 </tree>
             </field>

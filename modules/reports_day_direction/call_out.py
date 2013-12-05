@@ -39,7 +39,7 @@ class ReportDayCallOut(Model):
 
     def _get_data(self, cr, uid, ids, name, arg, context=None):
         res = {}
-        for record in self.read(cr, uid, ids, ['partner_id'], context):
+        for record in self.read(cr, uid, ids, ['partner_id', 'contact_num'], context):
             if record.get('partner_id'):
                 records_ids = self.search(cr, 1, [('partner_id', '=', record['partner_id'][0])])
                 contact_end_status_num_sum = 0.0
@@ -50,6 +50,7 @@ class ReportDayCallOut(Model):
                     partner_give_sum += data['partner_give']
                 res[record['id']] = {
                     'current_conversion_general': (partner_give_sum / contact_end_status_num_sum),
+                    'conversion': (partner_give_sum/record['contact_num'])
                 }
         return res
 
@@ -64,15 +65,20 @@ class ReportDayCallOut(Model):
         'contact_num': fields.integer('Всего контактов для прозвона', group_operator='avg'),
         'contact_end_status_num': fields.integer('С конечным статусом', group_operator='sum'),
         'coll_num': fields.integer('Совершено звонков', group_operator='sum'),
-        'conversion': fields.float('Конверсия', group_operator='sum'),
-        'current_conversion': fields.float('Текущая конверсия'),
+        'conversion': fields.function(
+            _get_data,
+            type='float',
+            multi='need_date',
+            string='Конверсия по проекту',
+        ),
+        'current_conversion': fields.float('Текущая конверсия', group_operator='sum'),
         'partner_give': fields.integer('Передано Партнеру'),
         'current_conversion_general': fields.function(
             _get_data,
             type='float',
             multi='need_date',
-            string='Текущая конверсия (итого)',
-            group_operator='avg'
+            string='Текущая конверсия',
+
         )
     }
 
