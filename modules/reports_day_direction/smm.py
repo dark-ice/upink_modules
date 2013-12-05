@@ -93,8 +93,8 @@ class ReportDaySmm(Model):
         'date_start_plan': fields.date('Дата начала периода'),
         'date_end_plan': fields.date('Дата конца периода'),
         'kpi_index': fields.many2one('process.sla.indicators', 'Показатель KPI', domain="[('type', '=', 'smm')]"),
-        'kpi_target': fields.float('Цель по KPI'),
-        'old_point': fields.float('Значение показателя за предыдущий период'),
+        'kpi_target': fields.float('Цель по KPI', group_operator='avg'),
+        'old_point': fields.float('Значение показателя за предыдущий период', group_operator='avg'),
         'index_point': fields.float('Значение показателя'),
         'index_point_for_current': fields.function(
             _get_data,
