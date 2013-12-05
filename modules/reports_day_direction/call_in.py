@@ -91,9 +91,9 @@ class ReportDayCallIn(Model):
                     s.missed_night,
                     s.call_out,
                     s.processed_missed,
-                    case when (cast(call_in as real)+cast(missed as real)) is null then 0.0 else (cast(missed as real)/(cast(call_in as real)+cast(missed as real))) end procent,
-                    case when (cast(call_in_day as real)+cast(missed_day as real)) is null then 0.0 else (cast(missed_day as real)/(cast(call_in_day as real)+cast(missed_day as real))) end procent_day,
-                    case when (cast(call_in_night as real)+cast(missed_night as real)) is null then 0.0 else (cast(missed_night as real)/(cast(call_in_night as real)+cast(missed_night as real))) end procent_night
+                    case when (cast(call_in as real)+cast(missed as real)) = 0 then 0.0 else (cast(missed as real)/(cast(call_in as real)+cast(missed as real))) end procent,
+                    case when (cast(call_in_day as real)+cast(missed_day as real)) = 0  then 0.0 else (cast(missed_day as real)/(cast(call_in_day as real)+cast(missed_day as real))) end procent_day,
+                    case when (cast(call_in_night as real)+cast(missed_night as real)) = 0 then 0.0 else (cast(missed_night as real)/(cast(call_in_night as real)+cast(missed_night as real))) end procent_night
                 FROM process_call_in c
                 LEFT JOIN process_launch l on (c.launch_id=l.id)
                 LEFT JOIN report_day_call_in_static s on (s.process_call_in_id=c.id)
