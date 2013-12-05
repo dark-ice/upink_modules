@@ -215,7 +215,7 @@ class ReportDaySite(Model):
                       max(CASE when pss.stage = 'testing' then pss.real_date_fn else Null end) testing_date_fn,
                       max(CASE when pss.stage = 'testing' then (pss.real_date_fn - pss.real_date_st) else Null end) testing_days,
 
-                      max(ps.date_end) as date_end,
+                      max(ph.create_date) as date_end,
                       max(ps.date_end) as search_date,
                       'Ф' as type
 
@@ -224,7 +224,8 @@ class ReportDaySite(Model):
                       on (pl.id = ps.launch_id)
                     join process_site_stage pss
                       on (pss.site_id = ps.id)
-
+                    left join process_history ph
+                      on (ph.process_id = ps.id and ph.state = 'Проект закрыт' and ph.process_model = 'process.site')
                     where pss.plan_date_fn is not NULL and pss.plan_date_st is not NULL
                     group by pl.id) as r order by r.launch_id, r.type
             )""")
