@@ -84,10 +84,9 @@ class ReportDaySite(Model):
                         process_name = 'Тестирование'
                         process_date = record['testing_date_fn']
 
-                else:
-                    if record['date_end'] and record['date_end'] <= context['date']:
-                        process_name = 'Production'
-                        process_date = record['date_end']
+                if record['date_end'] and record['date_end'] <= context['date']:
+                    process_name = 'Production'
+                    process_date = record['date_end']
 
             res[record['id']] = {
                 'process_name': process_name,
