@@ -7,72 +7,139 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form>
-                    <group>
+                    <group colspan="4">
                         <field name="check_f"/>
                         <field name="check_a"/>
                     </group>
-                    <group>
+                    <group colspan="4">
                         <field name="id" string="Номер распорядения" />
                         <field name="disposition_date" />
                         <field name="user_id" />
                         <field name="line" />
                         <field name="category_id"/>
                     </group>
-                    <group>
-                        <field name="direction_name"/>
-                        <field name="employee_id"/>
-                        <field name="job_id"/>
-                        <field name="department_id"/>
-                        <field name="next_job_id"/>
-                        <field name="next_department_id"/>
-                        <field name="remark"/>
-                        <field name="seeing"/>
-                        <field name="amount"/>
-                        <field name="from_date"/>
-                        <field name="on_date"/>
-                        <field name="from_date_second"/>
-                        <field name="on_date_second"/>
-                        <field name="to_date"/>
+                    <notebook colspan="4">
+                        <page string="Распоряжение">
+                            <group colspan="4">
+                                <field name="direction_name"/>
+                                <field name="employee_id"/>
+                                <field name="fio"/>
+                                <field name="job_id"/>
+                                <field name="department_id"/>
+                                <field name="next_job_id"/>
+                                <field name="next_department_id"/>
+                                <field name="remark"/>
+                                <field name="seeing"/>
+                                <field name="amount"/>
+                                <field name="from_date"/>
+                                <field name="on_date"/>
+                                <field name="from_date_second"/>
+                                <field name="on_date_second"/>
+                                <field name="working_off_dates"/>
+                                <field name="to_date"/>
+
+                                <field name="salary"/>
+                                <field name="salary_per"/>
+                                <field name="variable"/>
+                                <field name="variable_per"/>
+                                <field name="grade_id"/>
+                                <field name="reason"/>
+                                <field name="period_id"/>
+                                <field name="motive_rewarding"/>
+                                <field name="promotion_type"/>
+                                <field name="term_str"/>
+
+                                <field name="at_rate"/>
+                                <field name="not_later_date"/>
+                                <field name="financier_id"/>
+                                <field name="date_ot"/>
+                                <field name="year"/>
+                                <field name="no_work"/>
+                                <field name="work_day"/>
+                                <field name="not_later_date_second"/>
+                                <field name="instate_date"/>
+                                <field name="term"/>
+                                <field name="trip"/>
+                                <field name="trip_place"/>
+                                <field name="financing_source"/>
+                                <field name="teacher_id"/>
+                                <field name="teacher_job_id"/>
+                                <field name="teacher_department_id"/>
+                                <field name="post_probation_grade_id"/>
+                                <field name="probation_grade_id"/>
+                                <field name="duration_probation"/>
+                                <field name="next_attestation"/>
 
 
-                        <field name="salary"/>
-                        <field name="salary_per"/>
-                        <field name="variable"/>
-                        <field name="variable_per"/>
-                        <field name="grade_id"/>
-                        <field name="reason"/>
-                        <field name="period_id"/>
-                        <field name="at_rate"/>
-                        <field name="not_later_date"/>
-                        <field name="financier_id"/>
-                        <field name="date_ot"/>
-                        <field name="year"/>
-                        <field name="no_work"/>
-                        <field name="work_day"/>
-                        <field name="not_later_date_second"/>
-                        <field name="term"/>
-                        <field name="trip"/>
-                        <field name="trip_place"/>
-                        <field name="financing_source"/>
-                        <field name="teacher_id"/>
-                        <field name="post_probation_grade_id"/>
-                        <field name="probation_grade_id"/>
-                        <field name="duration_probation"/>
-                        <field name="next_attestation"/>
-                    </group>
+                                <field name="schedule_date"/>
+                                <field name="commission_date"/>
+                                <field name="commission_ids"/>
+                                <field name="set_date"/>
+                                <field name="list_date"/>
+                                <field name="protocol_date"/>
+                                <field name="top_date"/>
+                                <field name="result_date"/>
+                                <field name="on_date"/>
+                                <field name="statement_date"/>
 
-
-                    <field name="comments"/>
-                    <field name="on_date"/>
-                    <field name="working_off"/>
-                    <field name="working_dates"/>
-                    <field name="working_off_days"/>
-                    <field name="motive_rewarding"/>
-                    <field name="promotion_type"/>
-                    <field name="commission_ids"/>
-                    <field name="statement_date"/>
-                    <field name="instate_date"/>
-
+                            </group>
+                        </page>
+                        <page string="Согласование">
+                            <button type="action"
+                                    name="%(action_disposition_agreement)d"
+                                    string="Добавить"
+                                    context="{'disposition_id': id}"
+                                    icon="gtk-convert"
+                                    colspan="4"
+                                    states="draft,agreement"
+                                    />
+                            <field name="agreement_ids" colspan="4" nolabel="1" readonly="1">
+                                    <tree string="Комиссия на согласование">
+                                        <field name="check_r" invisible="1"/>
+                                        <field name="user_id" />
+                                        <field name="agree" />
+                                        <field name="date_agree" />
+                                        <button type="object"
+                                                name="save"
+                                                string="Согласен"
+                                                icon="gtk-apply"
+                                                attrs="{'invisible': ['|', ('check_r', '=', False), ('agree', '=', True)]}"/>
+                                        <button type="object"
+                                                name="delete"
+                                                string="Удалить"
+                                                icon="gtk-delete"
+                                               />
+                                    </tree>
+                                </field>
+                        </page>
+                        <page string="Видимость">
+                            <field name="access_user_ids" colspan="2" nolabel="1"/>
+                            <field name="access_group_ids" colspan="2" nolabel="1"/>
+                        </page>
+                        <page string="Журнал">
+                            <separator colspan="4" string="Журналы всякие" />
+                        </page>
+                    </notebook>
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="draft,agreement,approval,publish"
+                           statusbar_colors='{"publish":"orange"}'
+                            />
+                    <newline />
+                    <button type="object"
+                            name="save"
+                            string="На согласование"
+                            context="{'state': 'agreement'}"
+                            icon="gtk-execute"
+                            states="draft"
+                            />
+                    <button type="object"
+                            name="save"
+                            string="Опубликовать"
+                            context="{'state': 'publish'}"
+                            icon="gtk-execute"
+                            states="approval"
+                            />
                 </form>
             </field>
         </record>
@@ -83,10 +150,12 @@
             <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree>
+                    <field name="user_id" />
                     <field name="id" string="Номер распорядения"/>
                     <field name="disposition_date"/>
                     <field name="line"/>
                     <field name="category_id" />
+                    <field name="state" />
                 </tree>
             </field>
         </record>

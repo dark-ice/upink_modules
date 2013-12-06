@@ -16,6 +16,7 @@
     'auto_install': False,
     'update_xml': [
         #'security/ir.model.access.csv',
+        'wizard/wizard_view.xml',
         'view_items.xml',
         'view_disposition.xml',
     ],
@@ -23,5 +24,5 @@
     'js': [],
     'css': [],
     'qweb': [],
-    'images': ['images/process.jpg', 'images/process_hover.jpg'],
+    'images': [],
 }

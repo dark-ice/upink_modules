@@ -1601,7 +1601,7 @@ class Export(View):
 
         records = []
         for field_name, field in fields_sequence:
-            print field_name
+            #print field_name
             if import_compat:
                 if exclude and field_name in exclude:
                     continue
