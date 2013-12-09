@@ -9,7 +9,8 @@
                 <form>
                     <field name="name"/>
                     <field name="line"/>
-                    <field name="template_id" colspan="4" />
+                    <field name="template_id" />
+                    <field name="screen_id" />
                     <field name="field_ids" colspan="4" />
                 </form>
             </field>
@@ -28,6 +29,18 @@
             </field>
         </record>
 
+        <record id="view_cd_disposition_category_search" model="ir.ui.view">
+            <field name="name">Распоряжения - Категории</field>
+            <field name="model">cd.disposition.category</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="line"/>
+                </search>
+            </field>
+        </record>
+
         <record id="action_cd_disposition_category" model="ir.actions.act_window">
             <field name="name">Распоряжения - Категории</field>
             <field name="type">ir.actions.act_window</field>
@@ -35,6 +48,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="view_cd_disposition_category_tree"/>
+            <field name="search_view_id" ref="view_cd_disposition_category_search"/>
             <field name="context">{}</field>
             <field name="domain">[]</field>
             <field name="target">inline</field>

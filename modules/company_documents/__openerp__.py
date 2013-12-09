@@ -24,11 +24,11 @@
         'company_documents.xml',
         'company_documents_data.xml',
         'company_documents_workflow.xml',
-        #'company_documents_disposal_workflow.xml',
+        'company_documents_disposal_workflow.xml',
         'company_documents_problem_note_workflow.xml',
         #'company_documents_helpdesk_workflow.xml',
         'process/helpdesk.xml',
-        #'process/disposal.xml',
+        'process/disposal.xml',
         'company_documents_production_note_workflow.xml',
 
     ],

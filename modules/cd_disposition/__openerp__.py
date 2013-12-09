@@ -1,7 +1,7 @@
 # coding=utf-8
 {
     'name': 'Распоряжения',
-    'version': '0.1',
+    'version': '1.0',
     'category': 'Documents',
     'complexity': "easy",
     'description': """
