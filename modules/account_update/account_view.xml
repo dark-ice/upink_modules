@@ -581,7 +581,7 @@
                     <filter string="Закрытые ЗДС" icon="terp-personal" domain="[('state', '=', 'close')]"/>
                     <field name="id" string="№ ЗДС"/>
                     <field name="division_id" string="Направление" />
-                    <field name="categ_id"/>
+                    <field name="categ_id" domain="[]"/>
                     <field name="card_id"/>
                     <field name="cash_mr" string="Сумма ЗДС"/>
                     <field name="currency_id"/>
