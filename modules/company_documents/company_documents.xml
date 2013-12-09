@@ -264,82 +264,82 @@
     </record>
 
     <!-- Формы для распоряжения -->
-    <record model="ir.ui.view" id="view_company_disposal_tree">
-        <field name="name">company.disposal.tree</field>
-        <field name="model">company.disposal</field>
-        <field name="type">tree</field>
-        <field name="arch" type="xml">
-            <tree string="Список распоряжений">
-                <field name="id" string="№" />
-                <field name="create_date" />
-                <field name="author" />
-                <newline />
-                <field name="name" />
-                <field name="state" />
-            </tree>
-        </field>
-    </record>
+    <!--<record model="ir.ui.view" id="view_company_disposal_tree">-->
+        <!--<field name="name">company.disposal.tree</field>-->
+        <!--<field name="model">company.disposal</field>-->
+        <!--<field name="type">tree</field>-->
+        <!--<field name="arch" type="xml">-->
+            <!--<tree string="Список распоряжений">-->
+                <!--<field name="id" string="№" />-->
+                <!--<field name="create_date" />-->
+                <!--<field name="author" />-->
+                <!--<newline />-->
+                <!--<field name="name" />-->
+                <!--<field name="state" />-->
+            <!--</tree>-->
+        <!--</field>-->
+    <!--</record>-->
 
-    <record model="ir.ui.view" id="view_company_disposal_search">
-        <field name="name">company.disposal.seach</field>
-        <field name="model">company.disposal</field>
-        <field name="type">search</field>
-        <field name="arch" type="xml">
-            <search>
-                <field name="id" string="№" />
-                <field name="create_date" />
-                <field name="author" />
-                <field name="name" />
-                <field name="state" />
-            </search>
-        </field>
-    </record>
+    <!--<record model="ir.ui.view" id="view_company_disposal_search">-->
+        <!--<field name="name">company.disposal.seach</field>-->
+        <!--<field name="model">company.disposal</field>-->
+        <!--<field name="type">search</field>-->
+        <!--<field name="arch" type="xml">-->
+            <!--<search>-->
+                <!--<field name="id" string="№" />-->
+                <!--<field name="create_date" />-->
+                <!--<field name="author" />-->
+                <!--<field name="name" />-->
+                <!--<field name="state" />-->
+            <!--</search>-->
+        <!--</field>-->
+    <!--</record>-->
 
-    <record model="ir.ui.view" id="view_company_disposal_form">
-        <field name="name">company.disposal.form</field>
-        <field name="model">company.disposal</field>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-            <form string="Распоряжение">
-                <field name="access" />
-                <group colspan="4" col="6">
-                    <group colspan="2" col="2" >
-                        <separator string="Основная информация" colspan="2" />
-                        <field name="id" string="Порядковый номер" />
-                        <field name="create_date" />
-                        <field name="former" attrs="{'readonly':[('state','not in',('draft'))]}" />
-                        <field name="author" string="Автор" />
-                        <field name="chief_officer" attrs="{'readonly':[('state','not in',('draft'))]}" />
-                        <field name="send_to" mode="tree" nolabel="1" colspan="2" attrs="{'readonly':[('state','in',('approved'))]}">
-                            <tree string="Разослать">
-                                <field name="name" />
-                            </tree>
-                        </field>
-                        <field name="groups_user" colspan="2" nolabel="1" attrs="{'readonly':[('state','in',('approved'))]}" />
-                    </group>
-                    <group colspan="4" col="2" attrs="{'readonly':['|',('state','in',('waiting','approved')),('access','not in',('author',''))]}">
-                        <separator string="Тема" colspan="2" />
-                        <field name="name" nolabel="1" colspan="2" />
-                        <separator string="Предлагаю:" colspan="2" />
-                        <field name="content" widget="text" nolabel="1" colspan="2" />
-                    </group>
-                    <group colspan="6" col="8" >
-                        <separator string="Этап" colspan="8"/>
-                        <field name="state" nolabel="1"/>
-                        <button name="action_cancel" states="draft" string="Отменить" />
-                        <button name="action_waiting" states="draft,approved,rework" string="На утверждение" />
-                        <button name="action_draft" states="waiting" string="В черновик" />
-                        <button name="action_approved" states="waiting" string="Утвердить" />
-                        <button name="action_rework" states="waiting" string="На доработку" />
-                        <group colspan="8" col="8" attrs="{'invisible':[('state','not in',('waiting','rework'))]}">
-                            <separator string="Комментарий на доработку" colspan="8" />
-                            <field name="redo_comment" nolabel="1" colspan="8" />
-                        </group>
-                    </group>
-                </group>
-            </form>
-        </field>
-    </record>
+    <!--<record model="ir.ui.view" id="view_company_disposal_form">-->
+        <!--<field name="name">company.disposal.form</field>-->
+        <!--<field name="model">company.disposal</field>-->
+        <!--<field name="type">form</field>-->
+        <!--<field name="arch" type="xml">-->
+            <!--<form string="Распоряжение">-->
+                <!--<field name="access" />-->
+                <!--<group colspan="4" col="6">-->
+                    <!--<group colspan="2" col="2" >-->
+                        <!--<separator string="Основная информация" colspan="2" />-->
+                        <!--<field name="id" string="Порядковый номер" />-->
+                        <!--<field name="create_date" />-->
+                        <!--<field name="former" attrs="{'readonly':[('state','not in',('draft'))]}" />-->
+                        <!--<field name="author" string="Автор" />-->
+                        <!--<field name="chief_officer" attrs="{'readonly':[('state','not in',('draft'))]}" />-->
+                        <!--<field name="send_to" mode="tree" nolabel="1" colspan="2" attrs="{'readonly':[('state','in',('approved'))]}">-->
+                            <!--<tree string="Разослать">-->
+                                <!--<field name="name" />-->
+                            <!--</tree>-->
+                        <!--</field>-->
+                        <!--<field name="groups_user" colspan="2" nolabel="1" attrs="{'readonly':[('state','in',('approved'))]}" />-->
+                    <!--</group>-->
+                    <!--<group colspan="4" col="2" attrs="{'readonly':['|',('state','in',('waiting','approved')),('access','not in',('author',''))]}">-->
+                        <!--<separator string="Тема" colspan="2" />-->
+                        <!--<field name="name" nolabel="1" colspan="2" />-->
+                        <!--<separator string="Предлагаю:" colspan="2" />-->
+                        <!--<field name="content" widget="text" nolabel="1" colspan="2" />-->
+                    <!--</group>-->
+                    <!--<group colspan="6" col="8" >-->
+                        <!--<separator string="Этап" colspan="8"/>-->
+                        <!--<field name="state" nolabel="1"/>-->
+                        <!--<button name="action_cancel" states="draft" string="Отменить" />-->
+                        <!--<button name="action_waiting" states="draft,approved,rework" string="На утверждение" />-->
+                        <!--<button name="action_draft" states="waiting" string="В черновик" />-->
+                        <!--<button name="action_approved" states="waiting" string="Утвердить" />-->
+                        <!--<button name="action_rework" states="waiting" string="На доработку" />-->
+                        <!--<group colspan="8" col="8" attrs="{'invisible':[('state','not in',('waiting','rework'))]}">-->
+                            <!--<separator string="Комментарий на доработку" colspan="8" />-->
+                            <!--<field name="redo_comment" nolabel="1" colspan="8" />-->
+                        <!--</group>-->
+                    <!--</group>-->
+                <!--</group>-->
+            <!--</form>-->
+        <!--</field>-->
+    <!--</record>-->
 
     <!-- Действия окна для всех форм -->
 
@@ -370,20 +370,20 @@
         <field name="search_view_id" ref="view_company_production_note_search"/>
     </record>
 
-    <record id="window_company_disaposal" model="ir.actions.act_window">
-        <field name="name">Распоряжение</field>
-        <field name="res_model">company.disposal</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="view_company_disposal_tree"/>
-        <field name="search_view_id" ref="view_company_disposal_search"/>
-    </record>
+    <!--<record id="window_company_disaposal" model="ir.actions.act_window">-->
+        <!--<field name="name">Распоряжение</field>-->
+        <!--<field name="res_model">company.disposal</field>-->
+        <!--<field name="view_type">form</field>-->
+        <!--<field name="view_mode">tree,form</field>-->
+        <!--<field name="view_id" ref="view_company_disposal_tree"/>-->
+        <!--<field name="search_view_id" ref="view_company_disposal_search"/>-->
+    <!--</record>-->
 
     <!-- Меню для всех форм -->
     <menuitem action="window_company_info_note" id="info_note_menuitem" name="Информационная записка" parent="company_notes_list"/>
     <menuitem action="window_company_problem_note" id="problem_note_menuitem" name="Проблемная записка" parent="company_notes_list"/>
     <menuitem action="window_company_production_note" id="production_note_menuitem" name="Производственная записка" parent="company_notes_list"/>
-    <menuitem action="window_company_disaposal" id="disposal_menuitem" name="Распоряжение" parent="company_notes_list"/>
+    <!--<menuitem action="window_company_disaposal" id="disposal_menuitem" name="Распоряжение" parent="company_notes_list"/>-->
 
     <!-- Планировщик -->
 

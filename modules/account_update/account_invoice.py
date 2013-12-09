@@ -201,7 +201,7 @@ class AccountInvoice(Model):
                 access += 'p'
 
             #  Финансист
-            users_f = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', [194, 17])], order='id')
+            users_f = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', [17])], order='id')
             if uid in users_f:
                 access += 'f'
 
