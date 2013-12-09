@@ -400,7 +400,6 @@ class AccountInvoice(Model):
             'account.invoice.category',
             'Статья расходов',
             required=False,
-            domain="[('parent_id', '!=', False), ('division_id', '=', division_id)]",
             states={'close': [('readonly', True)]},
             help='Статья расходов, по которой необходимы денежные средства.'),
         'card_id': fields.many2one(
