@@ -1099,7 +1099,7 @@ class Kpi(Model):
 
     def _get_cash(self, cr, uid, ids, name, arg, context=None):
         res = {}
-        for record in self.read(cr, uid, ids, ['grade_cash', 'sv', 'days', 'work_days_1', 'total_mbo', 'without_mbo', 'night_work', 'cash_night', 'weekend_work', 'cash_weekend'], context):
+        for record in self.read(cr, uid, ids, ['grade_cash', 'sv', 'days', 'work_days_1', 'total_mbo', 'without_mbo', 'night_work', 'cash_night', 'weekend_work', 'cash_weekend', 'without_mbo'], context):
             salary, variable, total = self._calculate_cash(
                 record['grade_cash'],
                 record['sv'],
@@ -1110,7 +1110,8 @@ class Kpi(Model):
                 record['night_work'],
                 record['cash_night'],
                 record['weekend_work'],
-                record['cash_weekend']
+                record['cash_weekend'],
+                record['without_mbo']
             )
             res[record['id']] = {
                 'salary': salary,
@@ -1263,7 +1264,7 @@ class Kpi(Model):
         return res
 
     def _calculate_cash(self, grade_cash=0.0, sv='60-40', days=0, work_days=1, total_mbo=100,
-                        without_mbo=False, night_work=0, cash_night=0.0, weekend_work=0, cash_weekend=0.0):
+                        without_mbo=False, night_work=0, cash_night=0.0, weekend_work=0, cash_weekend=0.0, no_mbo=False):
         salary_factor = .0
         variable_factor = .0
 
@@ -1287,8 +1288,9 @@ class Kpi(Model):
         #salary = grade_cash * salary_factor * (days / work_days)
         #variable = grade_cash * variable_factor * mbo
 
-        total = salary * day_factor + variable * mbo + night_work * cash_night + weekend_work * cash_weekend
-
+        total = salary * day_factor + night_work * cash_night + weekend_work * cash_weekend
+        if not no_mbo:
+            total += variable * mbo
         return salary, variable, total
 
     def _calculate_pay(self, cash=0.0, retention=0.0, advance=0.0, formal_cash=0.0, formal_tax=0.0, award=0.0):
@@ -1459,7 +1461,7 @@ class Kpi(Model):
         return {'value': {'total_mbo': mbo}}
 
     def change_cash(self, cr, uid, ids, grade_cash=0.0, sv='60-40', days=0, work_days=1, total_mbo=100,
-                    without_mbo=False, night_work=0, cash_night=0.0, weekend_work=0, cash_weekend=0.0, context=None):
+                    without_mbo=False, night_work=0, cash_night=0.0, weekend_work=0, cash_weekend=0.0, no_mbo=False, context=None):
         salary, variable, total = self._calculate_cash(
             grade_cash,
             sv,
@@ -1470,7 +1472,8 @@ class Kpi(Model):
             night_work,
             cash_night,
             weekend_work,
-            cash_weekend
+            cash_weekend,
+            no_mbo
         )
         return {
             'value': {

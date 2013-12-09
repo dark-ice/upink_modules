@@ -52,7 +52,7 @@
                                 </tree>
                             </field>
                             <field name="without_mbo" on_change="change_mbo(without_mbo)" attrs="{'readonly': [('check_h', '=', False)]}"/>
-                            <field name="total_mbo" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)"/>
+                            <field name="total_mbo" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend, without_mbo)"/>
                         </page>
                         <page string="SMART-задачи">
                             <field nolabel="1" name="smart_ids" colspan="4" context="{'responsible_id': employee_id}" attrs="{'readonly':
@@ -191,13 +191,13 @@
                                 '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
                                 '&amp;', ('check_h', '=', False), ('state', 'in', ('waiting' ,'planned_revision', 'passed', 'agreed_revision')),
                                 '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
-                                ]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)" />
+                                ]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend, without_mbo)" />
                                 <field name="weekend_work" attrs="{'invisible': [('job_id', 'not in', (26, 107, 208, 75))], 'readonly':
                                 [ '|', '|',
                                 '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
                                 '&amp;', ('check_h', '=', False), ('state', 'in', ('waiting' ,'planned_revision', 'passed', 'agreed_revision')),
                                 '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
-                                ]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)" />
+                                ]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend, without_mbo)" />
                                 <field name="fact_days" on_change="change_days(period_id, employee_id, fact_days)"  attrs="{'readonly':
                                 [ '|', '|',
                                 '&amp;', ('check_e', '=', False), ('state', 'in', ('draft' ,'waiting_revision', 'planned', 'passed_revision')),
@@ -205,7 +205,7 @@
                                 '&amp;', ('check_r', '=', False), ('state', 'in', ('agreed' ,'saved')),
                                 ]}"/>
                                 <field name="holidays" readonly="1" />
-                                <field name="days" readonly="1" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)" />
+                                <field name="days" readonly="1" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend, without_mbo)" />
                             </group>
                         </page>
                         <page string="Экспертная оценка">
@@ -323,12 +323,12 @@
                             <group colspan="4" col="4" >
                                 <group colspan="2">
                                     <field name="grade" colspan="4" readonly="1"/>
-                                    <field name="grade_cash" colspan="4" attrs="{'readonly': ['|', ('grade', '!=', False), ('grade', '!=', 46)]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)"/>
+                                    <field name="grade_cash" colspan="4" attrs="{'readonly': ['|', ('grade', '!=', False), ('grade', '!=', 46)]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend, without_mbo)"/>
 
-                                    <field name="cash_night" colspan="4" attrs="{'invisible': [('job_id', 'not in', (26, 107, 208, 75))]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)" />
-                                    <field name="cash_weekend" colspan="4" attrs="{'invisible': [('job_id', 'not in', (26, 107, 208, 75))]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)" />
+                                    <field name="cash_night" colspan="4" attrs="{'invisible': [('job_id', 'not in', (26, 107, 208, 75))]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend, without_mbo)" />
+                                    <field name="cash_weekend" colspan="4" attrs="{'invisible': [('job_id', 'not in', (26, 107, 208, 75))]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend, without_mbo)" />
 
-                                    <field name="sv" colspan="4" attrs="{'readonly': [('check_h', '=', False)]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend)" />
+                                    <field name="sv" colspan="4" attrs="{'readonly': [('check_h', '=', False)]}" on_change="change_cash(grade_cash, sv, days, work_days_1, total_mbo, without_mbo, night_work, cash_night, weekend_work, cash_weekend, without_mbo)" />
                                 </group>
                                 <group colspan="2">
                                     <field name="salary" readonly="1" />
