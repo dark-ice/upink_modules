@@ -965,8 +965,8 @@ class Brief(Model):
                     ['name'],
                     context=context
                 )
-                for id in visible_fields:
-                    checkbox_name = id['name'] + '_cb'
+                for f_id in visible_fields:
+                    checkbox_name = f_id['name'] + '_cb'
                     res[checkbox_name] = True
                 required_fields = self.pool.get('ir.model.fields').read(
                     cr,
@@ -975,8 +975,8 @@ class Brief(Model):
                     ['name'],
                     context=context
                 )
-                for id in required_fields:
-                    checkbox_name = id['name'] + '_cbr'
+                for f_id in required_fields:
+                    checkbox_name = f_id['name'] + '_cbr'
                     res[checkbox_name] = True
                 data_service = self.pool.get('brief.services.stage').browse(cr, uid, services_ids)
                 res['usergroup'] = data_service.usergroup.id

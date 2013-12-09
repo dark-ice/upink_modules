@@ -6,7 +6,7 @@ from openerp import netsvc
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
 
-from notify import notify
+from openerp.addons.notify import notify
 
 wf_service = netsvc.LocalService("workflow")
 

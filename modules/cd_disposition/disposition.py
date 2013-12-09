@@ -2,9 +2,9 @@
 import base64
 from aeroolib.plugins.opendocument import Template, OOSerializer
 from datetime import datetime, date
+import math
 from pytils import dt
 from notify import notify
-
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -28,6 +28,25 @@ STATE = (
     ('approval', 'На утверждении Ген. директором'),
     ('publish', 'Опубликовано'),
 )
+
+
+def numeral(param):
+    pass
+
+
+def to_grn(amount):
+    cash_d = math.modf(cash)
+    if round(cash_d[0], 2) != 0.0:
+        d = int(round(cash_d[0], 2) * 100)
+        if d < 10:
+            d = u"0%s" % d
+        else:
+            d = u"%s" % d
+    else:
+        d = u"00"
+    d += u" коп"
+    result = (numeral.rubles(cash_d[1]), d)
+    return result
 
 
 class CdDisposition(Model):

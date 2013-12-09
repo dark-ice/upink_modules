@@ -13,7 +13,7 @@
                         <field name="check_g"/>
                     </group>
                     <group colspan="4">
-                        <field name="id" string="Номер распорядения" />
+                        <field name="id" string="Номер распоряжения" />
                         <field name="disposition_date" />
                         <field name="user_id" /><newline />
                         <field name="line" />
@@ -81,6 +81,8 @@
                                 <field name="top_date"/>
                                 <field name="result_date"/>
                                 <field name="statement_date"/>
+
+                                <field name="disposition"/>
 
                             </group>
                             <group colspan="2" attrs="{'invisible': [('check_g', '=', False)]}">
@@ -166,7 +168,7 @@
             <field name="arch" type="xml">
                 <tree>
                     <field name="user_id" />
-                    <field name="id" string="Номер распорядения"/>
+                    <field name="id" string="Номер распоряжения"/>
                     <field name="disposition_date"/>
                     <field name="line"/>
                     <field name="category_id" />
