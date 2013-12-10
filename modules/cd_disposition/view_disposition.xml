@@ -184,7 +184,7 @@
             <field name="arch" type="xml">
                 <search>
                     <field name="user_id" />
-                    <field name="id" string="Номер распорядения"/>
+                    <field name="id" string="Номер распоряжения"/>
                     <field name="disposition_date"/>
                     <field name="line"/>
                     <field name="category_id" />

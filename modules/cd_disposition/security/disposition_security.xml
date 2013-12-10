@@ -18,7 +18,7 @@
             <field name="name">Распоряжения: видят свои, доступные для видения, в которых согласовывает</field>
             <field ref="model_cd_disposition" name="model_id"/>
             <field name="domain_force">[('user_id.id', '=', user.id)]</field>
-            <field name="perm_read" eval="True" />
+            <field name="perm_read" eval="False" />
             <field name="perm_create" eval="True" />
             <field name="perm_write" eval="True" />
             <field name="perm_unlink" eval="False" />
