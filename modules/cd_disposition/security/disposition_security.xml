@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+
+        <!-- Правила доступа для групп -->
+        <record id="cd_disposition_see_rule" model="ir.rule">
+            <field name="name">Распоряжения: видят свои, доступные для видения, в которых согласовывает</field>
+            <field ref="model_cd_disposition" name="model_id"/>
+            <field name="domain_force">['|', '|', '|', '|', ('user_id.id', '=', user.id), ('agreement_ids.user_id', '=', user.id), ('access_user_ids', '=', user.id), ('access_group_ids.users_group','in',user.id), ('access_group_ids.is_all','=',True)]</field>
+            <field name="perm_read" eval="True" />
+            <field name="perm_create" eval="False" />
+            <field name="perm_write" eval="False" />
+            <field name="perm_unlink" eval="False" />
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="cd_disposition_edit_rule" model="ir.rule">
+            <field name="name">Распоряжения: видят свои, доступные для видения, в которых согласовывает</field>
+            <field ref="model_cd_disposition" name="model_id"/>
+            <field name="domain_force">[('user_id.id', '=', user.id)]</field>
+            <field name="perm_read" eval="True" />
+            <field name="perm_create" eval="True" />
+            <field name="perm_write" eval="True" />
+            <field name="perm_unlink" eval="False" />
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+    </data>
+</openerp>

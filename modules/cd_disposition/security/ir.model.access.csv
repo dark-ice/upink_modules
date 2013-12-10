@@ -1,0 +1,5 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_cd_disposition","cd_disposition user","model_cd_disposition","base.group_user",1,1,1,0
+"access_cd_disposition_category","cd_disposition_category user","model_cd_disposition_category","base.group_user",1,1,0,0
+"access_cd_disposition_agreement","cd_disposition_agreement user","model_cd_disposition_agreement","base.group_user",1,1,1,0
+"access_cd_disposition_history","cd_disposition_history user","model_cd_disposition_history","base.group_user",1,1,1,0
