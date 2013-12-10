@@ -15,7 +15,7 @@
     'installable': True,
     'auto_install': False,
     'update_xml': [
-        'security/disposition_security.csv',
+        'security/disposition_security.xml',
         'security/ir.model.access.csv',
         'wizard/wizard_view.xml',
         'view_items.xml',
