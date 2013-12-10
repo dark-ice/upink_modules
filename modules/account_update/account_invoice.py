@@ -67,7 +67,8 @@ class AccountInvoice(Model):
     def onchange_account(self, cr, uid, ids, account_id, context=None):
         account_pool = self.pool.get('account.account')
         account_obj = account_pool.read(cr, uid, account_id, ['currency_id', 'tax', 'lang'])
-        return {'value': {'currency_id': account_obj['currency_id'], 'tax': account_obj['tax'], 'lang': account_obj['lang']}}
+        return {
+            'value': {'currency_id': account_obj['currency_id'], 'tax': account_obj['tax'], 'lang': account_obj['lang']}}
 
     def onchange_bank(self, cr, uid, ids, partner_id, lead_id, context=None):
         if partner_id:
@@ -83,7 +84,8 @@ class AccountInvoice(Model):
         if currency_id is not None and currency_id:
             currency_rate_pool = self.pool.get('res.currency.rate')
             currency_pool = self.pool.get('res.currency')
-            currency_date_ids = currency_rate_pool.search(cr, uid, [('name', '=', date), ('currency_id', '=', currency_id)])
+            currency_date_ids = currency_rate_pool.search(cr, uid,
+                                                          [('name', '=', date), ('currency_id', '=', currency_id)])
             if currency_date_ids:
                 currency_date = currency_rate_pool.read(cr, uid, currency_date_ids[0], ['rate'])
             else:
@@ -149,14 +151,17 @@ class AccountInvoice(Model):
     def _get_cash_dol(self, cr, uid, ids, name, arg, context=None):
         res = {}
         for record in self.browse(cr, uid, ids, context):
-            res[record.id] = round(self._calculate_cash(record.total_mr, record.change_mr, record.overrun_mr) / record.rate, 2)
+            res[record.id] = round(
+                self._calculate_cash(record.total_mr, record.change_mr, record.overrun_mr) / record.rate, 2)
         return res
 
     def _search_cash(self, cr, uid, obj, name, args, context):
         ids = set()
         for cond in args:
             amount = cond[2]
-            cr.execute("select id from account_invoice where type='in_invoice' AND (COALESCE(total_mr, 0.00) - COALESCE(change_mr, 0.00) + COALESCE(overrun_mr, 0.00)) = %s",(amount,))
+            cr.execute(
+                "select id from account_invoice where type='in_invoice' AND (COALESCE(total_mr, 0.00) - COALESCE(change_mr, 0.00) + COALESCE(overrun_mr, 0.00)) = %s",
+                (amount,))
             res_ids = set(id[0] for id in cr.fetchall())
 
             ids = ids and (ids & res_ids) or res_ids
@@ -193,7 +198,9 @@ class AccountInvoice(Model):
             access = str()
 
             #  Автор + руководитель
-            if data.user_id.id == uid or employee_pool.get_department_manager(cr, uid, employee_pool.get_employee(cr, uid, uid).id).user_id.id == uid:
+            if data.user_id.id == uid or employee_pool.get_department_manager(cr, uid,
+                                                                              employee_pool.get_employee(cr, uid,
+                                                                                                         uid).id).user_id.id == uid:
                 access += 'a'
 
             #  Директор UpSale
@@ -567,6 +574,11 @@ class AccountInvoice(Model):
             ), 'Тип счета'
         ),
         'period_id': fields.many2one('kpi.period', 'Период', domain=[('calendar', '=', 'rus')]),
+        'loyalty_ids': fields.one2many(
+            'account.invoice.loyalty',
+            'invoice_id',
+            'Лояльность',
+        ),
     }
 
     _defaults = {
@@ -585,7 +597,7 @@ class AccountInvoice(Model):
             if values.get('card_id'):
                 card = self.pool.get('account.invoice.card').browse(cr, uid, values['card_id'], context)
                 values['currency_id'] = card.currency_id.id
-        # записываю новые данные в услуги
+            # записываю новые данные в услуги
         if values.get('invoice_line'):
             service_pool = self.pool.get('partner.added.services')
             for i in values.get('invoice_line'):
@@ -650,6 +662,8 @@ class AccountInvoice(Model):
 
     def unlink(self, cr, uid, ids, context=None):
         return super(Model, self).unlink(cr, uid, ids, context)
+
+
 AccountInvoice()
 
 
@@ -684,7 +698,8 @@ class AccountInvoiceLine(Model):
         return result
 
     _columns = {
-        'service_id': fields.many2one('brief.services.stage', 'Услуга', ondelete='set null', domain=[('in_account', '=', True)]),
+        'service_id': fields.many2one('brief.services.stage', 'Услуга', ondelete='set null',
+                                      domain=[('in_account', '=', True)]),
         'name': fields.char('Description', size=256, required=False),
         'price_currency': fields.float('Стоимость в валюте счета', digits=(10, 6)),
         'price_subtotal': fields.function(
@@ -693,10 +708,12 @@ class AccountInvoiceLine(Model):
         'paid': fields.float('Оплачено', digits=(10, 2)),
         'price_unit': fields.float('Unit Price', required=True, digits=(10, 6)),
         'account_id': fields.many2one('account.account', 'Account', required=True, domain=[]),
-        'partner_id': fields.related('invoice_id', 'partner_id', string='Партнер', type='many2one', relation='res.partner', store=True),
+        'partner_id': fields.related('invoice_id', 'partner_id', string='Партнер', type='many2one',
+                                     relation='res.partner', store=True),
 
         'nbr': fields.function(_show_number, method=True, string='Номер', type='integer', store=False),
-        'brief_id': fields.many2one('brief.main', 'Медиаплан', domain="[('services_ids', '=', service_id), ('partner_id', '=', partner_id)]"),
+        'brief_id': fields.many2one('brief.main', 'Медиаплан',
+                                    domain="[('services_ids', '=', service_id), ('partner_id', '=', partner_id)]"),
         'no_brief': fields.boolean('Нет медиаплана'),
     }
 
@@ -721,7 +738,8 @@ class AccountInvoiceLine(Model):
                 return False
             return True
 
-    def onchange_price(self, cr, uid, ids, currency, date_invoice, paid, price_unit=0.0, price_currency=0.0, context=None):
+    def onchange_price(self, cr, uid, ids, currency, date_invoice, paid, price_unit=0.0, price_currency=0.0,
+                       context=None):
         currency_rate_pool = self.pool.get('res.currency.rate')
         currency_pool = self.pool.get('res.currency')
         currency_date_ids = currency_rate_pool.search(
@@ -822,7 +840,8 @@ class AccountInvoiceLine(Model):
     def unlink(self, cr, uid, ids, context=None):
         pay_line_pool = self.pool.get('account.invoice.pay.line')
         for record in self.browse(cr, uid, ids, context):
-            if not pay_line_pool.search(cr, uid, [('invoice_id', '=', record.invoice_id.id), ('service_id', '=', record.service_id.id)]):
+            if not pay_line_pool.search(cr, uid, [('invoice_id', '=', record.invoice_id.id),
+                                                  ('service_id', '=', record.service_id.id)]):
                 return super(AccountInvoiceLine, self).unlink(cr, uid, ids, context)
             else:
                 raise osv.except_osv('Нельзя удалить!', 'Нельзя удалять позицию счета по которой уже проведена оплата!')
@@ -831,6 +850,8 @@ class AccountInvoiceLine(Model):
         #(_check_unique_insesitive, 'должна быть уникальной!', ['Услуга']),
         #(_check_unique_insesitive, 'Стоимость должна быть больше 0', []),
     ]
+
+
 AccountInvoiceLine()
 
 
@@ -907,6 +928,8 @@ class AccountInvoicePay(Model):
         for record in self.read(cr, user, ids, ['invoice_pay_ids']):
             line_pool.unlink(cr, user, record['invoice_pay_ids'])
         return super(AccountInvoicePay, self).unlink(cr, user, ids, context)
+
+
 AccountInvoicePay()
 
 
@@ -1010,7 +1033,7 @@ class AccountInvoicePayLine(Model):
                 ('service_id', '=', service_id)
             ]
         )
-        return invoice_line_pool.write(cr, user, line_ids, {'paid': pay, 'price_subtotal': amount-pay})
+        return invoice_line_pool.write(cr, user, line_ids, {'paid': pay, 'price_subtotal': amount - pay})
 
     def create(self, cr, user, vals, context=None):
         line_id = super(AccountInvoicePayLine, self).create(cr, user, vals, context)
@@ -1033,6 +1056,8 @@ class AccountInvoicePayLine(Model):
             self.update_line(cr, user, record['invoice_id'], record['service_id'])
 
         return flag
+
+
 AccountInvoicePayLine()
 
 
@@ -1069,6 +1094,8 @@ class Account(Model):
         'count': 2001,
         'step': 1
     }
+
+
 Account()
 
 
@@ -1085,6 +1112,8 @@ class InvoiceHistory(Model):
         'create_date': fields.datetime('Дата', readonly=True),
         'invoice_id': fields.many2one('account.invoice', 'Invoice', invisible=True),
     }
+
+
 InvoiceHistory()
 
 
@@ -1098,6 +1127,8 @@ class AccountInvoiceDivision(Model):
         'check_man_id': fields.many2one('res.users', 'Кто утверждает оплаты'),
         'division': fields.boolean('Возможны ли расходы общего назначения?'),
     }
+
+
 AccountInvoiceDivision()
 
 
@@ -1114,6 +1145,8 @@ class AccountInvoiceCategory(Model):
             'Направление',
             help='Направление, для которого будут выданы денежные средства.'),
     }
+
+
 AccountInvoiceCategory()
 
 
@@ -1214,6 +1247,8 @@ class AccountInvoiceCard(Model):
             'card_id',
             'Кто может получать средства'),
     }
+
+
 AccountInvoiceCard()
 
 
@@ -1369,6 +1404,7 @@ class AccountInvoiceDocuments(Model):
 
         return flag
 
+
 AccountInvoiceDocuments()
 
 
@@ -1392,6 +1428,8 @@ class AccountInvoiceDocumentLine(Model):
         'name': fields.float('Сумма', digits=(10, 2)),
         'nbr': fields.function(_show_number, method=True, string='Номер', type='integer', store=False),
     }
+
+
 AccountInvoiceDocumentLine()
 
 
@@ -1451,7 +1489,6 @@ class AccountInvoiceTransferFunds(Model):
                 rate = 1
             value = out_total * rate
         return {'value': {'in_total': value, 'out_total': out_total}}
-
     _columns = {
         'id': fields.integer('Номер перемещения', size=11, select=True),
         'out_date': fields.date('Дата отправки денег', required=True),
@@ -1539,6 +1576,8 @@ class AccountInvoiceTransferFunds(Model):
                 raise osv.except_osv('Не заполнено поле', 'Необходимо заполнить Дату получения')
 
         return super(AccountInvoiceTransferFunds, self).write(cr, user, ids, vals, context)
+
+
 AccountInvoiceTransferFunds()
 
 
@@ -1565,4 +1604,108 @@ class ResCurrencyRate(Model):
             [u'Дата']
         )
     ]
+
+
 ResCurrencyRate()
+
+
+class AccountInvoiceLoyalty(Model):
+    _name = 'account.invoice.loyalty'
+
+    def get_services(self, cr, uid, ids, invoice_id, context=None):
+        invoice_line_pool = self.pool.get('account.invoice.line')
+        invoice_line_ids = invoice_line_pool.search(cr, 1, [('invoice_id', '=', invoice_id)])
+        services = invoice_line_pool.read(cr, 1, invoice_line_ids, ['service_id'])
+        res = [x['service_id'][0] for x in services]
+        return {'domain': {'service_id': [('id', 'in', res)]}}
+
+    def get_program(self, cr, uid, ids, service_id, invoice_id, context=None):
+        programs = list()
+        invoice_line_pool = self.pool.get('account.invoice.line')
+        service_stage_pool = self.pool.get('brief.services.stage')
+        process_lounch_pool = self.pool.get('process.launch')
+        invoice_line_ids = invoice_line_pool.search(cr, 1, [('invoice_id', '=', invoice_id)])
+        partner_id = invoice_line_pool.read(cr, 1, invoice_line_ids, ['partner_id'])
+        need_invoice_ids = invoice_line_pool.search(cr, 1, [('partner_id', '=', partner_id[0]['partner_id'][0]), ('invoice_id', '!=', invoice_id)])
+        services_ids = [serv['service_id'][0] for serv in invoice_line_pool.read(cr, 1, need_invoice_ids, ['service_id'])]
+
+        #проверка что счет создается по услуге которую не покупал партнер ранее но уже покупал другие услуги
+        if service_id not in services_ids and len(services_ids) >= 1:
+            if len(need_invoice_ids) == 1:
+                programs.append(1)
+            elif len(need_invoice_ids) == 2:
+                programs.append(2)
+            elif len(need_invoice_ids) == 3:
+                programs.append(3)
+        brief_stage_data = service_stage_pool.read(cr, 1, service_id, ['usergroup'])
+
+        #добавляю программы если партнер заказывает у нас какие-либо услуги, без привязки к бюджету
+        if not brief_stage_data['usergroup']:
+            programs.extend([4, 5, 6, 7, 8, 9, 10])
+
+        #проверяю на входящие и исходящие и добавляю необходимые программы
+        process_callin_ids = process_lounch_pool.search(cr, 1,  [
+            ('partner_id', '=', partner_id[0]['partner_id'][0]),
+            ('service_id', '=', service_id),
+            ('process_model', '=', 'process.call.in')
+        ])
+        if process_callin_ids:
+            programs.append(12)
+        process_callout_ids = process_lounch_pool.search(cr, 1,  [
+            ('partner_id', '=', partner_id[0]['partner_id'][0]),
+            ('service_id', '=', service_id),
+            ('process_model', '=', 'process.call.in')
+        ])
+        if process_callout_ids:
+            programs.append(11)
+        return {'domain': {'program_id': [('id', 'in', programs)]}}
+
+    def get_bonus(self, cr, uid, ids, service_id, invoice_id, program_id, context=None):
+        suma = self.pool.get('account.invoice').read(cr, 1, invoice_id, ['a_total'])
+        suma = suma['a_total']
+        if service_id == 1:
+            proc = suma * 5 / 100
+            suma -= proc
+            return {'value': {'bonus_p': 5, 'bonus_sum': suma}}
+        elif service_id == 2:
+            proc = suma * 5 / 100
+            suma -= proc
+            return {'value': {'bonus_p': 5, 'bonus_sum': suma}}
+        elif service_id == 3:
+            proc = suma * 5 / 100
+            suma -= proc
+            return {'value': {'bonus_p': 5, 'bonus_sum': suma}}
+
+    _columns = {
+        'invoice_id': fields.many2one('account.invoice', ''),
+        'service_id': fields.many2one('brief.services.stage', 'Услуги', domain="[('id', 'in', invoice_id.invoice_line.service_id.id)]"),
+        'program_id': fields.many2one('account.invoice.programs', 'Программы'),
+        'bonus_p': fields.float('% бонуса'),
+        'bonus_sum': fields.float('Сумма бонуса'),
+        'how_return': fields.selection(
+            [
+                ('beznal', 'Безнал'),
+                ('e_cash', 'Электронный кошелек'),
+                ('ad', 'В рекламу'),
+                ('50_for_50', '50 на 50'),
+                ('mks', 'Наличными в мск'),
+                ('service', 'Услугой'),
+            ], 'Как возвращать'
+        ),
+        'whom_return_partner': fields.many2one('res.partner', 'Кому возвращать (партнер)', inbisible=True),
+        'whom_return_text': fields.char('Кому возвращать (текстовое)', size=128)
+    }
+
+    _defaults = {
+        'invoice_id': lambda s, c, u, context: context.get('invoice_id'),
+    }
+
+AccountInvoiceLoyalty()
+
+
+class AccountInvoicePrograms(Model):
+    _name = 'account.invoice.programs'
+    _columns = {
+        'name': fields.char('Название программы', size=128)
+    }
+AccountInvoicePrograms()

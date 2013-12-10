@@ -246,6 +246,20 @@
                                 </tree>
                             </field>
                         </page>
+                        <page string="Лояльность">
+                            <field name="loyalty_ids"  nolabel="1" colspan="4" context="{'invoice_id': id}">
+                                <tree editable="top">
+                                    <field name="invoice_id" on_change="get_services(invoice_id)" invisible="1"/>
+                                    <field name="service_id" on_change="get_program(service_id, invoice_id)"/>
+                                    <field name="program_id" on_change="get_bonus(service_id, invoice_id, program_id)"/>
+                                    <field name="bonus_p" attrs="{'readonly': [('program_id', 'in', [1, 2, 3])]}"/>
+                                    <field name="bonus_sum" attrs="{'readonly': [('program_id', 'in', [1, 2, 3])]}"/>
+                                    <field name="how_return"/>
+                                    <field name="whom_return_partner" attrs="{'readonly': [('how_return', 'in', ['beznal', 'ad', '50_for_50', 'service'])]}"/>
+                                    <field name="whom_return_text" attrs="{'readonly': [('how_return', 'in', ['e_cash', 'mks'])]}"/>
+                                </tree>
+                            </field>
+                        </page>
                     </notebook>
                 </form>
             </field>

@@ -31,3 +31,4 @@
 "access_account_document_line_manager","account manager","model_account_invoice_document_line","account.group_account_manager","1","1","1","0"
 "access_account_document_line_invoice","account invoice","model_account_invoice_document_line","account.group_account_invoice","1","1","1","0"
 "access_account_document_line_head","account head","model_account_invoice_document_line","account.group_account_head","1","1","1","0"
+"access_account_invoice_loyalty","account_invoice","model_account_invoice_loyalty","account.group_account_invoice","1","0","1","1"
