@@ -23,6 +23,7 @@ Update for module Account
         'report/reports_view.xml',
         'wizard/invoice_act_view.xml',
         'wizard/invoice_kassa_view.xml',
+        'data.xml',
     ],
     'installable': True,
     'active': False,
