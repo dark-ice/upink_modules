@@ -652,7 +652,7 @@ class CdDisposition(Model):
                 'term': disposition['term'] or '-',
                 'term_str': disposition['term_str'] or '-',
                 'amount': disposition['amount'] or '-',
-                'amount_str': to_grn(disposition['amount']),
+                'amount_str': to_grn(disposition['at_rate']),
                 'statement_date': '-',
                 'instate_date': '-',
                 'salary': disposition['salary'] or '-',
