@@ -42,7 +42,7 @@ def to_grn(amount):
         else:
             d = u"00"
         d += u" коп"
-        return u"{0} {1}".format(numeral.in_words(cash_d[1]), d)
+        return u"{0} {1}".format(numeral.in_words(int(cash_d[1])), d)
     else:
         return '-'
 
