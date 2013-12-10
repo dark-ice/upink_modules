@@ -99,6 +99,8 @@ class ProcessCallIn(Model):
             'res_id',
             'Дополнения к сценарию',
             domain=[('res_model', '=', _name), ('tmp_res_model', '=', 'scenario_files')]),
+        'fact_ids': fields.one2many('report.day.call.in.static', 'process_call_in_id', 'Факты'),
+        'queue': fields.integer('Очередь'),
     }
 
     _defaults = {

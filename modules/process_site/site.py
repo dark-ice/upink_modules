@@ -97,8 +97,8 @@ class ProcessSite(Model):
 
             val = False
             letter = name[6]
-            #if letter in access or uid == 1:
-            if letter in access:
+            if letter in access or uid == 1:
+            #if letter in access:
                 val = True
 
             res[data['id']] = val

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_report_day_call_in_tree">
+            <field name="name">Показатели по входящим проектам</field>
+            <field name="model">report.day.call.in.static</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree editable = 'top'>
+                    <field name="process_call_in_id" />
+                    <field name="supervisor_id" readonly="1"/>
+                    <field name="date" />
+                    <field name="call_in" />
+                    <field name="call_in_day" />
+                    <field name="call_in_night" />
+                    <field name="missed" />
+                    <field name="missed_day" />
+                    <field name="missed_night" />
+                    <field name="call_out" />
+                    <field name="processed_missed" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_window_report_day_call_in_statistic" model="ir.actions.act_window">
+            <field name="name">Показатели по входящим проектам</field>
+            <field name="res_model">report.day.call.in.static</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_report_day_call_in_tree"/>
+            <field name="context">{}</field>
+        </record>
+
+
+
+<!--отчет по входящим-->
+        <record model="ir.ui.view" id="view_rep_call_in_tree">
+            <field name="name">Отчет по входящим проектам</field>
+            <field name="model">report.call.in</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree editable = 'top'>
+                    <field name="partner_id" readonly="1" />
+                    <field name="date" readonly="1" />
+                    <field name="queue" readonly="1"/>
+
+
+                    <field name="call_in" readonly="1" sum=""/>
+                    <field name="missed" readonly="1" sum=""/>
+                    <field name="call_in_day" readonly="1" sum=""/>
+                    <field name="call_in_night" readonly="1" sum=""/>
+
+                    <field name="missed_day" readonly="1" sum="" />
+                    <field name="missed_night" readonly="1" sum=""/>
+                    <field name="call_out" readonly="1" sum=""/>
+                    <field name="processed_missed" readonly="1" sum=""/>
+
+                    <field name="procent" readonly="1" avg=""/>
+                    <field name="procent_day" readonly="1" avg=""/>
+                    <field name="procent_night" readonly="1" avg=""/>
+
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_rep_call_in_search">
+            <field name="name">view.rep.call.in.search</field>
+            <field name="model">process.call.in</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <group>
+                        <field name="date_start" />
+                        <field name="date_end" />
+                        <field name="partner_id" />
+                        <field name="queue" />
+                    </group>
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Проект" icon="terp-partner" name="Partner" context="{'group_by':'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Дата" icon="stock_calendar" name="Date" context="{'group_by':'date'}"/>
+                        <separator orientation="vertical"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_rep_call_in_statistic" model="ir.actions.act_window">
+            <field name="name">Отчет по входящим проектам</field>
+            <field name="res_model">report.call.in</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_rep_call_in_tree"/>
+            <field name="search_view_id" ref="view_rep_call_in_search"/>
+            <field name="context">{}</field>
+        </record>
+
+
+        <menuitem id="menu_report_day_dop_call_in" action="action_window_report_day_call_in_statistic" name="Показатели по входящим проектам" parent="process_call_in.top_menu_process_call_in_dev" sequence="30"/>
+        <menuitem id="menu_day_dop_call_in" action="action_rep_call_in_statistic" name="Отчет по входящим проектам" parent="process_call_in.top_menu_process_call_in_dev" sequence="20"/>
+    </data>
+</openerp>

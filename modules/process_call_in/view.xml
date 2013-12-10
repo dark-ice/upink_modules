@@ -35,7 +35,7 @@
         </record>
 
         <record model="ir.ui.view" id="view_process_call_in_form">
-            <field name="name">Разработка и реализация исходящей кампании</field>
+            <field name="name">Разработка и реализация входящей кампании</field>
             <field name="model">process.call.in</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
@@ -54,6 +54,7 @@
                         <field name="prep_days"/>
                         <field name="start_line"/>
                         <field name="report_type"/>
+                        <field name="queue"/>
                     </group>
                     <notebook colspan="4">
                         <page string="Данные по запуску процесса">
@@ -165,6 +166,21 @@
                                     <field name="pay_date" />
                                     <field name="name" />
                                     <field name="get" />
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Факты по кампании" attrs="{'invisible': [('state', '!=', 'development')]}">
+                            <field name="fact_ids" colspan="4" nolabel="1">
+                                <tree string="Факты" editable="top">
+                                    <field name="date" />
+                                    <field name="call_in" />
+                                    <field name="call_in_day" />
+                                    <field name="call_in_night" />
+                                    <field name="missed" />
+                                    <field name="missed_day" />
+                                    <field name="missed_night" />
+                                    <field name="call_out" />
+                                    <field name="processed_missed" />
                                 </tree>
                             </field>
                         </page>
@@ -421,7 +437,9 @@
             <field name="search_view_id" ref="view_process_call_in_search"/>
         </record>
 
-        <menuitem action="window_process_call_in" id="menu_process_call_in_dev" parent="process_call.menu_process_call"/>
+
+        <menuitem name="Входящая кампания" id="top_menu_process_call_in_dev" parent="process_call.menu_process_call"/>
+        <menuitem action="window_process_call_in" id="menu_process_call_in_dev" parent="process_call_in.top_menu_process_call_in_dev" sequence="10"/>
 
     </data>
 </openerp>

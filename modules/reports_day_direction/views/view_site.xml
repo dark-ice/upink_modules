@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_rep_site">
+            <field name="name">Отчет по site</field>
+            <field name="model">report.day.site</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree editable = 'top'>
+                    <field name="partner_id" readonly="1" />
+                    <field name="type" readonly="1" />
+                    <field name="process_name" readonly="1" />
+                    <field name="process_date" readonly="1" />
+                    <field name="planning_days" readonly="1" />
+                    <field name="design_days" readonly="1" />
+                    <field name="makeup_days" readonly="1" />
+                    <field name="developing_days" readonly="1" />
+                    <field name="testing_days" readonly="1" />
+                    <!--<field name="planning_stage" readonly="1" />-->
+                    <field name="planning_date_st" readonly="1" />
+                    <field name="planning_date_fn" readonly="1" />
+                    <!--<field name="design_stage" readonly="1" />-->
+                    <field name="design_date_st" readonly="1" />
+                    <field name="design_date_fn" readonly="1" />
+                    <!--<field name="makeup_stage" readonly="1" />-->
+                    <field name="makeup_date_st" readonly="1" />
+                    <field name="makeup_date_fn" readonly="1" />
+                    <!--<field name="developing_stage" readonly="1" />-->
+                    <field name="developing_date_st" readonly="1" />
+                    <field name="developing_date_fn" readonly="1" />
+                    <!--<field name="testing_stage" readonly="1" />-->
+                    <field name="testing_date_st" readonly="1" />
+                    <field name="testing_date_fn" readonly="1" />
+                    <field name="date_end" readonly="1" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_rep_site_search">
+            <field name="name">view.rep.site</field>
+            <field name="model">report.day.site</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <group>
+                        <field name="search_date" />
+                        <field name="partner_id" />
+                    </group>
+                    <!--<newline/>-->
+                    <!--<group expand="0" string="Группировать по...">-->
+                        <!--<filter string="Проект" icon="terp-partner" name="Partner" context="{'group_by':'partner_id'}"/>-->
+                        <!--<separator orientation="vertical"/>-->
+                    <!--</group>-->
+                </search>
+            </field>
+        </record>
+
+        <record id="action_rep_site_statistic" model="ir.actions.act_window">
+            <field name="name">Ежедневный отчет</field>
+            <field name="res_model">report.day.site</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_rep_site"/>
+            <field name="search_view_id" ref="view_rep_site_search"/>
+            <field name="context">{'search_default_search_date': time.strftime('%Y-%m-%d')}</field>
+        </record>
+
+
+        <menuitem action="action_rep_site_statistic" id="menu_action_site_report" sequence="80" parent="process_site.menu_process_site" />
+    </data>
+</openerp>

@@ -152,6 +152,25 @@
                                     <field name="name"/>
                                 </tree>
                             </field>
+                            <separator string="Планы" colspan="4"/>
+                                <field name="plan_ids" nolabel="1" attrs="{'readonly': [('state', '!=', 'work')]}">
+                                    <tree string="Планы" editable="top">
+                                        <field name="work_start" />
+                                        <field name="date_start" required="1"/>
+                                        <field name="date_end" required="1"/>
+                                        <field name="report" />
+                                        <field name="kpi_index" />
+                                        <field name="kpi_target" />
+                                    </tree>
+                                </field>
+                            <separator string="Факты" colspan="4"/>
+                                <field name="fact_ids" nolabel="1" attrs="{'readonly': [('state', '!=', 'work')]}">
+                                    <tree string="Факты" editable="top">
+                                        <field name="kpi_index" />
+                                        <field name="date" />
+                                        <field name="index_point" />
+                                    </tree>
+                                </field>
                         </page>
                     </notebook>
                     <group colspan="4" col="6">
@@ -223,7 +242,8 @@
         </record>
 
         <menuitem action="window_process_smm" id="menu_process_smm" sequence="20" parent="process_launch.menu_process" name="SMM стратегии"/>
-        <menuitem action="window_process_smm" id="menu_process_smm_dev" parent="menu_process_smm"/>
+        <menuitem action="window_process_smm" string="Разработка и реализация стратегии SMM" id="menu_process_smm_dev" parent="menu_process_smm"/>
+        <!--<menuitem action="window_process_smm" id="menu_action_process_smm" sequence="10" parent="menu_process_smm_dev" />-->
 
     </data>
 </openerp>

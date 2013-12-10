@@ -8,6 +8,10 @@
 Ежедневные отчеты направлений.
 ==============================
 - PPC
+- CALL (call_in call_out)
+- SMM
+- SITE
+- VIDEO
 - SEO
     """,
     'author': 'Andrey Karbanovich',
@@ -19,6 +23,12 @@
     'update_xml': [
         #'security/ir.model.access.csv',
         'views/view_ppc.xml',
+        'views/view_call_in.xml',
+        'views/view_call_out.xml',
+        'views/view_smm.xml',
+        'views/view_site.xml',
+        'views/view_video.xml',
+        #'workflow.xml',
         'views/view_seo.xml',
     ],
 
