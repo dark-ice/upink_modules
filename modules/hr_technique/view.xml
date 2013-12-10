@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_technique_form" model="ir.ui.view">
+            <field name="name">Учет техники</field>
+            <field name="model">hr.technique</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <field name="id" invisible="1" />
+                    <field name="check_r" invisible="1" />
+                    <field name="check_s" invisible="1" />
+                    <group colspan="4">
+                        <field name="name" />
+                        <field name="type" />
+                        <field name="employee_id" />
+                        <field name="date_of_issue" />
+                        <field name="department_id" /><newline />
+                        <button type="action"
+                                name="%(action_technique_issue)d"
+                                string="В резерв"
+                                context="{'state': 'reserve', 'technique_id': id, 'employee_id': employee_id}"
+                                icon="gtk-save"
+                                colspan="2"
+                                attrs="{'invisible': [('state', 'in', ('on_cancellation', 'cancellation'))]}"
+                                groups="base.group_sys_admin_head,base.group_sys_admin"
+                                />
+                        <button type="action"
+                                name="%(action_technique_issue)d"
+                                string="Выдать"
+                                context="{'state': 'issued', 'technique_id': id, 'employee_id': employee_id}"
+                                icon="gtk-convert"
+                                attrs="{'invisible': [('state', 'in', ('on_cancellation', 'cancellation'))]}"
+                                colspan="2"
+                                groups="base.group_sys_admin_head,base.group_sys_admin"
+                                />
+                        <notebook colspan="4">
+                            <page string="Общие данные" attrs="{'invisible': [('check_s', '=', False)]}">
+                                <field name="serial_number" />
+                                <field name="inventory_number" />
+                                <separator colspan="4"/>
+                                <field name="date_of_purchase"/><newline />
+                                <field name="cash"/>
+                                <field name="currency_id" widget="selection"/>
+                                <field name="cash_ye" />
+                                <field name="rate" />
+                                <separator colspan="4"/>
+                                <field name="account_id" attrs="{'readonly': ['|', ('no_account', '=', True), ('state', '!=', 'storage')]}"/>
+                                <field name="no_account" attrs="{'readonly': ['|', ('account_id', '!=', False), ('state', '!=', 'storage')]}"/>
+                                <separator colspan="4"/>
+                                <field name="stock" />
+                            </page>
+                            <page string="Ремонт" attrs="{'invisible': [('check_s', '=', False)]}">
+                                <field name="venue_repair" colspan="4" widget="char"/>
+                                <field name="cause_of_repair" colspan="4" />
+                                <field name="history_repair_ids" colspan="4" nolabel="1" readonly="1">
+                                    <tree string="История ремонта">
+                                        <field name="create_date"/>
+                                        <field name="name" />
+                                        <field name="cause_of_repair" />
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Списание" attrs="{'invisible': [('check_s', '=', False), ('check_r', '=', False)]}">
+                                <field name="cancellation_act_number"/> <newline />
+                                <field name="reason_for_cancellation" colspan="4" />
+                                <button type="action"
+                                        name="%(action_technique_committee)d"
+                                        string="Добавить в комиссию"
+                                        context="{'technique_id': id}"
+                                        icon="gtk-convert"
+                                        colspan="4"
+                                        attrs="{'invisible': [('state', '=', 'cancellation')]}"
+                                        />
+                                <field name="cancellation_employee_ids" colspan="4" nolabel="1" readonly="1">
+                                    <tree string="Комиссия по списанию">
+                                        <field name="check_r" invisible="1"/>
+                                        <field name="employee_id" />
+                                        <field name="agree" />
+                                        <field name="date_agree" />
+                                        <button type="object"
+                                                name="save"
+                                                string="Согласен"
+                                                icon="gtk-ok"
+                                                attrs="{'invisible': ['|', ('check_r', '=', False), ('agree', '=', True)]}"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Дополнительно" attrs="{'invisible': [('check_s', '=', False)]}">
+                                <field name="comment_ids" colspan="4" nolabel="1" attrs="{'invisible': [('check_s', '=', False)]}">
+                                    <tree string="Комментарии" editable="top">
+                                        <field name="create_uid" />
+                                        <field name="create_date" />
+                                        <field name="name" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </group>
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="storage,issued"
+                           statusbar_colors='{"reserve":"orange", "repair": "red", "cancellation": "gray"}'
+                            />
+                    <newline />
+                    <button type="object"
+                            name="save"
+                            string="В ремонт"
+                            context="{'state': 'repair'}"
+                            icon="gtk-execute"
+                            attrs="{'invisible': [('state', 'in', ('on_cancellation', 'cancellation', 'repair'))]}"
+                            groups="base.group_sys_admin_head,base.group_sys_admin"
+                            />
+                    <button type="object"
+                            name="save"
+                            string="Списать"
+                            context="{'state': 'on_cancellation'}"
+                            icon="gtk-delete"
+                            attrs="{'invisible': [('state', 'in', ('on_cancellation', 'cancellation'))]}"
+                            groups="base.group_sys_admin_head,base.group_sys_admin"
+                            />
+                    <button type="object"
+                            name="save"
+                            string="На склад"
+                            context="{'state': 'storage'}"
+                            attrs="{'invisible': [('state', 'in', ('on_cancellation', 'cancellation', 'storage'))]}"
+                            icon="gtk-home"
+                            groups="base.group_sys_admin_head,base.group_sys_admin"
+                            />
+                    <group colspan="4" groups="base.group_sys_admin_head,base.group_sys_admin">
+                        <field name="history_ids" colspan="4" nolabel="1" readonly="1">
+                            <tree string="История">
+                                <field name="create_uid"/>
+                                <field name="create_date"/>
+                                <field name="name" />
+                            </tree>
+                        </field>
+                    </group>
+
+                </form>
+            </field>
+        </record>
+
+        <record id="view_technique_tree" model="ir.ui.view">
+            <field name="name">Учет техники</field>
+            <field name="model">hr.technique</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" />
+                    <field name="type" />
+                    <field name="employee_id" />
+                    <field name="department_id" />
+                    <field name="date_of_issue" />
+                    <field name="cash_ye" groups="base.group_sys_admin_head,base.group_sys_admin"/>
+                    <field name="state" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_technique_search" model="ir.ui.view">
+            <field name="name">Учет техники</field>
+            <field name="model">hr.technique</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" />
+                    <field name="type" />
+                    <field name="inventory_number" />
+                    <field name="employee_id" />
+                    <field name="department_id" />
+                    <field name="date_of_issue" />
+                    <field name="cash_ye" groups="base.group_sys_admin_head,base.group_sys_admin"/>
+                    <field name="state" />
+                </search>
+            </field>
+        </record>
+
+        <record id="action_technique" model="ir.actions.act_window">
+            <field name="name">Учет техники</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.technique</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_technique_tree"/>
+            <field name="search_view_id" ref="view_technique_search"/>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_technique_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_technique_form"/>
+            <field name="act_window_id" ref="action_technique"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_technique_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_technique_tree"/>
+            <field name="act_window_id" ref="action_technique"/>
+        </record>
+
+        <menuitem parent="hr.menu_hr_root" name="Учет техники" sequence="1" id="menu_hr_technique_root" groups="base.group_user"/>
+        <menuitem parent="menu_hr_technique_root" action="action_technique" sequence="1" id="menu_hr_technique" groups="base.group_user"/>
+
+
+        <record id="view_employee_form_inherit" model="ir.ui.view">
+            <field name="name">view.employee.form.inherit</field>
+            <field name="model">hr.employee</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="hr_update.view_employee_form1"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@string='Categories']" position="after">
+                    <page string="Техника" attrs="{'invisible': [('check_l', '=', False), ('check_e', '=', False), ('check_s', '=', False)]}">
+                        <field name="technique_ids" colspan="4" nolabel="1"/>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

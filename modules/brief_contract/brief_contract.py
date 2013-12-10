@@ -1,9 +1,32 @@
 # -*- encoding: utf-8 -*-
+from shutil import copy2
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+import base64
+import subprocess
+import os
+from datetime import datetime
+import random
+import string
 from openerp import tools
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
-#from relatorio.templates.opendocument import Template
+
+from aeroolib.plugins.opendocument import Template, OOSerializer
+from pytils import dt, numeral
+import paramiko
+from pytils.translit import slugify
 from notify import notify
+
+
+def random_name(n=10):
+    random.seed()
+    d = [random.choice(string.ascii_letters) for x in xrange(n)]
+    name = "".join(d)
+    return name
 
 
 class BriefContract(Model):
@@ -16,12 +39,12 @@ class BriefContract(Model):
 
     _states = (
         ('draft', 'Черновик'),
-        ('approval', 'Бриф на согласовании'),
-        ('completion', 'Бриф на доработке'),
-        ('preparation', 'Подготовка договора'),
+        ('approval', 'Договор на корректировке'),
+        #('completion', 'Бриф на доработке'), approval
+        #('preparation', 'Подготовка договора'), approval
         ('contract_approval', 'Согласование договора с обслуживающим направлением'),
         ('contract_completion', 'Доработка договора'),
-        ('contract_agreed', 'Договор согласован'),
+        #('contract_agreed', 'Договор согласован'), approval_partner
         ('approval_partner', 'Утверждение договора с партнером'),
         ('partner_cancel', 'Отмена'),
         ('contract_approved', 'Договор утвержден'),
@@ -42,52 +65,55 @@ class BriefContract(Model):
             Динамически определяет роли на форме
         """
         res = {}
-        if ids:
-            data_ids = self.browse(cr, uid, ids, context)
+        for data in self.browse(cr, uid, ids, context):
+            access = str()
 
-            for data in data_ids:
-                access = str()
+            #  Менеджеры 2 и 3
+            group_work = self.pool.get('res.groups').search(
+                cr,
+                1,
+                [
+                    ('name', 'in', (
+                        'Продажи / Менеджер по работе с партнерами',
+                        'Продажи / Менеджер по развитию партнеров',
+                        'Продажи / Руководитель по развитию партнеров',
+                        'Продажи / Руководитель по работе с партнерами',
+                        'Продажи / Менеджер по привлечению партнеров',
+                        'Продажи / Руководитель по привлечению партнеров',
+                    ))
+                ])
+            users_work = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', group_work)], order='id')
+            if uid in users_work:
+                access += 'm'
 
-                #  Менеджеры 2 и 3
-                group_work = self.pool.get('res.groups').search(
-                    cr,
-                    1,
-                    [
-                        ('name', 'in', (
-                            'Продажи / Менеджер по работе с партнерами',
-                            'Продажи / Менеджер по развитию партнеров',
-                            'Продажи / Руководитель по развитию партнеров',
-                            'Продажи / Руководитель по работе с партнерами',
-                            'Продажи / Менеджер по привлечению партнеров',
-                            'Продажи / Руководитель по привлечению партнеров',
-                        ))
-                    ])
-                users_work = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', group_work)], order='id')
-                if uid in users_work:
-                    access += 'm'
+            #  Менеджер Москвы
+            if data.responsible_id.id == uid:
+                access += 'r'
 
-                #  Менеджер Москвы
-                if data.responsible_id.id == uid:
-                    access += 'r'
+            #  Юрист
+            if data.lawyer_id.id == uid:
+                access += 'l'
 
-                #  Юрист
-                if data.lawyer_id.id == uid:
-                    access += 'l'
+            #  Руководитель направления
+            if data.service_id:
+                users = self.pool.get('res.users').search(cr, 1,
+                                                          [('groups_id', 'in', data.service_id.leader_group_id.id)],
+                                                          order='id')
+                users = [x for x in users if x not in [1, 5, 13, 18, 354]]
+                if uid in users:
+                    access += 's'
 
-                #  Руководитель направления
-                if data.service_id:
-                    users = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', data.service_id.leader_group_id.id)], order='id')
-                    users = [x for x in users if x not in [1, 5, 13, 18, 354]]
-                    if uid in users:
-                        access += 's'
+            #  БЕНЯ
+            if uid == 18:
+                access += 'b'
 
-                val = False
+            val = False
 
-                letter = name[6]
+            letter = name[6]
 
-                if letter in access:
-                    val = True
-                res[data.id] = val
+            if letter in access or uid == 1:
+                val = True
+            res[data.id] = val
         return res
 
     def _get_head(self, cr, user, ids, name, arg, context=None):
@@ -97,7 +123,8 @@ class BriefContract(Model):
             for data in data_ids:
                 service = self.pool.get('brief.services.stage').browse(cr, user, data.service_id)
                 if service:
-                    users = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', data.leader_group_id.id)], order='id')
+                    users = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', data.leader_group_id.id)],
+                                                              order='id')
                     if users:
                         u = [x for x in users if x not in [1, 5, 13, 18, 354, 472]]
                         if u:
@@ -127,6 +154,10 @@ class BriefContract(Model):
             select=True,
             domain="[('groups_id','in',[131])]",
             help='Заполняется при создании Брифа, указывается отетственный сотрудник за подписание договора'
+        ),
+        'doc_type_id': fields.many2one(
+            'doc.type',
+            'действующего на основании'
         ),
         'lawyer_id': fields.many2one(
             'res.users',
@@ -160,9 +191,8 @@ class BriefContract(Model):
             ],
             'Условия для расчета',
             help='Выпадающий список условий. Обязательное к заполнению.'),
-        'amount': fields.char(
+        'amount': fields.float(
             'Сумма',
-            size=50,
             help='Денежная сумма, на которую заключается договор.'),
         'currency': fields.many2one(
             'partner.currency',
@@ -319,6 +349,12 @@ class BriefContract(Model):
             string="Руковолитель направления",
             type="boolean",
             invisible=True),
+        'check_b': fields.function(
+            _check_access,
+            method=True,
+            string="Проверка на Беню",
+            type="boolean",
+            invisible=True),
         'create_date': fields.datetime(
             'Дата создания',
             readonly=True,
@@ -326,6 +362,19 @@ class BriefContract(Model):
         'from': fields.char('from', size=10),
 
         'wuser_ids': fields.integer("Без этих людей"),
+        'doc_id': fields.many2one('ir.attachment', 'Договор(odt)'),
+        'pdf_id': fields.many2one('ir.attachment', 'Договор(pdf)', readonly=True),
+        'account_id': fields.many2one(
+            'account.account',
+            'Фирма',
+            domain=[('type', '!=', 'closed'), ('company_id', '=', 4)],
+            required=True,
+            help='Фирма, от лица которой создается данный счет.'
+        ),
+        'web': fields.char('Название баннерной или тизерной сети', size=250),
+        'url': fields.char('URL', size=250, readonly=True),
+        'login': fields.char('Логин', size=10, readonly=True),
+        'pass': fields.char('Пароль', size=10, readonly=True),
     }
 
     _defaults = {
@@ -355,8 +404,9 @@ class BriefContract(Model):
         if isinstance(ids, (int, long)):
             ids = [ids]
 
-        return [(r['id'], tools.ustr(self._get_name(r['contract_number'], r['contract_date']))) for r in self.read(cr, user, ids,
-            ['contract_number', 'contract_date'], context, load='_classic_write')]
+        return [(r['id'], tools.ustr(self._get_name(r['contract_number'], r['contract_date']))) for r in
+                self.read(cr, user, ids,
+                          ['contract_number', 'contract_date'], context, load='_classic_write')]
 
     def onchange_service(self, cr, user, ids, service, context=None):
         res = {}
@@ -392,13 +442,44 @@ class BriefContract(Model):
         if values.get('from'):
             del values['from']
         data = self.browse(cr, user, ids)[0]
+
+        #  генерим pdf
+        if values.get('doc_id') and not values.get('pdf_id'):
+            odt_file = self.pool.get('ir.attachment').read(cr, user, values['doc_id'],
+                                                       ['store_fname', 'parent_id'])
+            dbro = self.pool.get('document.directory').read(cr, user, odt_file['parent_id'][0], ['storage_id'], context)
+            storage = self.pool.get('document.storage').read(cr, user, dbro['storage_id'][0], ['path'])
+            filepath = os.path.join(storage['path'], odt_file['store_fname'])
+
+            filename = '{0} {1} {2}'.format(
+                data.contract_number.encode('utf-8'),
+                data.partner_id.name.encode('utf-8'),
+                data.service_id.name.encode('utf-8'), )
+
+            copy2(filepath, os.path.join(storage['path'], 'tmp.odt'))
+            odt = os.path.join(storage['path'], 'tmp.odt')
+            pdf_file = os.path.join(storage['path'], 'tmp.pdf')
+
+            status = subprocess.call(['libreoffice', '--headless', '--convert-to', 'pdf', '-outdir', storage['path'], '/home/andrey/erp/filestorage/tmp.odt'], stderr=subprocess.PIPE)
+
+            values['pdf_id'] = self.pool.get('ir.attachment').create(cr, user, {
+                'name': '{0}.pdf'.format(filename, ),
+                'datas': base64.b64encode(open(pdf_file, 'rb').read()),
+                'datas_fname': '{0}.pdf'.format(filename, ),
+                'res_model': self._name,
+                'res_id': data.id})
+
+            os.remove(odt)
+            os.remove(pdf_file)
+
         if data.service_id or values.get('service_id', False):
             service_id = values['service_id'] if values.get('service_id', False) else data.service_id.id
             service = self.pool.get('brief.services.stage').browse(cr, 1, service_id)
             if service:
-                users = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', service.leader_group_id.id)], order='id')
+                users = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', service.leader_group_id.id)],
+                                                          order='id')
                 if users:
-                    u = [x for x in users if x not in [1, 5, 13, 18, 354, 472]]
+                    u = [x for x in users if x not in [1, 5, 13, 18, 354]]
                     if u:
                         values['service_head_id'] = u[0]
         next_state = values.get('state', False)
@@ -425,7 +506,8 @@ class BriefContract(Model):
                         error += " Введите сумму оплаты; "
                     if not values.get('currency', False) and not data.currency:
                         error += " Выберите Валюту оплаты; "
-                payment_schedule = values['payment_schedule'] if values.get('payment_schedule', False) else data.payment_schedule
+                payment_schedule = values['payment_schedule'] if values.get('payment_schedule',
+                                                                            False) else data.payment_schedule
                 if not payment_schedule:
                     error += " Выберите График оплаты; "
                 else:
@@ -448,74 +530,76 @@ class BriefContract(Model):
                     error += " Выберите Способ доставки закрывающих документов; "
 
             #  draft -> cancel
-            if state == 'draft' and next_state == 'cancel':
-                print values
+            #if state == 'draft' and next_state == 'cancel':
+            #    print values
             #  approval -> completion
             if state == 'approval' and next_state == 'completion':
                 if not values.get('comment_rework', False) and not data.comment_rework:
                     error += " Введите Комментарий по доработке брифа; "
             #  completion -> approval
-            if state == 'completion' and next_state == 'approval':
-                pass
+            #if state == 'completion' and next_state == 'approval':
+            #    pass
             #  approval -> preparation
-            if state == 'approval' and next_state == 'preparation':
-                pass
+            #if state == 'approval' and next_state == 'preparation':
+            #    pass
             #  preparation -> contract_approval
             if state == 'preparation' and next_state == 'contract_approval':
                 if not values.get('contract_file', False) and not data.contract_file:
                     error += " Необходимо вложить Проект договора; "
             #  contract_approval -> contract_completion
             if state == 'contract_approval' and next_state == 'contract_completion':
-                if not values.get('comment_rework_2', False) and not data.comment_rework_2 and not values.get('contract_re_file', False) and not data.contract_re_file:
+                if not values.get('comment_rework_2', False) and not data.comment_rework_2 and not values.get(
+                        'contract_re_file', False) and not data.contract_re_file:
                     error += " Введите Комментарий по доработке договора или прикрепите файл доработки; "
             #  contract_completion -> contract_approval
-            if state == 'contract_completion' and next_state == 'contract_approval':
-                pass
+            #if state == 'contract_completion' and next_state == 'contract_approval':
+            #    pass
             #  contract_approval -> contract_agreed
-            if state == 'contract_approval' and next_state == 'contract_agreed':
-                pass
+            #if state == 'contract_approval' and next_state == 'contract_agreed':
+            #    pass
             #  contract_agreed -> approval_partner
-            if state == 'contract_agreed' and next_state == 'approval_partner':
-                pass
+            #if state == 'contract_agreed' and next_state == 'approval_partner':
+            #    pass
             #  approval_partner -> contract_completion
             if state == 'approval_partner' and next_state == 'contract_completion':
-                if not values.get('comment_rework_3', False) and not data.comment_rework_3 and not values.get('contract_re_file', False) and not data.contract_re_file:
+                if not values.get('comment_rework_3', False) and not data.comment_rework_3 and not values.get(
+                        'contract_re_file', False) and not data.contract_re_file:
                     error += " Введите Комментарий по доработке перед утверждением договора или прикрепите файл доработки; "
             #  approval_partner -> partner_cancel
-            if state == 'approval_partner' and next_state == 'partner_cancel':
-                pass
+            #if state == 'approval_partner' and next_state == 'partner_cancel':
+            #    pass
             #  partner_cancel -> approval_partner
-            if state == 'partner_cancel' and next_state == 'approval_partner':
-                pass
+            #if state == 'partner_cancel' and next_state == 'approval_partner':
+            #    pass
             #  approval_partner -> contract_approved
             if state == 'approval_partner' and next_state == 'contract_approved':
                 if not values.get('contract_approved_file', False) and not data.contract_approved_file:
                     error += " Прикрепите утвержденный договор; "
 
             #  contract_approved -> send_mail
-            if state == 'contract_approved' and next_state == 'send_mail':
-                pass
+            #if state == 'contract_approved' and next_state == 'send_mail':
+            #    pass
             #  contract_approved -> send_express
-            if state == 'contract_approved' and next_state == 'send_express':
-                pass
+            #if state == 'contract_approved' and next_state == 'send_express':
+            #    pass
             #  contract_approved -> send_courier
-            if state == 'contract_approved' and next_state == 'send_courier':
-                pass
+            #if state == 'contract_approved' and next_state == 'send_courier':
+            #    pass
             #  send_courier -> meeting_scheduled
-            if state == 'send_courier' and next_state == 'meeting_scheduled':
-                pass
+            #if state == 'send_courier' and next_state == 'meeting_scheduled':
+            #    pass
             #  send_mail -> waiting_receipt
-            if state == 'send_mail' and next_state == 'waiting_receipt':
-                pass
+            #if state == 'send_mail' and next_state == 'waiting_receipt':
+            #    pass
             #  send_express -> waiting_receipt
-            if state == 'send_express' and next_state == 'waiting_receipt':
-                pass
+            #if state == 'send_express' and next_state == 'waiting_receipt':
+            #    pass
             #  waiting_receipt -> meeting_scheduled
-            if state == 'waiting_receipt' and next_state == 'meeting_scheduled':
-                pass
+            #if state == 'waiting_receipt' and next_state == 'meeting_scheduled':
+            #    pass
             #  meeting_scheduled -> meeting_cancel
-            if state == 'meeting_scheduled' and next_state == 'meeting_cancel':
-                pass
+            #if state == 'meeting_scheduled' and next_state == 'meeting_cancel':
+            #    pass
             #  meeting_scheduled -> contract_signed
             if state == 'meeting_scheduled' and next_state == 'contract_signed':
                 if not data.pcontract_file and not values.get('pcontract_file', False):
@@ -541,21 +625,220 @@ class BriefContract(Model):
 
     def create(self, cr, user, vals, context=None):
         if vals.get('from'):
-            vals['from'] = None
+            del vals['from']
 
         if vals.get('partner_id'):
             self.pool.get('res.partner').write(cr, user, [vals['partner_id']], {'partner_base': 'hot'})
         return super(BriefContract, self).create(cr, user, vals, context)
 
-    def generate(self, cr, user, ids):
+    #  генерим odt
+    def generate(self, cr, user, ids, context=None):
         contract_id = ids
         if isinstance(ids, (list, tuple)):
             contract_id = ids[0]
-        contract = self.read(cr, user, contract_id, ['contract_number', 'contract_date', 'service_id', 'partner_id'])
+        contract = self.read(cr, user, contract_id, [])
+
         service = self.pool.get('brief.services.stage').read(cr, user, contract['service_id'][0], ['template_id'])
-        template = self.pool.get('ir.attachment')._data_get(cr, user, )
-        #basic = Template(source=None, filepath='basic.odt')
-        #file('bonham_basic.odt', 'wb').write(basic.generate(o=contract).render().getvalue())
+        if service['template_id']:
+            template = self.pool.get('ir.attachment').read(cr, user, service['template_id'][0],
+                                                           ['store_fname', 'parent_id'])
+            dbro = self.pool.get('document.directory').read(cr, user, template['parent_id'][0], ['storage_id'], context)
+            storage = self.pool.get('document.storage').read(cr, user, dbro['storage_id'][0], ['path'])
+
+            filepath = os.path.join(storage['path'], template['store_fname'])
+            file_data = open(filepath, 'rb').read()
+            template_io = StringIO()
+            template_io.write(file_data)
+            serializer = OOSerializer(template_io)
+            basic = Template(source=template_io, serializer=serializer)
+
+            d = datetime.strptime(contract['contract_date'], '%Y-%m-%d')
+            date_str = dt.ru_strftime(u"%d %B %Y", d, inflected=True)
+            if not contract['contract_number']:
+                raise osv.except_osv('Договор', 'Необходимо ввести номер договора')
+            if not contract['amount']:
+                raise osv.except_osv('Договор', 'Необходимо ввести сумму договора')
+
+            term = 7
+            if contract['term'] == 'mounth':
+                term = 30
+            elif contract['term'] == 'year':
+                term = 365
+            else:
+                term = 0
+            o = {
+                'name': u'-',
+                'contract_number': contract['contract_number'],
+                'contract_date': date_str,
+                'doc_type': contract['doc_type_id'][1] if contract['doc_type_id'] else '-',
+                'responsible_id': contract['responsible_id'][1] if contract['responsible_id'] else '-',
+                #  Название баннерной или тизерной сети
+                'web': 'test',
+
+                #  стоимость услуг цифры
+                'cost_num': contract['amount'],
+                #  стоимость услуг слова
+                'cost_word': numeral.in_words(float(contract['amount'])),
+
+                #  срок предоставления услуги в фомате 30 (тридцать)
+                'term': term,
+
+
+                #  наш генеральный директор
+                'our_gen_dir': u'-',
+                #  название фирмы
+                'our_firm_name': u'-',
+                #  наш Юридический адрес
+                'our_address': u'-',
+                #  Фактический адрес,адрес почтовой корреспонденции наш
+                'our_fact_address': u'-',
+                #  ИНН / КПП наш
+                'our_inn': u'-',
+                #  ОГРН наш
+                'our_ogrn': u'-',
+                #  Код ОКПО наш
+                'our_okpo': u'-',
+                #  банк наш
+                'our_bank': u'-',
+                #  к/с наш
+                'our_ks': u'-',
+                #  р/с наш
+                'our_rs': u'-',
+                #  бик наш
+                'our_bik': u'-',
+                #  Тел/факс наш
+                'our_phone': u'-',
+                #  Web сайт почта наш
+                'our_site': u'-',
+
+                #  заказчика e-mail
+                'partner_mail': u'-',
+                #  название фирмы заказчика
+                'partner_firm_name': u'-',
+                #  Юридический адрес партнера
+                'partner_address': u'-',
+                #  Фактический адрес,адрес почтовой корреспонденции партнера
+                'partner_fact_address': u'-',
+                #  ИНН / КПП партнера
+                'partner_inn': u'-',
+                #  ОГРН партнера
+                'partner_ogrn': u'-',
+                #  Код ОКПО партнера
+                'partner_okpo': u'-',
+                #  банк партнера
+                'partner_bank': u'-',
+                #  к/с партнера
+                'partner_ks': u'-',
+                #  р/с партнера
+                'partner_rs': u'-',
+                #  бик партнера
+                'partner_bik': u'-',
+                'partner_kpp': u'-',
+                #  Тел/факс партнера
+                'partner_phone': u'-',
+                #  Web сайт почта партнера
+                'partner_site': u'-',
+            }
+
+            if contract['bank_id']:
+                bank = self.pool.get('res.partner.bank').read(cr, 1, contract['bank_id'][0], [])
+                o.update({
+                    'partner_mail': bank['email'] or u'-',
+                    'partner_site': bank['site'] or u'-',
+                    'partner_firm_name': bank['fullname'] or u'-',
+                    'partner_address': self.pool.get('res.partner.bank.address').get_address(cr, contract['bank_id'][0]) or u'-',
+                    'partner_fact_address': self.pool.get('res.partner.bank.address').get_address(cr, contract['bank_id'][0], 'fa') or u'-',
+                    'partner_inn': bank['inn'] or u'-',
+                    'partner_kpp': bank['kpp'] or u'-',
+                    'partner_ogrn': bank['ogrn'] or u'-',
+                    'partner_okpo': bank['okpo'] or u'-',
+                    'partner_bank': bank['bank'] or u'-',
+                    'partner_ks': bank['correspondent_account'] or u'-',
+                    'partner_rs': bank['current_account'] or u'-',
+                    'partner_bik': bank['bik'] or u'-',
+                    'partner_phone': bank['phone'] or u'-',
+                })
+
+            if contract['account_id']:
+                account = self.pool.get('account.account').read(cr, 1, contract['account_id'][0], [])
+                o.update({
+                    'our_gen_dir': account['responsible'] or u'-',
+                    'our_firm_name': account['full'] or u'-',
+                    'our_address': account['address'] or u'-',
+                    'our_fact_address': account['address'] or u'-',
+                    'our_inn': account['inn'] or u'-',
+                    'our_kpp': account['kpp'] or u'-',
+                    'our_ogrn': u'1127747081406',
+                    'our_okpo': u'13183255',
+                    'our_bank': account['bank'] or u'-',
+                    'our_ks': account['bank_number'] or u'-',
+                    'our_rs': account['account_number'] or u'-',
+                    'our_bik': account['bik'] or u'-',
+                    'our_phone': account['phone'] or u'-',
+                    'our_site': u'UpSale.ru, Fortune@UpSale.ru',
+                })
+
+            filename = '{0} {1} {2}'.format(
+                contract['contract_number'].encode('utf-8'),
+                contract['partner_id'][1].encode('utf-8'),
+                contract['service_id'][1].encode('utf-8'), )
+
+            #data = [(k, v.encode('cp1251')) for k, v in o.iteritems() if isinstance(v, unicode)]
+
+            odt_file = os.path.join(storage['path'], 'tmp.odt')
+            file(odt_file, 'wb').write(basic.generate(o=o).render().getvalue())
+
+            doc_id = self.pool.get('ir.attachment').create(cr, user, {
+                'name': '{0}.odt'.format(filename, ),
+                'datas': base64.b64encode(open(odt_file, 'rb').read()),
+                'datas_fname': '{0}.odt'.format(filename, ),
+                'res_model': self._name,
+                'res_id': contract['id']
+            })
+            self.write(cr, user, [contract['id']], {'doc_id': doc_id})
+        return True
+
+    #  отправляем pdf на сервер
+    def send(self, cr, user, ids, context=None):
+        host = '46.28.66.55'
+        port = 22
+        ssh_user = 'erpub'
+        secret = 'VeY4cgrQ9C9MN4M0'
+        for record in self.read(cr, user, ids, ['pdf_id', 'partner_id', 'service_id']):
+            if record['pdf_id']:
+                pdf = self.pool.get('ir.attachment').read(cr, 1, record['pdf_id'][0], ['name', 'store_fname', 'parent_id'])
+                dbro = self.pool.get('document.directory').read(cr, user, pdf['parent_id'][0], ['storage_id'], context)
+                storage = self.pool.get('document.storage').read(cr, user, dbro['storage_id'][0], ['path'])
+                filepath = os.path.join(storage['path'], pdf['store_fname'])
+
+                transport = paramiko.Transport((host, port))
+                transport.connect(username=ssh_user, password=secret)
+                sftp = paramiko.SFTPClient.from_transport(transport)
+                remoteurl = 'http://publish.upsale.ru/'
+                remotefile = slugify(pdf['name'][:-4])
+                remotefile = remotefile[:32]
+                remotepath = '/var/www/publish/files/{file}.pdf'.format(file=remotefile,)
+                url = "{url}{file}.pdf".format(url=remoteurl, file=remotefile)
+                sftp.put(filepath, remotepath)
+
+                sftp.close()
+                transport.close()
+
+                client = paramiko.SSHClient()
+                client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                client.connect(hostname=host, username=ssh_user, password=secret, port=port)
+                partner_user = random_name(7)
+                partner_pass = random_name(10)
+                command = 'htpasswd -b /var/www/publish/.htpasswd {user} {password}'.format(user=partner_user, password=partner_pass)
+                stdin, stdout, stderr = client.exec_command(command)
+
+                client.close()
+
+                self.write(cr, 1, [record['id']], {'url': url, 'login': partner_user, 'pass': partner_pass})
+            else:
+                raise osv.except_osv('Договор', "Сначала надо сгенерировать pdf!")
+        return True
+
 BriefContract()
 
 
@@ -569,6 +852,8 @@ class BriefContractAmount(Model):
         'term': fields.char('Срок выставления счета на оплату', size=255),
         'contract_id': fields.many2one('brief.contract', 'Бриф на договор', invisible=True),
     }
+
+
 BriefContractAmount()
 
 
@@ -587,6 +872,8 @@ class BriefContractComments(Model):
     _defaults = {
         'usr_id': lambda self, cr, uid, context: uid,
     }
+
+
 BriefContractComments()
 
 
@@ -603,6 +890,8 @@ class BriefContractHistory(Model):
         'contract_id': fields.many2one('brief.contract', 'Бриф на встречу', invisible=True),
         'create_date': fields.datetime('Дата', readonly=True),
     }
+
+
 BriefContractHistory()
 
 
@@ -637,4 +926,19 @@ class ResPartner(Model):
                 })
 
         return data
+
+
 ResPartner()
+
+
+class DocType(Model):
+    _name = 'doc.type'
+    _columns = {
+        'name': fields.char(
+            "Тип документа",
+            size=256,
+            help='Тип документа'),
+    }
+
+
+DocType()

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data noupdate="1">
+
+    <record id="base.group_sys_admin" model="res.groups">
+        <field name="name">Сис. админ</field>
+    </record>
+    <record id="base.group_sys_admin_head" model="res.groups">
+        <field name="name">Руководитель сис. админов</field>
+    </record>
+
+    <!-- Правила доступа для групп -->
+    <record id="rule_hr_technique_view" model="ir.rule">
+        <field name="name">Учет техники видят: свои, своего направления, те в которых состоят в комиссии</field>
+        <field ref="model_hr_technique" name="model_id"/>
+        <field name="domain_force">['|',  '|', '&amp;', ('employee_id.user_id.id', '=', user.id),  ('state', '=', 'issued'), ('employee_id.parent_id.user_id.id', '=', user.id), '&amp;', ('cancellation_employee_send_ids.user_id.id', '=', user.id), ('state', '=', 'on_cancellation')]</field>
+        <field name="perm_read" eval="True" />
+        <field name="perm_create" eval="False" />
+        <field name="perm_write" eval="False" />
+        <field name="perm_unlink" eval="False" />
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="rule_hr_technique_admin" model="ir.rule">
+        <field name="name">Учет техники: сис. админы</field>
+        <field ref="model_hr_technique" name="model_id"/>
+        <field name="domain_force">[]</field>
+        <field name="perm_read" eval="True" />
+        <field name="perm_create" eval="True" />
+        <field name="perm_write" eval="True" />
+        <field name="perm_unlink" eval="False" />
+        <field name="groups" eval="[(4, ref('base.group_sys_admin')), (4, ref('base.group_sys_admin_head'))]"/>
+    </record>
+    <record id="rule_hr_technique_admin_head" model="ir.rule">
+        <field name="name">Учет техники: рук. сис. админов удаляет</field>
+        <field ref="model_hr_technique" name="model_id"/>
+        <field name="domain_force">[]</field>
+        <field name="perm_read" eval="True" />
+        <field name="perm_create" eval="True" />
+        <field name="perm_write" eval="True" />
+        <field name="perm_unlink" eval="True" />
+        <field name="groups" eval="[(4, ref('base.group_sys_admin_head'))]"/>
+    </record>
+</data>
+</openerp>

@@ -20,7 +20,7 @@ class ReportSourcePlan(Model):
         'section_id': fields.many2one(
             'crm.case.section',
             'Поднаправление',
-            domain=[('id', 'child_of', [6])], required=True
+            domain=[('id', 'child_of', [8, 7, 9, 18])], required=True
         ),
         'plan': fields.float('План'),
         'period_month': fields.selection(

@@ -1,5 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 from datetime import datetime, timedelta, date
+import re
 import numpy
 import pytz
 from openerp import tools
@@ -353,8 +354,8 @@ class partner_added_services(Model):
     _columns = {
         'service_id': fields.many2one('brief.services.stage', 'Услуга'),
         'comment': fields.text('Комментарий'),
-        'date_start':fields.date('Дата подключения'),
-        'date_finish':fields.date('Дата окончания'),
+        'date_start': fields.date('Дата подключения'),
+        'date_finish': fields.date('Дата окончания'),
         'partner_id': fields.many2one('res.partner', 'Партнер', inbisible=True),
         'check': fields.function(_set_check, type="boolean", method=True, string='Статус подключения'),
         'budget': fields.float('Бюджет, y.e.'),
@@ -772,10 +773,10 @@ class res_partner_access(Model):
                 ('yandexMetrica', 'Доступ в YandexMetrica'),
                 ('googleAdWords', 'Доступ в GoogleAdWords'),
                 ('yandexDirect', 'Доступ в ЯндексДирект'),
-            ], 'Доступы партнера'),
+            ], 'Доступы партнера', required=True),
         'link': fields.char('Ссылка', size=250),
-        'login': fields.char('Логин', size=250),
-        'pswd': fields.char('Пароль', size=250),
+        'login': fields.char('Логин', size=250, required=True),
+        'pswd': fields.char('Пароль', size=250, required=True),
     }
 res_partner_access()
 
@@ -910,6 +911,17 @@ class ResPartnerBankAddress(Model):
             ], 'Тип'),
         'index': fields.char("Почтовый индекс", size=6),
         'city': fields.char("Город", size=250),
+        'st_type': fields.selection(
+            [
+                ('alleya', 'Аллея'),
+                ('ylitsa', 'Улица'),
+                ('bulvar', 'Бульвар'),
+                ('naberegnaya', 'Набережная'),
+                ('pereyloc', 'Переулок'),
+                ('proezd', 'Проезд'),
+                ('prospect', 'Проспект'),
+                ('ploshad', 'Площадь'),
+            ], 'Тип улицы'),
         'street': fields.char("Улица", size=250),
         'house': fields.char("№ дома", size=50),
         'housing': fields.char("№ корпуса", size=50),
@@ -929,9 +941,40 @@ class ResPartnerBankAddress(Model):
     }
 
     _defaults = {
-        'name': lambda *a: 'ua',
-        'flat_type': lambda *a: 'flat'
+        'name': 'ua',
+        'flat_type': 'flat',
+        'st_type': 'ylitsa'
     }
+
+    def get_address(self, cr, bank_id, address_type='ua'):
+        address_ids = self.search(cr, 1, [('bank_id', '=', bank_id), ('name', '=', address_type)])
+        address_list = []
+        if address_ids:
+            address = self.read(cr, 1, address_ids[0], [])
+            if address['index']:
+                address_list.append(address['index'])
+            if address['city']:
+                address_list.append(address['city'])
+            if address['street']:
+                st = u'ул.'
+                if address['st_type'] == 'alleya':
+                    st = u'ал.'
+                if address['st_type'] == 'bulvar':
+                    st = u'бул.'
+                if address['st_type'] == 'naberegnaya':
+                    st = u'наб.'
+                if address['st_type'] == 'pereyloc':
+                    st = u'пр.'
+                if address['st_type'] == 'proezd':
+                    st = u'проезд'
+                if address['st_type'] == 'prospect':
+                    st = u'просп.'
+                if address['st_type'] == 'ploshad':
+                    st = u'пл.'
+                address_list.append(u"{st_type} {street}".format(street=address['street'], st_type=st))
+            if address['house']:
+                address_list.append(u"д. {house}".format(house=address['house']))
+        return ','.join(address_list) or u'-'
 ResPartnerBankAddress()
 
 
@@ -942,10 +985,9 @@ class SkkNotes(Model):
 SkkNotes()
 
 
-class res_partner(Model):
-    _description = u'Partner'
-    _name = "res.partner"
+class ResPartner(Model):
     _inherit = "res.partner"
+    _description = u'Partner'
     _order = "priority, create_date desc"
 
     def change_name(self, cr, uid, ids, ur_name='', site='', context=None):
@@ -974,13 +1016,10 @@ class res_partner(Model):
         return res
 
     def _check_access(self, cr, uid, ids, name, arg, context=None):
-        res = {}
-        for record in self.browse(cr, uid, ids):
-            if uid in (14, 284):
-                res[record.id] = True
-            else:
-                res[record.id] = False
-        return res
+        flag = False
+        if uid in (1, 14):
+            flag = True
+        return dict([(record_id, flag) for record_id in ids])
 
     def _get_service(self, cr, uid, ids, name, arg, context=None):
         res = {}
@@ -1009,10 +1048,113 @@ class res_partner(Model):
 
         return res
 
-    def _get_date(self, cr, uid, ids, name, arg, context=None):
+    def _get_rate(self, cr, uid, ids, name, arg, context=None):
         res = {}
-        for record in self.perm_read(cr, uid, ids):
-            res[record.id] = record['create_date']
+        fields = [
+            'description',
+            'key_person',
+            'key_moment',
+            'zone',
+            'another',
+            'terms_of_service',
+            'conformity',
+            'quality_feedback',
+            'completeness_of_reporting',
+        ]
+        for record in self.read(cr, 1, ids, fields):
+            rate = 0.0
+
+            if self.pool.get('partner.operational.departments').search(cr, 1, [('partner_id', '=', record['id'])], count=True):
+                rate += 5.0
+
+            if self.pool.get('ir.attachment').search(cr, 1, [('res_id', '=', record['id']), ('res_model', '=', 'res.partner')], count=True) >= 2:
+                rate += 10.0
+
+            if self.pool.get('res.partner.access').search(cr, 1, [('partner_id', '=', record['id'])], count=True):
+                rate += 10.0
+
+            services_ids = self.pool.get('partner.added.services').search(cr, 1, [('partner_id', '=', record['id'])])
+            if services_ids:
+
+                flag = True
+                for service in self.pool.get('partner.added.services').read(cr, 1, services_ids, ['service_id', 'comment', 'budget']):
+                    if not service['service_id'] or not (service['comment'] and service['comment'].split()) or not service['budget']:
+                        flag = False
+                        break
+                if flag:
+                    rate += 10.0
+
+            if record['terms_of_service'] and record['terms_of_service'].split() and record['conformity'] and record['conformity'].split() and record['quality_feedback'] and record['quality_feedback'].split() and record['completeness_of_reporting'] and record['completeness_of_reporting'].split():
+                rate += 5.0
+
+            if record['description'] and len(record['description'].strip()) > 15:
+                rate += 5.0
+
+            if record['key_person'] and len(record['key_person'].strip()) > 15:
+                rate += 10.0
+
+            if record['key_moment'] and len(record['key_moment'].strip()) > 15:
+                rate += 10.0
+
+            if record['zone'] and len(record['zone'].strip()) > 15:
+                rate += 5.0
+
+            if record['another'] and len(record['another'].strip()) > 15:
+                rate += 5.0
+
+            note_ids = self.pool.get('crm.lead.notes').search(cr, 1, [('partner_id', '=', record['id']), ('type', '!=', 'skk')])
+            if note_ids:
+                note_last = self.pool.get('crm.lead.notes').read(cr, 1, note_ids[0], ['create_date'])
+                week_day = date.today().weekday()
+                td = 3
+                if week_day in (5, 6):
+                    td = week_day - 4
+                if date.today() - timedelta(days=td) <= datetime.strptime(note_last['create_date'], '%Y-%m-%d %H:%M:%S').date():
+                    rate += 20.0
+
+            address_ids = self.pool.get('res.partner.address').search(cr, 1, [('partner_id', '=', record['id'])])
+            if address_ids:
+                flag = True
+                for address in self.pool.get('res.partner.address').read(cr, 1, address_ids, ['site_ids', 'phone_ids', 'email_ids', 'name', 'function']):
+                    if not (address['name'] and address['name'].strip()) or not (address['function'] and address['function'].strip()):
+                        flag = False
+                        break
+
+                    site_ids = self.pool.get('res.partner.address.site').search(cr, 1, [('address_id', '=', address['id'])])
+                    if site_ids:
+                        for item in self.pool.get('res.partner.address.site').read(cr, 1, site_ids, ['name']):
+                            if not (item['name'] and item['name'].strip()):
+                                flag = False
+                                break
+                    else:
+                        flag = False
+                        break
+
+                    phone_ids = self.pool.get('tel.reference').search(cr, 1, [('partner_address_id', '=', address['id'])])
+                    if phone_ids:
+                        pe = re.compile('^\d+$', re.UNICODE)
+                        for item in self.pool.get('tel.reference').read(cr, 1, phone_ids, ['phone']):
+                            if not item['phone'] or not pe.match(item['phone']):
+                                flag = False
+                                break
+                    else:
+                        flag = False
+                        break
+
+                    email_ids = self.pool.get('res.partner.address.email').search(cr, 1, [('address_id', '=', address['id'])])
+                    if email_ids:
+                        pe = re.compile("^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", re.UNICODE)
+                        for item in self.pool.get('res.partner.address.email').read(cr, 1, email_ids, ['name']):
+                            if not (item['name'] and pe.match(item['name'])):
+                                flag = False
+                                break
+                    else:
+                        flag = False
+                        break
+
+                if flag:
+                    rate += 5.0
+            res[record['id']] = rate
         return res
 
     def _search_cr_date(self, cr, uid, obj, name, args, context):
@@ -1099,9 +1241,9 @@ class res_partner(Model):
             service_ids = p_service_pool.search(cr, 1, [('partner_id', '!=', False)])
             service_statuses = p_service_pool._get_service_status(cr, 1, service_ids, '', [])
             ids = [k for k, v in service_statuses.iteritems() if get_state(PARTNER_STATUS, status)[1] == v]
-            partner_id = set([r['partner_id'][0] for r in p_service_pool.read(cr, 1, ids, ['partner_id'])])
-        if ids:
-            return [('id', 'in', tuple(partner_id))]
+            partner_ids = set([r['partner_id'][0] for r in p_service_pool.read(cr, 1, ids, ['partner_id'])])
+            if ids:
+                return [('id', 'in', tuple(partner_ids))]
         return [('id', '=', '0')]
 
     def _search_service_name(self, cr, uid, obj, name, args, context):
@@ -1417,10 +1559,10 @@ class res_partner(Model):
         'categ_id': fields.many2one(
             'crm.case.categ',
             'Тематика',
-            domain="['|',('section_id','=',section_id),('section_id','=',False),('object_id.model', '=', 'crm.lead')]",
+            #domain="['|', ('section_id', '=', False), ('responsible_users', '=', user_id)]",
             help='Категория, которой принадлежит данный Партнер'
         ),
-        'description': fields.text('Дополнительная информация о контактном лице'),
+
         'access_ids': fields.one2many(
             'res.partner.access',
             'partner_id',
@@ -1458,7 +1600,7 @@ class res_partner(Model):
             fnct_search=_search_service_name
         ),
         'site_s': fields.function(
-            lambda *a: [],
+            lambda *a: dict((r_id, '') for r_id in a[3]),
             method=True,
             string='Сайт',
             type='char',
@@ -1479,7 +1621,7 @@ class res_partner(Model):
         'last_comment': fields.related('note_ids', 'title', type='char', size=128, string=u'Комментарий'),
 
         'phone_s': fields.function(
-            lambda *a: [],
+            lambda *a: dict((r_id, '') for r_id in a[3]),
             method=True,
             string='Телефон',
             type='char',
@@ -1487,14 +1629,14 @@ class res_partner(Model):
         ),
 
         'email_s': fields.function(
-            lambda *a: [],
+            lambda *a: dict((r_id, '') for r_id in a[3]),
             method=True,
             string='Эл. почта',
             type='char',
             fnct_search=_search_email
         ),
         'full_name_s': fields.function(
-            lambda *a: [],
+            lambda *a: dict((r_id, '') for r_id in a[3]),
             method=True,
             string='Полное наименование партнера',
             type='char',
@@ -1503,7 +1645,7 @@ class res_partner(Model):
         ),
 
         'service_s': fields.function(
-            lambda *a: [],
+            lambda *a: dict((r_id, '') for r_id in a[3]),
             method=True,
             string='Тип услуги',
             type='selection',
@@ -1511,7 +1653,7 @@ class res_partner(Model):
             fnct_search=_search_service
         ),
         'service_status': fields.function(
-            lambda *a: [],
+            lambda *a: dict((r_id, '') for r_id in a[3]),
             method=True,
             string='Статус услуги',
             type='selection',
@@ -1555,6 +1697,20 @@ class res_partner(Model):
         'check_ppc': fields.function(_check_ppc, type="boolean", method=True, string=u"Маркер PPC"),
         'old_discounts_ids': fields.one2many('res.partner.ppc.discounts', 'partner_id', 'Скидки', domain=[('finish_date', '<', date.today().strftime('%Y-%m-%d'))]),
         'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством'),
+
+        'description': fields.text('Описание компании', help='-специфика работы;\n-на чем они зарабатывают больше всего;\n-ключевые направления деятельность;\n-специфика иерархии в компании;\n-основные векторы дальнейшего развития и тд.'),
+        'key_person': fields.text('Характеристика ключевых лиц', help='должности, эмоциональные характеристики, их интересы и другие важные данные для работы с ними'),
+        'zone': fields.text('Зоны ответственности разных контактных лиц', help='Кто за что отвечает'),
+        'key_moment': fields.text('Ключевые моменты взаимодействия нашей компании и партнера', help='Например, партнер приезжал к нам в Харьков, конфликты с партнером и тд.'),
+        'another': fields.text('Другая', help='Любая другая полезная информация'),
+
+        'rate': fields.function(
+            _get_rate,
+            type='float',
+            readonly=True,
+            digits=(3, 2),
+            string='Процент заполненности'
+        )
     }
 
     def _get_type(self, cr, uid, context=None):
@@ -1572,10 +1728,6 @@ class res_partner(Model):
         'lead': _get_type,
         'partner_base': 'cold',
     }
-
-    def default_get(self, cr, uid, fields_list, context=None):
-        pass
-        return super(res_partner, self).default_get(cr, uid, fields_list, context)
 
     def add_note(self, cr, uid, ids, context=None):
         view_id = self.pool.get('ir.ui.view').search(cr, uid,
@@ -1660,7 +1812,7 @@ class res_partner(Model):
             for indx in date_indx:
                 del args[indx]
 
-        return super(res_partner, self).search(cr, uid, args, offset, limit, order, context, count)
+        return super(ResPartner, self).search(cr, uid, args, offset, limit, order, context, count)
 
     def write(self, cr, user, ids, vals, context=None):
         next_partner_status = vals.get('partner_status', False)
@@ -1682,7 +1834,13 @@ class res_partner(Model):
             if attachment[0] == 0:
                 attachment[2]['res_model'] = 'res.partner'
 
-        return super(res_partner, self).write(cr, user, ids, vals, context)
+        return super(ResPartner, self).write(cr, user, ids, vals, context)
+
+    def create(self, cr, user, vals, context=None):
+        categ_ids = self.pool.get('crm.case.categ').search(cr, user, [('responsible_users', '=', user)])
+        if vals.get('partner_base') == 'cold' and (not vals.get('categ_id') or vals['categ_id'] not in categ_ids):
+            raise osv.except_osv("Ошибка", "Заполните поле 'Тематика' Вашей тематикой")
+        return super(ResPartner, self).create(cr, user, vals, context)
 
     def _check_unique_insesitive(self, cr, uid, ids, context=None):
         for self_obj in self.browse(cr, 1, ids, context):
@@ -1712,8 +1870,11 @@ class res_partner(Model):
             if (record.partner_type in ('upsale', False) and terms_of_service \
                     and conformity and quality_feedback and completeness_of_reporting):
 
-                sum_criteries = int(terms_of_service) + int(conformity) + \
-                                int(quality_feedback) + int(completeness_of_reporting)
+                try:
+                    sum_criteries = int(terms_of_service) + int(conformity) + \
+                                    int(quality_feedback) + int(completeness_of_reporting)
+                except:
+                    sum_criteries = 0
 
                 if sum_criteries != 100:
                     return False
@@ -1806,7 +1967,7 @@ class res_partner(Model):
         ),
         (
             _check_criteries,
-            'Сумма критериев должна равняться 100',
+            'Сумма критериев должна равняться 100 и не должно быть пустых полей',
             []
         ),
         #(
@@ -1815,13 +1976,20 @@ class res_partner(Model):
         #    []
         #),
     ]
-res_partner()
+ResPartner()
 
 
 class TransferHistory(Model):
-    _inherit = 'transfer.history'
+    _name = 'transfer.history'
+    _description = u'Lead/Partner - История переприсвоение карточки'
+    _log_create = True
+    _order = "create_date desc"
 
     _columns = {
+        'create_uid': fields.many2one('res.users', 'Перевел', readonly=True),
+        'user_id': fields.many2one('res.users', 'Перевел', readonly=True),
+        'name': fields.many2one('res.users', 'На кого переприсвоили'),
+        'create_date': fields.datetime('Дата', readonly=True),
         'partner_id': fields.many2one('res.partner', 'Партнер', invisible=True),
     }
 TransferHistory()
@@ -2008,17 +2176,29 @@ class PartnerQualityControl(Model):
 
     def _get_ydolit(self, cr, uid, ids, name, arg, context=None):
         res = {}
-        for record in self.read(cr, uid, ids, ['partner_id', 'criteria_ids', 'mbo'], context=context):
+
+        for record in self.read(cr, uid, ids, ['partner_id', 'criteria_ids', 'period_id', 'service_id'], context=context):
             res[record['id']] = {
                 'level_ydolit': 0.0,
                 'index_ydolit': 0.0,
+                'mbo': 0.0
             }
             partner = self.pool.get('res.partner').read(cr, 1, record['partner_id'][0], ['terms_of_service', 'conformity', 'quality_feedback', 'completeness_of_reporting'])
-
             level = sum(c['value']*float(partner[c['name']])/100 for c in self.pool.get('res.partner.quality.criteria').read(cr, 1, record['criteria_ids'], ['name', 'value']))
 
+            if record['partner_id'] and record['service_id']:
+                process_launch_ids = self.pool.get('process.launch').search(cr, 1, [('partner_id', '=', record['partner_id'][0]), ('service_id', '=', record['service_id'][0])])
+                if process_launch_ids:
+                    data = self.pool.get('process.launch').read(cr, 1, process_launch_ids,  ['process_model', 'process_id'])
+                    if data:
+                        sla_ids = self.pool.get('process.sla').search(cr, 1, [('process_model', '=', data[0]['process_model']), ('process_id', '=', data[0]['process_id']), ('period_id', '=', record['period_id'][0])])
+                        if sla_ids:
+                            mbo_list = self.pool.get('process.sla').read(cr, 1, sla_ids[0], ['avg_mbo'])
+                            res[record['id']]['mbo'] = mbo_list['avg_mbo']
+
             res[record['id']]['level_ydolit'] = level
-            res[record['id']]['index_ydolit'] = numpy.mean((level, record['mbo'])) if record['mbo'] else level
+            res[record['id']]['index_ydolit'] = numpy.mean((level, res[record['id']]['mbo'])) if res[record['id']]['mbo'] else level
+
         return res
 
     _columns = {
@@ -2041,23 +2221,43 @@ class PartnerQualityControl(Model):
         ),
         'specialist_id': fields.many2one('res.users', 'Специалист', readonly=True),
         'criteria_ids': fields.one2many('res.partner.quality.criteria', 'quality_id', string='Критерии'),
-        'mbo': fields.float('MBO'),
+        'mbo': fields.function(
+            _get_ydolit,
+            type='float',
+            string='MBO',
+            multi='ydolit',
+            readonly=True,
+        ),
         # Троллинг Маши Кравчук за "Уровень удолит." в ТЗ
         'level_ydolit': fields.function(
             _get_ydolit,
             type='float',
-            string='Уровень удовлетворительности',
+            string='Уровень удовлетворенности',
             multi='ydolit',
             readonly=True,
         ),
         'index_ydolit': fields.function(
             _get_ydolit,
             type='float',
-            string='Индекс удовлетворительности',
+            string='Индекс удовлетворенности',
             multi='ydolit',
             readonly=True,
         ),
     }
+
+    def _check_unique(self, cr, uid, ids, context=None):
+        for self_obj in self.read(cr, 1, ids, ['period_id', 'service_id', 'partner_id'], context):
+            if self.search(cr, 1, [('period_id', '=', self_obj['period_id'][0]), ('service_id', '=', self_obj['service_id'][0]), ('id', '!=', self_obj['id']), ('partner_id', '=', self_obj['partner_id'][0])], context):
+                return False
+            return True
+
+    _constraints = [
+        (
+            _check_unique,
+            'оценивать одну и ту же услугу 2 раза за период!',
+            [u'Нельзя']
+        ),
+    ]
 PartnerQualityControl()
 
 

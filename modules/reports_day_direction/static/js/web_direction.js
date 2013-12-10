@@ -10,7 +10,7 @@ openerp.reports_day_direction = function (openerp) {
         },
         start: function() {
             var view = this.widget_parent,
-                models = ['report.day.ppc.statistic', ];
+                models = ['report.day.ppc.statistic', 'report.day.seo.statistic',];
             this._super(this);
             var self = this;
             this.$element.html(openerp.web.qweb.render('Sidebar'));
@@ -29,11 +29,15 @@ openerp.reports_day_direction = function (openerp) {
         },
         on_update: function () {
             var self = this;
-            var ids = self.widget_parent.get_selected_ids();
             var model = self.widget_parent.model;
-
+            var title = '';
+            if (model == 'report.day.ppc.statistic') {
+                title = 'Обновление информации от Яндекс.Директа';
+            } else {
+                title = 'Обновление информации от AllPosition.ru';
+            }
             this.dialog = new openerp.web.Dialog(this,{
-                title: "Обновление информации от Яндекс.Директа",
+                title: title,
                 width: '300px',
                 buttons: [
                     {text: _t("Cancel"), click: function(){ self.dialog.stop(); }},

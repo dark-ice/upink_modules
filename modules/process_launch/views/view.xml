@@ -203,7 +203,7 @@
             <field name="target">new</field>
         </record>
 
-        <menuitem name="Процессы" action="window_process_launch" id="menu_process" web_icon="images/process.jpg" web_icon_hover="images/process_hover.jpg" sequence="5"/>
+        <menuitem name="Процессы" id="menu_process" web_icon="images/process.jpg" web_icon_hover="images/process_hover.jpg" sequence="5"/>
         <menuitem action="window_process_launch" id="menu_process_launch" sequence="0" parent="menu_process"/>
 
     </data>

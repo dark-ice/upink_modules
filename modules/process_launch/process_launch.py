@@ -1,5 +1,6 @@
 # coding=utf-8
 from datetime import date
+import numpy
 
 __author__ = 'andrey'
 import netsvc
@@ -484,11 +485,10 @@ class ProcessLaunch(Model):
             state = record['state']
 
             if values.get('account_ids'):
-                line_ids = self._get_pay_ids(cr, uid, record['id'], '', {})['invoice_pay_ids']
                 try:
+                    line_ids = self._get_pay_ids(cr, uid, record['id'], '', {})['invoice_pay_ids']
                     process = self.pool.get(record['process_model']).read(cr, uid, record['process_id'], ['specialist_id'])
-                    if process['specialist_id']:
-                        self.pool.get('account.invoice.pay.line').write(cr, 1, line_ids, {'specialist_id': process['specialist_id'][0]})
+                    self.pool.get('account.invoice.pay.line').write(cr, 1, line_ids, {'specialist_id': process['specialist_id'][0]})
                 except:
                     pass
 
@@ -772,6 +772,7 @@ class ProcessIndicators(Model):
                 ('smm', 'smm'),
                 ('seo', 'seo'),
                 ('ppc', 'ppc'),
+                ('site', 'site'),
             ), "Тип показателя", required=True
         ),
     }
@@ -805,6 +806,11 @@ class ProcessSla(Model):
     def change_sla(self, cr, uid, ids, context=None):
         if context is None:
             context = {}
+        active_id = 0
+        if isinstance(ids, (list, tuple)) and ids:
+            active_id = ids[0]
+        if isinstance(ids, (long, int)):
+            active_id = ids
         view_id = self.pool.get('ir.ui.view').search(cr, uid, [('name', 'like', 'SLA'), ('model', '=', self._name)])
         return {
             'view_type': 'form',
@@ -812,7 +818,7 @@ class ProcessSla(Model):
             'res_model': self._name,
             'name': 'SLA',
             'view_id': view_id,
-            'res_id': context.get('sla_id', 0),
+            'res_id': active_id,
             'type': 'ir.actions.act_window',
             'target': 'new',
             'nodestroy': True,
@@ -820,6 +826,34 @@ class ProcessSla(Model):
 
     def save(self, cr, uid, ids, context=None):
         return {'type': 'ir.actions.act_window_close'}
+
+    def set_sla_data(self, cr, period_id, partner_id, service_id, avg_mbo):
+        res_partner_quality_control = self.pool.get('res.partner.quality.control')
+        ids = res_partner_quality_control.search(cr, 1, [
+            ('period_id', '=', period_id),
+            ('partner_id', '=', partner_id),
+            ('service_id', '=', service_id)
+        ])
+        if ids:
+            return res_partner_quality_control.write(cr, 1, ids, {'mbo': avg_mbo})
+
+    def create(self, cr, user, vals, context=None):
+        if vals.get('avg_mbo'):
+            if vals.get('process_model') and vals.get('process_id'):
+                data = self.pool.get(vals['process_model']).read(cr, 1, vals['process_id'], ['partner_id', 'service_id'])
+                self.set_sla_data(cr, vals['period_id'], data['partner_id'][0], data['service_id'][0], vals['avg_mbo'])
+        return super(ProcessSla, self).create(cr, user, vals, context)
+
+    def write(self, cr, user, ids, vals, context=None):
+        #self.read(cr, 1, ids, ['process_id', 'period_id', 'avg_mbo'])
+        if vals.get('avg_mbo'):
+            for record in self.read(cr, 1, ids, ['process_id', 'period_id', 'process_model']):
+                data = self.pool.get(record['process_model']).read(cr, 1, record['process_id'], ['partner_id', 'service_id'])
+                self.set_sla_data(cr, record['period_id'][0], data['partner_id'][0], data['service_id'][0], vals['avg_mbo'])
+        return super(ProcessSla, self).write(cr, user, ids, vals, context)
+
+
+
 ProcessSla()
 
 
@@ -886,6 +920,16 @@ class ProcessSlaLine(Model):
     _defaults = {
         'type': lambda cr, u, i, ctx: ctx.get('type', 'call').lower()
     }
+
+    def write(self, cr, user, ids, vals, context=None):
+        sla_pool = self.pool.get('process.sla')
+        flag = super(ProcessSlaLine, self).write(cr, user, ids, vals, context)
+
+        sla_ids = list(set(r['sla_id'][0] for r in self.read(cr, 1, ids, ['sla_id'])))
+        for sla_id in sla_ids:
+            line_ids = self.search(cr, 1, [('sla_id', '=', sla_id)])
+            sla_pool.write(cr, 1, [sla_id], {'avg_mbo': numpy.mean([i['mbo'] for i in self.read(cr, 1, line_ids, ['mbo'])]) or 0.0})
+        return flag
 ProcessSlaLine()
 
 

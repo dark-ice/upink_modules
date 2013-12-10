@@ -11,7 +11,7 @@
         <record model="workflow.activity" id="act_draft">
             <field name="wkf_id" ref="wkf_brief_contract"/>
             <field name="flow_start">True</field>
-            <field name="name">draft</field>
+            <field name="name">Черновик</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='draft')</field>
         </record>
@@ -20,7 +20,7 @@
         <record model="workflow.activity" id="act_cancel">
             <field name="wkf_id" ref="wkf_brief_contract"/>
             <field name="flow_stop">True</field>
-            <field name="name">cancel</field>
+            <field name="name">Отмена</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='cancel')</field>
         </record>
@@ -29,7 +29,7 @@
         <record model="workflow.activity" id="act_cancel2">
             <field name="wkf_id" ref="wkf_brief_contract"/>
             <field name="flow_stop">True</field>
-            <field name="name">cancel2</field>
+            <field name="name">Отмена2</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='cancel_2')</field>
         </record>
@@ -37,31 +37,15 @@
         <!-- approval -->
         <record model="workflow.activity" id="act_approval">
             <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">approval</field>
+            <field name="name">Договор на корректировке</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='approval')</field>
-        </record>
-
-        <!-- completion -->
-        <record model="workflow.activity" id="act_completion">
-            <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">completion</field>
-            <field name="kind">function</field>
-            <field name="action">workflow_setter(state='completion')</field>
-        </record>
-
-        <!-- preparation -->
-        <record model="workflow.activity" id="act_preparation">
-            <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">preparation</field>
-            <field name="kind">function</field>
-            <field name="action">workflow_setter(state='preparation')</field>
         </record>
 
         <!-- contract_approval -->
         <record model="workflow.activity" id="act_contract_approval">
             <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">contract_approval</field>
+            <field name="name">Согласование договора с обслуживающим направлением</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='contract_approval')</field>
         </record>
@@ -69,23 +53,15 @@
         <!-- contract_completion -->
         <record model="workflow.activity" id="act_contract_completion">
             <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">contract_completion</field>
+            <field name="name">Доработка договора</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='contract_completion')</field>
-        </record>
-
-        <!-- contract_agreed -->
-        <record model="workflow.activity" id="act_contract_agreed">
-            <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">contract_agreed</field>
-            <field name="kind">function</field>
-            <field name="action">workflow_setter(state='contract_agreed')</field>
         </record>
 
         <!-- approval_partner -->
         <record model="workflow.activity" id="act_approval_partner">
             <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">approval_partner</field>
+            <field name="name">Утверждение договора с партнером</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='approval_partner')</field>
         </record>
@@ -93,7 +69,7 @@
         <!-- partner_cancel -->
         <record model="workflow.activity" id="act_partner_cancel">
             <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">partner_cancel</field>
+            <field name="name">Отмена партнером</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='partner_cancel')</field>
         </record>
@@ -101,7 +77,7 @@
         <!-- contract_approved -->
         <record model="workflow.activity" id="act_contract_approved">
             <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">contract_approved</field>
+            <field name="name">Договор утвержден</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='contract_approved')</field>
         </record>
@@ -109,7 +85,7 @@
         <!-- send_mail -->
         <record model="workflow.activity" id="act_send_mail">
             <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">send_mail</field>
+            <field name="name">Отправление договора по почте России</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='send_mail')</field>
         </record>
@@ -117,7 +93,7 @@
         <!-- send_express -->
         <record model="workflow.activity" id="act_send_express">
             <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">send_express</field>
+            <field name="name">Отправление договора экспресс-почтой</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='send_express')</field>
         </record>
@@ -125,7 +101,7 @@
         <!-- send_courier -->
         <record model="workflow.activity" id="act_send_courier">
             <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">send_courier</field>
+            <field name="name">Отправка договора курьером</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='send_courier')</field>
         </record>
@@ -133,7 +109,7 @@
         <!-- waiting_receipt -->
         <record model="workflow.activity" id="act_waiting_receipt">
             <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">waiting_receipt</field>
+            <field name="name">Ожидание квитанции об возврате договора</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='waiting_receipt')</field>
         </record>
@@ -141,7 +117,7 @@
         <!-- receipt_obtained -->
         <record model="workflow.activity" id="act_receipt_obtained">
             <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">receipt_obtained</field>
+            <field name="name">Квитанция получена</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='receipt_obtained')</field>
         </record>
@@ -149,7 +125,7 @@
         <!-- meeting_scheduled -->
         <record model="workflow.activity" id="act_meeting_scheduled">
             <field name="wkf_id" ref="wkf_brief_contract"/>
-            <field name="name">meeting_scheduled</field>
+            <field name="name">Встреча назначена</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='meeting_scheduled')</field>
         </record>
@@ -158,7 +134,7 @@
         <record model="workflow.activity" id="act_meeting_cancel">
             <field name="wkf_id" ref="wkf_brief_contract"/>
             <field name="flow_stop">True</field>
-            <field name="name">meeting_cancel</field>
+            <field name="name">Отмена встречи</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='meeting_cancel')</field>
         </record>
@@ -167,7 +143,7 @@
         <record model="workflow.activity" id="act_contract_signed">
             <field name="wkf_id" ref="wkf_brief_contract"/>
             <field name="flow_stop">True</field>
-            <field name="name">contract_signed</field>
+            <field name="name">Оригинал договора</field>
             <field name="kind">function</field>
             <field name="action">workflow_setter(state='contract_signed')</field>
         </record>
@@ -180,6 +156,13 @@
             <field name="signal">action_d_c</field>
         </record>
 
+        <!-- draft -> contract_approval -->
+        <record model="workflow.transition" id="d_ca">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_contract_approval"/>
+            <field name="signal">action_d_ca</field>
+        </record>
+
         <!-- draft -> approval -->
         <record model="workflow.transition" id="d_a">
             <field name="act_from" ref="act_draft"/>
@@ -187,32 +170,11 @@
             <field name="signal">action_d_a</field>
         </record>
 
-        <!-- approval -> completion -->
-        <record model="workflow.transition" id="a_c">
+        <!-- approval -> contract_approval -->
+        <record model="workflow.transition" id="a_ca">
             <field name="act_from" ref="act_approval"/>
-            <field name="act_to" ref="act_completion"/>
-            <field name="signal">action_a_c</field>
-        </record>
-
-        <!-- completion -> approval -->
-        <record model="workflow.transition" id="c_a">
-            <field name="act_from" ref="act_completion"/>
-            <field name="act_to" ref="act_approval"/>
-            <field name="signal">action_c_a</field>
-        </record>
-
-        <!-- approval -> preparation -->
-        <record model="workflow.transition" id="a_p">
-            <field name="act_from" ref="act_approval"/>
-            <field name="act_to" ref="act_preparation"/>
-            <field name="signal">action_a_p</field>
-        </record>
-
-        <!-- preparation -> contract_approval -->
-        <record model="workflow.transition" id="p_ca">
-            <field name="act_from" ref="act_preparation"/>
             <field name="act_to" ref="act_contract_approval"/>
-            <field name="signal">action_p_ca</field>
+            <field name="signal">action_a_ca</field>
         </record>
 
         <!-- contract_approval -> contract_completion -->
@@ -243,18 +205,12 @@
             <field name="signal">action_c2_cc</field>
         </record>
 
-        <!-- contract_approval -> contract_agreed -->
-        <record model="workflow.transition" id="ca_cagr">
-            <field name="act_from" ref="act_contract_approval"/>
-            <field name="act_to" ref="act_contract_agreed"/>
-            <field name="signal">action_ca_cagr</field>
-        </record>
 
-        <!-- contract_agreed -> approval_partner -->
-        <record model="workflow.transition" id="cagr_ap">
-            <field name="act_from" ref="act_contract_agreed"/>
+        <!-- contract_approval -> approval_partner -->
+        <record model="workflow.transition" id="ca_ap">
+            <field name="act_from" ref="act_contract_approval"/>
             <field name="act_to" ref="act_approval_partner"/>
-            <field name="signal">action_cagr_ap</field>
+            <field name="signal">action_ca_ap</field>
         </record>
 
         <!-- approval_partner -> contract_completion -->

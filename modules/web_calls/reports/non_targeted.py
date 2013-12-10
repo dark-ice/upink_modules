@@ -39,7 +39,7 @@ class NonTargetedCalls(Model):
                     sum(case when call_type='order' then 1 else 0 end) ordr,
                     sum(case when call_type='atc' then 1 else 0 end) atc,
                     sum(case when call_type='number' then 1 else 0 end) number
-                FROM web_calls WHERE call_type IN ('qa', 'order', 'atc', 'number') GROUP BY responsible_id, call_date::date
+                FROM web_calls WHERE call_type IN ('qa', 'order', 'atc', 'number') and incoming_call = True GROUP BY responsible_id, call_date::date
             )""")
 
     def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False):

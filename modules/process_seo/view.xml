@@ -88,6 +88,8 @@
                         </page>
                         <page string="Данные по стратегии">
                             <group colspan="4" col="4">
+
+                                <separator colspan="4" />
                                 <field name="strategy_ids" nolabel="1" colspan="4">
                                     <tree string="Стратегия">
                                         <field name="name"/>
@@ -108,6 +110,33 @@
                                 <field name="reason_stop_work" colspan="4" nolabel="1"/>
                                 </group>
                         </page>
+                        <page string="Проект на allposition">
+                            <field name="date_start" />
+                            <field name="process_type" />
+                            <field name="campaign"/>
+                            <button
+                                    string="Запросить данные с AllPositions.ru"
+                                    attrs="{'invisible': [('process_type', '=', 'traffic')]}"
+                                    type="object"
+                                    name="update"
+                                    colspan="2"/>
+                            <newline/>
+                            <field name="plan_ids" colspan="4" nolabel="1">
+                                <tree string="Планы" editable="top">
+                                    <field name="period_id" />
+                                    <field name="name" />
+                                </tree>
+                            </field>
+                            <newline/>
+                            <field name="fact_ids" colspan="4" nolabel="1" context="{'campaign': campaign}" attrs="{'readonly': [('process_type', '!=', 'traffic')]}">
+                                <tree editable="top" string="Факты">
+                                    <field name="date" />
+                                    <field name="top3" />
+                                    <field name="top10" />
+                                    <field name="fact" />
+                                </tree>
+                            </field>
+                        </page>
                         <page string="Переписка по проекту">
                             <field name="message_ids" nolabel="1" colspan="4" mode="tree">
                                 <tree string="Переписка по проекту" editable="top">
@@ -122,6 +151,25 @@
                                     <field name="create_uid"/>
                                     <field name="create_date"/>
                                     <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="SLA">
+                            <button type="action"
+                                name="%(process_launch.action_process_sla)d"
+                                string="Создать"
+                                context="{'process_id': id, 'process_model': 'process.seo', 'type': direction}"
+                                icon="gtk-ok"/>
+                            <field name="sla_ids" nolabel="1" colspan="4" readonly="1">
+                                <tree string="SLA">
+                                    <field name="id" invisible="1"/>
+                                    <field name="period_id" domain="[('calendar', '=', 'rus')]"/>
+                                    <field name="avg_mbo" sum="Сумма"/>
+                                    <button type="object"
+                                        name="change_sla"
+                                        string="Изменить"
+                                        context="{'sla_id': id}"
+                                        icon="gtk-ok"/>
                                 </tree>
                             </field>
                         </page>

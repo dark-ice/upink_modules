@@ -417,7 +417,7 @@
                         <field name="next_call"/>
 
                         <field name="user_id"/>
-                        <field name="categ_id" string="Тематика" />
+                        <field name="categ_id" widget="selection" string="Тематика" />
                         <field name="partner_type" invisible="1"/>
                     </group>
                     <notebook colspan="4">
@@ -623,7 +623,8 @@
                     <field name="partner_name" />
                     <field name="next_call"/>
                     <field name="user_id"/>
-                    <field name="categ_id" string="Тематика" />
+                    <field name="categ_id" widget="selection" string="Тематика" />
+                    <field name="rate" widget="progressbar" />
                 </tree>
             </field>
         </record>
@@ -641,21 +642,27 @@
                         <group colspan="4" col="8">
                             <field name="name" string="Основной сайт"/>
                             <field name="ur_name"/>
-                            <field name="lead" groups="base.partner_extended" />
+                            <field name="rate" widget="progressbar"/>
+                            <field name="lead" attrs="{'invisible': [('check', '=', False)]}" />
+                            <field name="active" attrs="{'invisible': [('check', '=', False)]}" />
                             <newline/>
 
                             <field name="partner_status" />
                             <field name="next_call"/>
-                            <field name="user_id"/>
-                            <field name="categ_id" string="Тематика" />
+                            <field name="user_id" readonly="1"/>
+                            <field name="categ_id" widget="selection" string="Тематика" />
                             <field name="partner_type" invisible="1"/>
 
                         </group>
                         <notebook colspan="4">
                             <page string="Контакты">
                                 <field colspan="4" mode="tree" name="address" nolabel="1" context="{'site_ids' : name}"/>
-                                <separator string="Дополнительная информация о контактном лице" colspan="4"/>
-                                <field name="description" nolabel="1" colspan="4"/>
+                                <separator string="Дополнительная информация" colspan="4"/>
+                                <field name="description" colspan="2"/>
+                                <field name="key_person" colspan="2"/>
+                                <field name="zone" colspan="2"/>
+                                <field name="key_moment" colspan="2"/>
+                                <field name="another" colspan="4"/>
                             </page>
                             <page string="Услуги">
                                 <group colspan="4" col="4">
@@ -1174,7 +1181,7 @@
                                     <field name="transfer_ids" nolabel="1" colspan="4" readonly="1">
                                         <tree>
                                             <field name="name"/>
-                                            <field name="create_uid" />
+                                            <field name="user_id" />
                                             <field name="create_date" />
                                         </tree>
                                     </field>
@@ -1302,7 +1309,7 @@
                             <field name="next_call"/>
                             <field name="next_call_comment"/>
 
-                            <field name="user_id"/>
+                            <field name="user_id" readonly="1"/>
                             <field name="priority"/>
 
                             <field name="categ_id" string="Тематика" />
@@ -1818,7 +1825,7 @@
                                     <field name="transfer_ids" nolabel="1" colspan="4" readonly="1">
                                         <tree>
                                             <field name="name"/>
-                                            <field name="create_uid" />
+                                            <field name="user_id" />
                                             <field name="create_date" />
                                         </tree>
                                     </field>
@@ -2052,6 +2059,7 @@
                         <field name="index"/>
 
                         <field name="city"/>
+                        <field name="st_type"/>
                         <field name="street"/>
 
                         <field name="house"/>
@@ -2076,6 +2084,7 @@
                     <field name="index"/>
 
                     <field name="city"/>
+                    <field name="st_type"/>
                     <field name="street"/>
 
                     <field name="house"/>

@@ -80,6 +80,12 @@ class ProcessPPC(Model):
             'Переписка по проекту',
             domain=[('process_model', '=', _name)],
             context={'process_model': _name}),
+        'sla_ids': fields.one2many(
+            'process.sla',
+            'process_id',
+            'SLA',
+            domain=[('process_model', '=', _name)],
+            context={'type': 'ppc', 'process_model': _name}),
 
         'access_ids': fields.one2many(
             'process.ppc.access',
@@ -151,11 +157,6 @@ class ProcessPPC(Model):
             type='boolean',
             invisible=True
         ),
-
-        'date_start': fields.date('Дата запуска проекта'),
-        'date_end': fields.date('Дата окончания проекта'),
-        'domain_zone': fields.selection((('ru', 'ru'), ('ua', 'ua')), 'Доменная зона'),
-        'campaign': fields.char('ID кампании', size=200),
     }
 
     _defaults = {

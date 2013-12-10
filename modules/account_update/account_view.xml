@@ -395,7 +395,7 @@
                             <field name='division'  attrs="{'invisible': ['|', ('type_getter', '=', 'employee'), ('get_division', '=', False)], 'required': [('type_getter', '!=', 'employee'), ('partner_id', '=', False)]}"/>
                             <field name="employee_id"
                                attrs="{'invisible': [('type_getter', '!=', 'employee')], 'required': [('type_getter', '=', 'employee')]}"/>
-                            <field name="categ_id" required="1" />
+                            <field name="categ_id" required="1"  domain="[('parent_id', '!=', False), ('division_id', '=', division_id)]"/>
                             <field name="payment_details" required="1"/>
                         </group>
                         <group colspan="2" col="2">

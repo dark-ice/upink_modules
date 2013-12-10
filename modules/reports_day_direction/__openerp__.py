@@ -12,6 +12,7 @@
 - SMM
 - SITE
 - VIDEO
+- SEO
     """,
     'author': 'Andrey Karbanovich',
     'website': 'http://upsale.ru',
@@ -28,6 +29,7 @@
         'views/view_site.xml',
         'views/view_video.xml',
         #'workflow.xml',
+        'views/view_seo.xml',
     ],
 
     'js': [

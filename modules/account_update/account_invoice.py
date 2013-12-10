@@ -6,7 +6,7 @@ from openerp import netsvc
 from openerp.osv import fields, osv
 from openerp.osv.orm import Model
 
-from notify import notify
+from openerp.addons.notify import notify
 
 wf_service = netsvc.LocalService("workflow")
 
@@ -201,7 +201,7 @@ class AccountInvoice(Model):
                 access += 'p'
 
             #  Финансист
-            users_f = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', [194, 17])], order='id')
+            users_f = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', [17])], order='id')
             if uid in users_f:
                 access += 'f'
 
@@ -263,6 +263,7 @@ class AccountInvoice(Model):
         'bank_id': fields.many2one(
             'res.partner.bank',
             'Реквизиты',
+            domain=[('name', '!=', False)],
             help='Банковские реквизиты Партнера'
         ),
         'pay_ids': fields.one2many('account.invoice.pay', 'invoice_id', 'Платежи', help='Платежи', ondelete='cascade'),
@@ -399,7 +400,6 @@ class AccountInvoice(Model):
             'account.invoice.category',
             'Статья расходов',
             required=False,
-            domain="[('parent_id', '!=', False), ('division_id', '=', division_id)]",
             states={'close': [('readonly', True)]},
             help='Статья расходов, по которой необходимы денежные средства.'),
         'card_id': fields.many2one(

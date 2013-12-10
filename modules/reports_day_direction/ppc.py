@@ -6,6 +6,18 @@ from openerp.osv.orm import Model
 from reports_day_direction.yandex_direct import YandexDirect
 
 
+class ProcessPPC(Model):
+    _inherit = 'process.ppc'
+
+    _columns = {
+        'date_start': fields.date('Дата запуска проекта'),
+        'domain_zone': fields.selection((('ru', 'ru'), ('ua', 'ua')), 'Доменная зона'),
+        'campaign': fields.char('ID кампании', size=200),
+        'fact_ids': fields.one2many('report.day.ppc.statistic', 'ppc_id', 'Факты'),
+    }
+ProcessPPC()
+
+
 class ReportDayPPCStatistic(Model):
     _name = 'report.day.ppc.statistic'
     _description = u'Ежедневный отчет направлений - PPC - значения статистики'
@@ -18,13 +30,39 @@ class ReportDayPPCStatistic(Model):
         ),
         'date': fields.date('Дата'),
         'cash': fields.float('Сумма'),
-        'campaign': fields.char('ID кампании', size=100)
+        'campaign': fields.char('ID кампании', size=100),
+        'ppc_id': fields.many2one('process.ppc', 'Проект'),
+        'specialist_id': fields.related(
+            'ppc_id',
+            'specialist_id',
+            type='many2one',
+            relation='res.users',
+            string='Аккаунт-менеджер')
     }
+
+    _defaults = {
+        'campaign': lambda s, c, u, cntx: cntx.get('campaign'),
+    }
+
+    def onchange_ppc(self, cr, uid, ids, ppc_id='', campaign='', context=None):
+        specialist_id = False
+        if campaign:
+            ppc_ids = self.pool.get('process.ppc').search(cr, 1, [('campaign', '=', campaign)])
+            if ppc_ids:
+                ppc_id = ppc_ids[0]
+            else:
+                ppc_id = False
+        if ppc_id:
+            ppc = self.pool.get('process.ppc').read(cr, 1, ppc_id, ['campaign', 'specialist_id'])
+            campaign = ppc['campaign']
+            if ppc['specialist_id']:
+                specialist_id = ppc['specialist_id'][0]
+        return {'value': {'campaign': campaign, 'ppc_id': ppc_id, 'specialist_id': specialist_id}}
 
     def update(self, cr, uid):
         yandex_campaign = []
         date_start = date_end = date.today().strftime("%Y-%m-%d")
-
+        ppc_dict = {}
         ppc_pool = self.pool.get('process.ppc')
         ppc_ids = ppc_pool.search(cr, 1, [])
         records = ppc_pool.read(cr, 1, ppc_ids, ['campaign', 'advertising_id', 'partner_id', 'specialist_id', 'domain_zone', 'date_start'])
@@ -33,6 +71,7 @@ class ReportDayPPCStatistic(Model):
                 date_start = record['date_start']
             if record['advertising_id'] and record['advertising_id'][0] == 1 and record['campaign']:
                 yandex_campaign.append(int(record['campaign']))
+                ppc_dict[int(record['campaign'])] = record['id']
 
         yandex = YandexDirect()
         if yandex_campaign:
@@ -47,6 +86,7 @@ class ReportDayPPCStatistic(Model):
                     )
 
             for item in yandex_result:
+
                 if not self.search(cr, 1, [('campaign', '=', item['CampaignID']), ('date', '=', item['StatDate'])]):
                     self.create(
                         cr,
@@ -55,7 +95,8 @@ class ReportDayPPCStatistic(Model):
                             'campaign': item['CampaignID'],
                             'date': item['StatDate'],
                             'cash': item['SumSearch'],
-                            'name': 'direct'
+                            'name': 'direct',
+                            'ppc_id': ppc_dict[item['CampaignID']]
                         })
         return True
 
@@ -67,6 +108,7 @@ class ReportDayPPC(Model):
     _name = 'report.day.ppc'
     _description = u'Ежедневный отчет направлений - PPC'
     _auto = False
+    _order = 'date DESC'
 
     _columns = {
         'date_start': fields.date('Дата начала'),
@@ -87,8 +129,8 @@ class ReportDayPPC(Model):
             create or replace view report_day_ppc as (
                 SELECT
                   row_number() over() as id,
-                  p.date_end,
-                  p.date_start,
+                  s.date date_end,
+                  s.date date_start,
                   l.partner_id,
                   l.service_id,
                   p.specialist_id,
@@ -100,7 +142,7 @@ class ReportDayPPC(Model):
                   process_ppc p
                   LEFT JOIN process_launch l on (l.id=p.launch_id)
                   LEFT JOIN report_day_ppc_statistic s on (p.campaign=s.campaign)
-                WHERE p.state='implementation'
+                WHERE p.state='implementation' and p.campaign is not null
             )""")
 
     def search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False):
@@ -113,6 +155,18 @@ class ReportDayPPC(Model):
                 item[0] = 'date'
                 item[1] = '<='
         return super(ReportDayPPC, self).search(cr, user, args, offset, limit, order, context, count)
+
+    def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False):
+        for item in domain:
+            if item[0] == 'date_start':
+                item[0] = 'date'
+                item[1] = '>='
+
+            if item[0] == 'date_end':
+                item[0] = 'date'
+                item[1] = '<='
+
+        return super(ReportDayPPC, self).read_group(cr, uid, domain, fields, groupby, offset, limit, context, orderby)
 
 ReportDayPPC()
 

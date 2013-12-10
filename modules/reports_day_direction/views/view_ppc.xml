@@ -2,7 +2,7 @@
 <openerp>
     <data>
         <record model="ir.ui.view" id="view_report_day_ppc_tree">
-            <field name="name">Ежедневный отчет направлений - PPC</field>
+            <field name="name">Ежедневный отчет PPC</field>
             <field name="model">report.day.ppc</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
@@ -11,7 +11,7 @@
                     <field name="service_id" />
                     <field name="specialist_id" />
                     <field name="domain_zone" />
-                    <field name="campaign" />
+                    <field name="campaign" invisible="1"/>
                     <field name="date" />
                     <field name="cash" />
                 </tree>
@@ -19,7 +19,7 @@
         </record>
 
         <record model="ir.ui.view" id="view_report_day_ppc_search">
-            <field name="name">Ежедневный отчет направлений - PPC</field>
+            <field name="name">Ежедневный отчет PPC</field>
             <field name="model">report.day.ppc</field>
             <field name="type">search</field>
             <field name="priority" eval="1"/>
@@ -32,35 +32,31 @@
                     <field name="specialist_id" />
                     <field name="domain_zone" />
                     <field name="campaign" />
-                    <field name="date" />
-                    <newline/>
-                    <group expand="0" string="Группировать по...">
-                        <filter string="Партнеру" icon="terp-partner" name="Customer" context="{'group_by':'partner_id'}"/>
-                        <separator orientation="vertical"/>
-                    </group>
                 </search>
             </field>
         </record>
 
         <record id="window_report_day_ppc" model="ir.actions.act_window">
-            <field name="name">PPC</field>
+            <field name="name">Ежедневный отчет PPC</field>
             <field name="res_model">report.day.ppc</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
             <field name="view_id" ref="view_report_day_ppc_tree"/>
             <field name="search_view_id" ref="view_report_day_ppc_search"/>
-            <field name="context">{'search_default_date_start': time.strftime('%Y-%m-01'), 'search_default_date_end': time.strftime('%Y-%m-%d')}</field>
+            <field name="context">{'search_default_date_start': time.strftime('%Y-%m-01'), 'search_default_date_end': time.strftime('%Y-%m-%d'), 'group_by': ['campaign']}</field>
         </record>
 
 
         <record model="ir.ui.view" id="view_report_day_ppc_statistic_tree">
-            <field name="name">PPC</field>
+            <field name="name">Факты - PPC</field>
             <field name="model">report.day.ppc.statistic</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree editable="top">
+                    <field name="ppc_id" on_change="onchange_ppc(ppc_id, '')"/>
+                    <field name="specialist_id" readonly="1"/>
                     <field name="name" />
-                    <field name="campaign" />
+                    <field name="campaign" on_change="onchange_ppc('', campaign)"/>
                     <field name="date" />
                     <field name="cash" />
                 </tree>
@@ -68,7 +64,7 @@
         </record>
 
         <record model="ir.ui.view" id="view_report_day_ppc_statistic_search">
-            <field name="name">PPC</field>
+            <field name="name">Факты - PPC</field>
             <field name="model">report.day.ppc.statistic</field>
             <field name="type">search</field>
             <field name="priority" eval="1"/>
@@ -83,7 +79,7 @@
         </record>
 
         <record id="window_report_day_ppc_statistic" model="ir.actions.act_window">
-            <field name="name">PPC</field>
+            <field name="name">Факты - PPC</field>
             <field name="res_model">report.day.ppc.statistic</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
@@ -93,6 +89,6 @@
         </record>
 
         <menuitem action="window_report_day_ppc" id="menu_report_day_ppc" parent="process_ppc.menu_process_ppc" sequence="10"/>
-        <menuitem id="menu_report_day_settings_ppc" action="window_report_day_ppc_statistic" name="Доп. модель PPC" parent="process_ppc.menu_process_ppc" sequence="99"/>
+        <menuitem id="menu_report_day_settings_ppc" action="window_report_day_ppc_statistic" name="Факты" parent="process_ppc.menu_process_ppc" sequence="99"/>
     </data>
 </openerp>

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_cd_disposition_form" model="ir.ui.view">
+            <field name="name">Распоряжения</field>
+            <field name="model">cd.disposition</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group colspan="4">
+                        <field name="check_f"/>
+                        <field name="check_a"/>
+                        <field name="check_g"/>
+                    </group>
+                    <group colspan="4">
+                        <field name="id" string="Номер распоряжения" />
+                        <field name="disposition_date" />
+                        <field name="user_id" /><newline />
+                        <field name="line" />
+                        <field name="category_id" attrs="{'readonly': [('line', '=', False)]}" on_change="change_category(category_id)"/>
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Распоряжение">
+                            <group colspan="2">
+                                <field name="direction_name"/>
+                                <field name="employee_id"/>
+                                <field name="fio"/>
+                                <field name="job_id"/>
+                                <field name="department_id"/>
+                                <field name="next_job_id"/>
+                                <field name="next_department_id"/>
+                                <field name="remark"/>
+                                <field name="seeing"/>
+                                <field name="amount"/>
+                                <field name="from_date"/>
+                                <field name="on_date"/>
+                                <field name="from_date_second"/>
+                                <field name="on_date_second"/>
+                                <field name="working_off_dates"/>
+                                <field name="to_date"/>
+
+                                <field name="salary"/>
+                                <field name="salary_per"/>
+                                <field name="variable"/>
+                                <field name="variable_per"/>
+                                <field name="grade_id"/>
+                                <field name="reason"/>
+                                <field name="period_id"/>
+                                <field name="motive_rewarding"/>
+                                <field name="promotion_type"/>
+                                <field name="term_str"/>
+
+                                <field name="at_rate"/>
+                                <field name="not_later_date"/>
+                                <field name="financier_id"/>
+                                <field name="date_ot"/>
+                                <field name="year"/>
+                                <field name="no_work"/>
+                                <field name="work_day"/>
+                                <field name="not_later_date_second"/>
+                                <field name="instate_date"/>
+                                <field name="term"/>
+                                <field name="trip"/>
+                                <field name="trip_place"/>
+                                <field name="financing_source"/>
+                                <field name="teacher_id"/>
+                                <field name="teacher_job_id"/>
+                                <field name="teacher_department_id"/>
+                                <field name="post_probation_grade_id"/>
+                                <field name="probation_grade_id"/>
+                                <field name="duration_probation"/>
+                                <field name="next_attestation"/>
+
+
+                                <field name="schedule_date"/>
+                                <field name="commission_date"/>
+                                <field name="commission_ids"/>
+                                <field name="set_date"/>
+                                <field name="list_date"/>
+                                <field name="protocol_date"/>
+                                <field name="top_date"/>
+                                <field name="result_date"/>
+                                <field name="statement_date"/>
+
+                                <field name="disposition"/>
+
+                            </group>
+                            <group colspan="2" attrs="{'invisible': [('check_g', '=', False)]}">
+                                <field name="screen_id" widget='image' nolabel="1" readonly="1" colspan="4"/>
+                            </group>
+                            <group colspan="4" attrs="{'invisible': [('check_g', '=', False)]}" string="Распоряжение(Файл)">
+                                <field name="doc_id" colspan="2"/>
+                                <button type="object"
+                                                name="generate_file"
+                                                string="Сгенерировать документ"
+                                                icon="STOCK_EDIT"
+                                                attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_a', '=', False)]}"
+                                                />
+                                <field name="index_content" colspan="4" nolabel="1"/>
+                            </group>
+
+                        </page>
+                        <page string="Согласование">
+                            <button type="action"
+                                    name="%(action_disposition_agreement)d"
+                                    string="Добавить"
+                                    context="{'disposition_id': id}"
+                                    icon="gtk-convert"
+                                    colspan="4"
+                                    attrs="{'invisible': ['|', ('state', 'not in', ('draft', 'agreement')), ('check_a', '=', False)]}"
+                                    />
+                            <field name="agreement_ids" colspan="4" nolabel="1" readonly="1">
+                                    <tree string="Комиссия на согласование">
+                                        <field name="check_r" invisible="1"/>
+                                        <field name="user_id" />
+                                        <field name="agree" />
+                                        <field name="date_agree" />
+                                        <button type="object"
+                                                name="save"
+                                                string="Согласен"
+                                                icon="gtk-apply"
+                                                attrs="{'invisible': ['|', ('check_r', '=', False), ('agree', '=', True)]}"/>
+                                    </tree>
+                                </field>
+                        </page>
+                        <page string="Видимость">
+                            <field name="access_user_ids" colspan="2" nolabel="1"/>
+                            <field name="access_group_ids" colspan="2" nolabel="1"/>
+                        </page>
+                        <page string="Журнал">
+                            <field name="history_ids" colspan="4" nolabel="1" readonly="1">
+                                <tree string="История">
+                                    <field name="create_uid"/>
+                                    <field name="create_date"/>
+                                    <field name="name" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="draft,agreement,approval,publish"
+                           statusbar_colors='{"publish":"orange"}'
+                            />
+                    <newline />
+                    <button type="object"
+                            name="save"
+                            string="На согласование"
+                            context="{'state': 'agreement'}"
+                            icon="gtk-go-forward"
+                            attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('check_a', '=', False)]}"
+                            />
+                    <button type="object"
+                            name="save"
+                            string="Опубликовать"
+                            context="{'state': 'publish'}"
+                            icon="gtk-apply"
+                            attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_f', '=', False)]}"
+                            />
+                </form>
+            </field>
+        </record>
+
+        <record id="view_cd_disposition_tree" model="ir.ui.view">
+            <field name="name">Распоряжения</field>
+            <field name="model">cd.disposition</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="user_id" />
+                    <field name="id" string="Номер распоряжения"/>
+                    <field name="disposition_date"/>
+                    <field name="line"/>
+                    <field name="category_id" />
+                    <field name="state" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_cd_disposition_search" model="ir.ui.view">
+            <field name="name">Распоряжения</field>
+            <field name="model">cd.disposition</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="user_id" />
+                    <field name="id" string="Номер распорядения"/>
+                    <field name="disposition_date"/>
+                    <field name="line"/>
+                    <field name="category_id" />
+                    <field name="state" />
+                </search>
+            </field>
+        </record>
+
+        <record id="action_cd_disposition" model="ir.actions.act_window">
+            <field name="name">Распоряжения</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">cd.disposition</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_cd_disposition_tree"/>
+            <field name="search_view_id" ref="view_cd_disposition_search"/>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+            <field name="target">inline</field>
+        </record>
+        <menuitem action="action_cd_disposition" id="disposal_menuitem" parent="company_documents.company_notes_list"/>
+    </data>
+</openerp>

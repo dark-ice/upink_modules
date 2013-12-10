@@ -175,6 +175,7 @@
                     <field name="livesite" sum="Сумма"/>
                     <field name="adminpanel" sum="Сумма"/>
                     <field name="shara" sum="Сумма"/>
+                    <field name="incoming_call" sum="Сумма"/>
 
                 </tree>
             </field>
