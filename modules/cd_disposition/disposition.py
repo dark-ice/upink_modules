@@ -50,6 +50,7 @@ def to_grn(amount):
 class CdDisposition(Model):
     _name = 'cd.disposition'
     _description = u'Распоряжения'
+    _order = 'id desc'
 
     def name_get(self, cr, user, ids, context=None):
         if not ids:
