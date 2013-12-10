@@ -41,8 +41,8 @@ def to_grn(amount):
                 d = u"%s" % d
         else:
             d = u"00"
-        d += u" коп"
-        return u"{0} {1}".format(numeral.in_words(int(cash_d[1])), d)
+        d += u" коп."
+        return u"{0} грн. {1}".format(numeral.in_words(int(cash_d[1])), d)
     else:
         return '-'
 
@@ -641,7 +641,7 @@ class CdDisposition(Model):
                 'reason': disposition['reason'] or '-',
                 'remark': disposition['remark'] or '-',
                 'direction_name': disposition['direction_name'] or '-',
-                'at_rate': disposition['at_rate'] or '-',
+                'at_rate': int(disposition['at_rate']) or '-',
                 'date_ot': '-',
                 'next_attestation': '-',
                 'motive_rewarding': disposition['motive_rewarding'] or '-',
