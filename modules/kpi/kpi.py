@@ -82,10 +82,7 @@ class KpiPeriod(Model):
     }
 
     def create(self, cr, uid, values, context=None):
-        if uid == 1:
-            return super(KpiPeriod, self).create(cr, uid, values, context)
-        else:
-            raise osv.except_osv('', 'Периоды может создавать только администратор')
+        return super(KpiPeriod, self).create(cr, uid, values, context)
 
     def _check_month(self, cr, uid, ids, context=None):
         for record in self.browse(cr, uid, ids, context):
