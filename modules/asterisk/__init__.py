@@ -21,5 +21,5 @@
 ##############################################################################
 
 import tel_reference
-# import asterisk
+import asterisk
 
