@@ -538,7 +538,6 @@ class res_partner_address(osv.osv):
         else:
             return False
 
-
     def get_partner_from_phone_number(self, cr, uid, number, context=None):
         # We check that "number" is really a number
         _logger.debug(u"Call get_name_from_phone_number with number = %s" % number)
@@ -564,6 +563,16 @@ class res_partner_address(osv.osv):
             return False
 
 res_partner_address()
+
+
+class crm_lead(osv.osv):
+    _inherit = 'crm.lead'
+
+    _columns = {
+        'phone_ids': fields.one2many('tel.reference', 'crm_lead_id', u'Номера телефонов', select=True)
+    }
+
+crm_lead()
 
 
 # This module supports multi-company
