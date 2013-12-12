@@ -184,12 +184,12 @@ class mail_message(osv.osv):
         'display_text': fields.function(_get_display_text, method=True, type='text', size="512", string='Display Text'),
         'mail_server_id': fields.many2one('ir.mail_server', 'Outgoing mail server', readonly=1),
         'state': fields.selection([
-                                      ('outgoing', 'Outgoing'),
-                                      ('sent', 'Sent'),
-                                      ('received', 'Received'),
-                                      ('exception', 'Delivery Failed'),
-                                      ('cancel', 'Cancelled'),
-                                  ], 'State', readonly=True),
+            ('outgoing', 'Outgoing'),
+            ('sent', 'Sent'),
+            ('received', 'Received'),
+            ('exception', 'Delivery Failed'),
+            ('cancel', 'Cancelled'),
+        ], 'State', readonly=True),
         'auto_delete': fields.boolean('Auto Delete',
                                       help="Permanently delete this email after sending it, to save space"),
         'original': fields.binary('Original', help="Original version of the message, as it was sent on the network",
@@ -270,7 +270,7 @@ class mail_message(osv.osv):
             'message_id': message_id,
             'references': references,
             'subtype': subtype,
-            'headers': headers, # serialize the dict on the fly
+            'headers': headers,  # serialize the dict on the fly
             'mail_server_id': mail_server_id,
             'state': 'outgoing',
             'auto_delete': auto_delete
