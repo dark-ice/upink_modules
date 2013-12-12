@@ -166,19 +166,19 @@
                                 <field name="commentary"/>
                             </tree>
                         </field>
-                        <field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">
-                            <tree string="Phone Calls">
-                                <field name="date"/>
-                                <field name="name" string="Отчет звонка"/>
-                                <field name="partner_phone"/>
-                                <!--<field name="time_of_coll"/>-->
-                                <field name="duration"/>
-                                <field name="user_id"/>
-                                <field name="id_sphone"/>
-                                <field name="categ_id" string="Тип звонка"/>
-                                <field name="id_ast_coll"/>
-                            </tree>
-                        </field>
+                        <!--<field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">-->
+                            <!--<tree string="Phone Calls">-->
+                                <!--<field name="date"/>-->
+                                <!--<field name="name" string="Отчет звонка"/>-->
+                                <!--<field name="partner_phone"/>-->
+                                <!--&lt;!&ndash;<field name="time_of_coll"/>&ndash;&gt;-->
+                                <!--<field name="duration"/>-->
+                                <!--<field name="user_id"/>-->
+                                <!--<field name="id_sphone"/>-->
+                                <!--<field name="categ_id" string="Тип звонка"/>-->
+                                <!--<field name="id_ast_coll"/>-->
+                            <!--</tree>-->
+                        <!--</field>-->
                         <field name="note_ids" colspan="4" nolabel="1" readonly="1">
                             <tree string="История переписки">
                                 <field name="title"/>
@@ -351,19 +351,19 @@
                                         <field name="date_deadline" string="End Date"/>
                                     </tree>
                                 </field>
-                                <field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">
-                                    <tree string="Phone Calls">
-                                        <field name="date"/>
-                                        <field name="name" string="Отчет звонка"/>
-                                        <field name="partner_phone"/>
-                                        <!--<field name="time_of_coll"/>-->
-                                        <field name="duration"/>
-                                        <field name="user_id"/>
-                                        <field name="id_sphone"/>
-                                        <field name="categ_id" string="Тип звонка"/>
-                                        <field name="id_ast_coll"/>
-                                    </tree>
-                                </field>
+                                <!--<field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">-->
+                                    <!--<tree string="Phone Calls">-->
+                                        <!--<field name="date"/>-->
+                                        <!--<field name="name" string="Отчет звонка"/>-->
+                                        <!--<field name="partner_phone"/>-->
+                                        <!--&lt;!&ndash;<field name="time_of_coll"/>&ndash;&gt;-->
+                                        <!--<field name="duration"/>-->
+                                        <!--<field name="user_id"/>-->
+                                        <!--<field name="id_sphone"/>-->
+                                        <!--<field name="categ_id" string="Тип звонка"/>-->
+                                        <!--<field name="id_ast_coll"/>-->
+                                    <!--</tree>-->
+                                <!--</field>-->
                                 <field name="note_ids" colspan="4" nolabel="1" readonly="1">
                                     <tree string="История переписки">
                                         <field name="title"/>
@@ -474,19 +474,19 @@
                             </group>
                         </page>
                         <page string="Журнал">
-                            <field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">
-                                <tree string="Звонки" >
-                                    <field name="date"/>
-                                    <field name="name" string="Отчет звонка"/>
-                                    <field name="partner_phone"/>
-                                    <!--<field name="time_of_coll"/>-->
-                                    <field name="duration"/>
-                                    <field name="user_id"/>
-                                    <field name="id_sphone"/>
-                                    <field name="categ_id" string="Тип звонка"/>
-                                    <field name="id_ast_coll"/>
-                                </tree>
-                            </field>
+                            <!--<field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">-->
+                                <!--<tree string="Звонки" >-->
+                                    <!--<field name="date"/>-->
+                                    <!--<field name="name" string="Отчет звонка"/>-->
+                                    <!--<field name="partner_phone"/>-->
+                                    <!--&lt;!&ndash;<field name="time_of_coll"/>&ndash;&gt;-->
+                                    <!--<field name="duration"/>-->
+                                    <!--<field name="user_id"/>-->
+                                    <!--<field name="id_sphone"/>-->
+                                    <!--<field name="categ_id" string="Тип звонка"/>-->
+                                    <!--<field name="id_ast_coll"/>-->
+                                <!--</tree>-->
+                            <!--</field>-->
                             <field name="note_ids" colspan="4" nolabel="1" readonly="1">
                                 <tree string="История переписки">
                                     <field name="title"/>
@@ -1162,19 +1162,19 @@
                                         <field name="create_uid"/>
                                     </tree>
                                 </field>
-                                <field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">
-                                    <tree string="Звонки" >
-                                        <field name="date"/>
-                                        <field name="name" string="Отчет звонка"/>
-                                        <field name="partner_phone"/>
-                                        <!--<field name="time_of_coll"/>-->
-                                        <field name="duration"/>
-                                        <field name="user_id"/>
-                                        <field name="id_sphone"/>
-                                        <field name="categ_id" string="Тип звонка"/>
-                                        <field name="id_ast_coll"/>
-                                    </tree>
-                                </field>
+                                <!--<field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">-->
+                                    <!--<tree string="Звонки" >-->
+                                        <!--<field name="date"/>-->
+                                        <!--<field name="name" string="Отчет звонка"/>-->
+                                        <!--<field name="partner_phone"/>-->
+                                        <!--&lt;!&ndash;<field name="time_of_coll"/>&ndash;&gt;-->
+                                        <!--<field name="duration"/>-->
+                                        <!--<field name="user_id"/>-->
+                                        <!--<field name="id_sphone"/>-->
+                                        <!--<field name="categ_id" string="Тип звонка"/>-->
+                                        <!--<field name="id_ast_coll"/>-->
+                                    <!--</tree>-->
+                                <!--</field>-->
 
                                 <group col="4" colspan="4">
                                     <separator string="История переприсвоений" colspan="4"/>
@@ -1806,19 +1806,19 @@
                                         <field name="create_uid"/>
                                     </tree>
                                 </field>
-                                <field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">
-                                    <tree string="Phone Calls" >
-                                        <field name="date"/>
-                                        <field name="name" string="Отчет звонка"/>
-                                        <field name="partner_phone"/>
-                                        <!--<field name="time_of_coll"/>-->
-                                        <field name="duration"/>
-                                        <field name="user_id"/>
-                                        <field name="id_sphone"/>
-                                        <field name="categ_id" string="Тип звонка"/>
-                                        <field name="id_ast_coll"/>
-                                    </tree>
-                                </field>
+                                <!--<field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">-->
+                                    <!--<tree string="Phone Calls" >-->
+                                        <!--<field name="date"/>-->
+                                        <!--<field name="name" string="Отчет звонка"/>-->
+                                        <!--<field name="partner_phone"/>-->
+                                        <!--&lt;!&ndash;<field name="time_of_coll"/>&ndash;&gt;-->
+                                        <!--<field name="duration"/>-->
+                                        <!--<field name="user_id"/>-->
+                                        <!--<field name="id_sphone"/>-->
+                                        <!--<field name="categ_id" string="Тип звонка"/>-->
+                                        <!--<field name="id_ast_coll"/>-->
+                                    <!--</tree>-->
+                                <!--</field>-->
 
                                 <group col="4" colspan="4">
                                     <separator string="История переприсвоений" colspan="4"/>

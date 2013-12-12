@@ -173,19 +173,19 @@
                                         <field name="date_deadline" string="End Date"/>
                                     </tree>
                                 </field>
-                                <field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">
-                                    <tree string="Phone Calls">
-                                        <field name="date"/>
-                                        <field name="name" string="Отчет звонка"/>
-                                        <field name="partner_phone"/>
-                                        <!--<field name="time_of_coll"/>-->
-                                        <field name="duration"/>
-                                        <field name="user_id"/>
-                                        <field name="id_sphone"/>
-                                        <field name="categ_id" string="Тип звонка"/>
-                                        <field name="id_ast_coll"/>
-                                    </tree>
-                                </field>
+                                <!--<field name="phonecall_ids" colspan="4" nolabel="1" mode="tree" readonly="1">-->
+                                    <!--<tree string="Phone Calls">-->
+                                        <!--<field name="date"/>-->
+                                        <!--<field name="name" string="Отчет звонка"/>-->
+                                        <!--<field name="partner_phone"/>-->
+                                        <!--&lt;!&ndash;<field name="time_of_coll"/>&ndash;&gt;-->
+                                        <!--<field name="duration"/>-->
+                                        <!--<field name="user_id"/>-->
+                                        <!--&lt;!&ndash;<field name="id_sphone"/>&ndash;&gt;-->
+                                        <!--<field name="categ_id" string="Тип звонка"/>-->
+                                        <!--<field name="id_ast_coll"/>-->
+                                    <!--</tree>-->
+                                <!--</field>-->
                                 <field name="comm_ids" colspan="4" nolabel="1" mode="tree">
                                     <tree string="История общения" editable="top">
                                         <field name="create_date"/>
