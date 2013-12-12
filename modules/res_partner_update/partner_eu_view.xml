@@ -178,7 +178,7 @@
                                         <field name="date"/>
                                         <field name="name" string="Отчет звонка"/>
                                         <field name="partner_phone"/>
-                                        <field name="time_of_coll"/>
+                                        <!--<field name="time_of_coll"/>-->
                                         <field name="duration"/>
                                         <field name="user_id"/>
                                         <field name="id_sphone"/>
