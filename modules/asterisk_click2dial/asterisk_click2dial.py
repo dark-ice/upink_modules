@@ -23,6 +23,7 @@ from osv import osv, fields
 # Lib required to print logs
 import logging
 # Lib to translate error messages
+import re
 from tools.translate import _
 # Lib for phone number reformating -> pip install phonenumbers
 import phonenumbers
@@ -30,8 +31,10 @@ import phonenumbers
 # We need a version which has this commit : http://code.google.com/p/py-asterisk/source/detail?r=8d0e1c941cce727c702582f3c9fcd49beb4eeaa4
 # so a version after Nov 20th, 2012
 from Asterisk import Manager
+from openerp import netsvc
 
 _logger = logging.getLogger(__name__)
+
 
 class asterisk_server(osv.osv):
     '''Asterisk server object, to store all the parameters of the Asterisk IPBXs'''
@@ -189,7 +192,6 @@ class asterisk_server(osv.osv):
                 ast_server = self.browse(cr, uid, asterisk_server_ids[0], context=context)
         return ast_server
 
-
     def _connect_to_asterisk(self, cr, uid, context=None):
         '''
         Open the connection to the asterisk manager
@@ -210,7 +212,6 @@ class asterisk_server(osv.osv):
         if not user.resource:
             raise osv.except_osv(_('Error :'), _('No resource name configured for the current user'))
 
-
         _logger.debug("User's phone : %s/%s" % (user.asterisk_chan_type, user.resource))
         _logger.debug("Asterisk server = %s:%d" % (ast_server.ip_address, ast_server.port))
 
@@ -221,7 +222,6 @@ class asterisk_server(osv.osv):
             _logger.error("Error in the Originate request to Asterisk server %s" % ast_server.ip_address)
             _logger.error("Here is the detail of the error : '%s'" % unicode(e))
             raise osv.except_osv(_('Error :'), _("Problem in the request from OpenERP to Asterisk. Here is the detail of the error: '%s'" % unicode(e)))
-            return False
 
         return (user, ast_server, ast_manager)
 
@@ -357,9 +357,85 @@ class res_users(osv.osv):
 res_users()
 
 
+class tel_reference(osv.osv):
+    _name = 'tel.reference'
+    _description = 'Tel references for crm_lead, res_partner and res_partner_address'
+    _rec_name = 'phone'
+    _columns = {
+        'crm_lead_id': fields.many2one('crm.lead', u'Кандидат'),
+        'res_partner_id': fields.many2one('res.partner', u'Партнер'),
+        'partner_address_id': fields.many2one('res.partner.address', u'Адрес партнера'),
+        'phone_type': fields.selection([('mob', 'Мобильный'),('stat', 'Стационарный'),], u'Тип телефона'),
+        'phone': fields.char(u'Номер телефона', size=56, select=True),
+        'phone_for_search': fields.char("Integer number phone", size=56),
+    }
+    _defaults = {
+        'phone_type': lambda *a: 'stat',
+    }
+
+    def create(self, cr, uid, values, context=None):
+        if context is None:
+            context = {}
+        if values.get('partner_address_id'):
+            ival = self.pool.get('res.partner.address').browse(cr, uid, values['partner_address_id'], context)
+            values['res_partner_id'] = ival.partner_id.id
+
+        if values.get('phone_for_search') is None and values.get('phone'):
+            pe = re.compile('\d+', re.UNICODE)
+            try:
+               t_val = "".join(pe.findall(values.get('phone')))
+               values.setdefault('phone_for_search',t_val[-10:])
+            except Exception, e:
+                    _logger.notifyChannel(
+                                         ("Asterisk module"),
+                                         netsvc.LOG_ERROR,
+                                         ("Error number create: %s") % str(e))
+        elif not values.get('phone'):
+             raise osv.except_osv(
+                                     ("Error create phone"),
+                                     ("Введите номер!")
+                                     )
+        if not values.get('phone_for_search'):
+            raise osv.except_osv(
+                                 ("Error create phone"),
+                                 ("В номере нет цифр. Введите номер!")
+                                 )
+        if len(values.get('phone_for_search')) < 10:
+            raise osv.except_osv(
+                                 ("Error create phone"),
+                                 ("В номере тел. не может быть меньше 10 цифр!")
+                                 )
+        return super(tel_reference, self).create(cr, uid, values, context)
+
+    def write(self, cr, uid, ids, values, context=None):
+        if values.get('phone_for_search') == None and values.get('phone', False):
+            pe = re.compile('\d+', re.UNICODE)
+           # print values.get('phone')
+            try:
+                t_val = "".join(pe.findall(values.get('phone')))
+                values.setdefault('phone_for_search',t_val[-10:])
+            except Exception, e:
+                    _logger.notifyChannel(
+                                         ("Asterisk module"),
+                                         netsvc.LOG_ERROR,
+                                         ("Error number write: %s") % str(e))
+        if not values.get('phone_for_search') and values.get('phone', False):
+            raise osv.except_osv(
+                                 ("Error write phone"),
+                                 ("В номере нет цифр. Введите номер!")
+                                 )
+        if values.get('phone', False) and len(values.get('phone_for_search')) < 10:
+            raise osv.except_osv(
+                                 ("Error create phone"),
+                                 ("В номере тел. не может быть меньше 10 цифр!")
+                                 )
+        return super(tel_reference, self).write(cr, uid, ids, values, context)
+
+tel_reference()
+
+
 class res_partner_address(osv.osv):
     _inherit = "res.partner.address"
-
 
     def _format_phonenumber_to_e164(self, cr, uid, ids, name, arg, context=None):
         result = {}
@@ -382,7 +458,6 @@ class res_partner_address(osv.osv):
         #print "RESULT _format_phonenumber_to_e164", result
         return result
 
-
     _columns = {
         'phone_e164': fields.function(_format_phonenumber_to_e164, type='char', size=64, string='Phone in E.164 format', readonly=True, multi="e164", store={
             'res.partner.address': (lambda self, cr, uid, ids, c={}: ids, ['phone'], 10),
@@ -393,7 +468,8 @@ class res_partner_address(osv.osv):
         'fax_e164': fields.function(_format_phonenumber_to_e164, type='char', size=64, string='Fax in E.164 format', readonly=True, multi="e164", store={
             'res.partner.address': (lambda self, cr, uid, ids, c={}: ids, ['fax'], 10),
             }),
-        }
+        'phone_ids': fields.one2many('tel.reference', 'partner_address_id', u'Номера телефонов', select=True),
+    }
 
     def _reformat_phonenumbers(self, cr, uid, vals, context=None):
         """Reformat phone numbers in international format i.e. +33141981242"""
@@ -418,16 +494,13 @@ class res_partner_address(osv.osv):
                     vals[field] = phonenumbers.format_number(res_parse, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
         return vals
 
-
     def create(self, cr, uid, vals, context=None):
         vals_reformated = self._reformat_phonenumbers(cr, uid, vals, context=context)
         return super(res_partner_address, self).create(cr, uid, vals_reformated, context=context)
 
-
     def write(self, cr, uid, ids, vals, context=None):
         vals_reformated = self._reformat_phonenumbers(cr, uid, vals, context=context)
         return super(res_partner_address, self).write(cr, uid, ids, vals_reformated, context=context)
-
 
     def dial(self, cr, uid, ids, phone_field=['phone', 'phone_e164'], context=None):
         '''Read the number to dial and call _connect_to_asterisk the right way'''
@@ -441,18 +514,15 @@ class res_partner_address(osv.osv):
             raise osv.except_osv(_('Error :'), _("The phone number isn't stored in the standard E.164 format. Try to run the wizard 'Reformat all phone numbers' from the menu Settings > Configuration > Asterisk."))
         return self.pool.get('asterisk.server')._dial_with_asterisk(cr, uid, erp_number_e164, context=context)
 
-
     def action_dial_phone(self, cr, uid, ids, context=None):
         '''Function called by the button 'Dial' next to the 'phone' field
         in the partner address view'''
         return self.dial(cr, uid, ids, phone_field=['phone', 'phone_e164'], context=context)
 
-
     def action_dial_mobile(self, cr, uid, ids, context=None):
         '''Function called by the button 'Dial' next to the 'mobile' field
         in the partner address view'''
         return self.dial(cr, uid, ids, phone_field=['mobile', 'mobile_e164'], context=context)
-
 
     def get_name_from_phone_number(self, cr, uid, number, context=None):
         '''Function to get name from phone number. Usefull for use from Asterisk
