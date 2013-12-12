@@ -16,9 +16,9 @@ Module Asterisk statistics of calls.
     'depends': ['base', 'crm'],
     'init_xml': [],
     'update_xml': [
-        'asterisk_view.xml',
-        'tel_reference.xml',
-        'asterisk_event.xml',
+        # 'asterisk_view.xml',
+        # 'tel_reference.xml',
+        # 'asterisk_event.xml',
     ],
     'demo_xml': [],
     'test': [],
