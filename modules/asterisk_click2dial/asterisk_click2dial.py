@@ -565,16 +565,6 @@ class res_partner_address(osv.osv):
 res_partner_address()
 
 
-class crm_lead(osv.osv):
-    _inherit = 'crm.lead'
-
-    _columns = {
-        'phone_ids': fields.one2many('tel.reference', 'crm_lead_id', u'Номера телефонов', select=True)
-    }
-
-crm_lead()
-
-
 # This module supports multi-company
 class res_company(osv.osv):
     _inherit = "res.company"
