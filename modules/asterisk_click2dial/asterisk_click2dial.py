@@ -362,7 +362,6 @@ class tel_reference(osv.osv):
     _description = 'Tel references for crm_lead, res_partner and res_partner_address'
     _rec_name = 'phone'
     _columns = {
-        'crm_lead_id': fields.many2one('crm.lead', u'Кандидат'),
         'res_partner_id': fields.many2one('res.partner', u'Партнер'),
         'partner_address_id': fields.many2one('res.partner.address', u'Адрес партнера'),
         'phone_type': fields.selection([('mob', 'Мобильный'),('stat', 'Стационарный'),], u'Тип телефона'),
