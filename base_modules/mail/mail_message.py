@@ -256,7 +256,7 @@ class mail_message(osv.osv):
                 param = [param]
         msg_vals = {
             'subject': subject,
-            'date': datetime.datetime.now().replace(tzinfo=pytz.utc).strftime('%Y-%m-%d %H:%M:%S') - datetime.timedelta(hours=-2),
+            'date': (datetime.datetime.now().replace(tzinfo=pytz.utc) - datetime.timedelta(hours=-2)).strftime('%Y-%m-%d %H:%M:%S'),
             'user_id': uid,
             'model': model,
             'res_id': res_id,
