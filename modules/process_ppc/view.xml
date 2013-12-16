@@ -210,7 +210,7 @@
                                 name="implementation"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                states="approval" />
+                                states="approval,finish" />
                                 <!--attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_k', '=', False)]}"-->
                                 <!--/>-->
 

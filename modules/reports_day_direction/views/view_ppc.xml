@@ -32,6 +32,17 @@
                     <field name="specialist_id" />
                     <field name="domain_zone" />
                     <field name="campaign" />
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Партнер" icon="terp-partner" context="{'group_by':'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Кампания" icon="terp-partner" context="{'group_by':'campaign'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Аккаунт-менеджер" icon="terp-partner" context="{'group_by':'specialist_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Услуга" icon="terp-partner" context="{'group_by':'service_id'}"/>
+                        <separator orientation="vertical"/>
+                    </group>
                 </search>
             </field>
         </record>

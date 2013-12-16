@@ -12,7 +12,7 @@ class ProcessPPC(Model):
     _columns = {
         'date_start': fields.date('Дата запуска проекта'),
         'domain_zone': fields.selection((('ru', 'ru'), ('ua', 'ua')), 'Доменная зона'),
-        'campaign': fields.char('ID кампании', size=200),
+        'campaign': fields.text('ID кампании', help='Разделяем ID кампаний запятой без пробелов! Пример: 1235531,12354561'),
         'fact_ids': fields.one2many('report.day.ppc.statistic', 'ppc_id', 'Факты'),
     }
 ProcessPPC()
@@ -70,8 +70,10 @@ class ReportDayPPCStatistic(Model):
             if date_start > record['date_start'] and record['date_start']:
                 date_start = record['date_start']
             if record['advertising_id'] and record['advertising_id'][0] == 1 and record['campaign']:
-                yandex_campaign.append(int(record['campaign']))
-                ppc_dict[int(record['campaign'])] = record['id']
+                campaigns = record['campaign'].strip(',').split(',')
+                yandex_campaign.extend(map(int, campaigns))
+                for campaign in campaigns:
+                    ppc_dict[int(campaign)] = record['id']
 
         yandex = YandexDirect()
         if yandex_campaign:
@@ -82,7 +84,7 @@ class ReportDayPPCStatistic(Model):
                 count = len(yandex_campaign) // 100 + 1
                 for line in range(count):
                     yandex_result.update(
-                        yandex.get_summary_stat(yandex_campaign[line*100:(line+1)*100], date_start, date_end)
+                        yandex.get_summary_stat(yandex_campaign[line * 100:(line + 1) * 100], date_start, date_end)
                     )
 
             for item in yandex_result:

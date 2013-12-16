@@ -91,11 +91,7 @@ class ProcessPPC(Model):
             'process.ppc.access',
             'process_id',
             'Доступы',
-            readonly=True,
-            states={
-                'drafting': [('readonly', False), ('required', True)],
-                'revision': [('readonly', False)],
-            }),
+            readonly=False),
         'additional_data_company': fields.text(
             'Дополнительные данные по кампании'
         ),
@@ -103,7 +99,7 @@ class ProcessPPC(Model):
             'Причина остановки кампании',
             readonly=True,
             states={
-                'implementation': [('readonly', False), ('required', True)]
+                'implementation': [('readonly', False)]
             }
         ),
 
@@ -165,7 +161,7 @@ class ProcessPPC(Model):
 
     @notify.msg_send(_name)
     def write(self, cr, uid, ids, values, context=None):
-        error = ''
+        error = []
         for key in ['report_ids', 'message_ids']:
             for item in values.get(key, []):
                 if item[0] == 0:
@@ -180,19 +176,21 @@ class ProcessPPC(Model):
 
             if next_state and next_state != state:
                 if next_state == 'drafting' and (not values.get('specialist_id', False) and not record['specialist_id']):
-                    error += 'Необходимо выбрать специалиста'
+                    error.append('Необходимо выбрать специалиста.')
                 if next_state == 'revision' and (not values.get('comment', False) and not record['comment']):
-                    error += 'Необходимо ввести комментарий по доработке'
+                    error.append('Необходимо ввести комментарий по доработке.')
                 if next_state == 'finish' and (not values.get('reason_stop_company', False) and not record['reason_stop_company']):
-                    error += 'Необходимо ввести причину остановки работ'
+                    error.append('Необходимо ввести причину остановки работ.')
                 if next_state == 'approval':
                     if not values.get('advertising_id', False) and not record['advertising_id']:
-                        error += 'Необходимо выбрать рекламная система'
+                        error.append('Необходимо выбрать рекламная система.')
                     if not values.get('access_ids', False) and not record['access_ids']:
-                        error += 'Необходимо ввести доступы'
+                        error.append('Необходимо ввести доступы.')
+                if next_state == 'finish' and (not values.get('reason_stop_company', False) and not record['reason_stop_company']):
+                    error.append('Необходимо ввести причину остановки кампании.')
 
                 if error:
-                    raise osv.except_osv("PPC", error)
+                    raise osv.except_osv("PPC", ' '.split(error))
 
                 values.update({
                     'history_ids': [
