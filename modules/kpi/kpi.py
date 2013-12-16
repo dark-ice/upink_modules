@@ -2215,10 +2215,7 @@ class KpiSla2(Model):
         data = self.browse(cr, uid, ids, context)
         for row in data:
             percentage = self.calculate_percent(cr, uid, row, context)
-            res[row.id] = {
-                'percentage': percentage,
-                'mbo': round((row.weight * percentage), 2) if percentage else 0,
-            }
+            res[row.id] = round((row.weight * percentage), 2) if percentage else 0
         return res
 
     _columns = {
