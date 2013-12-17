@@ -2182,8 +2182,41 @@ class KpiSla2(Model):
     _inherit = 'kpi.mbo'
     _name = 'kpi.sla2'
 
+    def calculate_percent(self, cr, uid, row, context=None):
+        """
+            Расчет показателя.
+                На случай если формулы нет -> проводим стандартный расчет
+                    факт*100/план
+                Если найдена формула разбиваем её по разделителю ';',
+                    и исполняем итерационными, затем что бы использовалось последнее условие
+                По просчету округляем до двух знаков
+                RETURNS float
+        """
+        plan = row.plan
+        fact = row.fact
+        weight = row.weight
+        result = 0
+
+        if plan:
+            result = fact * 100 / plan
+
+        if row.name.formula and (result or 'plan==0' in row.name.formula or 'fact==0' in row.name.formula):
+            formula_table = row.name.formula.split(';')
+            for formula in formula_table:
+                exec formula
+
+        if not row.name.index_type and result > 100:
+            result = 100
+        result = round(result, 2) if result else False
+        return result
+
     def _calculate(self, cr, uid, ids, name, arg, context=None):
-        return super(KpiSla2, self)._calculate(cr, uid, ids, name, arg, context)
+        res = {}
+        data = self.browse(cr, uid, ids, context)
+        for row in data:
+            percentage = self.calculate_percent(cr, uid, row, context)
+            res[row.id] = round((row.weight * percentage), 2) if percentage else 0
+        return res
 
     _columns = {
         'site': fields.char('Сайт', size=200),
