@@ -66,6 +66,13 @@
                 </tree>
             </field>
         </record>
+        <record model="ir.actions.act_window" id="window_loyalty_create">
+            <field name="name">Программа лояльности</field>
+            <field name="res_model">account.invoice.loyalty</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="form_loyalty_create"/>
+            <field name="target">new</field>
+        </record>
         <record model="ir.ui.view" id="view_account_invoice_form">
             <field name="name">account.invoice.form1</field>
             <field name="model">account.invoice</field>
@@ -294,15 +301,6 @@
 
             </field>
         </record>
-
-        <record model="ir.actions.act_window" id="window_loyalty_create">
-            <field name="name">Программа лояльности</field>
-            <field name="res_model">account.invoice.loyalty</field>
-            <field name="view_mode">form</field>
-            <field name="view_id" ref="form_loyalty_create"/>
-            <field name="target">new</field>
-        </record>
-
         <record model="ir.ui.view" id="view_account_invoice_line_tree_inherit">
             <field name="name">view_invoice_line_tree.inherit</field>
             <field name="model">account.invoice.line</field>
