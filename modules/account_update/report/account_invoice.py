@@ -165,7 +165,7 @@ class AccountInvoiceDocument(report_sxw.rml_parse):
                         ft = u'ячейка'
                     if item.flat_type == 'aya':
                         ft = u'а/я'
-                    result_second.append(u"{flat_type} {flat}".format(flat_type=ft, flat=item.flat))
+                    result_first.append(u"{flat_type} {flat}".format(flat_type=ft, flat=item.flat))
 
                 break
 
