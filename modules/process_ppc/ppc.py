@@ -179,6 +179,7 @@ class ProcessPPC(Model):
                     error.append('Необходимо выбрать специалиста.')
                 if next_state == 'revision' and (not values.get('comment', False) and not record['comment']):
                     error.append('Необходимо ввести комментарий по доработке.')
+
                 if next_state == 'finish' and (not values.get('reason_stop_company', False) and not record['reason_stop_company']):
                     error.append('Необходимо ввести причину остановки работ.')
                 if next_state == 'approval':
@@ -186,11 +187,9 @@ class ProcessPPC(Model):
                         error.append('Необходимо выбрать рекламная система.')
                     if not values.get('access_ids', False) and not record['access_ids']:
                         error.append('Необходимо ввести доступы.')
-                if next_state == 'finish' and (not values.get('reason_stop_company', False) and not record['reason_stop_company']):
-                    error.append('Необходимо ввести причину остановки кампании.')
 
                 if error:
-                    raise osv.except_osv("PPC", ' '.split(error))
+                    raise osv.except_osv("PPC", ' '.join(error))
 
                 values.update({
                     'history_ids': [

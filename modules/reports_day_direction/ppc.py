@@ -137,13 +137,13 @@ class ReportDayPPC(Model):
                   l.service_id,
                   p.specialist_id,
                   p.domain_zone,
-                  p.campaign,
+                  s.campaign,
                   s.cash,
                   s.date
                 FROM
                   process_ppc p
                   LEFT JOIN process_launch l on (l.id=p.launch_id)
-                  LEFT JOIN report_day_ppc_statistic s on (p.campaign=s.campaign)
+                  LEFT JOIN report_day_ppc_statistic s on (s.campaign=substring(p.campaign from s.campaign))
                 WHERE p.state='implementation' and p.campaign is not null
             )""")
 

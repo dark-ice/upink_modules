@@ -1,5 +1,6 @@
 # coding=utf-8
 import json
+import os
 from pprint import pprint
 import urllib2
 import httplib
@@ -12,12 +13,15 @@ VERSIONS = {
 
 
 CURRENCY = ('RUB', 'CHF', 'EUR', 'KZT', 'TRY', 'UAH', 'USD')
-KEYFILE = '/home/andrey/upink_modules/modules/reports_day_direction/private.key'
-CERTFILE = '/home/andrey/upink_modules/modules/reports_day_direction/cert.crt'
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+KEYFILE = os.path.join(BASE_DIR, 'reports_day_direction/private.key')
+CERTFILE = os.path.join(BASE_DIR, 'reports_day_direction/cert.crt')
 
 
 class YandexCertConnection(httplib.HTTPSConnection):
     def __init__(self, host, port=None, key_file=KEYFILE, cert_file=CERTFILE, timeout=30):
+        print '!!!!!!!!!!!! %s' % KEYFILE
+        print '!!!!!!!!!!!! %s' % CERTFILE
         httplib.HTTPSConnection.__init__(self, host, port, key_file, cert_file)
 
 
