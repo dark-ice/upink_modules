@@ -247,23 +247,62 @@
                             </field>
                         </page>
                         <page string="Лояльность">
-                            <field name="loyalty_ids"  nolabel="1" colspan="4" context="{'invoice_id': id}">
+                            <field name="loyalty_ids"  nolabel="1" colspan="4" context="{'invoice_id': id}" >
                                 <tree editable="top">
                                     <field name="invoice_id" on_change="get_services(invoice_id)" invisible="1"/>
-                                    <field name="service_id" on_change="get_program(service_id, invoice_id)"/>
-                                    <field name="program_id" on_change="get_bonus(service_id, invoice_id, program_id)"/>
-                                    <field name="bonus_p" attrs="{'readonly': [('program_id', 'in', [1, 2, 3])]}"/>
-                                    <field name="bonus_sum" attrs="{'readonly': [('program_id', 'in', [1, 2, 3])]}"/>
-                                    <field name="how_return"/>
-                                    <field name="whom_return_partner" attrs="{'readonly': [('how_return', 'in', ['beznal', 'ad', '50_for_50', 'service'])]}"/>
-                                    <field name="whom_return_text" attrs="{'readonly': [('how_return', 'in', ['e_cash', 'mks'])]}"/>
+                                    <field name="service_id" on_change="get_program(service_id, invoice_id)" readonly="1"/>
+                                    <field name="program_id" on_change="get_bonus(service_id, invoice_id, program_id)" readonly="1"/>
+                                    <field name="bonus_p" readonly="1" attrs="{'readonly': [('program_id', 'in', [1, 2, 3])]}"/>
+                                    <field name="bonus_sum" readonly="1" attrs="{'readonly': [('program_id', 'in', [1, 2, 3])]}"/>
+                                    <field name="how_return" readonly="1"/>
+                                    <field name="whom_return_partner" attrs="{'readonly': [('how_return', 'in', ['beznal', 'ad', '50_for_50', 'service'])]}" readonly="1"/>
+                                    <field name="whom_return_text" attrs="{'readonly': [('how_return', 'in', ['e_cash', 'mks'])]}" readonly="1"/>
+                                    <field name="partner_id" readonly="1" invisible="1"/>
                                 </tree>
                             </field>
+                            <button type="action"
+                                        name="%(window_loyalty_create)d"
+                                        string="Создать"
+                                        context="{'invoice_id': id}"
+                                        icon="gtk-ok"/>
                         </page>
                     </notebook>
                 </form>
             </field>
         </record>
+
+        <record model="ir.ui.view" id="form_loyalty_create">
+            <field name="name">view_form_loyalty_create</field>
+            <field name="model">account.invoice.loyalty</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Лояльность">
+                    <field name="invoice_id" on_change="get_services(invoice_id)" invisible="1"/>
+                    <field name="service_id" on_change="get_program(service_id, invoice_id)" />
+                    <field name="program_id" on_change="get_bonus(service_id, invoice_id, program_id)" required="1"/>
+                    <field name="bonus_p" on_change="get_calck(program_id, invoice_id, bonus_p, False)" attrs="{'readonly': [('program_id', 'in', [1, 2, 3])]}"/>
+                    <field name="bonus_sum" on_change="get_calck(program_id, invoice_id, False, bonus_sum)" attrs="{'readonly': [('program_id', 'in', [1, 2, 3])]}"/>
+                    <field name="how_return" />
+                    <field name="whom_return_partner" attrs="{'readonly': [('how_return', 'in', ['e_cash', 'mks'])]}" />
+                    <field name="whom_return_text" attrs="{'readonly': [('how_return', 'in', ['beznal', 'ad', '50_for_50', 'service'])]}" />
+                    <field name="partner_id" invisible="1"/>
+                    <group col="4" colspan="4">
+                        <button string="Отмена" icon="gtk-close" special="cancel" />
+                        <button name="set_loyalty" string="Сохранить" type="object" icon="gtk-ok"/>
+                    </group>
+                </form>
+
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="window_loyalty_create">
+            <field name="name">Программа лояльности</field>
+            <field name="res_model">account.invoice.loyalty</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="form_loyalty_create"/>
+            <field name="target">new</field>
+        </record>
+
         <record model="ir.ui.view" id="view_account_invoice_line_tree_inherit">
             <field name="name">view_invoice_line_tree.inherit</field>
             <field name="model">account.invoice.line</field>

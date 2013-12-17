@@ -1710,7 +1710,8 @@ class ResPartner(Model):
             readonly=True,
             digits=(3, 2),
             string='Процент заполненности'
-        )
+        ),
+        'bonuses_ids': fields.one2many('account.invoice.loyalty', 'partner_id', 'Скидки')
     }
 
     def _get_type(self, cr, uid, context=None):
@@ -2292,3 +2293,17 @@ class InvoiceReportingPeriod(Model):
         ),
     }
 InvoiceReportingPeriod()
+
+
+#class PartnerInvoiceBonuses(Model):
+#    _name = 'partner.invoice.bonuses'
+#    _columns = {
+#        'invoice_ids': fields.one2many(
+#            'account.invoice',
+#            'partner_id',
+#            'Счета',
+#            domain=[('type', '=', 'out_invoice')]
+#        ),
+#    }
+#
+#PartnerInvoiceBonuses()

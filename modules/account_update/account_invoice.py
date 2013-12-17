@@ -1626,8 +1626,9 @@ class AccountInvoiceLoyalty(Model):
         process_lounch_pool = self.pool.get('process.launch')
         invoice_line_ids = invoice_line_pool.search(cr, 1, [('invoice_id', '=', invoice_id)])
         partner_id = invoice_line_pool.read(cr, 1, invoice_line_ids, ['partner_id'])
-        need_invoice_ids = invoice_line_pool.search(cr, 1, [('partner_id', '=', partner_id[0]['partner_id'][0]), ('invoice_id', '!=', invoice_id)])
-        services_ids = [serv['service_id'][0] for serv in invoice_line_pool.read(cr, 1, need_invoice_ids, ['service_id'])]
+        need_invoice_ids = self.pool.get('account.invoice').search(cr, 1, [('partner_id', '=', partner_id[0]['partner_id'][0]), ('id', '!=', invoice_id), ('type', '=', 'out_invoice')])
+        need_invoice_line_ids = invoice_line_pool.search(cr, 1, [('invoice_id', 'in', need_invoice_ids)])
+        services_ids = [serv['service_id'][0] for serv in invoice_line_pool.read(cr, 1, need_invoice_line_ids, ['service_id'])]
 
         #проверка что счет создается по услуге которую не покупал партнер ранее но уже покупал другие услуги
         if service_id not in services_ids and len(services_ids) >= 1:
@@ -1654,7 +1655,7 @@ class AccountInvoiceLoyalty(Model):
         process_callout_ids = process_lounch_pool.search(cr, 1,  [
             ('partner_id', '=', partner_id[0]['partner_id'][0]),
             ('service_id', '=', service_id),
-            ('process_model', '=', 'process.call.in')
+            ('process_model', '=', 'process.call.out')
         ])
         if process_callout_ids:
             programs.append(11)
@@ -1663,23 +1664,34 @@ class AccountInvoiceLoyalty(Model):
     def get_bonus(self, cr, uid, ids, service_id, invoice_id, program_id, context=None):
         suma = self.pool.get('account.invoice').read(cr, 1, invoice_id, ['a_total'])
         suma = suma['a_total']
-        if service_id == 1:
+        if program_id == 1:
             proc = suma * 5 / 100
             suma -= proc
-            return {'value': {'bonus_p': 5, 'bonus_sum': suma}}
-        elif service_id == 2:
-            proc = suma * 5 / 100
+            return {'value': {'bonus_p': 5, 'bonus_sum': proc}}
+        elif program_id == 2:
+            proc = suma * 10 / 100
             suma -= proc
-            return {'value': {'bonus_p': 5, 'bonus_sum': suma}}
-        elif service_id == 3:
-            proc = suma * 5 / 100
+            return {'value': {'bonus_p': 10, 'bonus_sum': proc}}
+        elif program_id == 3:
+            proc = suma * 15 / 100
             suma -= proc
-            return {'value': {'bonus_p': 5, 'bonus_sum': suma}}
+            return {'value': {'bonus_p': 15, 'bonus_sum': proc}}
+
+    def get_calck(self, cr, uid, ids, program_id, invoice_id, bonus_p, bonus_sum):
+        if program_id not in [1, 2, 3]:
+            suma = self.pool.get('account.invoice').read(cr, 1, invoice_id, ['a_total'])
+            suma = suma['a_total']
+            if bonus_p:
+                target = suma * bonus_p / 100
+                return {'value': {'bonus_sum': target}}
+            if bonus_sum:
+                target = bonus_sum * 100 / suma
+                return {'value': {'bonus_p': target}}
 
     _columns = {
         'invoice_id': fields.many2one('account.invoice', ''),
-        'service_id': fields.many2one('brief.services.stage', 'Услуги', domain="[('id', 'in', invoice_id.invoice_line.service_id.id)]"),
-        'program_id': fields.many2one('account.invoice.programs', 'Программы'),
+        'service_id': fields.many2one('brief.services.stage', 'Услуги'),
+        'program_id': fields.many2one('account.invoice.programs', 'Программа'),
         'bonus_p': fields.float('% бонуса'),
         'bonus_sum': fields.float('Сумма бонуса'),
         'how_return': fields.selection(
@@ -1693,12 +1705,30 @@ class AccountInvoiceLoyalty(Model):
             ], 'Как возвращать'
         ),
         'whom_return_partner': fields.many2one('res.partner', 'Кому возвращать (партнер)', inbisible=True),
-        'whom_return_text': fields.char('Кому возвращать (текстовое)', size=128)
+        'whom_return_text': fields.char('Кому возвращать (текстовое)', size=128),
+        'partner_id': fields.related(
+            'invoice_id',
+            'partner_id',
+            type="many2one",
+            relation="res.partner",
+            string="Партнер",
+            store=True
+        ),
+        'paid_date': fields.related(
+            'invoice_id',
+            'paid_date',
+            type="many2one",
+            relation="account.invoice",
+            string="Дата оплаты"
+        )
     }
 
     _defaults = {
         'invoice_id': lambda s, c, u, context: context.get('invoice_id'),
     }
+
+    def set_loyalty(self, cr, uid, ids, context=None):
+        return {'type': 'ir.actions.act_window_close'}
 
 AccountInvoiceLoyalty()
 
