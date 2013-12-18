@@ -1122,16 +1122,16 @@
                                         </form>
                                     </field>
                                     <separator string="Программы лояльности" colspan="4"/>
-                                        <field name="bonuses_ids" nolabel="1" colspan="4" readonly="1">
-                                            <tree>
-                                                <field name="invoice_id"/>
-                                                <field name="service_id"/>
-                                                <field name="program_id"/>
-                                                <field name="bonus_p"/>
-                                                <field name="bonus_sum"/>
-                                                <field name="paid_date"/>
-                                            </tree>
-                                        </field>
+                                    <field name="bonuses_ids" nolabel="1" colspan="4" readonly="1">
+                                        <tree>
+                                            <field name="invoice_id"/>
+                                            <field name="service_id"/>
+                                            <field name="program_id"/>
+                                            <field name="bonus_p"/>
+                                            <field name="bonus_sum"/>
+                                            <field name="paid_date"/>
+                                        </tree>
+                                    </field>
                                 </group>
                                 <group colspan="4" col="4">
                                     <separator string="Финансовые договоренности" colspan="4"/>

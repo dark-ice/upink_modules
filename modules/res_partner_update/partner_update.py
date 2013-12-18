@@ -2295,7 +2295,7 @@ class InvoiceReportingPeriod(Model):
 InvoiceReportingPeriod()
 
 
-#class PartnerInvoiceBonuses(Model):
+# class PartnerInvoiceBonuses(Model):
 #    _name = 'partner.invoice.bonuses'
 #    _columns = {
 #        'invoice_ids': fields.one2many(
@@ -2306,4 +2306,4 @@ InvoiceReportingPeriod()
 #        ),
 #    }
 #
-#PartnerInvoiceBonuses()
+# PartnerInvoiceBonuses()

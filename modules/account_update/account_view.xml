@@ -75,8 +75,8 @@
                     <field name="invoice_id" on_change="get_services(invoice_id)" invisible="1"/>
                     <field name="service_id" on_change="get_program(service_id, invoice_id)" />
                     <field name="program_id" on_change="get_bonus(service_id, invoice_id, program_id)" required="1"/>
-                    <field name="bonus_p" on_change="get_calck(program_id, invoice_id, bonus_p, False)" />
-                    <field name="bonus_sum" on_change="get_calck(program_id, invoice_id, False, bonus_sum)" />
+                    <field name="bonus_p" on_change="get_calck(program_id, invoice_id, bonus_p, False)" attrs="{'readonly': [('program_id', 'in', [1, 2, 3])]}" />
+                    <field name="bonus_sum" on_change="get_calck(program_id, invoice_id, False, bonus_sum)" attrs="{'readonly': [('program_id', 'in', [1, 2, 3])]}" />
                     <field name="how_return" />
                     <field name="whom_return_partner" attrs="{'readonly': [('how_return', 'in', ['e_cash', 'mks'])]}" />
                     <field name="whom_return_text" attrs="{'readonly': [('how_return', 'in', ['beznal', 'ad', '50_for_50', 'service'])]}" />

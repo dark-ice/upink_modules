@@ -1626,7 +1626,7 @@ class AccountInvoiceLoyalty(Model):
         process_lounch_pool = self.pool.get('process.launch')
         invoice_line_ids = invoice_line_pool.search(cr, 1, [('invoice_id', '=', invoice_id)])
         partner_id = invoice_line_pool.read(cr, 1, invoice_line_ids, ['partner_id'])
-        need_invoice_ids = self.pool.get('account.invoice').search(cr, 1, [('partner_id', '=', partner_id[0]['partner_id'][0]), ('id', '!=', invoice_id), ('type', '=', 'out_invoice')])
+        need_invoice_ids = self.pool.get('account.invoice').search(cr, 1, [('partner_id', '=', partner_id[0]['partner_id'][0]), ('id', '<', invoice_id), ('type', '=', 'out_invoice')])
         need_invoice_line_ids = invoice_line_pool.search(cr, 1, [('invoice_id', 'in', need_invoice_ids)])
         services_ids = [serv['service_id'][0] for serv in invoice_line_pool.read(cr, 1, need_invoice_line_ids, ['service_id'])]
 
@@ -1689,7 +1689,7 @@ class AccountInvoiceLoyalty(Model):
                 return {'value': {'bonus_p': target}}
 
     _columns = {
-        'invoice_id': fields.many2one('account.invoice', ''),
+        'invoice_id': fields.many2one('account.invoice', 'номер счета'),
         'service_id': fields.many2one('brief.services.stage', 'Услуги'),
         'program_id': fields.many2one('account.invoice.programs', 'Программа'),
         'bonus_p': fields.float('% бонуса'),
@@ -1717,8 +1717,7 @@ class AccountInvoiceLoyalty(Model):
         'paid_date': fields.related(
             'invoice_id',
             'paid_date',
-            type="many2one",
-            relation="account.invoice",
+            type="date",
             string="Дата оплаты"
         )
     }
@@ -1746,6 +1745,13 @@ class AccountInvoiceLoyalty(Model):
             'nodestroy': False,
             'context': {'add': True},
         }
+
+    def create(self, cr, user, vals, context=None):
+        bonus_data = self.get_bonus(cr, 1, 1, vals['service_id'], vals['invoice_id'], vals['program_id'], context)
+        vals['bonus_p'] = bonus_data['value']['bonus_p']
+        vals['bonus_sum'] = bonus_data['value']['bonus_sum']
+        document_id = super(AccountInvoiceLoyalty, self).create(cr, user, vals, context)
+        return document_id
 
 AccountInvoiceLoyalty()
 
