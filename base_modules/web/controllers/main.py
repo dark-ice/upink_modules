@@ -1462,7 +1462,8 @@ class Binary(openerpweb.Controller):
             res = Model.read([int(id)], fields, context)[0]
         else:
             res = Model.default_get(fields, context)
-        filecontent = base64.b64decode(res.get(field, ''))
+        data = res.get(field, '')
+        filecontent = base64.b64decode(data + '=' * (4 - len(data) % 4))
         if not filecontent:
             raise ValueError("No content found for field '%s' on '%s:%s'" %
                 (field, model, id))
