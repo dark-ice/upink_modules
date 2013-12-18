@@ -1747,9 +1747,10 @@ class AccountInvoiceLoyalty(Model):
         }
 
     def create(self, cr, user, vals, context=None):
-        bonus_data = self.get_bonus(cr, 1, 1, vals['service_id'], vals['invoice_id'], vals['program_id'], context)
-        vals['bonus_p'] = bonus_data['value']['bonus_p']
-        vals['bonus_sum'] = bonus_data['value']['bonus_sum']
+        if vals['program_id'] in [1, 2, 3]:
+            bonus_data = self.get_bonus(cr, 1, 1, vals['service_id'], vals['invoice_id'], vals['program_id'], context)
+            vals['bonus_p'] = bonus_data['value']['bonus_p']
+            vals['bonus_sum'] = bonus_data['value']['bonus_sum']
         document_id = super(AccountInvoiceLoyalty, self).create(cr, user, vals, context)
         return document_id
 
