@@ -2133,19 +2133,19 @@ class PartnerPpcDiscountsHistory(Model):
         'permanent': fields.boolean('На постоянной основе'),
         'create_uid': fields.many2one('res.users', 'Автор', readonly=True),
         'create_date': fields.datetime('Дата', readonly=True),
-        'old_service_id': fields.many2one('brief.services.stage', 'Предидущее Услуга'),
+        'old_service_id': fields.many2one('brief.services.stage', 'Предыдущее Услуга'),
         'old_discount_type': fields.selection(
             [
                 ('yandex_discount', 'Скидка Up в аккаунте Яндекс'),
                 ('google_discount', 'Скидка Up в аккаунте Google'),
                 ('partner_discount', 'Скидка Партнера'),
                 ('nds', 'НДС')
-            ], 'Предидущий Тип скидки', required=True),
-        'old_percent': fields.float('Предидущее Значение'),
-        'old_google': fields.boolean('Предидущее 4500'),
-        'old_start_date': fields.date('Предидущая Дата начала'),
-        'old_finish_date': fields.date('Предидущая Дата окончания'),
-        'old_permanent': fields.boolean('Предидущее На постоянной основе'),
+            ], 'Предыдущий Тип скидки', required=True),
+        'old_percent': fields.float('Предыдущее Значение'),
+        'old_google': fields.boolean('Предыдущее 4500'),
+        'old_start_date': fields.date('Предыдущая Дата начала'),
+        'old_finish_date': fields.date('Предыдущая Дата окончания'),
+        'old_permanent': fields.boolean('Предыдущее На постоянной основе'),
     }
 PartnerPpcDiscountsHistory()
 

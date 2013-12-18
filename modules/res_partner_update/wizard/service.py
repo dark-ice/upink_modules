@@ -48,7 +48,7 @@ class PartnerAddedServicesWizard(TransientModel):
                 lines = [(1, history_id, {'date_finish': wizard['date'], 'budget': wizard['budget'], 'comment': wizard['comment']})]
             else:
                 if not history['date_finish']:
-                    raise osv.except_osv('Незакрытая услуга', 'Пожалуйста, закройте предидущий период по этой услуге!')
+                    raise osv.except_osv('Незакрытая услуга', 'Пожалуйста, закройте предыдущий период по этой услуге!')
                 lines = [(0, 0, {
                     'date_finish': wizard['date'],
                     'date_start': date_st['date_start'],

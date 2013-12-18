@@ -1730,6 +1730,23 @@ class AccountInvoiceLoyalty(Model):
     def set_loyalty(self, cr, uid, ids, context=None):
         return {'type': 'ir.actions.act_window_close'}
 
+    def loyalty_delete(self, cr, uid, ids, context):
+        self.unlink(cr, uid, [context['loyalty']])
+
+        view_id = self.pool.get('ir.ui.view').search(cr, uid, [('name', 'like', 'account.invoice.form1'), ('model', '=', 'account.invoice')])
+        return {
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'account.invoice',
+            'name': 'Подключение услуги',
+            'view_id': view_id,
+            'res_id': context['invoice_id'] or 0,
+            'type': 'ir.actions.act_window',
+            'target': 'inline',
+            'nodestroy': False,
+            'context': {'add': True},
+        }
+
 AccountInvoiceLoyalty()
 
 
