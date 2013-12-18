@@ -1760,6 +1760,6 @@ AccountInvoiceLoyalty()
 class AccountInvoicePrograms(Model):
     _name = 'account.invoice.programs'
     _columns = {
-        'name': fields.char('Название программы', size=128)
+        'name': fields.char('Название программы', size=128, readonly=True)
     }
 AccountInvoicePrograms()
