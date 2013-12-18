@@ -1038,8 +1038,8 @@ class ResPartner(Model):
             pay_ids = pay_pool.search(cr, 1, [('invoice_id', 'in', record['invoice_ids'])], order='date_pay')
             for pay in pay_pool.read(cr, 1, pay_ids, ['total', 'date_pay', 'invoice_id']):
                 invoice = self.pool.get('account.invoice').read(cr, 1, pay['invoice_id'][0], ['rate'])
-                date = datetime.strptime(pay['date_pay'], "%Y-%m-%d")
-                period = self.pool.get('kpi.period').get_by_date(cr, date, calendar='rus')
+                date_pay = datetime.strptime(pay['date_pay'], "%Y-%m-%d")
+                period = self.pool.get('kpi.period').get_by_date(cr, date_pay, calendar='rus')
                 try:
                     sum_list[period.id] += pay['total'] / invoice['rate']
                 except KeyError:
@@ -1590,7 +1590,7 @@ class ResPartner(Model):
             ], 'Категория клиента'
         ),
 
-        'check': fields.function(_check_access, type="boolean", method=True),
+        'check': fields.function(_check_access, type="boolean", method=True, string='Проверка'),
         'service': fields.function(
             _get_service,
             type="many2one",
@@ -1618,7 +1618,7 @@ class ResPartner(Model):
             help='Этап Кандидата'),
         'priority': fields.selection(AVAILABLE_PRIORITIES, 'Приоритет', select=True, help='Приоритет Кандидата'),
         'lead': fields.boolean('Кандидат'),
-        'last_comment': fields.related('note_ids', 'title', type='char', size=128, string=u'Комментарий'),
+        'last_comment': fields.related('note_ids', 'title', type='char', size=128, string='Комментарий'),
 
         'phone_s': fields.function(
             lambda *a: dict((r_id, '') for r_id in a[3]),
@@ -1690,11 +1690,11 @@ class ResPartner(Model):
             relation="invoice.reporting.period",
             store=False,
             readonly=True,
-            string=""
+            string="Суммы за период"
         ),
         'discounts_ids': fields.one2many('res.partner.ppc.discounts', 'partner_id', 'Скидки', domain=['|', ('finish_date', '>=', date.today().strftime('%Y-%m-%d')), ('permanent', '=', True)]),
         'discounts_history_ids': fields.one2many('res.partner.ppc.discounts.history', 'partner_id', 'Скидки'),
-        'check_ppc': fields.function(_check_ppc, type="boolean", method=True, string=u"Маркер PPC"),
+        'check_ppc': fields.function(_check_ppc, type="boolean", method=True, string="Маркер PPC"),
         'old_discounts_ids': fields.one2many('res.partner.ppc.discounts', 'partner_id', 'Скидки', domain=[('finish_date', '<', date.today().strftime('%Y-%m-%d'))]),
         'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством'),
 
