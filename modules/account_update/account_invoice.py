@@ -628,14 +628,22 @@ class AccountInvoice(Model):
             card = self.pool.get('account.invoice.card').browse(cr, uid, card_id, context)
             values['currency_id'] = card.currency_id.id
 
+        if next_state == 'open':
+            launch_pool = self.pool.get('process.launch')
+            partner_id = data.partner_id.id
+            service_ids = [s.service_id.id for s in data.invioce_line if s.invioce_line.service_id.direction == 'PPC']
+            for service in service_ids:
+                launch_ids = launch_pool.search(cr, 1, [('partner_id', '=', partner_id), ('service_id', '=', service)])
+                if launch_ids:
+                    launch_pool.write(cr, 1, launch_ids, {'account_ids': [(4, invoice_id) for invoice_id in ids]})
         if next_state and next_state != state:
             values.update({'history_ids': [(0, 0, {
                 'state': self.get_state(next_state)[1]
             })]})
 
-        if not sum([x.price_subtotal for x in data.invoice_line]):
+        if not sum(x.price_subtotal for x in data.invoice_line):
             wf_service.trg_validate(uid, self._inherit, ids[0], 'invoice_paid', cr)
-        elif sum([x.paid for x in data.invoice_line]):
+        elif sum(x.paid for x in data.invoice_line):
             wf_service.trg_validate(uid, self._inherit, ids[0], 'invoice_proforma', cr)
 
         for attachment in values.get('attachment_ids', []):

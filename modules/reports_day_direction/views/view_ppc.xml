@@ -32,6 +32,17 @@
                     <field name="specialist_id" />
                     <field name="domain_zone" />
                     <field name="campaign" />
+                    <newline/>
+                    <group expand="0" string="Группировать по...">
+                        <filter string="Партнер" icon="terp-partner" context="{'group_by':'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Кампания" name="Gcampaign" icon="terp-partner" context="{'group_by':'campaign'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Аккаунт-менеджер" icon="terp-partner" context="{'group_by':'specialist_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Услуга" icon="terp-partner" context="{'group_by':'service_id'}"/>
+                        <separator orientation="vertical"/>
+                    </group>
                 </search>
             </field>
         </record>
@@ -43,7 +54,7 @@
             <field name="view_mode">tree</field>
             <field name="view_id" ref="view_report_day_ppc_tree"/>
             <field name="search_view_id" ref="view_report_day_ppc_search"/>
-            <field name="context">{'search_default_date_start': time.strftime('%Y-%m-01'), 'search_default_date_end': time.strftime('%Y-%m-%d'), 'group_by': ['campaign']}</field>
+            <field name="context">{'search_default_date_start': time.strftime('%Y-%m-01'), 'search_default_date_end': time.strftime('%Y-%m-%d'), 'search_default_Gcampaign': eval('True')}</field>
         </record>
 
 

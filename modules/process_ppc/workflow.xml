@@ -52,11 +52,10 @@ update_partner()</field>
         <!-- finish -->
         <record model="workflow.activity" id="act_finish">
             <field name="wkf_id" ref="wkf_process_ppc"/>
-            <field name="flow_stop">True</field>
+            <field name="flow_stop">False</field>
             <field name="name">Кампания остановлена</field>
             <field name="kind">function</field>
-            <field name="action">write({'state':'finish'})
-close_launch()</field>
+            <field name="action">write({'state':'finish'})</field>
         </record>
 
 
@@ -100,6 +99,13 @@ close_launch()</field>
             <field name="act_from" ref="act_implementation"/>
             <field name="act_to" ref="act_finish"/>
             <field name="signal">finish</field>
+        </record>
+
+        <!-- finish -> implementation -->
+        <record model="workflow.transition" id="i_f">
+            <field name="act_from" ref="act_finish"/>
+            <field name="act_to" ref="act_implementation"/>
+            <field name="signal">implementation</field>
         </record>
     </data>
 </openerp>
