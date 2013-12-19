@@ -213,6 +213,7 @@
                         <field name="check_e" />
                         <field name="check_t" />
                         <field name="check_s" />
+                        <field name="check_h" />
                     </group>
                     <group colspan="4" col="8">
                         <group colspan="6" col="6">

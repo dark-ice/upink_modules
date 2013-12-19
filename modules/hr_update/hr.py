@@ -12,32 +12,45 @@ class hr_employee(Model):
         """
             Динамически определяет роли на форме
         """
-        empl_pool = self.pool.get('hr.employee')
         res = {}
         for data in self.browse(cr, uid, ids, context):
-            access = str()
+            if uid == 1:
+                res[data.id] = {
+                    'check_e': True,
+                    'check_l': True,
+                    'check_t': True,
+                    'check_s': True,
+                    'check_h': True,
+                }
+            else:
+                res[data.id] = {
+                    'check_e': False,
+                    'check_l': False,
+                    'check_t': False,
+                    'check_s': False,
+                    'check_h': False,
+                }
+                top_users = self.pool.get('res.users').search(cr, 1, [('groups_id', '=', 37)])
 
-            top_users = self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', [37, 14])])
+                #  Сотрудник
+                if data.user_id.id == uid:
+                    res[data.id]['check_e'] = True
 
-            if data.user_id.id == uid:
-                access += 'e'
+                #  Руководитель + топы
+                if (data.parent_id and data.parent_id.user_id.id == uid) or uid in top_users:
+                    res[data.id]['check_l'] = True
 
-            #  Руководитель
-            if (data.parent_id and data.parent_id.user_id.id == uid) or uid in top_users:
-                access += 'l'
+                #  Топы
+                if uid in top_users:
+                    res[data.id]['check_t'] = True
 
-            if uid in top_users:
-                access += 't'
+                #  Сис админы
+                if uid in self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', [193, 194])]):
+                    res[data.id]['check_s'] = True
 
-            if uid in self.pool.get('res.users').search(cr, 1, [('groups_id', 'in', [193, 194])]):
-                access += 's'
-
-            val = False
-            letter = name[6]
-            if letter in access or uid == 1:
-                val = True
-
-            res[data.id] = val
+                #  Hr
+                if uid in self.pool.get('res.users').search(cr, 1, [('groups_id', '=', 14)]):
+                    res[data.id]['check_h'] = True
         return res
 
     _columns = {
@@ -121,28 +134,40 @@ class hr_employee(Model):
             method=True,
             string="Проверка на линейного руководителя",
             type="boolean",
-            invisible=True
+            invisible=True,
+            multi='access'
         ),
         'check_t': fields.function(
             _check_access,
             method=True,
-            string="Проверка на топ менеджеров + hr",
+            string="Проверка на топ менеджеров + Зоя",
             type="boolean",
-            invisible=True
+            invisible=True,
+            multi='access'
         ),
         'check_e': fields.function(
             _check_access,
             method=True,
             string="Проверка на сотрудника",
             type="boolean",
-            invisible=True
+            invisible=True,
+            multi='access'
         ),
         'check_s': fields.function(
             _check_access,
             method=True,
             string="Проверка на сис админов",
             type="boolean",
-            invisible=True
+            invisible=True,
+            multi='access'
+        ),
+        'check_h': fields.function(
+            _check_access,
+            method=True,
+            string="Проверка на hr",
+            type="boolean",
+            invisible=True,
+            multi='access'
         ),
 
 
