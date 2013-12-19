@@ -142,7 +142,7 @@ class PPCReport(Model):
 
             if record['service_id'][0] in (17, 21, 22, ):
                 # 30 - курс долара у Яндекса
-                costs_partner = (1 - vals['discount_up'] / 100) * record['factor'] * rate / 30
+                costs_partner = (1 - vals['discount_up'] - vals['discount_partner'] / 100) * record['factor'] * rate / 30
             elif record['service_id'][0] in (18, ):
                 if google:
                     costs_partner = (record['factor'] - 4500 / rate) / (1 + vals['discount_nds'] / 100)
