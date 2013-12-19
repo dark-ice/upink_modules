@@ -11,7 +11,7 @@ class ProcessPPC(Model):
 
     _columns = {
         'date_start': fields.date('Дата запуска проекта'),
-        'domain_zone': fields.selection((('ru', 'ru'), ('ua', 'ua')), 'Доменная зона'),
+        'domain_zone': fields.selection((('ru', 'ru'), ('ua', 'ua'), ('no_ru', 'не ru')), 'Доменная зона'),
         'campaign': fields.text('ID кампании', help='Разделяем ID кампаний запятой без пробелов! Пример: 1235531,12354561'),
         'fact_ids': fields.one2many('report.day.ppc.statistic', 'ppc_id', 'Факты'),
     }
@@ -25,7 +25,12 @@ class ReportDayPPCStatistic(Model):
 
     _columns = {
         'name': fields.selection(
-            (('direct', 'Яндекс.Директ'), ('adwords', 'Google.Adwords')),
+            (
+                ('direct', 'Яндекс.Директ'),
+                ('market', 'Яндекс.Маркет'),
+                ('adwords', 'Google.Adwords'),
+                ('tizer', 'Тизерная реклама'),
+            ),
             'Рекламная система'
         ),
         'date': fields.date('Дата'),
@@ -101,8 +106,6 @@ class ReportDayPPCStatistic(Model):
                             'ppc_id': ppc_dict[item['CampaignID']]
                         })
         return True
-
-
 ReportDayPPCStatistic()
 
 
@@ -119,7 +122,7 @@ class ReportDayPPC(Model):
         'partner_id': fields.many2one('res.partner', 'Партнер'),
         'service_id': fields.many2one('brief.services.stage', 'Услуга'),
         'specialist_id': fields.many2one('res.users', 'Аккаунт-менеджер'),
-        'domain_zone': fields.selection((('ru', 'ru'), ('ua', 'ua')), 'Доменная зона'),
+        'domain_zone': fields.selection((('ru', 'ru'), ('ua', 'ua'), ('no_ru', 'не ru')), 'Доменная зона'),
         'campaign': fields.char('ID кампании', size=200),
         'cash': fields.float('Сумма'),
         'date': fields.date('Дата'),
@@ -169,7 +172,6 @@ class ReportDayPPC(Model):
                 item[1] = '<='
 
         return super(ReportDayPPC, self).read_group(cr, uid, domain, fields, groupby, offset, limit, context, orderby)
-
 ReportDayPPC()
 
 
