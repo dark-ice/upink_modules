@@ -68,7 +68,8 @@ class AccountInvoice(Model):
         account_pool = self.pool.get('account.account')
         account_obj = account_pool.read(cr, uid, account_id, ['currency_id', 'tax', 'lang'])
         return {
-            'value': {'currency_id': account_obj['currency_id'], 'tax': account_obj['tax'], 'lang': account_obj['lang']}}
+            'value': {'currency_id': account_obj['currency_id'], 'tax': account_obj['tax'],
+                      'lang': account_obj['lang']}}
 
     def onchange_bank(self, cr, uid, ids, partner_id, lead_id, context=None):
         if partner_id:
@@ -597,7 +598,7 @@ class AccountInvoice(Model):
             if values.get('card_id'):
                 card = self.pool.get('account.invoice.card').browse(cr, uid, values['card_id'], context)
                 values['currency_id'] = card.currency_id.id
-            # записываю новые данные в услуги
+                # записываю новые данные в услуги
         if values.get('invoice_line'):
             service_pool = self.pool.get('partner.added.services')
             for i in values.get('invoice_line'):
@@ -1489,6 +1490,7 @@ class AccountInvoiceTransferFunds(Model):
                 rate = 1
             value = out_total * rate
         return {'value': {'in_total': value, 'out_total': out_total}}
+
     _columns = {
         'id': fields.integer('Номер перемещения', size=11, select=True),
         'out_date': fields.date('Дата отправки денег', required=True),
@@ -1626,9 +1628,13 @@ class AccountInvoiceLoyalty(Model):
         process_lounch_pool = self.pool.get('process.launch')
         invoice_line_ids = invoice_line_pool.search(cr, 1, [('invoice_id', '=', invoice_id)])
         partner_id = invoice_line_pool.read(cr, 1, invoice_line_ids, ['partner_id'])
-        need_invoice_ids = self.pool.get('account.invoice').search(cr, 1, [('partner_id', '=', partner_id[0]['partner_id'][0]), ('id', '<', invoice_id), ('type', '=', 'out_invoice')])
+        need_invoice_ids = self.pool.get('account.invoice').search(cr, 1,
+                                                                   [('partner_id', '=', partner_id[0]['partner_id'][0]),
+                                                                    ('id', '<', invoice_id),
+                                                                    ('type', '=', 'out_invoice')])
         need_invoice_line_ids = invoice_line_pool.search(cr, 1, [('invoice_id', 'in', need_invoice_ids)])
-        services_ids = [serv['service_id'][0] for serv in invoice_line_pool.read(cr, 1, need_invoice_line_ids, ['service_id'])]
+        services_ids = [serv['service_id'][0] for serv in
+                        invoice_line_pool.read(cr, 1, need_invoice_line_ids, ['service_id'])]
 
         #проверка что счет создается по услуге которую не покупал партнер ранее но уже покупал другие услуги
         if service_id not in services_ids and len(services_ids) >= 1:
@@ -1645,14 +1651,14 @@ class AccountInvoiceLoyalty(Model):
             programs.extend([4, 5, 6, 7, 8, 9, 10])
 
         #проверяю на входящие и исходящие и добавляю необходимые программы
-        process_callin_ids = process_lounch_pool.search(cr, 1,  [
+        process_callin_ids = process_lounch_pool.search(cr, 1, [
             ('partner_id', '=', partner_id[0]['partner_id'][0]),
             ('service_id', '=', service_id),
             ('process_model', '=', 'process.call.in')
         ])
         if process_callin_ids:
             programs.append(12)
-        process_callout_ids = process_lounch_pool.search(cr, 1,  [
+        process_callout_ids = process_lounch_pool.search(cr, 1, [
             ('partner_id', '=', partner_id[0]['partner_id'][0]),
             ('service_id', '=', service_id),
             ('process_model', '=', 'process.call.out')
@@ -1688,8 +1694,33 @@ class AccountInvoiceLoyalty(Model):
                 target = bonus_sum * 100 / suma
                 return {'value': {'bonus_p': target}}
 
+    def _search_empty(self, cr, uid, obj, name, args, context):
+        history_id = self.pool.get('account.invoice.history').search(cr, 1, [('state', '=', 'Оплачен полностью')])
+        res = []
+        for record in self.pool.get('account.invoice.history').read(cr, 1, history_id, ['invoice_id']):
+            if record['invoice_id']:
+                res.append(record['invoice_id'][0])
+        if res:
+            return [('invoice_id', 'in', res)]
+
+
+    def _get_paid_date(self, cr, uid, ids, name, arg, context=None):
+        res = {}
+        if context.get('invoice_id'):
+            for record in self.browse(cr, uid, ids, context):
+                history_id = self.pool.get('account.invoice.history').search(cr, 1,
+                                                                             [('invoice_id', '=', record.invoice_id.id),
+                                                                              ('state', '=', 'Оплачен полностью')])
+                if history_id:
+                    need_date = self.pool.get('account.invoice.history').read(cr, 1, history_id[0], ['create_date'])
+                    res[record.id] = need_date['create_date']
+                else:
+                    res[record.id] = ''
+        return res
+
+
     _columns = {
-        'invoice_id': fields.many2one('account.invoice', 'номер счета'),
+        'invoice_id': fields.many2one('account.invoice', 'номер счета', ondelete='cascade'),
         'service_id': fields.many2one('brief.services.stage', 'Услуги'),
         'program_id': fields.many2one('account.invoice.programs', 'Программа'),
         'bonus_p': fields.float('% бонуса'),
@@ -1714,11 +1745,18 @@ class AccountInvoiceLoyalty(Model):
             string="Партнер",
             store=True
         ),
-        'paid_date': fields.related(
-            'invoice_id',
-            'paid_date',
-            type="date",
-            string="Дата оплаты"
+        # 'paid_date': fields.related(
+        #     'invoice_id',
+        #     'paid_date',
+        #     type="date",
+        #     string="Дата оплаты"
+        # )
+        'paid_date': fields.function(
+            _get_paid_date,
+            method=True,
+            string='Дата полной оплаты',
+            type='char',
+            fnct_search=_search_empty,
         )
     }
 
@@ -1732,7 +1770,8 @@ class AccountInvoiceLoyalty(Model):
     def loyalty_delete(self, cr, uid, ids, context):
         self.unlink(cr, uid, [context['loyalty']])
 
-        view_id = self.pool.get('ir.ui.view').search(cr, uid, [('name', 'like', 'account.invoice.form1'), ('model', '=', 'account.invoice')])
+        view_id = self.pool.get('ir.ui.view').search(cr, uid, [('name', 'like', 'account.invoice.form1'),
+                                                               ('model', '=', 'account.invoice')])
         return {
             'view_type': 'form',
             'view_mode': 'form',
@@ -1754,6 +1793,7 @@ class AccountInvoiceLoyalty(Model):
         document_id = super(AccountInvoiceLoyalty, self).create(cr, user, vals, context)
         return document_id
 
+
 AccountInvoiceLoyalty()
 
 
@@ -1762,4 +1802,6 @@ class AccountInvoicePrograms(Model):
     _columns = {
         'name': fields.char('Название программы', size=128, readonly=True)
     }
+
+
 AccountInvoicePrograms()

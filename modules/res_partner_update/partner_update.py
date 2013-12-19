@@ -25,14 +25,13 @@ PARTNER_STATUS = (
     ('closed', 'Закрыт'),
 )
 
-
 CRITERIAS = (
     ('terms_of_service', 'Сроки предоставления услуги'),
     ('conformity', 'Соответствие услуги всем входным требованиям, указанным в ТЗ'),
     ('quality_feedback', 'Качество обратной связи с представителем Компании , скорость и полнота ответов менеджера'),
-    ('completeness_of_reporting', 'Полнота отчетов о результатах рекламной кампании и соблюдение сроков их предоставления'),
+    ('completeness_of_reporting',
+     'Полнота отчетов о результатах рекламной кампании и соблюдение сроков их предоставления'),
 )
-
 
 SERVISE_TYPE = (
     ('project', 'Проектная'),
@@ -245,21 +244,22 @@ class res_partner_address(Model):
         if not len(ids):
             return []
         res = []
-        for r in self.read(cr, user, ids, ['name','zip','country_id', 'city','partner_id', 'street']):
-            if context.get('contact_display', 'contact')=='partner' and r['partner_id']:
+        for r in self.read(cr, user, ids, ['name', 'zip', 'country_id', 'city', 'partner_id', 'street']):
+            if context.get('contact_display', 'contact') == 'partner' and r['partner_id']:
                 res.append((r['id'], r['partner_id'][1]))
             else:
                 # make a comma-separated list with the following non-empty elements
                 elems = [r['country_id'] and r['country_id'][1], r['city'], r['street']]
                 addr = ', '.join(filter(bool, elems))
-                if (context.get('contact_display', 'contact')=='partner_address') and r['partner_id']:
+                if (context.get('contact_display', 'contact') == 'partner_address') and r['partner_id']:
                     res.append((r['id'], "%s: %s" % (r['partner_id'][1], addr or '/')))
                 else:
                     res.append((r['id'], addr or '/'))
         return res
 
     def check_main(self, cr, select_id, partner_id):
-        main_ids = self.search(cr, 1, [('partner_id', '=', partner_id), ('main_face', '=', True), ('id', '!=', select_id)])
+        main_ids = self.search(cr, 1,
+                               [('partner_id', '=', partner_id), ('main_face', '=', True), ('id', '!=', select_id)])
         if main_ids:
             self.write(cr, 1, main_ids, {'main_face': False})
 
@@ -287,6 +287,8 @@ class res_provider_category(Model):
     _columns = {
         'name': fields.char('Категория поставщика', size=256, required=True),
     }
+
+
 res_provider_category()
 
 
@@ -300,20 +302,26 @@ class partner_added_services(Model):
             val = 'Новая'
 
             if record.service_id.service_type == 'project':
-                launch_ids = self.pool.get('process.launch').search(cr, 1, [('partner_id', '=', record.partner_id.id), ('service_id', '=', record.service_id.id)])
+                launch_ids = self.pool.get('process.launch').search(cr, 1, [('partner_id', '=', record.partner_id.id),
+                                                                            ('service_id', '=', record.service_id.id)])
                 if launch_ids:
-                    launch = self.pool.get('process.launch').read(cr, 1, launch_ids[-1], ['process_model', 'process_id'])
+                    launch = self.pool.get('process.launch').read(cr, 1, launch_ids[-1],
+                                                                  ['process_model', 'process_id'])
                     if launch['process_model'] and launch['process_id']:
-                        process = self.pool.get(launch['process_model']).read(cr, 1, launch['process_id'], ['state', 'create_date'])
+                        process = self.pool.get(launch['process_model']).read(cr, 1, launch['process_id'],
+                                                                              ['state', 'create_date'])
                         if process:
                             if process['state'] == 'finish':
                                 val = 'Закрыт'
-                            elif datetime.strptime(process['create_date'], "%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.UTC) + timedelta(days=15) < datetime.now(pytz.UTC):
+                            elif datetime.strptime(process['create_date'], "%Y-%m-%d %H:%M:%S").replace(
+                                    tzinfo=pytz.UTC) + timedelta(days=15) < datetime.now(pytz.UTC):
                                 val = 'Существующая'
 
             elif record.service_id.service_type == 'process':
-                invoice_ids = self.pool.get('account.invoice').search(cr, 1, [('partner_id', '=', record.partner_id.id)])
-                pay_ids = self.pool.get('account.invoice.pay.line').search(cr, 1, [('invoice_id', 'in', invoice_ids), ('service_id', '=', record.service_id.id)])
+                invoice_ids = self.pool.get('account.invoice').search(cr, 1,
+                                                                      [('partner_id', '=', record.partner_id.id)])
+                pay_ids = self.pool.get('account.invoice.pay.line').search(cr, 1, [('invoice_id', 'in', invoice_ids), (
+                    'service_id', '=', record.service_id.id)])
                 if pay_ids:
                     first_pay = self.pool.get('account.invoice.pay.line').read(cr, 1, pay_ids[0], ['pay_date'])
                     last_pay = self.pool.get('account.invoice.pay.line').read(cr, 1, pay_ids[-1], ['pay_date'])
@@ -321,14 +329,19 @@ class partner_added_services(Model):
                     if len(pay_ids) > 1:
                         pre_last_pay = self.pool.get('account.invoice.pay.line').read(cr, 1, pay_ids[-2], ['pay_date'])
 
-                    if pre_last_pay is not None and pre_last_pay.get('pay_date') and datetime.strptime(pre_last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=90) < datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC):
+                    if pre_last_pay is not None and pre_last_pay.get('pay_date') and datetime.strptime(
+                            pre_last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(
+                            days=90) < datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC):
                         val = 'Возврат'
 
-                    if datetime.strptime(first_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=30) < datetime.now(pytz.UTC):
+                    if datetime.strptime(first_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(
+                            days=30) < datetime.now(pytz.UTC):
                         val = 'Существующая'
-                    if datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=40) < datetime.now(pytz.UTC):
+                    if datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(
+                            days=40) < datetime.now(pytz.UTC):
                         val = 'В зоне риска'
-                    if datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(days=90) < datetime.now(pytz.UTC):
+                    if datetime.strptime(last_pay['pay_date'], "%Y-%m-%d").replace(tzinfo=pytz.UTC) + timedelta(
+                            days=90) < datetime.now(pytz.UTC):
                         val = 'Отказ'
 
             res[record.id] = val
@@ -379,7 +392,8 @@ class partner_added_services(Model):
     def connect_service(self, cr, partner_id, service_id, date_start):
         flag = False
         as_ids = self.search(cr, 1, [('partner_id', '=', partner_id), ('service_id', '=', service_id)])
-        h_ids = self.pool.get('partner.added.services.history').search(cr, 1, [('history_service_id', 'in', as_ids), ('date_finish', '=', False)])
+        h_ids = self.pool.get('partner.added.services.history').search(cr, 1, [('history_service_id', 'in', as_ids),
+                                                                               ('date_finish', '=', False)])
         vals = {
             'partner_id': partner_id,
             'service_id': service_id,
@@ -407,9 +421,11 @@ class partner_added_services(Model):
         return flag
 
     def set_all_services(self, cr, uid, ids, context=None):
-        invoice_ids = self.pool.get('account.invoice').search(cr, 1, [('type', '=', 'out_invoice')], order='date_invoice')
+        invoice_ids = self.pool.get('account.invoice').search(cr, 1, [('type', '=', 'out_invoice')],
+                                                              order='date_invoice')
         vals = {}
-        for i in self.pool.get('account.invoice').read(cr, 1, invoice_ids, ['partner_id', 'date_invoice', 'invoice_line']):
+        for i in self.pool.get('account.invoice').read(cr, 1, invoice_ids,
+                                                       ['partner_id', 'date_invoice', 'invoice_line']):
             for j in self.pool.get('account.invoice.line').read(cr, 1, i['invoice_line'], ['service_id']):
                 if i['partner_id'] and j['service_id']:
                     if not vals.get((i['partner_id'][0], j['service_id'][0])):
@@ -422,6 +438,7 @@ class partner_added_services(Model):
                     vals[(p['partner_id'][0], p['service_id'][0])] = p['create_date']
         for k, v in vals.iteritems():
             self.connect_service(cr, k[0], k[1], v)
+
 
 partner_added_services()
 
@@ -484,7 +501,8 @@ class PartnerAddedServicesHistory(Model):
     def change_history(self, cr, uid, ids, context=None):
         if context is None:
             context = {}
-        view_id = self.pool.get('ir.ui.view').search(cr, uid, [('name', 'like', 'partner.added.services.history.form'), ('model', '=', self._name)])
+        view_id = self.pool.get('ir.ui.view').search(cr, uid, [('name', 'like', 'partner.added.services.history.form'),
+                                                               ('model', '=', self._name)])
         return {
             'view_type': 'form',
             'view_mode': 'form',
@@ -502,7 +520,8 @@ class PartnerAddedServicesHistory(Model):
 
     def write(self, cr, user, ids, vals, context=None):
         for record in self.read(cr, user, ids, ['date_start', 'date_finish', 'partner_id', 'service_id']):
-            if (vals.get('date_finish') and vals['date_finish'] != record['date_finish']) or (vals.get('date_start') and vals['date_start'] != record['date_start']):
+            if (vals.get('date_finish') and vals['date_finish'] != record['date_finish']) or (
+                    vals.get('date_start') and vals['date_start'] != record['date_start']):
                 vals.update({'history_ids': [(0, 0, {
                     'partner_id': record['partner_id'][0],
                     'service_id': record['service_id'][0],
@@ -538,18 +557,18 @@ class PartnerAddedServicesHistory(Model):
                 date_indx.append(indx)
 
         if date_st_from is not None and date_st_to is None:
-            sql_postfix.append("date_start='{0}'::date".format(date_st_from,))
+            sql_postfix.append("date_start='{0}'::date".format(date_st_from, ))
         elif date_st_from is not None and date_st_to is not None:
             sql_postfix.append("date_start between '{0}'::date and '{1}'::date".format(date_st_from, date_st_to))
 
         if date_fn_from is not None and date_fn_to is None:
-            sql_postfix.append("date_finish='{0}'::date".format(date_fn_from,))
+            sql_postfix.append("date_finish='{0}'::date".format(date_fn_from, ))
         elif date_fn_from is not None and date_fn_to is not None:
             sql_postfix.append("date_finish between '{0}'::date and '{1}'::date".format(date_fn_from, date_fn_to))
 
         sql_postfix_str = ' AND '.join(sql_postfix)
         if sql_postfix_str:
-            sql = 'SELECT id FROM partner_added_services_history WHERE {0}'.format(sql_postfix_str,)
+            sql = 'SELECT id FROM partner_added_services_history WHERE {0}'.format(sql_postfix_str, )
             cr.execute(sql)
             res_ids = set(service_id[0] for service_id in cr.fetchall())
             args.append(['id', 'in', tuple(res_ids)])
@@ -561,6 +580,7 @@ class PartnerAddedServicesHistory(Model):
                 del args[indx]
         return super(PartnerAddedServicesHistory, self).search(cr, uid, args, offset, limit, order, context, count)
 
+
 PartnerAddedServicesHistory()
 
 
@@ -569,10 +589,10 @@ class PartnerAddedServicesChangeHistory(Model):
     _columns = {
         'history_service_id': fields.integer('ID'),
         'service_id': fields.many2one('brief.services.stage', 'Услуга'),
-        'date_start':fields.date('Дата подключения'),
-        'old_date_start':fields.date('Старая Дата подключения'),
-        'date_finish':fields.date('Дата окончания'),
-        'old_date_finish':fields.date('Старая Дата окончания'),
+        'date_start': fields.date('Дата подключения'),
+        'old_date_start': fields.date('Старая Дата подключения'),
+        'date_finish': fields.date('Дата окончания'),
+        'old_date_finish': fields.date('Старая Дата окончания'),
         'partner_id': fields.many2one('res.partner', 'Партнер', inbisible=True),
         'create_uid': fields.many2one('res.users', 'Автор', readonly=True),
         'create_date': fields.datetime('Дата Изменения', readonly=True),
@@ -586,6 +606,8 @@ class bonus_reason(Model):
     _columns = {
         'name': fields.char('Причина бонуса', size=250),
     }
+
+
 bonus_reason()
 
 
@@ -596,6 +618,8 @@ class refusion_reason(Model):
     _columns = {
         'name': fields.char('Название', size=250),
     }
+
+
 refusion_reason()
 
 
@@ -609,6 +633,8 @@ class operational_departments(Model):
         'department': fields.many2one('hr.department', 'Направление'),
         'specialist': fields.many2one('hr.employee', 'Специалист', domain="[('department_id','=', department)]"),
     }
+
+
 operational_departments()
 
 
@@ -621,6 +647,8 @@ class partner_dealer_discount(Model):
         'amount': fields.float('Размер скидки'),
         'date': fields.datetime('Дата'),
     }
+
+
 partner_dealer_discount()
 
 
@@ -631,6 +659,8 @@ class order_type(Model):
     _columns = {
         'name': fields.char('Название', size=250),
     }
+
+
 order_type()
 
 
@@ -641,6 +671,8 @@ class shipment_type(Model):
     _columns = {
         'name': fields.char('Название', size=250),
     }
+
+
 shipment_type()
 
 
@@ -651,6 +683,8 @@ class payment_state(Model):
     _columns = {
         'name': fields.char('Название', size=250),
     }
+
+
 payment_state()
 
 
@@ -661,6 +695,8 @@ class partner_currency(Model):
     _columns = {
         'name': fields.char('Название', size=20),
     }
+
+
 partner_currency()
 
 
@@ -690,6 +726,8 @@ class partner_order_history(Model):
     _defaults = {
         'user_id': lambda self, cr, uid, context: uid,
     }
+
+
 partner_order_history()
 
 
@@ -701,6 +739,8 @@ class PartnerReferencesTemplate(Model):
     _columns = {
         'name': fields.char('Название', size=250, select=True),
     }
+
+
 PartnerReferencesTemplate()
 
 
@@ -709,6 +749,8 @@ class PayType(Model):
     _inherit = 'partner.template.references'
     _auto = True
     _description = u'Способы оплаты'
+
+
 PayType()
 
 
@@ -717,6 +759,8 @@ class PartnerState(Model):
     _inherit = 'partner.template.references'
     _auto = True
     _description = u'Статус партнера'
+
+
 PartnerState()
 
 
@@ -725,6 +769,8 @@ class DeliveryType(Model):
     _inherit = 'partner.template.references'
     _auto = True
     _description = u'Способ доставки'
+
+
 DeliveryType()
 
 
@@ -733,6 +779,8 @@ class DeliveryFrom(Model):
     _inherit = 'partner.template.references'
     _auto = True
     _description = u'Откуда делается доставка'
+
+
 DeliveryFrom()
 
 
@@ -755,6 +803,8 @@ class res_partner_circulation(Model):
     }
 
     _rec_name = "inksystem"
+
+
 res_partner_circulation()
 
 
@@ -778,6 +828,8 @@ class res_partner_access(Model):
         'login': fields.char('Логин', size=250, required=True),
         'pswd': fields.char('Пароль', size=250, required=True),
     }
+
+
 res_partner_access()
 
 
@@ -788,6 +840,8 @@ class res_partner_address_site(Model):
         'address_id': fields.many2one('res.partner.address', 'Address', invisible=True),
         'name': fields.char('Сайт', size=250, select=True, required=True),
     }
+
+
 res_partner_address_site()
 
 
@@ -798,6 +852,8 @@ class res_partner_address_skype(Model):
         'address_id': fields.many2one('res.partner.address', 'Address', invisible=True),
         'name': fields.char('Skype', size=250, select=True, required=True),
     }
+
+
 res_partner_address_skype()
 
 
@@ -808,6 +864,8 @@ class res_partner_address_icq(Model):
         'address_id': fields.many2one('res.partner.address', 'Address', invisible=True),
         'name': fields.char('ICQ', size=250, select=True, required=True),
     }
+
+
 res_partner_address_icq()
 
 
@@ -818,6 +876,8 @@ class res_partner_address_email(Model):
         'address_id': fields.many2one('res.partner.address', 'Address', invisible=True),
         'name': fields.char('Email', size=250, select=True, required=True),
     }
+
+
 res_partner_address_email()
 
 
@@ -896,6 +956,8 @@ class res_partner_bank(Model):
         'state': lambda *a: '1',
         'partner_id': lambda self, cr, uid, context: context.get('partner_id', False)
     }
+
+
 res_partner_bank()
 
 
@@ -975,6 +1037,8 @@ class ResPartnerBankAddress(Model):
             if address['house']:
                 address_list.append(u"д. {house}".format(house=address['house']))
         return ','.join(address_list) or u'-'
+
+
 ResPartnerBankAddress()
 
 
@@ -982,6 +1046,8 @@ class SkkNotes(Model):
     _name = 'skk.notes'
     _inherit = 'crm.lead.notes'
     _description = u"Заметки кандидатов"
+
+
 SkkNotes()
 
 
@@ -1064,10 +1130,13 @@ class ResPartner(Model):
         for record in self.read(cr, 1, ids, fields):
             rate = 0.0
 
-            if self.pool.get('partner.operational.departments').search(cr, 1, [('partner_id', '=', record['id'])], count=True):
+            if self.pool.get('partner.operational.departments').search(cr, 1, [('partner_id', '=', record['id'])],
+                                                                       count=True):
                 rate += 5.0
 
-            if self.pool.get('ir.attachment').search(cr, 1, [('res_id', '=', record['id']), ('res_model', '=', 'res.partner')], count=True) >= 2:
+            if self.pool.get('ir.attachment').search(cr, 1,
+                                                     [('res_id', '=', record['id']), ('res_model', '=', 'res.partner')],
+                                                     count=True) >= 2:
                 rate += 10.0
 
             if self.pool.get('res.partner.access').search(cr, 1, [('partner_id', '=', record['id'])], count=True):
@@ -1077,14 +1146,18 @@ class ResPartner(Model):
             if services_ids:
 
                 flag = True
-                for service in self.pool.get('partner.added.services').read(cr, 1, services_ids, ['service_id', 'comment', 'budget']):
-                    if not service['service_id'] or not (service['comment'] and service['comment'].split()) or not service['budget']:
+                for service in self.pool.get('partner.added.services').read(cr, 1, services_ids,
+                                                                            ['service_id', 'comment', 'budget']):
+                    if not service['service_id'] or not (service['comment'] and service['comment'].split()) or not \
+                        service['budget']:
                         flag = False
                         break
                 if flag:
                     rate += 10.0
 
-            if record['terms_of_service'] and record['terms_of_service'].split() and record['conformity'] and record['conformity'].split() and record['quality_feedback'] and record['quality_feedback'].split() and record['completeness_of_reporting'] and record['completeness_of_reporting'].split():
+            if record['terms_of_service'] and record['terms_of_service'].split() and record['conformity'] and record[
+                'conformity'].split() and record['quality_feedback'] and record['quality_feedback'].split() and record[
+                'completeness_of_reporting'] and record['completeness_of_reporting'].split():
                 rate += 5.0
 
             if record['description'] and len(record['description'].strip()) > 15:
@@ -1102,25 +1175,31 @@ class ResPartner(Model):
             if record['another'] and len(record['another'].strip()) > 15:
                 rate += 5.0
 
-            note_ids = self.pool.get('crm.lead.notes').search(cr, 1, [('partner_id', '=', record['id']), ('type', '!=', 'skk')])
+            note_ids = self.pool.get('crm.lead.notes').search(cr, 1, [('partner_id', '=', record['id']),
+                                                                      ('type', '!=', 'skk')])
             if note_ids:
                 note_last = self.pool.get('crm.lead.notes').read(cr, 1, note_ids[0], ['create_date'])
                 week_day = date.today().weekday()
                 td = 3
                 if week_day in (5, 6):
                     td = week_day - 4
-                if date.today() - timedelta(days=td) <= datetime.strptime(note_last['create_date'], '%Y-%m-%d %H:%M:%S').date():
+                if date.today() - timedelta(days=td) <= datetime.strptime(note_last['create_date'],
+                                                                          '%Y-%m-%d %H:%M:%S').date():
                     rate += 20.0
 
             address_ids = self.pool.get('res.partner.address').search(cr, 1, [('partner_id', '=', record['id'])])
             if address_ids:
                 flag = True
-                for address in self.pool.get('res.partner.address').read(cr, 1, address_ids, ['site_ids', 'phone_ids', 'email_ids', 'name', 'function']):
-                    if not (address['name'] and address['name'].strip()) or not (address['function'] and address['function'].strip()):
+                for address in self.pool.get('res.partner.address').read(cr, 1, address_ids,
+                                                                         ['site_ids', 'phone_ids', 'email_ids', 'name',
+                                                                          'function']):
+                    if not (address['name'] and address['name'].strip()) or not (
+                            address['function'] and address['function'].strip()):
                         flag = False
                         break
 
-                    site_ids = self.pool.get('res.partner.address.site').search(cr, 1, [('address_id', '=', address['id'])])
+                    site_ids = self.pool.get('res.partner.address.site').search(cr, 1,
+                                                                                [('address_id', '=', address['id'])])
                     if site_ids:
                         for item in self.pool.get('res.partner.address.site').read(cr, 1, site_ids, ['name']):
                             if not (item['name'] and item['name'].strip()):
@@ -1130,7 +1209,8 @@ class ResPartner(Model):
                         flag = False
                         break
 
-                    phone_ids = self.pool.get('tel.reference').search(cr, 1, [('partner_address_id', '=', address['id'])])
+                    phone_ids = self.pool.get('tel.reference').search(cr, 1,
+                                                                      [('partner_address_id', '=', address['id'])])
                     if phone_ids:
                         pe = re.compile('^\d+$', re.UNICODE)
                         for item in self.pool.get('tel.reference').read(cr, 1, phone_ids, ['phone']):
@@ -1141,7 +1221,8 @@ class ResPartner(Model):
                         flag = False
                         break
 
-                    email_ids = self.pool.get('res.partner.address.email').search(cr, 1, [('address_id', '=', address['id'])])
+                    email_ids = self.pool.get('res.partner.address.email').search(cr, 1,
+                                                                                  [('address_id', '=', address['id'])])
                     if email_ids:
                         pe = re.compile("^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", re.UNICODE)
                         for item in self.pool.get('res.partner.address.email').read(cr, 1, email_ids, ['name']):
@@ -1185,7 +1266,8 @@ class ResPartner(Model):
 
     def _search_full_name(self, cr, uid, obj, name, args, context=None):
         rek_ids = self.pool.get('res.partner.bank').search(cr, uid, [('fullname', args[0][1], args[0][2])])
-        partner_ids = [b['partner_id'][0] for b in self.pool.get('res.partner.bank').read(cr, uid, rek_ids, ['partner_id']) if b['partner_id']]
+        partner_ids = [b['partner_id'][0] for b in
+                       self.pool.get('res.partner.bank').read(cr, uid, rek_ids, ['partner_id']) if b['partner_id']]
         if partner_ids:
             return [('id', 'in', partner_ids)]
         return [('id', '=', '0')]
@@ -1224,7 +1306,8 @@ class ResPartner(Model):
 
     def _search_service(self, cr, uid, obj, name, args, context):
         if args:
-            sql = "SELECT partner_id FROM partner_added_services INNER JOIN brief_services_stage ON (brief_services_stage.id = partner_added_services.service_id) WHERE brief_services_stage.service_type = '"+args[0][2]+"';"
+            sql = "SELECT partner_id FROM partner_added_services INNER JOIN brief_services_stage ON (brief_services_stage.id = partner_added_services.service_id) WHERE brief_services_stage.service_type = '" + \
+                  args[0][2] + "';"
             cr.execute(sql)
             res_ids = set(partner_id[0] for partner_id in cr.fetchall())
             if res_ids:
@@ -1249,7 +1332,8 @@ class ResPartner(Model):
     def _search_service_name(self, cr, uid, obj, name, args, context):
         service_pool = self.pool.get('partner.added.services')
         services_ids = service_pool.search(cr, 1, [('service_id', '=', args[0][2])])
-        partner_ids = set([r['partner_id'][0] for r in service_pool.read(cr, 1, services_ids, ['partner_id']) if r['partner_id']])
+        partner_ids = set(
+            [r['partner_id'][0] for r in service_pool.read(cr, 1, services_ids, ['partner_id']) if r['partner_id']])
         if partner_ids:
             return [('id', 'in', tuple(partner_ids))]
         return [('id', '=', '0')]
@@ -1284,12 +1368,15 @@ class ResPartner(Model):
             process_service_ids = []
             project_service_ids = []
             val = 'new'
-            service_ids = [s['service_id'][0] for s in p_service_pool.read(cr, 1, record['added_services_ids'], ['service_id']) if s['service_id']]
+            service_ids = [s['service_id'][0] for s in
+                           p_service_pool.read(cr, 1, record['added_services_ids'], ['service_id']) if s['service_id']]
             for service in service_pool.read(cr, uid, service_ids, ['service_type']):
                 if service['service_type'] == 'process':
-                    process_service_ids += p_service_pool.search(cr, 1, [('id', 'in', record['added_services_ids']), ('service_id', '=', service['id'])])
+                    process_service_ids += p_service_pool.search(cr, 1, [('id', 'in', record['added_services_ids']),
+                                                                         ('service_id', '=', service['id'])])
                 else:
-                    project_service_ids += p_service_pool.search(cr, 1, [('id', 'in', record['added_services_ids']), ('service_id', '=', service['id'])])
+                    project_service_ids += p_service_pool.search(cr, 1, [('id', 'in', record['added_services_ids']),
+                                                                         ('service_id', '=', service['id'])])
 
             if process_service_ids:
                 process_service_status = p_service_pool._get_service_status(cr, 1, process_service_ids, '', []).values()
@@ -1338,7 +1425,9 @@ class ResPartner(Model):
             services = self.pool.get('partner.added.services').read(cr, 1, added_ids, ['service_id'])
             service_domain = [item['service_id'][0] for item in services if item['service_id']]
             res[val] = False
-            if self.pool.get('brief.services.stage').search(cr, 1, [('id', 'in', service_domain), ('direction', '=', 'PPC')], count=True):
+            if self.pool.get('brief.services.stage').search(cr, 1,
+                                                            [('id', 'in', service_domain), ('direction', '=', 'PPC')],
+                                                            count=True):
                 res[val] = True
         return res
 
@@ -1348,14 +1437,17 @@ class ResPartner(Model):
             name = ''
             phone = ''
             site = ''
-            address_ids = self.pool.get('res.partner.address').search(cr, 1, [('main_face', '=', True), ('id', 'in', i['address'])])
+            address_ids = self.pool.get('res.partner.address').search(cr, 1, [('main_face', '=', True),
+                                                                              ('id', 'in', i['address'])])
 
             if address_ids:
-                address = self.pool.get('res.partner.address').read(cr, uid, address_ids[0], ['name', 'phone_ids', 'email_ids'])
+                address = self.pool.get('res.partner.address').read(cr, uid, address_ids[0],
+                                                                    ['name', 'phone_ids', 'email_ids'])
 
                 name = address['name']
                 if address['email_ids']:
-                    site_name = self.pool.get('res.partner.address.email').read(cr, uid, address['email_ids'][0], ['name'])
+                    site_name = self.pool.get('res.partner.address.email').read(cr, uid, address['email_ids'][0],
+                                                                                ['name'])
                     site = site_name['name']
                 if address['phone_ids']:
                     phone_name = self.pool.get('tel.reference').read(cr, uid, address['phone_ids'][0], ['phone'])
@@ -1662,7 +1754,6 @@ class ResPartner(Model):
         ),
 
 
-
         'date_start_from': fields.date('дата начала с'),
         'date_start_to': fields.date('дата начала по'),
         'date_finish_from': fields.date('дата окончания с'),
@@ -1692,16 +1783,22 @@ class ResPartner(Model):
             readonly=True,
             string=""
         ),
-        'discounts_ids': fields.one2many('res.partner.ppc.discounts', 'partner_id', 'Скидки', domain=['|', ('finish_date', '>=', date.today().strftime('%Y-%m-%d')), ('permanent', '=', True)]),
+        'discounts_ids': fields.one2many('res.partner.ppc.discounts', 'partner_id', 'Скидки',
+                                         domain=['|', ('finish_date', '>=', date.today().strftime('%Y-%m-%d')),
+                                                 ('permanent', '=', True)]),
         'discounts_history_ids': fields.one2many('res.partner.ppc.discounts.history', 'partner_id', 'Скидки'),
         'check_ppc': fields.function(_check_ppc, type="boolean", method=True, string=u"Маркер PPC"),
-        'old_discounts_ids': fields.one2many('res.partner.ppc.discounts', 'partner_id', 'Скидки', domain=[('finish_date', '<', date.today().strftime('%Y-%m-%d'))]),
+        'old_discounts_ids': fields.one2many('res.partner.ppc.discounts', 'partner_id', 'Скидки',
+                                             domain=[('finish_date', '<', date.today().strftime('%Y-%m-%d'))]),
         'control_ids': fields.one2many('res.partner.quality.control', 'partner_id', 'Управление качеством'),
 
-        'description': fields.text('Описание компании', help='-специфика работы;\n-на чем они зарабатывают больше всего;\n-ключевые направления деятельность;\n-специфика иерархии в компании;\n-основные векторы дальнейшего развития и тд.'),
-        'key_person': fields.text('Характеристика ключевых лиц', help='должности, эмоциональные характеристики, их интересы и другие важные данные для работы с ними'),
+        'description': fields.text('Описание компании',
+                                   help='-специфика работы;\n-на чем они зарабатывают больше всего;\n-ключевые направления деятельность;\n-специфика иерархии в компании;\n-основные векторы дальнейшего развития и тд.'),
+        'key_person': fields.text('Характеристика ключевых лиц',
+                                  help='должности, эмоциональные характеристики, их интересы и другие важные данные для работы с ними'),
         'zone': fields.text('Зоны ответственности разных контактных лиц', help='Кто за что отвечает'),
-        'key_moment': fields.text('Ключевые моменты взаимодействия нашей компании и партнера', help='Например, партнер приезжал к нам в Харьков, конфликты с партнером и тд.'),
+        'key_moment': fields.text('Ключевые моменты взаимодействия нашей компании и партнера',
+                                  help='Например, партнер приезжал к нам в Харьков, конфликты с партнером и тд.'),
         'another': fields.text('Другая', help='Любая другая полезная информация'),
 
         'rate': fields.function(
@@ -1711,7 +1808,8 @@ class ResPartner(Model):
             digits=(3, 2),
             string='Процент заполненности'
         ),
-        'bonuses_ids': fields.one2many('account.invoice.loyalty', 'partner_id', 'Скидки')
+        'bonuses_ids': fields.one2many('account.invoice.loyalty', 'partner_id', 'Скидки',
+                                       domain=[('paid_date', '!=', False)])
     }
 
     def _get_type(self, cr, uid, context=None):
@@ -1786,19 +1884,19 @@ class ResPartner(Model):
                 args.append(('id', 'in', it_d))
 
         if date_st_from is not None and date_st_to is None:
-            sql_postfix.append("date_start='{0}'::date".format(date_st_from,))
+            sql_postfix.append("date_start='{0}'::date".format(date_st_from, ))
         elif date_st_from is not None and date_st_to is not None:
             sql_postfix.append("date_start between '{0}'::date and '{1}'::date".format(date_st_from, date_st_to))
 
         if date_fn_from is not None and date_fn_to is None:
-            sql_postfix.append("date_finish='{0}'::date".format(date_fn_from,))
+            sql_postfix.append("date_finish='{0}'::date".format(date_fn_from, ))
         elif date_fn_from is not None and date_fn_to is not None:
             sql_postfix.append("date_finish between '{0}'::date and '{1}'::date".format(date_fn_from, date_fn_to))
 
         sql_postfix_str = ' AND '.join(sql_postfix)
         if sql_postfix_str:
-            sql1 = 'SELECT partner_id FROM partner_added_services WHERE {0}'.format(sql_postfix_str,)
-            sql2 = 'SELECT partner_id FROM partner_added_services_history WHERE {0}'.format(sql_postfix_str,)
+            sql1 = 'SELECT partner_id FROM partner_added_services WHERE {0}'.format(sql_postfix_str, )
+            sql2 = 'SELECT partner_id FROM partner_added_services_history WHERE {0}'.format(sql_postfix_str, )
 
             cr.execute(sql1)
             res_ids1 = set(partner_id[0] for partner_id in cr.fetchall())
@@ -1977,6 +2075,8 @@ class ResPartner(Model):
         #    []
         #),
     ]
+
+
 ResPartner()
 
 
@@ -1993,6 +2093,8 @@ class TransferHistory(Model):
         'create_date': fields.datetime('Дата', readonly=True),
         'partner_id': fields.many2one('res.partner', 'Партнер', invisible=True),
     }
+
+
 TransferHistory()
 
 
@@ -2014,6 +2116,8 @@ class PartnerStatusHistory(Model):
         'create_date': fields.datetime('Дата', readonly=True),
         'partner_id': fields.many2one('res.partner', 'Партнер', invisible=True),
     }
+
+
 PartnerStatusHistory()
 
 
@@ -2075,8 +2179,11 @@ class PartnerPpcDiscounts(Model):
             vals['start_date'] = None
             vals['finish_date'] = None
 
-        for record in self.read(cr, user, ids, ['partner_id', 'service_id', 'discount_type', 'percent', 'google', 'start_date', 'finish_date', 'permanent']):
-            if vals.get('service_id') or vals.get('discount_type') or vals.get('percent') or vals.get('google') or vals.get('finish_date') or vals.get('start_date') or vals.get('permanent'):
+        for record in self.read(cr, user, ids,
+                                ['partner_id', 'service_id', 'discount_type', 'percent', 'google', 'start_date',
+                                 'finish_date', 'permanent']):
+            if vals.get('service_id') or vals.get('discount_type') or vals.get('percent') or vals.get(
+                    'google') or vals.get('finish_date') or vals.get('start_date') or vals.get('permanent'):
                 new_permanent = record['permanent']
                 if 'permanent' in vals.keys():
                     new_permanent = vals['permanent']
@@ -2109,6 +2216,8 @@ class PartnerPpcDiscounts(Model):
                     'old_permanent': record['permanent'],
                 })]})
         return super(PartnerPpcDiscounts, self).write(cr, user, ids, vals, context)
+
+
 PartnerPpcDiscounts()
 
 
@@ -2147,6 +2256,8 @@ class PartnerPpcDiscountsHistory(Model):
         'old_finish_date': fields.date('Предыдущая Дата окончания'),
         'old_permanent': fields.boolean('Предыдущее На постоянной основе'),
     }
+
+
 PartnerPpcDiscountsHistory()
 
 
@@ -2158,7 +2269,8 @@ class PartnerQualityControl(Model):
     def change_ydolit(self, cr, uid, ids, context=None):
         if context is None:
             context = {}
-        view_id = self.pool.get('ir.ui.view').search(cr, uid, [('name', 'like', 'Управление качеством'), ('model', '=', self._name), ('type', '=', 'form')])
+        view_id = self.pool.get('ir.ui.view').search(cr, uid, [('name', 'like', 'Управление качеством'),
+                                                               ('model', '=', self._name), ('type', '=', 'form')])
         return {
             'view_type': 'form',
             'view_mode': 'form',
@@ -2178,27 +2290,38 @@ class PartnerQualityControl(Model):
     def _get_ydolit(self, cr, uid, ids, name, arg, context=None):
         res = {}
 
-        for record in self.read(cr, uid, ids, ['partner_id', 'criteria_ids', 'period_id', 'service_id'], context=context):
+        for record in self.read(cr, uid, ids, ['partner_id', 'criteria_ids', 'period_id', 'service_id'],
+                                context=context):
             res[record['id']] = {
                 'level_ydolit': 0.0,
                 'index_ydolit': 0.0,
                 'mbo': 0.0
             }
-            partner = self.pool.get('res.partner').read(cr, 1, record['partner_id'][0], ['terms_of_service', 'conformity', 'quality_feedback', 'completeness_of_reporting'])
-            level = sum(c['value']*float(partner[c['name']])/100 for c in self.pool.get('res.partner.quality.criteria').read(cr, 1, record['criteria_ids'], ['name', 'value']))
+            partner = self.pool.get('res.partner').read(cr, 1, record['partner_id'][0],
+                                                        ['terms_of_service', 'conformity', 'quality_feedback',
+                                                         'completeness_of_reporting'])
+            level = sum(c['value'] * float(partner[c['name']]) / 100 for c in
+                        self.pool.get('res.partner.quality.criteria').read(cr, 1, record['criteria_ids'],
+                                                                           ['name', 'value']))
 
             if record['partner_id'] and record['service_id']:
-                process_launch_ids = self.pool.get('process.launch').search(cr, 1, [('partner_id', '=', record['partner_id'][0]), ('service_id', '=', record['service_id'][0])])
+                process_launch_ids = self.pool.get('process.launch').search(cr, 1, [
+                    ('partner_id', '=', record['partner_id'][0]), ('service_id', '=', record['service_id'][0])])
                 if process_launch_ids:
-                    data = self.pool.get('process.launch').read(cr, 1, process_launch_ids,  ['process_model', 'process_id'])
+                    data = self.pool.get('process.launch').read(cr, 1, process_launch_ids,
+                                                                ['process_model', 'process_id'])
                     if data:
-                        sla_ids = self.pool.get('process.sla').search(cr, 1, [('process_model', '=', data[0]['process_model']), ('process_id', '=', data[0]['process_id']), ('period_id', '=', record['period_id'][0])])
+                        sla_ids = self.pool.get('process.sla').search(cr, 1,
+                                                                      [('process_model', '=', data[0]['process_model']),
+                                                                       ('process_id', '=', data[0]['process_id']),
+                                                                       ('period_id', '=', record['period_id'][0])])
                         if sla_ids:
                             mbo_list = self.pool.get('process.sla').read(cr, 1, sla_ids[0], ['avg_mbo'])
                             res[record['id']]['mbo'] = mbo_list['avg_mbo']
 
             res[record['id']]['level_ydolit'] = level
-            res[record['id']]['index_ydolit'] = numpy.mean((level, res[record['id']]['mbo'])) if res[record['id']]['mbo'] else level
+            res[record['id']]['index_ydolit'] = numpy.mean((level, res[record['id']]['mbo'])) if res[record['id']][
+                'mbo'] else level
 
         return res
 
@@ -2248,7 +2371,9 @@ class PartnerQualityControl(Model):
 
     def _check_unique(self, cr, uid, ids, context=None):
         for self_obj in self.read(cr, 1, ids, ['period_id', 'service_id', 'partner_id'], context):
-            if self.search(cr, 1, [('period_id', '=', self_obj['period_id'][0]), ('service_id', '=', self_obj['service_id'][0]), ('id', '!=', self_obj['id']), ('partner_id', '=', self_obj['partner_id'][0])], context):
+            if self.search(cr, 1, [('period_id', '=', self_obj['period_id'][0]),
+                                   ('service_id', '=', self_obj['service_id'][0]), ('id', '!=', self_obj['id']),
+                                   ('partner_id', '=', self_obj['partner_id'][0])], context):
                 return False
             return True
 
@@ -2259,6 +2384,8 @@ class PartnerQualityControl(Model):
             [u'Нельзя']
         ),
     ]
+
+
 PartnerQualityControl()
 
 
@@ -2274,6 +2401,8 @@ class PartnerQualityCriteria(Model):
         'comment': fields.text('Комментарий'),
         'quality_id': fields.many2one('res.partner.quality.control', 'Управление качеством'),
     }
+
+
 PartnerQualityCriteria()
 
 
@@ -2292,6 +2421,8 @@ class InvoiceReportingPeriod(Model):
             store=True
         ),
     }
+
+
 InvoiceReportingPeriod()
 
 
