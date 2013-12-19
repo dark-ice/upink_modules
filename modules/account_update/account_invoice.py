@@ -631,7 +631,7 @@ class AccountInvoice(Model):
         if next_state == 'open':
             launch_pool = self.pool.get('process.launch')
             partner_id = data.partner_id.id
-            service_ids = [s.service_id.id for s in data.invioce_line if s.invioce_line.service_id.direction == 'PPC']
+            service_ids = [s.service_id.id for s in data.invioce_line if s.service_id.direction == 'PPC']
             for service in service_ids:
                 launch_ids = launch_pool.search(cr, 1, [('partner_id', '=', partner_id), ('service_id', '=', service)])
                 if launch_ids:
