@@ -217,60 +217,60 @@
                     </group>
                     <group colspan="4" col="8">
                         <group colspan="6" col="6">
-                            <field colspan="4" name="name" attrs="{'readonly': [('check_t', '=', False)]}"/>
-                            <field name="user_id" on_change="onchange_user(user_id)" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                            <field colspan="4" name="name" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                            <field name="user_id" on_change="onchange_user(user_id)" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
 
-                            <field name="company_id" widget="selection" on_change="onchange_company(company_id)" attrs="{'readonly': [('check_t', '=', False)]}"/>
-                            <field name="parent_id" attrs="{'readonly': [('check_t', '=', False)]}" />
-                            <field name="start_date" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                            <field name="company_id" widget="selection" on_change="onchange_company(company_id)" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                            <field name="parent_id" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}" />
+                            <field name="start_date" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
                             <newline/>
-                            <field name="department_id" on_change="onchange_department_id(department_id)" attrs="{'readonly': [('check_t', '=', False)]}"/>
-                            <field name="account_id"  attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
-                            <field name="instate_date"  attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                            <field name="department_id" on_change="onchange_department_id(department_id)" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                            <field name="account_id"  attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                            <field name="instate_date"  attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
                             <newline/>
-                            <field name="active" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
-                            <field name="maternity" attrs="{'invisible': [('check_l', '=', False), ], 'readonly': [('check_t', '=', False)]}"/>
-                            <field name="formalized" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                            <field name="active" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                            <field name="maternity" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False), ], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                            <field name="formalized" attrs="{'invisible': [('check_h', '=', False), ('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
                         </group>
                         <group colspan="2" col="1">
-                          <field name="photo" widget='image' nolabel="1" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                          <field name="photo" widget='image' nolabel="1" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
                         </group>
                     </group>
                     <notebook colspan="6">
-                        <page string="Личные данные" attrs="{'readonly': [('check_t', '=', False)], 'readonly': [('check_t', '=', False)]}">
-                            <group col="2" colspan="2" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}">
+                        <page string="Личные данные" attrs="{'readonly': [('check_h', '=', False), ('check_t', '=', False)]]}">
+                            <group col="2" colspan="2" attrs="{'invisible': [('check_h', '=', False), ('check_l', '=', False)], 'readonly': [('check_h', '=', False), ('check_t', '=', False)]}">
                                 <separator colspan="2" string="Паспортные данные"/>
-                                <field name="passport_id"  attrs="{'readonly': [('check_t', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
-                                <field name="inn" attrs="{'readonly': [('check_t', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                                <field name="passport_id"  attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                                <field name="inn" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
                             </group>
-                            <group col="2" colspan="2" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}">
+                            <group col="2" colspan="2" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}">
                                 <separator string="Status" colspan="2"/>
-                                <field name="gender" attrs="{'readonly': [('check_t', '=', False)]}"/>
-                                <field name="marital" attrs="{'readonly': [('check_t', '=', False)]}"/>
-                                <field name="birthday" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                                <field name="gender" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                                <field name="marital" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                                <field name="birthday" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
                             </group>
                             <group col="2" colspan="2">
                                 <separator string="Contact Information" colspan="2"/>
-                                <field name="address_home_id" colspan="2" string="Адрес прописки" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
-                                <field name="address_residence_id" colspan="2" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                                <field name="address_home_id" colspan="2" string="Адрес прописки" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                                <field name="address_residence_id" colspan="2" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
 
                                 <field name="partner_id" invisible="1" />
-                                <field name="address_id" colspan="2" on_change="onchange_address_id(address_id)" domain="[('partner_id', '=', partner_id)]" attrs="{'readonly': [('check_t', '=', False)]}"/>
-                                <field name="work_phone" attrs="{'readonly': [('check_t', '=', False)]}"/>
-                                <field name="mobile_phone" attrs="{'readonly': [('check_t', '=', False)]}"/>
-                                <field name="work_email" widget="email" attrs="{'readonly': [('check_t', '=', False)]}" />
-                                <field name="work_skype" attrs="{'readonly': [('check_t', '=', False)]}" />
-                                <field name="work_location" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                                <field name="address_id" colspan="2" on_change="onchange_address_id(address_id)" domain="[('partner_id', '=', partner_id)]" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                                <field name="work_phone" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                                <field name="mobile_phone" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                                <field name="work_email" widget="email" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}" />
+                                <field name="work_skype" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}" />
+                                <field name="work_location" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
                             </group>
                             <group col="2" colspan="2">
                                 <separator string="Job Information" colspan="2"/>
-                                <field name="job_id" domain="[('state','!=','old')]" attrs="{'readonly': [('check_t', '=', False)]}"/>
-                                <field name="coach_id"  attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
-                                <group col="2" colspan="2" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}">
+                                <field name="job_id" domain="[('state','!=','old')]" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                                <field name="coach_id"  attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                                <group col="2" colspan="2" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}">
                                     <separator string="Образование" colspan="2"/>
-                                    <field name="university_id" colspan="2" attrs="{'readonly': [('check_t', '=', False)]}"/>
-                                    <field name="specialty" colspan="2" attrs="{'readonly': [('check_t', '=', False)]}"/>
-                                    <field name="language_ids" colspan="4"  attrs="{'readonly': [('check_t', '=', False)]}" nolabel="1">
+                                    <field name="university_id" colspan="2" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                                    <field name="specialty" colspan="2" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                                    <field name="language_ids" colspan="4"  attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}" nolabel="1">
                                         <tree string="Знание языков" editable="top">
                                             <field name="name"/>
                                             <field name="value"/>
@@ -280,12 +280,12 @@
 
                             </group>
                         </page>
-                        <page string="Разное" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}">
+                        <page string="Разное" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}">
                             <group colspan="2" col="2">
                                 <separator colspan="2" string="Личные данные"/>
-                                <field name="account_number" attrs="{'readonly': [('check_t', '=', False)]}"/>
-                                <field name="children"  attrs="{'readonly': [('check_t', '=', False)]}"/>
-                                <field name="babies_ids" colspan="2" nolabel="1" attrs="{'readonly': [('check_t', '=', False)]}">
+                                <field name="account_number" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                                <field name="children"  attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                                <field name="babies_ids" colspan="2" nolabel="1" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}">
                                     <tree string="Дети" editable="top">
                                         <field name="name"/>
                                         <field name="gender"/>
@@ -294,16 +294,16 @@
                             </group>
                             <group colspan="2" col="2">
                                 <separator colspan="2" string="Информация о должности"/>
-                                <field name="manager" attrs="{'readonly': [('check_t', '=', False)]}"/>
-                                <field name="vehicle" string="Личный транспорт" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                                <field name="manager" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                                <field name="vehicle" string="Личный транспорт" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
                             </group>
                         </page>
-                        <page string="Categories" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}">
+                        <page string="Categories" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}">
                             <group colspan="4" col="4">
-                                <field name="category" colspan="2" nolabel="1" attrs="{'readonly': [('check_t', '=', False)]}"/> <newline/>
+                                <field name="category" colspan="2" nolabel="1" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/> <newline/>
                                 <group colspan="4" col="6">
-                                    <field name="grade_id" colspan="2" />
-                                    <field name="dy_cash" colspan="2" attrs="{'invisible': [('grade_id', '!=', 46)]}"/>
+                                    <field name="grade_id" colspan="2" attrs="{'invisible': [('check_h', '=', True)]}" />
+                                    <field name="dy_cash" colspan="2" attrs="{'invisible': [('check_h', '=', True),('grade_id', '!=', 46)]}"/>
                                     <button
                                         string="Изменить грейд"
                                         name="%(action_grade_wizard)d"
@@ -314,14 +314,14 @@
                                             'grade_id': grade_id,
                                             'dy_cash': dy_cash
                                         }"
-                                        attrs="{'invisible': [('check_t', '=', False)]}"
+                                        attrs="{'invisible': [('check_h', '=', True),('check_t', '=', False)]}"
                                         />
                                 </group>
                                 <newline />
-                                <field name="grade_history_ids" colspan="4" nolabel="1" readonly="True" />
+                                <field name="grade_history_ids" colspan="4" nolabel="1" readonly="True" attrs="{'invisible': [('check_h', '=', True)]}"/>
                                 <field name="retention_ids" colspan="2" nolabel="1" readonly="True" />
                                 <field name="award_ids" colspan="2" nolabel="1" readonly="True" />
-                                <field name="history_job_ids" colspan="4" attrs="{'readonly': [('check_t', '=', False)]}" nolabel="1">
+                                <field name="history_job_ids" colspan="4" readonly="1" nolabel="1">
                                     <tree string="История должностей">
                                         <field name="prev_value" string="С"/>
                                         <field name="name" string="На"/>
@@ -335,14 +335,14 @@
                                         <field name="create_eid" string="Перевел"/>
                                     </form>
                                 </field>
-                                <field name="certification_ids" colspan="2" attrs="{'readonly': [('check_t', '=', False)]}" nolabel="1">
+                                <field name="certification_ids" colspan="2" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}" nolabel="1">
                                     <tree string="Аттестации" editable="top">
                                         <field name="certification_date"/>
                                         <field name="name"/>
                                         <field name="state"/>
                                     </tree>
                                 </field>
-                                <field name="training_ids" colspan="2" attrs="{'readonly': [('check_t', '=', False)]}" nolabel="1">
+                                <field name="training_ids" colspan="2" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}" nolabel="1">
                                     <tree string="Участие во внешнем обучении" editable="top">
                                         <field name="name"/>
                                         <field name="when"/>
@@ -350,14 +350,14 @@
                                         <field name="how_much"/>
                                     </tree>
                                 </field>
-                                <field name="kpi_ids" readonly="1" colspan="4" nolabel="1">
+                                <field name="kpi_ids" readonly="1" colspan="4" nolabel="1" attrs="{'invisible': [('check_h', '=', True)]}">
                                     <tree string="KPI">
                                         <field name="period_id"/>
                                         <field name="total_mbo"/>
                                         <field name="total_pay"/>
                                     </tree>
                                 </field>
-                                <field readonly="1" colspan="4" name="expert_assessment_ids" nolabel="1" mode="tree">
+                                <field readonly="1" colspan="4" name="expert_assessment_ids" nolabel="1" mode="tree" attrs="{'invisible': [('check_h', '=', True)]}">
                                     <tree string="Экспертная оценка">
                                         <field name="expert_id"/>
                                         <field name="period_id" />
@@ -376,8 +376,8 @@
                                 </field>
                             </group>
                         </page>
-                        <page string="Доступы" attrs="{'invisible': [('check_l', '=', False)]}">
-                            <field name="identification_id" colspan="2" attrs="{'readonly': [('check_t', '=', False)]}" string="Внутренний номер"/>
+                        <page string="Доступы" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)]}">
+                            <field name="identification_id" colspan="2" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}" string="Внутренний номер"/>
                             <newline/>
                             <field name="access_ids" colspan="4" nolabel="1">
                                 <tree string="Доступы" editable="top">
@@ -387,7 +387,7 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string='Вложения' attrs="{'invisible': [('check_t', '=', False)]}">
+                        <page string='Вложения' attrs="{'invisible': [('check_h', '=', False),('check_t', '=', False)]}">
                             <field name="attachment_ids" nolabel="1" colspan="4" widget="one2many_list">
                                 <tree string="Вложения" colors="blue:type in ('url',)">
                                     <field name="datas_fname"/>
