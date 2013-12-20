@@ -360,6 +360,17 @@
                         </group>
                         <newline/>
 
+                        <group attrs="{'invisible':[('count_see_cb','==',False)]}" colspan="4" col="4">
+                            <field name="acount_see_cb" invisible="True"/>
+                            <field name="count_see_cbr" invisible="True"/>
+
+                            <field name="count_see"
+                                   attrs="{'required':[('count_see_cbr','==',True)]}"
+                                    />
+                            <separator colspan="4"/>
+                        </group>
+                        <newline/>
+
                         <group attrs="{'invisible':[('analytics_cb','==',False)]}" colspan="4" col="4">
                             <field name="analytics_cb" invisible="True"/>
                             <field name="analytics_cbr" invisible="True"/>

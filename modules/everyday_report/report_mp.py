@@ -95,7 +95,7 @@ class ReportMP(Model):
                     day_report_brief_plan r
                     LEFT JOIN (
                       SELECT
-                        h.cr_date::DATE date,
+                        h.create_date::DATE date,
                         sum(CASE WHEN bss.direction IN ('PPC', 'SEO', 'SMM', 'CALL', 'SITE', 'VIDEO', 'MP', 'MOSCOW') IS NOT NULL THEN 1 ELSE 0 END) total_fact,
                         sum(CASE WHEN bss.direction = 'PPC' THEN 1 ELSE 0 END) ppc_fact,
                         sum(CASE WHEN bss.direction = 'PPC' THEN b.sum_mediaplan ELSE 0 END) ppc_cash,
@@ -113,13 +113,13 @@ class ReportMP(Model):
                         sum(CASE WHEN bss.direction = 'MP' THEN b.sum_mediaplan ELSE 0 END) mp_cash,
                         sum(CASE WHEN bss.direction = 'MOSCOW' THEN 1 ELSE 0 END) moscow_fact,
                         sum(CASE WHEN bss.direction = 'MOSCOW' THEN b.sum_mediaplan ELSE 0 END) moscow_cash
-                      FROM brief_history h
+                      FROM  (select min(a.create_date) create_date, max(a.brief_id) brief_id, max(a.state_id) state_id from brief_history a WHERE a.state_id= 'media_approval' GROUP BY a.brief_id) h
                       LEFT JOIN brief_main b
                         ON (h.brief_id = b.id)
                       LEFT JOIN brief_services_stage bss
                         ON (bss.id = b.services_ids)
                       WHERE h.state_id = 'media_approval'
-                      GROUP BY h.cr_date::DATE
+                      GROUP BY h.create_date::DATE
                     ) b on (b.date=r.date)
                 GROUP BY r.date
             )""")

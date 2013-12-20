@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 import logging
-from openerp import tools
+from openerp.osv.osv import except_osv
 import pytz
 
 from datetime import datetime, timedelta
@@ -558,6 +558,7 @@ class BriefPartSix(Model):
             u'Укажите другие направления рекламы, которые Вы использовали ранее',
             size=256,
             help=''),
+        'count_see': fields.integer('Количество просмотров')
     }
 BriefPartSix()
 
@@ -683,6 +684,7 @@ class BriefCbThree(Model):
         'marketing_cb': fields.boolean('180_new'),
         'transfer_cb': fields.boolean('181_new'),
         'access_ids_cb': fields.boolean('182_new'),
+        'count_see_cb': fields.boolean('183'),
     }
 BriefCbThree()
 
@@ -808,6 +810,7 @@ class BriefCbrThree(Model):
         'marketing_cbr': fields.boolean('180'),
         'transfer_cbr': fields.boolean('181'),
         'access_ids_cbr': fields.boolean('182'),
+        'count_see_cbr': fields.boolean('183'),
     }
 BriefCbrThree()
 
@@ -1073,10 +1076,14 @@ class Brief(Model):
     def write(self, cr, uid, ids, values, context=None):
         if values.get('from', False):
             values['from'] = None
+
         if values.get('state', False):
             state = values.get('state', False)
             values.update({'history_ids': [
                 (0, 0, {'us_id': uid, 'cr_date': time.strftime('%Y-%m-%d %H:%M:%S'), 'state': self.get_state(state)[1], 'state_id': state})]})
+            for record in self.browse(cr, 1, ids):
+                if state in ('media_approval', 'media_accept') and not (record.sum_mediaplan and values.get('sum_mediaplan')):
+                    raise except_osv('Бриф на просчет', 'Необходимо ввести сумму медиалпана')
         return super(Brief, self).write(cr, uid, ids, values, context)
 
     def action_cancel(self, cr, uid, ids):
