@@ -272,6 +272,13 @@
             <field name="signal">coordination_reporting</field>
         </record>
 
+        <!-- coordination_reporting -> development -->
+        <record model="workflow.transition" id="in_d_cr">
+            <field name="act_from" ref="act_in_coordination_reporting"/>
+            <field name="act_to" ref="act_in_development"/>
+            <field name="signal">development</field>
+        </record>
+
         <!-- coordination_reporting -> pause -->
         <record model="workflow.transition" id="in_cr_p">
             <field name="act_from" ref="act_in_coordination_reporting"/>

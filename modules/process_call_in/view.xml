@@ -379,7 +379,7 @@
                                 name="development"
                                 type="workflow"
                                 icon="gtk-go-forward"
-                                states="approval_template" />
+                                states="approval_template,coordination_reporting" />
                                 <!--attrs="{'invisible': ['|', ('state', '!=', 'approval_template'), ('check_a', '=', False)]}"-->
                                 <!--/>-->
                         <!-- development -> coordination_reporting -->

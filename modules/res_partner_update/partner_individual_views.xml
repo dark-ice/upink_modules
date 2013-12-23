@@ -14,7 +14,7 @@
                         <!--<field name="default_site" invisible="1"/>-->
                         <field name="partner_id" invisible="1"/>
                         <field name="name" required="1" string="ФИО" on_change='insert_site_name(context)'/>
-                        <field name="function" required="1" string="Должность"/>
+                        <field name="function" string="Должность" required="'employee' not in context"/>
                         <field name="main_face"/>
                     </group>
                     <group colspan="4" col="4">
@@ -70,7 +70,7 @@
             <field name="priority" eval="1"/>
             <field name="type">tree</field>
             <field name="arch" type="xml">
-                <tree colors="blue:main_face">
+                <tree colors="blue:main_face" string="Контакты">
                     <field name="name" required="1" string="ФИО"/>
                     <field name="main_face" invisible="1"/>
                     <field name="function" required="1" string="Должность"/>
@@ -88,7 +88,7 @@
             <field name="priority" eval="1"/>
             <field name="type">search</field>
             <field name="arch" type="xml">
-                <search>
+                <search string="Контакты">
                     <field name="partner_id"/>
                     <field name="name" string="ФИО"/>
                     <field name="function" string="Должность"/>

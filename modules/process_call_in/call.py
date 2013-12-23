@@ -159,8 +159,6 @@ class ProcessCallIn(Model):
                     error.append('Необходимо добавить файл формы отчета')
 
                 if next_state == 'development':
-                    if not values.get('surcharge_ids', False) and not record['surcharge_ids']:
-                        error.append('Необходимо ввести доплаты')
                     if not values.get('report_ids', False) and not record['report_ids']:
                         error.append('Необходимо добавить отчеты')
 

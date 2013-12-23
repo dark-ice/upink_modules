@@ -237,7 +237,7 @@
                         </group>
                     </group>
                     <notebook colspan="6">
-                        <page string="Личные данные" attrs="{'readonly': [('check_h', '=', False), ('check_t', '=', False)]]}">
+                        <page string="Личные данные" attrs="{'readonly': [('check_h', '=', False), ('check_t', '=', False)]}">
                             <group col="2" colspan="2" attrs="{'invisible': [('check_h', '=', False), ('check_l', '=', False)], 'readonly': [('check_h', '=', False), ('check_t', '=', False)]}">
                                 <separator colspan="2" string="Паспортные данные"/>
                                 <field name="passport_id"  attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
@@ -251,8 +251,8 @@
                             </group>
                             <group col="2" colspan="2">
                                 <separator string="Contact Information" colspan="2"/>
-                                <field name="address_home_id" colspan="2" string="Адрес прописки" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
-                                <field name="address_residence_id" colspan="2" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>
+                                <field name="address_home_id" colspan="2" string="Адрес прописки" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}" context="{'employee': True}"/>
+                                <field name="address_residence_id" colspan="2" attrs="{'invisible': [('check_h', '=', False),('check_l', '=', False)], 'readonly': [('check_h', '=', False),('check_t', '=', False)]}"  context="{'employee': True}"/>
 
                                 <field name="partner_id" invisible="1" />
                                 <field name="address_id" colspan="2" on_change="onchange_address_id(address_id)" domain="[('partner_id', '=', partner_id)]" attrs="{'readonly': [('check_h', '=', False),('check_t', '=', False)]}"/>

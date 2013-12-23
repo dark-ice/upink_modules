@@ -170,19 +170,23 @@ class res_partner_address(Model):
         return [('id', '=', '0')]
 
     def _check_site_full(self, cr, uid, ids, context=None):
-        for record in self.read(cr, uid, ids, ['site_ids']):
+        for record in self.read(cr, uid, ids, ['site_ids', 'partner_id']):
+            if not record['partner_id']:
+                return True
             if not record['site_ids']:
                 return False
         return True
 
     def _check_phone_full(self, cr, uid, ids, context=None):
-        for record in self.read(cr, uid, ids, ['phone_ids']):
+        for record in self.read(cr, uid, ids, ['phone_ids', 'partner_id']):
+            if not record['partner_id']:
+                return True
             if not record['phone_ids']:
                 return False
         return True
 
     def insert_site_name(self, cr, uid, ids, context):
-        if context['site_ids']:
+        if context.get('site_ids'):
             return {'value': {'site_ids': [(0, 0, {'name': context['site_ids']})], }}
 
     _columns = {
