@@ -236,6 +236,27 @@
                                 </tree>
                             </field>
                         </page>
+                        <page string="Самооценка">
+                            <group col="6">
+                                <field name="client"/>
+                                <field name="standards"/>
+                                <field name="quality"/>
+                                <field name="client_note1" attrs="{'required':[('client','in',('-2','-1','1','2'))]}"/>
+                                <field name="standards_note1"
+                                       attrs="{'required':[('standards','in',('-2','-1','1','2'))]}"/>
+                                <field name="quality_note1" attrs="{'required':[('quality','in',('-2','-1','1','2'))]}"/>
+                                <field name="client_note2" attrs="{'required':[('client','in',('-2','-1','1','2'))]}"/>
+                                <field name="standards_note2"
+                                       attrs="{'required':[('standards','in',('-2','-1','1','2'))]}"/>
+                                <field name="quality_note2" attrs="{'required':[('quality','in',('-2','-1','1','2'))]}"/>
+                                <field name="client_note3" attrs="{'required':[('client','in',('-2','-1','1','2'))]}"/>
+                                <field name="standards_note3"
+                                       attrs="{'required':[('standards','in',('-2','-1','1','2'))]}"/>
+                                <field name="quality_note3" attrs="{'required':[('quality','in',('-2','-1','1','2'))]}"/>
+                                <field name="mean"/>
+                            </group>
+
+                        </page>
                         <page string="Партнеры" attrs="{'invisible': [('job_id', 'not in', (28, 65, 10, 202, 208, 75, 51, 118, 37, 70, 190, 119, 120, 150, 36, 66, 38, 110, 138, 148, 158, 159, 160, 161, 162, 73))]}">
                             <group col="6" colspan="4" attrs="{'readonly':
                                 [ '|', '|',

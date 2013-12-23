@@ -1518,6 +1518,26 @@ class Kpi(Model):
 
         return True
 
+    def _calculate_mean(self, cr, uid, ids, name, arg, context=None):
+        """
+            Расчет средней оценки.
+            Если показатели не самоотвод:
+                Суммируем и делим на их количество.
+                Округляем до двух знаков после запятой.
+        """
+        result = {}
+
+        def compute_value(*args):
+            if u'самоотвод' in args:
+                return False
+            else:
+                return round(numpy.mean([map(float, args)]), 2)
+
+        data = self.browse(cr, uid, ids, context)
+        for row in data:
+            result[row.id] = compute_value(row.client, row.standards, row.quality)
+        return result
+
     _states = (
         ('draft', 'Черновик'),
         ('waiting', 'Требуется утверждение планов руководителем'),
@@ -1765,6 +1785,118 @@ class Kpi(Model):
             string='HR',
             type='boolean',
             invisible=True
+        ),
+
+        #  Самооценка
+        'client': fields.selection(
+            [
+                ('-2', '-2'),
+                ('-1', '-1'),
+                ('0', '0'),
+                ('1', '+1'),
+                ('2', '+2'),
+                ('самоотвод', 'самоотвод')
+            ], 'Клиентоориентированность, оценка',
+            states={
+                'agreed': [('readonly', True)],
+                'agreed_revision': [('readonly', True)],
+                'saved': [('readonly', True)],
+            }),
+        'client_note1': fields.text('Примечание 1', states={
+            'agreed': [('readonly', True)],
+            'agreed_revision': [('readonly', True)],
+            'saved': [('readonly', True)],
+        }),
+        'client_note2': fields.text(
+            'Примечание 2',
+            states={
+                'agreed': [('readonly', True)],
+                'agreed_revision': [('readonly', True)],
+                'saved': [('readonly', True)],
+            }),
+        'client_note3': fields.text(
+            'Примечание 3',
+            states={
+                'agreed': [('readonly', True)],
+                'agreed_revision': [('readonly', True)],
+                'saved': [('readonly', True)],
+            }),
+        'standards': fields.selection(
+            [
+                ('-2', '-2'),
+                ('-1', '-1'),
+                ('0', '0'),
+                ('1', '+1'),
+                ('2', '+2'),
+                ('самоотвод', 'самоотвод')
+            ], 'Соблюдение стандартов, оценка',
+            states={
+                'agreed': [('readonly', True)],
+                'agreed_revision': [('readonly', True)],
+                'saved': [('readonly', True)],
+            }),
+        'standards_note1': fields.text(
+            'Примечание 1',
+            states={
+                'agreed': [('readonly', True)],
+                'agreed_revision': [('readonly', True)],
+                'saved': [('readonly', True)],
+            }),
+        'standards_note2': fields.text(
+            'Примечание 2',
+            states={
+                'agreed': [('readonly', True)],
+                'agreed_revision': [('readonly', True)],
+                'saved': [('readonly', True)],
+            }),
+        'standards_note3': fields.text(
+            'Примечание 3',
+            states={
+                'agreed': [('readonly', True)],
+                'agreed_revision': [('readonly', True)],
+                'saved': [('readonly', True)],
+            }),
+        'quality': fields.selection(
+            [
+                ('-2', '-2'),
+                ('-1', '-1'),
+                ('0', '0'),
+                ('1', '+1'),
+                ('2', '+2'),
+                ('самоотвод', 'самоотвод')
+            ], 'Качество работы, оценка',
+            states={
+                'agreed': [('readonly', True)],
+                'agreed_revision': [('readonly', True)],
+                'saved': [('readonly', True)],
+            }),
+        'quality_note1': fields.text(
+            'Примечание 1',
+            states={
+                'agreed': [('readonly', True)],
+                'agreed_revision': [('readonly', True)],
+                'saved': [('readonly', True)],
+            }),
+        'quality_note2': fields.text(
+            'Примечание 2',
+            states={
+                'agreed': [('readonly', True)],
+                'agreed_revision': [('readonly', True)],
+                'saved': [('readonly', True)],
+            }),
+        'quality_note3': fields.text(
+            'Примечание 3',
+            states={
+                'agreed': [('readonly', True)],
+                'agreed_revision': [('readonly', True)],
+                'saved': [('readonly', True)],
+            }),
+        'mean': fields.function(
+            _calculate_mean,
+            method=True,
+            string="Среднее значение",
+            type="float",
+            store=True
         ),
 
     }
@@ -2581,6 +2713,4 @@ class KpiExpertAssessments(Model):
          'Вы не можете выставить более одной экспертной оценки в месяц, конкретному сотруднику.',
          []),
     ]
-
-
 KpiExpertAssessments()
