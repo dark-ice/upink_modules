@@ -32,7 +32,7 @@ REGIONS = {
     'ekb': {'Ekatirenburg', 'EKT-reg'},
     'novosibirsk': {'Novosibirsk', 'Novosibirsk-new'},
     'chelyabinsk': {'Chelyabinsk', 'Chel_region'},
-    'samara': {'Samara', 'Samara-78462265810'},
+    'samara': {'Samara', 'Samara_78462265810'},
     'nino': {'NizhniyNovgorod', 'NizhniyNovgorod-region'},
     'kazan': {'Kazan', 'Kazan-region'},
     'rostov': {'Rostov', 'Rostov-site'},
@@ -291,6 +291,7 @@ class WebCalls(Model):
         calling_party_number = False
         city = ''
         phone = ''
+        l = ['Unavailable', 'Device', 'Anonymous']
         try:
             list_chan = ast_manager.Status()
             for chan in list_chan.values():
@@ -300,8 +301,13 @@ class WebCalls(Model):
                     _logger.info("CallerIDName: %s" % str(chan.get('CallerIDName')))
                     _logger.info("Chan: %s" % str(chan))
                     calling_party_number = chan.get('ConnectedLineNum')
+                    l.append(calling_party_number)
                     if chan.get('ConnectedLineName'):
-                        city = chan['ConnectedLineName'][:chan['ConnectedLineName'].find(calling_party_number)].strip('()')
+                        city = chan['ConnectedLineName']
+                        for item in l:
+                            if item in city:
+                                city, a = city.split(item)
+                        #city = chan['ConnectedLineName'][:chan['ConnectedLineName'].find(calling_party_number)].strip('()')
                         _logger.info("City: %s" % str(city))
                     break
         except Exception, e:

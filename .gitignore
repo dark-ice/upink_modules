@@ -26,3 +26,13 @@ build
 .vagrant
 .vagrant/*
 Vagrantfile
+
+
+*.pot
+__pycache__
+MANIFEST
+dist/
+docs/_build/
+docs/locale/
+tests/coverage_html/
+tests/.coverage
