@@ -66,7 +66,7 @@ class HelpDesk(Model):
                     access += 'a'
 
                 #  Руководитель автора
-                if data.author and employee_pool.get_department_manager(cr, uid, data.author.id).id == uid:
+                if data.author and employee_pool.get_department_manager(cr, uid, data.author.id).user_id.id == uid:
                     access += 'd'
 
                 #  Автор == Руководителю
@@ -74,19 +74,19 @@ class HelpDesk(Model):
                     access += 'e'
 
                 #  Кому
-                if data.send_to and (data.send_to.user_id.id == uid or employee_pool.get_department_manager(cr, uid, data.send_to.id).id == uid):
+                if data.send_to and (data.send_to.user_id.id == uid or employee_pool.get_department_manager(cr, uid, data.send_to.id).user_id.id == uid):
                     access += 's'
 
                 #  Руководитель кому
-                if data.send_to and employee_pool.get_department_manager(cr, uid, data.send_to.id).id == uid:
+                if data.send_to and employee_pool.get_department_manager(cr, uid, data.send_to.id).user_id.id == uid:
                     access += 'm'
 
                 #  Ответственный
-                if data.responsible_employee and (data.responsible_employee.user_id.id == uid or employee_pool.get_department_manager(cr, uid, data.responsible_employee.id).id == uid):
+                if data.responsible_employee and (data.responsible_employee.user_id.id == uid or employee_pool.get_department_manager(cr, uid, data.responsible_employee.id).user_id.id == uid):
                     access += 'r'
 
                 #  Руководитель ответственного
-                if data.responsible_employee and employee_pool.get_department_manager(cr, uid, data.responsible_employee.id).id == uid:
+                if data.responsible_employee and employee_pool.get_department_manager(cr, uid, data.responsible_employee.id).user_id.id == uid:
                     access += 'h'
 
                 val = False
