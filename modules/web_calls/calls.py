@@ -22,13 +22,13 @@ from Asterisk import Manager
 _logger = logging.getLogger(__name__)
 tzlocal = pytz.timezone(tools.detect_server_timezone())
 
-REGIONSREGIONS = {
+REGIONS = {
     'msk': {'yandexmarket_MSK', 'SEO_MSK', 'kont_google_MSK', 'kont_yandex_MSK', 'smm_MSK', 'catalog_MSK', 'seo_MSK',
             'yandexmarket_2_MSK', 'Moskva', 'MSK', 'jivosite.com', 'HotRussia', 'seo_MSK2'},
     'spb': {'yandexmarket_SPB', 'SEO_SPB', 'kont_google_SPB', 'kont_yandex_SPB', 'smm_SPB', 'catalog_SPB', 'seo_SPB',
             'St_Piter', 'SPb-78124948862', 'service-Russia', 'kont_yandex_SPB', 'SPb_78124948862'},
     'kiev': {'yandexmarket_KIEV', 'SEO_KIEV', 'kont_google_Kiev', 'kont_yandex_KIEV', 'smm_KIEV', 'catalog_KIEV',
-             'seo_KIEV', 'Kiev', 'Kiev_region', 'Kiev-service', 'SEO_KIEV', 'LuckyPrint', '(LuckyPrint)', 'HotUkraine'},
+             'seo_KIEV', 'Kiev', 'Kiev_region', 'Kiev-service', 'SEO_KIEV', 'LuckyPrint'},
     'ekb': {'Ekatirenburg', 'EKT-reg', 'EKT_reg'},
     'novosibirsk': {'Novosibirsk', 'Novosibirsk-new'},
     'chelyabinsk': {'Chelyabinsk', 'Chel_region'},
