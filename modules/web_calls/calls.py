@@ -28,7 +28,7 @@ REGIONS = {
     'spb': {'yandexmarket_SPB', 'SEO_SPB', 'kont_google_SPB', 'kont_yandex_SPB', 'smm_SPB', 'catalog_SPB', 'seo_SPB',
             'St_Piter', 'SPb-78124948862', 'service-Russia', 'kont_yandex_SPB', 'SPb_78124948862'},
     'kiev': {'yandexmarket_KIEV', 'SEO_KIEV', 'kont_google_Kiev', 'kont_yandex_KIEV', 'smm_KIEV', 'catalog_KIEV',
-             'seo_KIEV', 'Kiev', 'Kiev_region', 'Kiev-service', 'SEO_KIEV', 'LuckyPrint', 'HotUkraine'},
+             'seo_KIEV', 'Kiev', 'Kiev_region', 'Kiev-service', 'SEO_KIEV', 'LuckyPrint', 'HotUkraine', 'HotLucky'},
     'ekb': {'Ekatirenburg', 'EKT-reg', 'EKT_reg'},
     'novosibirsk': {'Novosibirsk', 'Novosibirsk-new'},
     'chelyabinsk': {'Chelyabinsk', 'Chel_region'},
