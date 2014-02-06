@@ -291,7 +291,7 @@ class Notify(Model):
                 ir_mail_server = self.pool.get('ir.mail_server')
                 server_id = ir_mail_server.search(cr, 1, [], limit=1)[0]
 
-                href = "<a href='http://46.28.67.221:8080/web/webclient/home#id=%s&view_type=page&model=%s'>" % (data['id'], model_name)
+                href = "<a href='http://46.28.67.245:8069/web/webclient/home#id=%s&view_type=page&model=%s'>" % (data['id'], model_name)
 
                 emails_list = []
                 emails_tmp = []
