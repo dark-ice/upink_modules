@@ -80,6 +80,33 @@
                     <page string="Доступы">
                         <separator/>
                     </page>
+
+                    <page string="Изменить грейд">
+                        <group colspan="4">
+                            <field name='id' invisible='1' />
+                            <field name="check_l" />
+                            <field name="check_e" />
+                            <field name="check_t" />
+                            <field name="check_s" />
+                        </group>
+                         <field name="category" colspan="2" nolabel="1"/> <newline/>
+                                <group colspan="4" col="6">
+                                    <field name="grade_id" colspan="2" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                                    <field name="dy_cash" colspan="2" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                                    <button
+                                        string="Изменить грейд"
+                                        name="%(action_grade_wizard)d"
+                                        type="action"
+                                        icon="STOCK_EDIT"
+                                        context="{
+                                            'employee_id': id,
+                                            'grade_id': grade_id,
+                                            'dy_cash': dy_cash
+                                        }"
+                                        attrs="{'invisible': [('user_id', '=', 1)]}"
+                                        />
+                                </group>
+                    </page>
                 </xpath>
                 <xpath expr="//page[@string='Categories']" position="replace">
                     <page string="Categories" groups="base.group_hr_user">
@@ -313,7 +340,6 @@
                                             'grade_id': grade_id,
                                             'dy_cash': dy_cash
                                         }"
-                                        attrs="{'invisible': [('check_t', '=', False)]}"
                                         />
                                 </group>
                                 <newline />

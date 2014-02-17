@@ -280,6 +280,21 @@
         <!--</field>-->
     <!--</record>-->
 
+    <!-- Формы для распоряжения -->
+    <!--<record model="ir.ui.view" id="view_acquainted_tree">-->
+        <!--<field name="name">acquainted.tree</field>-->
+        <!--<field name="model">acquainted.users.report</field>-->
+        <!--<field name="type">tree</field>-->
+        <!--<field name="arch" type="xml">-->
+            <!--<field name="acquainted_ids" colspan="4" nolabel="1">-->
+                <!--<tree string="Ознакомившиеся">-->
+                    <!--<field name="user_id"/>-->
+                    <!--<field name="create_date"/>-->
+                <!--</tree>-->
+            <!--</field>-->
+        <!--</field>-->
+    <!--</record>-->
+
     <!--<record model="ir.ui.view" id="view_company_disposal_search">-->
         <!--<field name="name">company.disposal.seach</field>-->
         <!--<field name="model">company.disposal</field>-->
@@ -379,13 +394,22 @@
         <!--<field name="search_view_id" ref="view_company_disposal_search"/>-->
     <!--</record>-->
 
+    <!--<record id="window_acquainted_report" model="ir.actions.act_window">-->
+        <!--<field name="name">Список ознакомившихся</field>-->
+        <!--<field name="res_model">acquainted.users.report</field>-->
+        <!--<field name="view_type">form</field>-->
+        <!--<field name="view_mode">tree</field>-->
+        <!--<field name="view_id" ref="view_acquainted_tree"/>-->
+    <!--</record>-->
+
     <!-- Меню для всех форм -->
-    <menuitem action="window_company_info_note" id="info_note_menuitem" name="Информационная записка" parent="company_notes_list"/>
-    <menuitem action="window_company_problem_note" id="problem_note_menuitem" name="Проблемная записка" parent="company_notes_list"/>
-    <menuitem action="window_company_production_note" id="production_note_menuitem" name="Производственная записка" parent="company_notes_list"/>
+    <!--<menuitem action="window_company_info_note" id="info_note_menuitem" name="Информационная записка" parent="company_notes_list"/>-->
+    <menuitem action="window_company_problem_note" id="problem_note_menuitem" name="Задачи к выполнению" parent="company_notes_list"/>
+    <!--<menuitem action="window_company_production_note" id="production_note_menuitem" name="Производственная записка" parent="company_notes_list"/>-->
     <!--<menuitem action="window_company_disaposal" id="disposal_menuitem" name="Распоряжение" parent="company_notes_list"/>-->
 
-    <!-- Планировщик -->
+    <!-- Отчет по распоряжению -->
+    <!--<menuitem action="window_acquainted_report" id="disposal_menuitem" name="Список ознакомившихся" parent="company_notes_list"/>-->
 
     </data>
 </openerp>

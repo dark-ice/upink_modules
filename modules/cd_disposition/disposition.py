@@ -25,7 +25,7 @@ LINES = (
 STATE = (
     ('draft', 'Черновик'),
     ('agreement', 'На согласовании'),
-    ('approval', 'На утверждении Ген. директором'),
+    ('approval', 'На утверждении автором'),
     ('publish', 'Опубликовано'),
 )
 
@@ -546,6 +546,11 @@ class CdDisposition(Model):
             'disposition_id',
             string='История',
             readonly=True
+        ),
+        'acquainted_ids': fields.one2many(
+            'acquainted.users',
+            'disposition_id',
+            string='Ознакомившиеся',
         )
     }
 
@@ -555,6 +560,15 @@ class CdDisposition(Model):
         'state': 'draft',
         'check_a': True,
     }
+
+    def acquainted(self, cr, uid, ids, context=None):
+        if context.get('disposition_id'):
+            acquainted_pool = self.pool.get('acquainted.users')
+            acquainted_ids = acquainted_pool.search(cr, uid, [('user_id', '=', uid), ('disposition_id', '=', context.get('disposition_id'))])
+            if not acquainted_ids:
+                return acquainted_pool.create(cr, uid, {'disposition_id': context.get('disposition_id'), 'user_id': uid})
+            else:
+                raise osv.except_osv('Распоряжение', 'Вы уже отметили свое ознакомление с этим распоряжением')
 
     def fields_view_get(self, cr, user, view_id=None, view_type='form', context=None, toolbar=False, submenu=False):
         result = super(CdDisposition, self).fields_view_get(cr, user, view_id, view_type, context, toolbar, submenu)
@@ -898,3 +912,21 @@ class CdDispositionHistory(Model):
         'disposition_id': fields.many2one('cd.disposition', 'Распоряжение'),
     }
 CdDispositionHistory()
+
+
+class AcquaintedUsers(Model):
+    _name = 'acquainted.users'
+    _description = u'Список ознакомленных пользователей'
+
+    _columns = {
+        'user_id': fields.many2one(
+            'res.users',
+            'Ознакомлен',
+            readonly=False,
+            help='Заполняется автоматически'),
+        'disposition_id': fields.many2one('cd.disposition', 'Распоряжение'),
+        'create_date': fields.datetime('Дата ознакомления', readonly=True),
+    }
+
+AcquaintedUsers()
+

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_meeting_form" model="ir.ui.view">
+            <field name="name">Совещание</field>
+            <field name="model">user.meeting</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group colspan="4">
+                        <field name="initiator_id" readonly="True"/>
+                        <field name="job_char" readonly="True"/>
+                        <field name="create_date" readonly="True"/>
+                        <newline />
+                        <separator string="Регламент по времени" />
+                        <newline />
+                        <field name="from_time" />
+                        <field name="to_time" />
+                        <newline />
+                        <separator string="Суть" />
+                        <newline />
+                        <field name="name" />
+                        <field name="comment" />
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Участники">
+                            <field name="participants_ids" mode="tree" nolabel="1" colspan="2">
+                                <tree string="" editable="top">
+                                    <field name="user_id" on_change="get_job(user_id)"/>
+                                    <field name="job_char" />
+                                    <field name="label" />
+                                    <field name="comm" />
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Вопросы к обсуждению">
+                            <field name="questions_ids" mode="tree" nolabel="1" colspan="2">
+                                <tree string="" editable="top">
+                                    <field name="initiator_id" />
+                                    <field name="name" />
+                                    <field name="answer_text" />
+                                    <field name="time_left" />
+                                    <field name="responsible_id" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </form>
+            </field>
+        </record>
+
+
+
+
+        <record id="view_meeting_tree" model="ir.ui.view">
+            <field name="name">Совещание</field>
+            <field name="model">user.meeting</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="id" string="Номер совещания"/>
+                    <field name="name" />
+                    <field name="initiator_id" />
+                    <field name="job_char" />
+                </tree>
+            </field>
+        </record>
+
+        <!--<record id="view_cd_disposition_search" model="ir.ui.view">-->
+            <!--<field name="name">Распоряжения</field>-->
+            <!--<field name="model">cd.disposition</field>-->
+            <!--<field name="type">search</field>-->
+            <!--<field name="arch" type="xml">-->
+                <!--<search>-->
+                    <!--<field name="user_id" />-->
+                    <!--<field name="id" string="Номер распоряжения"/>-->
+                    <!--<field name="disposition_date"/>-->
+                    <!--<field name="line"/>-->
+                    <!--<field name="category_id" />-->
+                    <!--<field name="state" />-->
+                <!--</search>-->
+            <!--</field>-->
+        <!--</record>-->
+
+        <record id="action_meeting" model="ir.actions.act_window">
+            <field name="name">Совещание</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">user.meeting</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_meeting_tree"/>
+            <!--<field name="search_view_id" ref="view_cd_disposition_search"/>-->
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+            <field name="target">inline</field>
+        </record>
+        <menuitem action="action_meeting" id="meeting_menuitem" parent="company_documents.company_notes_list"/>
+    </data>
+</openerp>

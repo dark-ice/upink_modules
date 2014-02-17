@@ -136,6 +136,20 @@
                                 </tree>
                             </field>
                         </page>
+                        <page string="Список ознакомившихся">
+                            <field name="acquainted_ids" colspan="4" nolabel="1" readonly="1">
+                                <tree string="Ознакомившиеся">
+                                    <field name="user_id"/>
+                                    <field name="create_date"/>
+                                </tree>
+                            </field>
+                            <button type="object"
+                                                name="acquainted"
+                                                string="Подтверждение ознакомления"
+                                                icon="STOCK_EDIT"
+                                                context="{'disposition_id': id, 'label': 'add_acquainted'}"
+                                                />
+                        </page>
                     </notebook>
                     <field name="state"
                            widget="statusbar"
@@ -152,10 +166,17 @@
                             />
                     <button type="object"
                             name="save"
+                            string="Утвердить"
+                            context="{'state': 'approval'}"
+                            icon="gtk-go-forward"
+                            attrs="{'invisible': ['|', ('state', '!=', 'agreement'), ('check_a', '=', False)]}"
+                            />
+                    <button type="object"
+                            name="save"
                             string="Опубликовать"
                             context="{'state': 'publish'}"
                             icon="gtk-apply"
-                            attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_f', '=', False)]}"
+                            attrs="{'invisible': ['|', ('state', '!=', 'approval'), ('check_a', '=', False)]}"
                             />
                 </form>
             </field>

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Company Documents',
-    'version': '1.9.5',
+    'version': '1.10.0',
     'category': "Generic Modules",
     'complexity': "easy",
     'description': """
@@ -30,6 +30,9 @@
         'process/helpdesk.xml',
         'process/disposal.xml',
         'company_documents_production_note_workflow.xml',
+        'acquainted_user_report_view.xml',
+        'meeting_view.xml',
+        'questions.xml',
 
     ],
     'demo_xml': [],

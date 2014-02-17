@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_acquainted_user_report_tree">
+            <field name="name">Список ознакомившихся</field>
+            <field name="model">acquainted.user.report</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="doc_id"/>
+                    <field name="user_id"/>
+                    <field name="label"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_acquainted_user_report_search">
+            <field name="name">Список ознакомившихся</field>
+            <field name="model">acquainted.user.report</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="doc_id"/>
+                    <field name="user_id"/>
+                    <field name="label"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="window_acquainted_user_report" model="ir.actions.act_window">
+            <field name="name">Список ознакомившихся</field>
+            <field name="res_model">acquainted.user.report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_acquainted_user_report_tree"/>
+            <field name="search_view_id" ref="view_acquainted_user_report_search"/>
+        </record>
+
+        <menuitem action="window_acquainted_user_report" id="acquainted_user_report_menuitem" name="Список ознакомившихся" parent="company_notes_list"/>
+
+
+    </data>
+</openerp>

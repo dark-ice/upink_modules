@@ -228,9 +228,9 @@
             <field name="search_view_id" ref="view_ink_incidents_search"/>
         </record>
 
-        <menuitem name="Реестр инцидентов" id="incidents" action="action_ink_incidents"
-                  parent="company_documents.company_notes_list" sequence="60"
-                  groups="incidents.user"/>
+        <!--<menuitem name="Реестр инцидентов" id="incidents" action="action_ink_incidents"-->
+                  <!--parent="company_documents.company_notes_list" sequence="60"-->
+                  <!--groups="incidents.user"/>-->
 
         <!-- Note view -->
         <record model="ir.ui.view" id="ink_incidents_comment_view">
