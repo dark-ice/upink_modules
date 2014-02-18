@@ -89,10 +89,10 @@
                             <field name="check_t" />
                             <field name="check_s" />
                         </group>
-                         <field name="category" colspan="2" nolabel="1"/> <newline/>
+                         <field name="category" colspan="2" nolabel="1" attrs="{'invisible': [('check_l', '=', False), ('check_t', '=', False)]}"/> <newline/>
                                 <group colspan="4" col="6">
-                                    <field name="grade_id" colspan="2" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
-                                    <field name="dy_cash" colspan="2" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                                    <field name="grade_id" colspan="2" attrs="{'invisible': [('check_l', '=', False), ('check_t', '=', False)]}"/>
+                                    <field name="dy_cash" colspan="2" attrs="{'invisible': [('check_l', '=', False), ('check_t', '=', False)]}"/>
                                     <button
                                         string="Изменить грейд"
                                         name="%(action_grade_wizard)d"
@@ -103,7 +103,7 @@
                                             'grade_id': grade_id,
                                             'dy_cash': dy_cash
                                         }"
-                                        attrs="{'invisible': [('user_id', '=', 1)]}"
+                                        attrs="{'invisible': [('check_l', '=', False), ('check_t', '=', False)]}"
                                         />
                                 </group>
                     </page>
