@@ -447,10 +447,10 @@
                   parent="menu_company_notes_config"
                 />
 
-        <record id="ir_ui_view_sc_helpdesk" model="ir.ui.view_sc">
-            <field name="name">Helpdesk</field>
-            <field name="resource">ir.ui.menu</field>
-            <field name="res_id" ref="company_documents.help_desk_menuitem"/>
-        </record>
+        <!--<record id="ir_ui_view_sc_helpdesk" model="ir.ui.view_sc">-->
+            <!--<field name="name">Helpdesk</field>-->
+            <!--<field name="resource">ir.ui.menu</field>-->
+            <!--<field name="res_id" ref="company_documents.help_desk_menuitem"/>-->
+        <!--</record>-->
     </data>
 </openerp>
