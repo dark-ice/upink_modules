@@ -5,6 +5,7 @@ from osv import fields, osv
 class hr_department(osv.osv):
     _name = "hr.department"
     _inherit = "hr.department"
+    _order = 'company_id desc'
 
     _columns = {
         'responsible_directors': fields.many2one('res.users', 'Ответственный директор'),

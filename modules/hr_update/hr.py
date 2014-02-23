@@ -87,8 +87,8 @@ class hr_employee(Model):
             'Аттестации',
         ),
         'address_residence_id': fields.many2one('res.partner.address', 'Адрес фактического проживания'),
-        'vehicle': fields.char('Личный транспорт', size=64),
-        'account_number': fields.char('Номер карточного счета', size=250),
+        'vehicle': fields.char('Автомобиль', size=64),
+        'account_number': fields.char('Номер карты', size=250),
         'training_ids': fields.one2many(
             'hr.employee.external.training',
             'employee_id',
@@ -144,8 +144,7 @@ class hr_employee(Model):
             type="boolean",
             invisible=True
         ),
-
-
+        'work_location_place_id': fields.many2one('work.location.place', 'Место расположение офиса'),
     }
     
     _defaults = {
@@ -339,3 +338,12 @@ class HrEmployeeAccess(Model):
         'employee_id': fields.many2one('hr.employee', 'Сотрудник', invisible=True),
     }
 HrEmployeeAccess()
+
+
+class WorkLocationPlace(Model):
+    _name = 'work.location.place'
+    _columns = {
+        'name': fields.char('Место работы', size=128)
+    }
+
+WorkLocationPlace()

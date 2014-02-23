@@ -282,11 +282,12 @@
 
                                 <field name="partner_id" invisible="1" />
                                 <field name="address_id" colspan="2" on_change="onchange_address_id(address_id)" domain="[('partner_id', '=', partner_id)]" attrs="{'readonly': [('check_t', '=', False)]}"/>
-                                <field name="work_phone" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                                <field name="work_phone" attrs="{'readonly': [('check_t', '=', False)]}, {'invisible': True}"/>
                                 <field name="mobile_phone" attrs="{'readonly': [('check_t', '=', False)]}"/>
                                 <field name="work_email" widget="email" attrs="{'readonly': [('check_t', '=', False)]}" />
                                 <field name="work_skype" attrs="{'readonly': [('check_t', '=', False)]}" />
-                                <field name="work_location" attrs="{'invisible': [('check_l', '=', False)], 'readonly': [('check_t', '=', False)]}"/>
+                                <field name="work_location" attrs="{'invisible': True}"/>
+                                <field name="work_location_place_id" />
                             </group>
                             <group col="2" colspan="2">
                                 <separator string="Job Information" colspan="2"/>
