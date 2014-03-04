@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!--planning-->
+        <record model='ir.actions.report.xml' id='ir_actions_report_xml_statistic_user'>
+            <field name='report_type'>aeroo</field>
+            <field name='in_format'>oo-ods</field>
+            <field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/>
+            <field name='multi' eval='True'/>
+            <field name='name'>Отчет по сотрудникам</field>
+            <field name='report_rml'>hr_update/report/UR.ods</field>
+            <field name='report_name'>UR.documents</field>
+            <field name='model'>statistic.user.report</field>
+            <field name='type'>ir.actions.report.xml</field>
+            <field name='attachment_use' eval='False'/>
+            <field name='parser_loc'>hr_update/report/parser.py</field>
+            <field name='tml_source'>file</field>
+            <field name='parser_state'>loc</field>
+            <field name='styles_mode'>default</field>
+        </record>
+
+    </data>
+</openerp>

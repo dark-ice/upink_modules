@@ -21,6 +21,8 @@ Human Resources Update.
         'security/ir.model.access.csv',
         'wizard/view.xml',
         'views/hr_view.xml',
+        'views/statistic_user_report_view.xml',
+        'statistic_user_report.xml'
     ],
     'demo_xml': [],
     'test': [],

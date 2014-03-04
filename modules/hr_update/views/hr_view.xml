@@ -179,6 +179,9 @@
                         <group colspan="2" col="2">
                             <separator string="Личные данные"/>
                             <field name="account_number" />
+                            <field name="bank_name" />
+                            <field name="account_number_2" />
+                            <field name="bank_name_2" />
                             <field name="children" />
                             <field name="babies_ids" colspan="2" nolabel="1">
                                 <tree string="Дети">
@@ -311,6 +314,9 @@
                             <group colspan="2" col="2">
                                 <separator colspan="2" string="Личные данные"/>
                                 <field name="account_number" attrs="{'readonly': [('check_t', '=', False)]}"/>
+                                <field name="bank_name" />
+                                <field name="account_number_2" />
+                                <field name="bank_name_2" />
                                 <field name="children"  attrs="{'readonly': [('check_t', '=', False)]}"/>
                                 <field name="babies_ids" colspan="2" nolabel="1" attrs="{'readonly': [('check_t', '=', False)]}">
                                     <tree string="Дети" editable="top">

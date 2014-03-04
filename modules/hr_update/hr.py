@@ -89,6 +89,9 @@ class hr_employee(Model):
         'address_residence_id': fields.many2one('res.partner.address', 'Адрес фактического проживания'),
         'vehicle': fields.char('Автомобиль', size=64),
         'account_number': fields.char('Номер карты', size=250),
+        'bank_name': fields.char('Название банка', size=128),
+        'account_number_2': fields.char('Номер карты(второй)', size=250),
+        'bank_name_2': fields.char('Название банка(второе)', size=128),
         'training_ids': fields.one2many(
             'hr.employee.external.training',
             'employee_id',

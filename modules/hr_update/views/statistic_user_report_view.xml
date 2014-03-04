@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_statistic_report_tree">
+            <field name="name">Отчет по сотрудникам</field>
+            <field name="model">statistic.user.report</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="id"/>
+                    <field name="active" invisible="True"/>
+                    <field name="name"/>
+                    <field name="category"/>
+                    <field name="grade_name"/>
+                    <field name="direction"/>
+                    <field name="position"/>
+                    <field name="start_date"/>
+                    <field name="probation"/>
+                    <field name="formalized"/>
+                    <field name="account_number"/>
+                    <field name="bank_name"/>
+                    <field name="account_number_2"/>
+                    <field name="bank_name_2"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="view_statistic_user_report_search">
+            <field name="name">Отчет по сотрудникам</field>
+            <field name="model">statistic.user.report</field>
+            <field name="type">search</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="active"/>
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="category"/>
+                    <field name="grade_name"/>
+                    <field name="direction"/>
+                    <field name="position"/>
+                    <field name="start_date"/>
+                    <field name="probation"/>
+                    <field name="formalized"/>
+                    <field name="account_number"/>
+                    <field name="bank_name"/>
+                    <field name="account_number_2"/>
+                    <field name="bank_name_2"/>
+                </search>
+            </field>
+        </record>
+
+
+        <record id="window_statistic_user_report" model="ir.actions.act_window">
+            <field name="name">Отчет по сотрудникам</field>
+            <field name="res_model">statistic.user.report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_statistic_report_tree"/>
+            <!--<field name="search_view_id" ref="view_statistic_user_report_search"/>-->
+        </record>
+
+        <menuitem parent="hr.menu_hr_root" name="Отчет по сотрудникам" sequence="10" id="menu_hr_kpi_root" groups="base.group_user"/>
+        <menuitem action="window_statistic_user_report" id="statistic_user_report_menuitem" name="Отчет по сотрудникам" parent="menu_hr_kpi_root"/>
+    </data>
+</openerp>
