@@ -467,10 +467,11 @@ class KpiSmart(Model):
                 access += 'a'
 
             #  Инициатор
-            if data and data.initiator_id and \
-                    ((data.initiator_id.user_id.id == uid and data.state == 'inwork')
-                     or (empl_pool.get_department_manager(cr, uid, data.initiator_id.id, context).user_id.id == uid and data.state == 'done')):
-                access += 'i'
+            if (empl_pool.get_department_manager(cr, uid, data.initiator_id.id, context)):
+                if data and data.initiator_id and \
+                        ((data.initiator_id.user_id.id == uid and data.state == 'inwork')
+                         or (empl_pool.get_department_manager(cr, uid, data.initiator_id.id, context).user_id.id == uid and data.state == 'done')):
+                    access += 'i'
 
             #  Ответственный
             if data and data.responsible_id and data.responsible_id.user_id.id == uid:
